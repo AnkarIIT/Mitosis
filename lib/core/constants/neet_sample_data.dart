@@ -1,5 +1,38 @@
 import '../models/question_model.dart';
 import '../models/subject_model.dart';
+import '../models/flashcard_model.dart';
+
+// ============= FLASHCARDS =============
+final List<Flashcard> sampleFlashcards = [
+  Flashcard(
+    id: 'f1',
+    front: 'Powerhouse of the cell',
+    back: 'Mitochondria',
+    subject: 'Biology',
+    topicId: 'bio_ch2_t1',
+  ),
+  Flashcard(
+    id: 'f2',
+    front: 'Avogadro\'s number value',
+    back: '6.022 × 10²³',
+    subject: 'Chemistry',
+    topicId: 'chem_ch1_t1',
+  ),
+  Flashcard(
+    id: 'f3',
+    front: 'Unit of Force',
+    back: 'Newton (N)',
+    subject: 'Physics',
+    topicId: 'phys_ch1_t1',
+  ),
+  Flashcard(
+    id: 'f4',
+    front: 'Father of Taxonomy',
+    back: 'Carolus Linnaeus',
+    subject: 'Biology',
+    topicId: 'bio_ch1_t1',
+  ),
+];
 
 // ============= BIOLOGY QUESTIONS =============
 final List<Question> biologyQuestions = [

@@ -1,22 +1,39 @@
 import 'package:drift/drift.dart';
 import 'connection.dart'
     if (dart.library.js_util) 'connection_web.dart'
-    if (dart.library.io) 'connection_native.dart' as conn;
+    if (dart.library.io) 'connection_native.dart'
+    as conn;
 
 import 'tables/question_table.dart';
 import 'tables/quiz_attempts_table.dart';
 import 'tables/topic_progress_table.dart';
 import 'tables/bookmarks_table.dart';
 import 'tables/chats_table.dart';
+import 'tables/daily_goals_table.dart';
+import 'tables/users_table.dart';
 
 part 'drift_database.g.dart';
 
-@DriftDatabase(tables: [Questions, QuizAttempts, TopicProgressEntries, Bookmarks, Chats])
+@DriftDatabase(
+  tables: [
+    Questions,
+    QuizAttempts,
+    TopicProgressEntries,
+    Bookmarks,
+    Chats,
+    DailyGoals,
+    Users,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(conn.connect());
+  static AppDatabase? _instance;
+
+  factory AppDatabase() => _instance ??= AppDatabase._internal();
+
+  AppDatabase._internal() : super(conn.connect());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -41,16 +58,59 @@ class AppDatabase extends _$AppDatabase {
       if (from < 5) {
         await m.createTable(chats);
       }
+      if (from < 6) {
+        await m.createTable(dailyGoals);
+      }
+      if (from < 7) {
+        await m.createTable(users);
+      }
     },
   );
+
+  // ============= USERS =============
+
+  Future<void> registerUser(UsersCompanion user) => into(users).insert(user);
+
+  Future<User?> getUserByEmail(String email) =>
+      (select(users)..where((t) => t.email.equals(email))).getSingleOrNull();
+
+  Future<User?> getUserById(int id) =>
+      (select(users)..where((t) => t.id.equals(id))).getSingleOrNull();
+
+  Future<void> updateLastLogin(int userId) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      const UsersCompanion(lastLogin: Value(null)),
+    );
+  }
+
+  // ============= DAILY GOALS =============
+
+  Future<void> upsertDailyGoal(DailyGoalsCompanion goal) =>
+      into(dailyGoals).insertOnConflictUpdate(goal);
+
+  Future<DailyGoal?> getDailyGoal(DateTime date) async {
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    return (select(
+      dailyGoals,
+    )..where((t) => t.date.equals(dateOnly))).getSingleOrNull();
+  }
+
+  Future<List<DailyGoal>> getDailyGoalsRange(DateTime from, DateTime to) =>
+      (select(dailyGoals)
+            ..where((t) => t.date.isBetween(Variable(from), Variable(to)))
+            ..orderBy([
+              (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc),
+            ]))
+          .get();
 
   // ============= CHATS =============
 
   Future<void> insertChatMessage(ChatsCompanion message) =>
       into(chats).insert(message);
 
-  Future<List<Chat>> getAllChats() =>
-      (select(chats)..orderBy([(t) => OrderingTerm(expression: t.timestamp)])).get();
+  Future<List<Chat>> getAllChats() => (select(
+    chats,
+  )..orderBy([(t) => OrderingTerm(expression: t.timestamp)])).get();
 
   Future<void> clearChatHistory() => delete(chats).go();
 
@@ -59,8 +119,7 @@ class AppDatabase extends _$AppDatabase {
   Future<void> insertQuizAttempt(Insertable<QuizAttempt> attempt) =>
       into(quizAttempts).insert(attempt);
 
-  Future<List<QuizAttempt>> getAllQuizAttempts() =>
-      select(quizAttempts).get();
+  Future<List<QuizAttempt>> getAllQuizAttempts() => select(quizAttempts).get();
 
   Future<List<QuizAttempt>> getQuizAttemptsBySubject(String subjectName) =>
       (select(quizAttempts)..where((t) => t.subject.equals(subjectName))).get();
@@ -73,9 +132,9 @@ class AppDatabase extends _$AppDatabase {
   Future<List<TopicProgressEntry>> getAllTopicProgress() =>
       select(topicProgressEntries).get();
 
-  Future<TopicProgressEntry?> getTopicProgress(String topicId) =>
-      (select(topicProgressEntries)..where((t) => t.topicId.equals(topicId)))
-          .getSingleOrNull();
+  Future<TopicProgressEntry?> getTopicProgress(String topicId) => (select(
+    topicProgressEntries,
+  )..where((t) => t.topicId.equals(topicId))).getSingleOrNull();
 
   // ============= BOOKMARKS =============
 
@@ -85,13 +144,23 @@ class AppDatabase extends _$AppDatabase {
   Future<void> removeBookmark(int questionId) =>
       (delete(bookmarks)..where((t) => t.questionId.equals(questionId))).go();
 
-  Future<List<Bookmark>> getAllBookmarks() =>
-      select(bookmarks).get();
+  Future<List<Bookmark>> getAllBookmarks() => select(bookmarks).get();
 
   Future<bool> isBookmarked(int questionId) async {
-    final result = await (select(bookmarks)
-          ..where((t) => t.questionId.equals(questionId)))
-        .get();
+    final result = await (select(
+      bookmarks,
+    )..where((t) => t.questionId.equals(questionId))).get();
     return result.isNotEmpty;
+  }
+
+  // ============= RESET DATA =============
+
+  Future<void> clearAllProgress() async {
+    await transaction(() async {
+      await delete(quizAttempts).go();
+      await delete(topicProgressEntries).go();
+      await delete(bookmarks).go();
+      await delete(dailyGoals).go();
+    });
   }
 }

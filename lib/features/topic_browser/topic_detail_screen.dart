@@ -27,6 +27,11 @@ class TopicDetailScreen extends ConsumerWidget {
     final isCompleted = progress?.isCompleted ?? false;
     final hasQuestions = questions.isNotEmpty;
 
+    // Record topic view on build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(userProgressProvider.notifier).recordTopicView(topic.id);
+    });
+
     return Scaffold(
       appBar: AppBar(title: Text(topic.name), elevation: 0),
       body: SingleChildScrollView(

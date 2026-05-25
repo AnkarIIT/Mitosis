@@ -1,16 +1,110 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/question_model.dart';
 import '../models/subject_model.dart';
 import '../models/user_progress_model.dart';
+import '../models/flashcard_model.dart';
 import '../constants/neet_sample_data.dart';
 import '../database/drift_database.dart' as db;
 import '../database/question_repository.dart';
 import 'package:drift/drift.dart' show Value;
 import '../services/gemini_chat_service.dart';
+import '../services/auth_service.dart';
+
+// ============= AUTH PROVIDERS =============
+
+final authServiceProvider = Provider<AuthService>((ref) {
+  final database = ref.watch(databaseProvider);
+  return AuthService(database);
+});
+
+class AuthState {
+  final db.User? user;
+  final bool isLoading;
+  final String? error;
+
+  AuthState({
+    this.user,
+    this.isLoading = false,
+    this.error,
+  });
+
+  bool get isLoggedIn => user != null;
+
+  AuthState copyWith({
+    db.User? user,
+    bool? isLoading,
+    String? error,
+  }) {
+    return AuthState(
+      user: user ?? this.user,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
+}
+
+class AuthNotifier extends StateNotifier<AuthState> {
+  final AuthService _authService;
+
+  AuthNotifier(this._authService) : super(AuthState());
+
+  Future<bool> register({
+    required String email,
+    required String username,
+    required String password,
+    String? fullName,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    
+    final result = await _authService.register(
+      email: email,
+      username: username,
+      password: password,
+      fullName: fullName,
+    );
+
+    if (result.success) {
+      state = state.copyWith(isLoading: false, user: result.user);
+      return true;
+    } else {
+      state = state.copyWith(isLoading: false, error: result.message);
+      return false;
+    }
+  }
+
+  Future<bool> login({
+    required String email,
+    required String password,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    
+    final result = await _authService.login(
+      email: email,
+      password: password,
+    );
+
+    if (result.success) {
+      state = state.copyWith(isLoading: false, user: result.user);
+      return true;
+    } else {
+      state = state.copyWith(isLoading: false, error: result.message);
+      return false;
+    }
+  }
+
+  void logout() {
+    state = AuthState();
+  }
+}
+
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  final authService = ref.watch(authServiceProvider);
+  return AuthNotifier(authService);
+});
 
 // ============= SUBJECT & CONTENT PROVIDERS =============
 
@@ -49,6 +143,17 @@ final topicsProvider = Provider.family<List<Topic>, String>((ref, chapterId) {
     }
   }
   return [];
+});
+
+// ============= FLASHCARD PROVIDERS =============
+
+final flashcardsProvider = Provider<List<Flashcard>>((ref) {
+  return sampleFlashcards;
+});
+
+final flashcardsForSubjectProvider = Provider.family<List<Flashcard>, String>((ref, subject) {
+  final all = ref.watch(flashcardsProvider);
+  return all.where((f) => f.subject == subject).toList();
 });
 
 // ============= QUESTION PROVIDERS =============
@@ -353,6 +458,39 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     state = state.copyWith(topicProgress: updated);
   }
 
+  // Track when a topic is viewed/studied
+  Future<void> recordTopicView(String topicId) async {
+    final existing = state.topicProgress[topicId];
+    
+    final updated = UserProgress(
+      topicId: topicId,
+      questionsAttempted: existing?.questionsAttempted ?? 0,
+      questionsCorrect: existing?.questionsCorrect ?? 0,
+      timeSpentSeconds: (existing?.timeSpentSeconds ?? 0) + 60, // Add 1 min for viewing
+      lastAttempted: DateTime.now(),
+      isCompleted: existing?.isCompleted ?? false,
+    );
+
+    // Update in-memory
+    final updatedMap = {...state.topicProgress, topicId: updated};
+    state = state.copyWith(topicProgress: updatedMap);
+
+    // Persist to database
+    try {
+      await _db.upsertTopicProgress(db.TopicProgressEntriesCompanion.insert(
+        topicId: topicId,
+        questionsAttempted: Value(updated.questionsAttempted),
+        questionsCorrect: Value(updated.questionsCorrect),
+        timeSpentSeconds: Value(updated.timeSpentSeconds),
+        lastAttempted: DateTime.now(),
+        isCompleted: Value(updated.isCompleted),
+      ));
+      debugPrint('✅ Topic view recorded: $topicId');
+    } catch (e) {
+      debugPrint('❌ Error recording topic view: $e');
+    }
+  }
+
   double getTopicAccuracy(String topicId) {
     final progress = state.topicProgress[topicId];
     return progress?.accuracy ?? 0.0;
@@ -360,6 +498,11 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
 
   bool isTopicCompleted(String topicId) {
     return state.topicProgress[topicId]?.isCompleted ?? false;
+  }
+
+  Future<void> clearAllProgress() async {
+    await _db.clearAllProgress();
+    state = UserProgressState(isLoaded: true);
   }
 }
 
@@ -503,23 +646,117 @@ final recentActivityProvider = Provider<List<QuizAttempt>>((ref) {
   return attempts.take(10).toList();
 });
 
-// Tracks daily question target
-final dailyGoalProvider = Provider((ref) {
-  final progress = ref.watch(userProgressProvider);
-  const target = 50;
+// Daily goal notifier - persistent storage
+class DailyGoalNotifier extends StateNotifier<Map<String, dynamic>> {
+  final db.AppDatabase _db;
 
-  final today = DateTime.now();
-  final todayAttempts = progress.quizAttempts.where((a) {
-    return a.attemptedAt.year == today.year &&
-        a.attemptedAt.month == today.month &&
-        a.attemptedAt.day == today.day;
-  });
+  DailyGoalNotifier(this._db) : super({
+    'target': 50,
+    'completed': 0,
+    'percent': 0.0,
+    'date': DateTime.now(),
+  }) {
+    _loadTodayGoal();
+  }
 
-  final completed = todayAttempts.fold(0, (sum, a) => sum + a.totalQuestions);
+  Future<void> _loadTodayGoal() async {
+    final today = DateTime.now();
+    final dateOnly = DateTime(today.year, today.month, today.day);
+    
+    try {
+      final goal = await _db.getDailyGoal(dateOnly);
+      if (goal != null) {
+        state = {
+          'target': goal.target,
+          'completed': goal.completed,
+          'percent': (goal.completed / goal.target).clamp(0.0, 1.0),
+          'date': goal.date,
+          'status': goal.status,
+        };
+      } else {
+        // Create default goal for today
+        await _db.upsertDailyGoal(
+          db.DailyGoalsCompanion(
+            date: Value(dateOnly),
+            target: const Value(50),
+            completed: const Value(0),
+            status: const Value('pending'),
+          ),
+        );
+        state = {
+          'target': 50,
+          'completed': 0,
+          'percent': 0.0,
+          'date': dateOnly,
+          'status': 'pending',
+        };
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading daily goal: $e');
+    }
+  }
 
-  return {
-    'target': target,
-    'completed': completed,
-    'percent': (completed / target).clamp(0.0, 1.0),
-  };
+  Future<void> updateDailyGoal(int completed) async {
+    final today = DateTime.now();
+    final dateOnly = DateTime(today.year, today.month, today.day);
+    
+    try {
+      await _db.upsertDailyGoal(
+        db.DailyGoalsCompanion(
+          date: Value(dateOnly),
+          target: Value(state['target'] as int),
+          completed: Value(completed),
+          status: Value(completed >= (state['target'] as int) ? 'completed' : 'in_progress'),
+        ),
+      );
+      
+      state = {
+        'target': state['target'],
+        'completed': completed,
+        'percent': (completed / (state['target'] as int)).clamp(0.0, 1.0),
+        'date': dateOnly,
+        'status': completed >= (state['target'] as int) ? 'completed' : 'in_progress',
+      };
+      debugPrint('✅ Daily goal updated: $completed/${state['target']}');
+    } catch (e) {
+      debugPrint('❌ Error updating daily goal: $e');
+    }
+  }
+
+  Future<void> resetGoal() async {
+    await _loadTodayGoal();
+  }
+}
+
+final dailyGoalProvider = StateNotifierProvider<DailyGoalNotifier, Map<String, dynamic>>((ref) {
+  final database = ref.watch(databaseProvider);
+  return DailyGoalNotifier(database);
+});
+
+// ============= THEME PROVIDER =============
+
+class ThemeNotifier extends StateNotifier<ThemeMode> {
+  ThemeNotifier() : super(ThemeMode.light) {
+    _loadTheme();
+  }
+
+  static const _themeKey = 'theme_mode';
+
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    final themeIndex = prefs.getInt(_themeKey);
+    if (themeIndex != null) {
+      state = ThemeMode.values[themeIndex];
+    }
+  }
+
+  Future<void> toggleTheme(bool isDark) async {
+    state = isDark ? ThemeMode.dark : ThemeMode.light;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_themeKey, state.index);
+  }
+}
+
+final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
+  return ThemeNotifier();
 });

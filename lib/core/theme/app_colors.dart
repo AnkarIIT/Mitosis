@@ -12,11 +12,17 @@ class AppColors {
   static const Color background = Color(0xFFF9F9F9); // Slightly off-white for depth
   static const Color surface = Color(0xFFFFFFFF);
   static const Color cardBg = Color(0xFFFFFFFF);
+
+  // Dark Mode Background and Surfaces
+  static const Color backgroundDark = Color(0xFF0F172A); // Deep Navy/Slate 900
+  static const Color surfaceDark = Color(0xFF1E293B);    // Slate 800
+  static const Color cardBgDark = Color(0xFF1E293B);
   
   // Text colors
   static const Color textDark = Color(0xFF1E293B); // Slate 800
   static const Color textLight = Color(0xFFFFFFFF);
   static const Color textSubtle = Color(0xFF64748B); // Slate 500
+  static const Color textDarkSubtle = Color(0xFF94A3B8); // Slate 400
 
   // Status/Utility colors
   static const Color success = Color(0xFF10B981); // Emerald 500
@@ -33,4 +39,5 @@ class AppColors {
 
   // Borders & Dividers
   static const Color divider = Color(0xFFE2E8F0); // Slate 200
+  static const Color dividerDark = Color(0xFF334155); // Slate 700
 }

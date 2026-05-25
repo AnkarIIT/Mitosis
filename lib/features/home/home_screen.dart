@@ -8,6 +8,9 @@ import '../bookmarks/bookmarks_dashboard.dart';
 import '../chatbot/chatbot_screen.dart';
 import '../test_series/test_series_screen.dart';
 import '../study_plan/study_plan_screen.dart';
+import '../settings/settings_screen.dart';
+import '../flashcards/flashcard_screen.dart';
+import '../profile/profile_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -32,6 +35,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         centerTitle: false,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Center(
@@ -70,10 +82,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: _selectedIndex == 0
           ? _buildSubjectScreen(context, subjects)
           : _selectedIndex == 1
-          ? const ProgressDashboard()
+          ? const FlashcardScreen()
           : _selectedIndex == 2
+          ? const ChatbotScreen()
+          : _selectedIndex == 3
+          ? const ProgressDashboard()
+          : _selectedIndex == 4
           ? const BookmarksDashboard()
-          : const ChatbotScreen(),
+          : const ProfileScreen(),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
@@ -85,6 +101,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Learn'),
           BottomNavigationBarItem(
+            icon: Icon(Icons.style),
+            label: 'Cards',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.smart_toy),
+            label: 'AI Tutor',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.trending_up),
             label: 'Progress',
           ),
@@ -93,8 +117,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             label: 'Bookmarks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.smart_toy),
-            label: 'AI Tutor',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),
@@ -210,6 +234,99 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
           ).animate().fade(delay: 150.ms).slideX(begin: 0.1, end: 0),
+
+          const SizedBox(height: 24),
+
+          // Practice tests section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withValues(alpha: 0.14),
+                  AppColors.primary.withValues(alpha: 0.08),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.18),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Practice Tests',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textDark,
+                                ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Full mock tests, subject drills, and daily practice sets — all in one place.',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: AppColors.secondary,
+                                  height: 1.4,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(
+                        Icons.quiz_outlined,
+                        color: AppColors.primary,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TestSeriesScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.assignment_turned_in, size: 18),
+                    label: const Text('Open Test Series'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.textLight,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ).animate().fade(delay: 180.ms).slideY(begin: 0.06, end: 0),
 
           const SizedBox(height: 32),
 
