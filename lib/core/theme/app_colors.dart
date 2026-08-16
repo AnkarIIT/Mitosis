@@ -12,6 +12,7 @@ class AppColors {
   static const Color background = Color(0xFFF9F9F9); // Slightly off-white for depth
   static const Color surface = Color(0xFFFFFFFF);
   static const Color cardBg = Color(0xFFFFFFFF);
+  static const Color surfaceWarm = Color(0xFFFDFBF7); // Warm beige for "Distraction-Free" reading
 
   // Dark Mode Background and Surfaces
   static const Color backgroundDark = Color(0xFF0F172A); // Deep Navy/Slate 900
@@ -40,4 +41,35 @@ class AppColors {
   // Borders & Dividers
   static const Color divider = Color(0xFFE2E8F0); // Slate 200
   static const Color dividerDark = Color(0xFF334155); // Slate 700
+
+  // Adaptive Color Helpers for Dynamic Dark/Light Mode
+  static Color adaptiveBackground(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? backgroundDark
+        : background;
+  }
+
+  static Color adaptiveSurface(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? surfaceDark
+        : surface;
+  }
+
+  static Color adaptiveText(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? textLight
+        : textDark;
+  }
+
+  static Color adaptiveSubtleText(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? textDarkSubtle
+        : textSubtle;
+  }
+
+  static Color adaptiveDivider(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? dividerDark
+        : divider;
+  }
 }
