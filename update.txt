@@ -1,0 +1,10 @@
+Mark Booster hardened. Changes:
+Mastery feedback loop (the core fix)
+- providers.dart — _updateTopicProgressFromAttempt rewritten to credit each drill question to its own topicId (via new MarkBoosterService.aggregateTopicResults), so booster drills now genuinely raise weak-topic accuracy instead of being inert. Time is apportioned per topic. Single-topic behavior unchanged.
+Progress-until-mastery
+- mark_booster_model.dart — WeakTopicDiagnosis.masteryProgress (accuracy → 60% clamp), new MasteredTopic.
+- markBoosterDiagnosisProvider — classifies every syllabus topic: mastered (≥5 attempts, ≥60%) vs weak (<60%, ≥2 attempts).
+- UI — weak-topic cards now show a bar to the 60% mastery line with "X% of the way to 60% mastery"; hero card adds mastered count; new green "Mastered" section.
+Drill history
+- MarkBoosterService.extractBoosterSessions pulls persisted booster attempts (newest first), rendered as a "Drill History" section with date, score, accuracy, NEET score. Session auto-records via the existing quiz pipeline.
+Verification: flutter analyze clean; 30 tests pass (14 mark-booster engine tests incl. aggregation, mastery, session extraction).
