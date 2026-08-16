@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -13,12 +14,14 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _targetScoreController = TextEditingController();
   bool _isEditing = false;
+  int _targetScore = 650;
+
+  static const _targetScoreKey = 'neet_target_score';
 
   @override
   void initState() {
     super.initState();
-    // Default or load from prefs
-    _targetScoreController.text = "650";
+    _loadTargetScore();
   }
 
   @override
@@ -27,23 +30,52 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.dispose();
   }
 
+  Future<void> _loadTargetScore() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedTarget = prefs.getInt(_targetScoreKey) ?? 650;
+
+    if (!mounted) return;
+
+    setState(() {
+      _targetScore = savedTarget;
+      _targetScoreController.text = savedTarget.toString();
+    });
+  }
+
+  Future<void> _saveTargetScore() async {
+    final parsed = int.tryParse(_targetScoreController.text.trim());
+    final nextTarget = parsed ?? _targetScore;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_targetScoreKey, nextTarget);
+
+    if (!mounted) return;
+
+    setState(() {
+      _targetScore = nextTarget;
+      _isEditing = false;
+      _targetScoreController.text = nextTarget.toString();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(overallStatsProvider);
     final authState = ref.watch(authProvider);
+    final currentAccuracy = (stats['accuracy'] as double);
+    final progress = _targetScore == 0
+        ? 0.0
+        : (currentAccuracy / _targetScore).clamp(0.0, 1.0);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Student Profile'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Student Profile'), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             _buildProfileHeader(authState),
             const SizedBox(height: 32),
-            _buildTargetScoreCard(),
+            _buildTargetScoreCard(currentAccuracy, progress),
             const SizedBox(height: 24),
             _buildAchievementSection(stats),
             const SizedBox(height: 24),
@@ -71,7 +103,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 radius: 20,
                 backgroundColor: AppColors.secondary,
                 child: IconButton(
-                  icon: const Icon(Icons.edit, size: 18, color: AppColors.primary),
+                  icon: const Icon(
+                    Icons.edit,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
                   onPressed: () {},
                 ),
               ),
@@ -91,7 +127,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildTargetScoreCard() {
+  Widget _buildTargetScoreCard(double currentAccuracy, double progress) {
     return Card(
       elevation: 0,
       color: AppColors.primary.withValues(alpha: 0.05),
@@ -111,17 +147,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   children: [
                     Text(
                       'NEET Target Score',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     Text(
                       'Aim high, work hard',
-                      style: TextStyle(fontSize: 12, color: AppColors.textSubtle),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSubtle,
+                      ),
                     ),
                   ],
                 ),
                 if (!_isEditing)
                   Text(
-                    _targetScoreController.text,
+                    _targetScore.toString(),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -137,14 +179,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       autofocus: true,
                       textAlign: TextAlign.center,
                       decoration: const InputDecoration(isDense: true),
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
               ],
             ),
             const SizedBox(height: 16),
             LinearProgressIndicator(
-              value: 0.6, // Mock value
+              value: progress,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
               valueColor: const AlwaysStoppedAnimation(AppColors.primary),
               borderRadius: BorderRadius.circular(10),
@@ -154,9 +199,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Current Est: 420', style: TextStyle(fontSize: 12)),
+                Text(
+                  'Current Est: ${currentAccuracy.toStringAsFixed(0)}',
+                  style: const TextStyle(fontSize: 12),
+                ),
                 TextButton(
-                  onPressed: () => setState(() => _isEditing = !_isEditing),
+                  onPressed: () async {
+                    if (_isEditing) {
+                      await _saveTargetScore();
+                      return;
+                    }
+
+                    setState(() => _isEditing = true);
+                  },
                   child: Text(_isEditing ? 'SAVE' : 'UPDATE GOAL'),
                 ),
               ],
@@ -179,7 +234,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildBadge(Icons.local_fire_department, '3 Day Streak', Colors.orange),
+            _buildBadge(
+              Icons.local_fire_department,
+              '3 Day Streak',
+              Colors.orange,
+            ),
             _buildBadge(Icons.verified, 'Quick Learner', Colors.blue),
             _buildBadge(Icons.emoji_events, '70% Accuracy', Colors.amber),
           ],
@@ -218,10 +277,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       crossAxisSpacing: 16,
       childAspectRatio: 1.5,
       children: [
-        _buildStatCard('Total Solved', '${stats['totalAttempted']}', Icons.check_circle_outline),
-        _buildStatCard('Accuracy', '${(stats['accuracy'] as double).toStringAsFixed(1)}%', Icons.track_changes),
+        _buildStatCard(
+          'Total Solved',
+          '${stats['totalAttempted']}',
+          Icons.check_circle_outline,
+        ),
+        _buildStatCard(
+          'Accuracy',
+          '${(stats['accuracy'] as double).toStringAsFixed(1)}%',
+          Icons.track_changes,
+        ),
         _buildStatCard('Quizzes', '${stats['quizCount']}', Icons.quiz_outlined),
-        _buildStatCard('Topics Done', '${stats['topicsCompleted']}', Icons.menu_book),
+        _buildStatCard(
+          'Topics Done',
+          '${stats['topicsCompleted']}',
+          Icons.menu_book,
+        ),
       ],
     );
   }
@@ -240,8 +311,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           children: [
             Icon(icon, size: 20, color: AppColors.primary),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSubtle)),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 11, color: AppColors.textSubtle),
+            ),
           ],
         ),
       ),

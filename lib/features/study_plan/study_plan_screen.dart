@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/models/subject_model.dart';
+import '../../core/models/user_preferences_model.dart';
 import '../topic_browser/topic_detail_screen.dart';
 
 class StudyPlanScreen extends ConsumerWidget {
@@ -10,37 +12,106 @@ class StudyPlanScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weakTopics = ref.watch(weakTopicsProvider);
+    final weakTopics = ref.watch(studyPlanTopicsProvider);
     final dailyGoal = ref.watch(dailyGoalProvider);
+    final prefs = ref.watch(userPreferencesProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.adaptiveBackground(context),
       appBar: AppBar(
         title: const Text('Study Planner'),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: AppColors.adaptiveText(context)),
+        titleTextStyle: TextStyle(
+          color: AppColors.adaptiveText(context),
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildStreakBanner(context, ref),
+            const SizedBox(height: 24),
             _buildDailyGoalStatus(context, dailyGoal),
             const SizedBox(height: 24),
-            _buildSmartStudyPlan(context, weakTopics),
+            _buildSmartStudyPlan(context, weakTopics, prefs),
             const SizedBox(height: 24),
-            _buildUpcomingMilestones(context),
+            _buildUpcomingMilestones(context, ref),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDailyGoalStatus(BuildContext context, Map<String, dynamic> goal) {
+  Widget _buildStreakBanner(BuildContext context, WidgetRef ref) {
+    final progress = ref.watch(userProgressProvider);
+    final streak = progress.currentStreak;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.orange.shade400, Colors.orange.shade700],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.local_fire_department,
+            color: Colors.white,
+            size: 40,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$streak Day Study Streak!',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                const Text(
+                  'Keep it up! You\'re building a powerful habit.',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDailyGoalStatus(
+    BuildContext context,
+    Map<String, dynamic> goal,
+  ) {
     final percent = goal['percent'] as double;
     final completed = goal['completed'] as int;
     final target = goal['target'] as int;
 
     return Card(
       elevation: 0,
+      color: AppColors.adaptiveSurface(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
@@ -52,9 +123,13 @@ class StudyPlanScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Today\'s Goal',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: AppColors.adaptiveText(context),
+                  ),
                 ),
                 Text(
                   '${(percent * 100).toInt()}% Done',
@@ -72,13 +147,15 @@ class StudyPlanScreen extends ConsumerWidget {
                 value: percent,
                 minHeight: 12,
                 backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                valueColor: AlwaysStoppedAnimation(percent >= 1.0 ? Colors.green : AppColors.primary),
+                valueColor: AlwaysStoppedAnimation(
+                  percent >= 1.0 ? Colors.green : AppColors.primary,
+                ),
               ),
             ),
             const SizedBox(height: 16),
             Text(
               '$completed of $target questions solved today',
-              style: const TextStyle(color: AppColors.secondary),
+              style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
             ),
           ],
         ),
@@ -86,22 +163,41 @@ class StudyPlanScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSmartStudyPlan(BuildContext context, List<Topic> weakTopics) {
+  Widget _buildSmartStudyPlan(
+    BuildContext context,
+    List<Topic> weakTopics,
+    UserPreferences prefs,
+  ) {
+    final batchSubtitle = prefs.batch != null
+        ? 'Your ${prefs.batch} syllabus • '
+              '${prefs.dailyCommitmentMinutes ?? 60} min/day • focus on these topics:'
+        : 'Based on your performance, focus on these topics today:';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Smart Study Plan',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: AppColors.adaptiveText(context),
+          ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Based on your performance, focus on these topics today:',
-          style: TextStyle(color: AppColors.secondary, fontSize: 14),
+        Text(
+          batchSubtitle,
+          style: TextStyle(
+            color: AppColors.adaptiveSubtleText(context),
+            fontSize: 14,
+          ),
         ),
         const SizedBox(height: 16),
         if (weakTopics.isEmpty)
-          _buildEmptyState(context, 'You\'re doing great! Keep practicing to identify focus areas.')
+          _buildEmptyState(
+            context,
+            'You\'re doing great! Keep practicing to identify focus areas.',
+          )
         else
           ListView.builder(
             shrinkWrap: true,
@@ -120,9 +216,10 @@ class StudyPlanScreen extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
+      color: AppColors.adaptiveSurface(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.divider),
+        side: BorderSide(color: AppColors.adaptiveDivider(context)),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -136,10 +233,20 @@ class StudyPlanScreen extends ConsumerWidget {
         ),
         title: Text(
           topic.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.adaptiveText(context),
+          ),
         ),
-        subtitle: const Text('Accuracy < 50% • Recommended: 10 Questions'),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+        subtitle: Text(
+          'Accuracy < 50% • Recommended: 10 Questions',
+          style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: AppColors.adaptiveSubtleText(context),
+        ),
         onTap: () {
           Navigator.push(
             context,
@@ -156,32 +263,61 @@ class StudyPlanScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUpcomingMilestones(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Milestones',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        const SizedBox(height: 16),
-        _buildMilestoneCard(
-          context,
-          title: 'NEET 2026 Countdown',
-          subtitle: '342 Days Remaining',
-          icon: Icons.event,
-          color: Colors.blue,
-        ),
-        const SizedBox(height: 12),
-        _buildMilestoneCard(
-          context,
-          title: 'Streak Hunter',
-          subtitle: '3 Day Current Streak',
-          icon: Icons.local_fire_department,
-          color: Colors.orange,
-        ),
-      ],
+  Widget _buildUpcomingMilestones(BuildContext context, WidgetRef ref) {
+    final progress = ref.watch(userProgressProvider);
+    final streak = progress.currentStreak;
+    final stats = ref.watch(overallStatsProvider);
+    final accuracy = stats['accuracy'] as double;
+
+    return FutureBuilder<int>(
+      future: _loadTargetScore(),
+      builder: (context, snapshot) {
+        final targetScore = snapshot.data ?? 650;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Milestones',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: AppColors.adaptiveText(context),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildMilestoneCard(
+              context,
+              title: 'Target Score',
+              subtitle: '$targetScore points goal',
+              icon: Icons.flag,
+              color: Colors.teal,
+            ),
+            const SizedBox(height: 12),
+            _buildMilestoneCard(
+              context,
+              title: 'Current Accuracy',
+              subtitle: '${accuracy.toStringAsFixed(0)}% accuracy',
+              icon: Icons.track_changes,
+              color: Colors.blue,
+            ),
+            const SizedBox(height: 12),
+            _buildMilestoneCard(
+              context,
+              title: 'Streak Hunter',
+              subtitle: '$streak Day Current Streak',
+              icon: Icons.local_fire_department,
+              color: Colors.orange,
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  Future<int> _loadTargetScore() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('neet_target_score') ?? 650;
   }
 
   Widget _buildMilestoneCard(
@@ -205,7 +341,13 @@ class StudyPlanScreen extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.adaptiveText(context),
+                ),
+              ),
               Text(subtitle, style: TextStyle(color: color, fontSize: 12)),
             ],
           ),
@@ -219,9 +361,9 @@ class StudyPlanScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.adaptiveSurface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: AppColors.adaptiveDivider(context)),
       ),
       child: Column(
         children: [
@@ -230,7 +372,7 @@ class StudyPlanScreen extends ConsumerWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.secondary),
+            style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
           ),
         ],
       ),

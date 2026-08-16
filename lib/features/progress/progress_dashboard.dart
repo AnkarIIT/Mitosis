@@ -4,6 +4,7 @@ import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../topic_browser/topic_detail_screen.dart';
+import '../../core/utils/rank_predictor.dart';
 
 class ProgressDashboard extends ConsumerWidget {
   const ProgressDashboard({super.key});
@@ -15,10 +16,13 @@ class ProgressDashboard extends ConsumerWidget {
     final recentActivity = ref.watch(recentActivityProvider);
     final weakTopics = ref.watch(weakTopicsProvider);
     final dailyGoal = ref.watch(dailyGoalProvider);
+    final mockStats = ref.watch(mockTestStatsProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.surfaceWarm,
       appBar: AppBar(
         title: const Text('Your Progress'),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
@@ -123,6 +127,10 @@ class ProgressDashboard extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+
+            // Rank Predictor Card
+            _buildRankPredictor(context, stats['accuracy'] as double, mockStats),
             const SizedBox(height: 32),
 
             // Recent Quizzes Chart
@@ -469,6 +477,107 @@ class ProgressDashboard extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRankPredictor(BuildContext context, double accuracy, Map<String, dynamic> mockStats) {
+    final bool hasMock = mockStats['hasMockTests'] as bool;
+    final int estimatedScore = hasMock 
+        ? mockStats['highestScore'] as int 
+        : (accuracy / 100 * 720).toInt();
+    
+    final predictedRank = RankPredictor.predictRank(estimatedScore);
+    final percentile = RankPredictor.getPercentile(estimatedScore);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.analytics_outlined, color: AppColors.primary, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'NEET Rank Predictor',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+              if (hasMock)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Based on Mocks',
+                    style: TextStyle(fontSize: 10, color: AppColors.success, fontWeight: FontWeight.bold),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    hasMock ? 'Highest Mock Score' : 'Estimated Score',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  Text(
+                    '$estimatedScore / 720',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Predicted AIR',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  Text(
+                    '~${predictedRank.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.primary),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Current Percentile: $percentile',
+                style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: AppColors.secondary),
+              ),
+              if (!hasMock)
+                const Text(
+                  '*Based on topic accuracy',
+                  style: TextStyle(fontSize: 10, color: AppColors.textSubtle),
+                ),
+            ],
           ),
         ],
       ),
