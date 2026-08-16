@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Question {
   final int id;
   final String subject;
@@ -13,6 +15,8 @@ class Question {
   final String difficulty;
   final List<String> tags;
   final String? imageUrl;
+  final String type;
+  final DateTime createdAt;
 
   Question({
     required this.id,
@@ -26,27 +30,71 @@ class Question {
     this.explanation,
     this.ncertReference,
     this.year,
-    this.difficulty = "Medium",
-    this.tags = const [],
+    required this.difficulty,
+    required this.tags,
     this.imageUrl,
-  });
+    required this.type,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'subject': subject,
+      'chapter': chapter,
+      'topic': topic,
+      'topicId': topicId,
+      'questionText': questionText,
+      'options': jsonEncode(options),
+      'correctAnswer': correctAnswer,
+      'explanation': explanation,
+      'ncertReference': ncertReference,
+      'year': year,
+      'difficulty': difficulty,
+      'tags': jsonEncode(tags),
+      'imageUrl': imageUrl,
+      'type': type,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
 
   factory Question.fromMap(Map<String, dynamic> map) {
     return Question(
-      id: map['id'] as int,
-      subject: map['subject'] as String,
-      chapter: map['chapter'] as String,
-      topic: map['topic'] as String,
-      topicId: map['topicId'] as String? ?? '',
-      questionText: map['questionText'] as String,
-      options: (map['options'] as String).split('|||'),
-      correctAnswer: map['correctAnswer'] as String,
-      explanation: map['explanation'] as String?,
-      ncertReference: map['ncertReference'] as String?,
-      year: map['year'] as int?,
-      difficulty: map['difficulty'] as String,
-      tags: (map['tags'] as String?)?.split('|||') ?? [],
-      imageUrl: map['imageUrl'] as String?,
+      id: map['id'] is String ? int.parse(map['id']) : map['id'],
+      subject: map['subject'] ?? '',
+      chapter: map['chapter'] ?? '',
+      topic: map['topic'] ?? '',
+      topicId: map['topicId'] ?? '',
+      questionText: map['questionText'] ?? '',
+      options: map['options'] is String
+          ? Question._decodeList(map['options'])
+          : List<String>.from(map['options'] ?? []),
+      correctAnswer: map['correctAnswer'] ?? '',
+      explanation: map['explanation'],
+      ncertReference: map['ncertReference'],
+      year: map['year'],
+      difficulty: map['difficulty'] ?? 'Medium',
+      tags: map['tags'] is String
+          ? Question._decodeList(map['tags'])
+          : List<String>.from(map['tags'] ?? []),
+      imageUrl: map['imageUrl'],
+      type: map['type'] ?? 'mcq',
+      createdAt: DateTime.tryParse(map['createdAt'] ?? '') ?? DateTime.now(),
     );
+  }
+
+  static List<String> _decodeList(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded.map((e) => e.toString()).toList();
+      }
+    } on FormatException {
+      // Fall through to the deprecated '|||' separator format.
+    }
+    return raw
+        .split('|||')
+        .where((e) => e.isNotEmpty)
+        .toList();
   }
 }

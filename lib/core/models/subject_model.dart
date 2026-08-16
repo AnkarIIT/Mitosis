@@ -39,6 +39,8 @@ class Topic {
   final String name;
   final String chapterId;
   final String? description;
+  final String? summary; // Detailed NCERT summary
+  final List<String>? keyPoints; // Bullet points for quick revision
   final int weight;
   final int questionCount;
   final String difficulty;
@@ -48,6 +50,8 @@ class Topic {
     required this.name,
     required this.chapterId,
     this.description,
+    this.summary,
+    this.keyPoints,
     this.weight = 1,
     required this.questionCount,
     this.difficulty = "Mixed",

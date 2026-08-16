@@ -1,16 +1,16 @@
-class UserProgress {
+class TopicProgress {
   final String topicId;
   final int questionsAttempted;
   final int questionsCorrect;
-  final int timeSpentSeconds;
+  final double averageTimeSeconds;
   final DateTime lastAttempted;
   final bool isCompleted;
 
-  UserProgress({
+  TopicProgress({
     required this.topicId,
     required this.questionsAttempted,
     required this.questionsCorrect,
-    required this.timeSpentSeconds,
+    required this.averageTimeSeconds,
     required this.lastAttempted,
     this.isCompleted = false,
   });
@@ -19,25 +19,53 @@ class UserProgress {
       ? 0
       : (questionsCorrect / questionsAttempted) * 100;
 
-  factory UserProgress.fromMap(Map<String, dynamic> map) {
-    return UserProgress(
+  factory TopicProgress.fromMap(Map<String, dynamic> map) {
+    return TopicProgress(
       topicId: map['topicId'] as String,
       questionsAttempted: map['questionsAttempted'] as int,
       questionsCorrect: map['questionsCorrect'] as int,
-      timeSpentSeconds: map['timeSpentSeconds'] as int,
-      lastAttempted: DateTime.parse(map['lastAttempted'] as String),
-      isCompleted: map['isCompleted'] as bool,
+      averageTimeSeconds: map['averageTimeSeconds'] as double,
+      lastAttempted: map['lastAttempted'] as DateTime,
+      isCompleted: map['isCompleted'] as bool? ?? false,
     );
   }
+}
 
-  Map<String, dynamic> toMap() => {
-    'topicId': topicId,
-    'questionsAttempted': questionsAttempted,
-    'questionsCorrect': questionsCorrect,
-    'timeSpentSeconds': timeSpentSeconds,
-    'lastAttempted': lastAttempted.toIso8601String(),
-    'isCompleted': isCompleted,
-  };
+class UserProgress {
+  final Map<String, TopicProgress> topicProgress;
+  final List<QuizAttempt> quizAttempts;
+  final int totalQuestionsAttempted;
+  final int questionsCorrect;
+  final int currentStreak;
+  final DateTime? lastActivityDate;
+
+  UserProgress({
+    this.topicProgress = const {},
+    this.quizAttempts = const [],
+    this.totalQuestionsAttempted = 0,
+    this.questionsCorrect = 0,
+    this.currentStreak = 0,
+    this.lastActivityDate,
+  });
+
+  UserProgress copyWith({
+    Map<String, TopicProgress>? topicProgress,
+    List<QuizAttempt>? quizAttempts,
+    int? totalQuestionsAttempted,
+    int? questionsCorrect,
+    int? currentStreak,
+    DateTime? lastActivityDate,
+  }) {
+    return UserProgress(
+      topicProgress: topicProgress ?? this.topicProgress,
+      quizAttempts: quizAttempts ?? this.quizAttempts,
+      totalQuestionsAttempted:
+          totalQuestionsAttempted ?? this.totalQuestionsAttempted,
+      questionsCorrect: questionsCorrect ?? this.questionsCorrect,
+      currentStreak: currentStreak ?? this.currentStreak,
+      lastActivityDate: lastActivityDate ?? this.lastActivityDate,
+    );
+  }
 }
 
 class QuizAttempt {
@@ -46,7 +74,8 @@ class QuizAttempt {
   final String subject;
   final String testType; // 'topic', 'chapter', 'subject', 'mock'
   final Map<String, int>? subjectScores; // For mock tests: { 'Biology': 45, ... }
-  final int score;
+  final int score; // Number of correct answers
+  final int incorrectCount; // Number of incorrect answers
   final int totalQuestions;
   final int timeSpentSeconds;
   final DateTime attemptedAt;
@@ -59,11 +88,19 @@ class QuizAttempt {
     this.testType = 'topic',
     this.subjectScores,
     required this.score,
+    required this.incorrectCount,
     required this.totalQuestions,
     required this.timeSpentSeconds,
     required this.attemptedAt,
     required this.selectedAnswers,
   });
 
-  double get accuracy => totalQuestions == 0 ? 0 : (score / totalQuestions) * 100;
+  /// NEET Score formula: 4 * Correct - 1 * Incorrect
+  int get neetScore => (score * 4) - incorrectCount;
+
+  /// Maximum possible score for this attempt
+  int get maxScore => totalQuestions * 4;
+
+  double get accuracy =>
+      totalQuestions == 0 ? 0 : (score / totalQuestions) * 100;
 }

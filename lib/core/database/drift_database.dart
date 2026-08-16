@@ -11,6 +11,10 @@ import 'tables/bookmarks_table.dart';
 import 'tables/chats_table.dart';
 import 'tables/daily_goals_table.dart';
 import 'tables/users_table.dart';
+import 'tables/error_book_table.dart';
+import 'tables/evaluations_table.dart';
+import 'tables/sync_watermarks_table.dart';
+import 'tables/spaced_repetition_table.dart';
 
 part 'drift_database.g.dart';
 
@@ -23,17 +27,29 @@ part 'drift_database.g.dart';
     Chats,
     DailyGoals,
     Users,
+    ErrorBook,
+    Evaluations,
+    SyncWatermarks,
+    SpacedRepetition,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   static AppDatabase? _instance;
 
-  factory AppDatabase() => _instance ??= AppDatabase._internal();
+  factory AppDatabase([QueryExecutor? executor]) {
+    if (executor != null) {
+      return AppDatabase._internal(executor);
+    }
 
-  AppDatabase._internal() : super(conn.connect());
+    _instance ??= AppDatabase._internal();
+    return _instance!;
+  }
+
+  AppDatabase._internal([QueryExecutor? executor])
+      : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 19;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -41,19 +57,23 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
     },
     onUpgrade: (Migrator m, int from, int to) async {
+      // Versioned migration logic
+      // Note: Drift executes all blocks sequentially if multiple versions are skipped.
+      // We use try-catch on specific columns to handle potential desyncs where columns already exist.
+
       if (from < 2) {
         await m.createTable(quizAttempts);
         await m.createTable(topicProgressEntries);
         await m.createTable(bookmarks);
       }
       if (from < 3) {
-        await m.addColumn(questions, questions.topicId);
-        await m.addColumn(questions, questions.tags);
-        await m.addColumn(questions, questions.imageUrl);
+        await _addColumnSafely(m, questions, (questions as dynamic).topicId);
+        await _addColumnSafely(m, questions, (questions as dynamic).tags);
+        await _addColumnSafely(m, questions, (questions as dynamic).imageUrl);
       }
       if (from < 4) {
-        await m.addColumn(quizAttempts, quizAttempts.testType);
-        await m.addColumn(quizAttempts, quizAttempts.subjectScores);
+        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).testType);
+        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).subjectScores);
       }
       if (from < 5) {
         await m.createTable(chats);
@@ -64,8 +84,118 @@ class AppDatabase extends _$AppDatabase {
       if (from < 7) {
         await m.createTable(users);
       }
+      if (from < 8) {
+        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).incorrectCount);
+      }
+      if (from < 9) {
+        await m.createTable(errorBook);
+      }
+      if (from < 10) {
+        await _addColumnSafely(m, questions, (questions as dynamic).type);
+      }
+      if (from < 11) {
+        await _addColumnSafely(m, users, (users as dynamic).currentStreak);
+        await _addColumnSafely(m, users, (users as dynamic).lastActivityDate);
+      }
+      if (from < 12) {
+        // Drop and recreate ErrorBook table to change primary key structure if needed
+        try {
+          await m.deleteTable('error_book');
+          await m.createTable(errorBook);
+        } catch (_) {}
+      }
+      if (from < 13) {
+        await _addColumnSafely(m, users, (users as dynamic).phone);
+        await _addColumnSafely(m, users, (users as dynamic).isEmailVerified);
+        await _addColumnSafely(m, users, (users as dynamic).isPhoneVerified);
+        try {
+          await m.alterTable(TableMigration(users));
+        } catch (_) {}
+      }
+      if (from < 14) {
+        await _addColumnSafely(m, users, (users as dynamic).isTwoFactorEnabled);
+      }
+      if (from < 15) {
+        await m.createTable(evaluations);
+      }
+      if (from < 16) {
+        // Content-catalog sync columns plus the delta-sync watermark table.
+        await _addColumnSafely(m, questions, (questions as dynamic).remoteId);
+        await _addColumnSafely(m, questions, (questions as dynamic).updatedAt);
+        await _addColumnSafely(m, questions, (questions as dynamic).isActive);
+        await m.createTable(syncWatermarks);
+      }
+      if (from < 17) {
+        // Timestamp-first cloud sync: every user-data row carries a local
+        // last-modified marker so the sync layer can reconcile Drift writes
+        // with Supabase upserts instead of blindly last-writer-wins.
+        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).updatedAt);
+        await _addColumnSafely(
+          m,
+          topicProgressEntries,
+          (topicProgressEntries as dynamic).updatedAt,
+        );
+        await _addColumnSafely(m, bookmarks, (bookmarks as dynamic).updatedAt);
+
+        // Bookmarks use `question_id` as their natural sync key. Collapse any
+        // pre-existing duplicates (older schema allowed them) before enforcing
+        // the unique index so repeated pulls become idempotent.
+        await customStatement(
+          'DELETE FROM bookmarks WHERE id NOT IN '
+          '(SELECT MIN(id) FROM bookmarks GROUP BY question_id)',
+        );
+        await customStatement(
+          'CREATE UNIQUE INDEX IF NOT EXISTS bookmarks_question_id_unique '
+          'ON bookmarks(question_id)',
+        );
+      }
+      if (from < 18) {
+        // Spaced-repetition scheduling cards (SM-2 / Leitner hybrid).
+        await m.createTable(spacedRepetition);
+      }
+      if (from < 19) {
+        // Batch onboarding triage stored on the user profile.
+        await m.addColumn(users, users.batch);
+        await m.addColumn(users, users.targetYear);
+        await m.addColumn(users, users.dailyCommitmentMinutes);
+      }
+    },
+    beforeOpen: (details) async {
+      // Enable foreign keys
+      await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  /// Safely attempts to add a column, ignoring 'duplicate column' errors.
+  /// This handles cases where the user's local DB is in a partial state.
+  Future<void> _addColumnSafely(Migrator m, TableInfo table, GeneratedColumn column) async {
+    try {
+      await m.addColumn(table, column);
+    } catch (e) {
+      if (e.toString().contains('duplicate column name')) {
+        // Column already exists, safe to ignore
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  // ============= ERROR BOOK =============
+
+  Future<void> addToErrorBook(ErrorBookCompanion entry) =>
+      into(errorBook).insertOnConflictUpdate(entry);
+
+  Future<void> removeFromErrorBook(int questionId) =>
+      (delete(errorBook)..where((t) => t.questionId.equals(questionId))).go();
+
+  Future<List<ErrorBookData>> getErrorBookEntries() =>
+      select(errorBook).get();
+
+  Future<void> resolveErrorBookEntry(int questionId) async {
+    await (update(errorBook)..where((t) => t.questionId.equals(questionId))).write(
+      const ErrorBookCompanion(isResolved: Value(true)),
+    );
+  }
 
   // ============= USERS =============
 
@@ -74,12 +204,48 @@ class AppDatabase extends _$AppDatabase {
   Future<User?> getUserByEmail(String email) =>
       (select(users)..where((t) => t.email.equals(email))).getSingleOrNull();
 
+  Future<User?> getUserByPhone(String phone) =>
+      (select(users)..where((t) => (users as dynamic).phone.equals(phone))).getSingleOrNull();
+
   Future<User?> getUserById(int id) =>
       (select(users)..where((t) => t.id.equals(id))).getSingleOrNull();
 
   Future<void> updateLastLogin(int userId) async {
     await (update(users)..where((t) => t.id.equals(userId))).write(
-      const UsersCompanion(lastLogin: Value(null)),
+      UsersCompanion(lastLogin: Value(DateTime.now())),
+    );
+  }
+
+  Future<void> verifyUserEmail(int userId) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      const UsersCompanion(isEmailVerified: Value(true)),
+    );
+  }
+
+  Future<void> verifyUserPhone(int userId) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      const UsersCompanion(isPhoneVerified: Value(true)),
+    );
+  }
+
+  Future<void> updateTwoFactorStatus(int userId, bool enabled) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(isTwoFactorEnabled: Value(enabled)),
+    );
+  }
+
+  Future<void> updateUserPreferences(
+    int userId, {
+    String? batch,
+    int? targetYear,
+    int? dailyCommitmentMinutes,
+  }) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(
+        batch: Value(batch),
+        targetYear: Value(targetYear),
+        dailyCommitmentMinutes: Value(dailyCommitmentMinutes),
+      ),
     );
   }
 
@@ -119,6 +285,27 @@ class AppDatabase extends _$AppDatabase {
   Future<void> insertQuizAttempt(Insertable<QuizAttempt> attempt) =>
       into(quizAttempts).insert(attempt);
 
+  Future<void> upsertQuizAttempt(QuizAttemptsCompanion attempt) async {
+    final attemptedAt = attempt.attemptedAt.value;
+
+    // An older schema could produce multiple local rows sharing an
+    // `attempted_at`. Updating every match (instead of `getSingleOrNull`,
+    // which would throw) keeps the pull loop crash-free.
+    final existing = await (select(quizAttempts)
+          ..where((t) => t.attemptedAt.equals(attemptedAt)))
+        .get();
+
+    if (existing.isEmpty) {
+      await into(quizAttempts).insert(attempt);
+      return;
+    }
+
+    for (final row in existing) {
+      await (update(quizAttempts)..where((t) => t.id.equals(row.id)))
+          .write(attempt);
+    }
+  }
+
   Future<List<QuizAttempt>> getAllQuizAttempts() => select(quizAttempts).get();
 
   Future<List<QuizAttempt>> getQuizAttemptsBySubject(String subjectName) =>
@@ -138,8 +325,13 @@ class AppDatabase extends _$AppDatabase {
 
   // ============= BOOKMARKS =============
 
+  /// Upserts by the `question_id` unique index so repeated cloud pulls never
+  /// duplicate a bookmark.
   Future<void> insertBookmark(BookmarksCompanion bookmark) =>
-      into(bookmarks).insert(bookmark);
+      into(bookmarks).insert(
+        bookmark,
+        onConflict: DoUpdate((_) => bookmark, target: [bookmarks.questionId]),
+      );
 
   Future<void> removeBookmark(int questionId) =>
       (delete(bookmarks)..where((t) => t.questionId.equals(questionId))).go();
@@ -153,6 +345,57 @@ class AppDatabase extends _$AppDatabase {
     return result.isNotEmpty;
   }
 
+  // ============= CONTENT SYNC WATERMARKS =============
+
+  Future<DateTime?> getLastSyncTimestamp(String tableName) async {
+    final row = await (select(syncWatermarks)
+          ..where((t) => t.remoteTable.equals(tableName)))
+        .getSingleOrNull();
+    return row?.lastSyncedAt;
+  }
+
+  Future<void> setSyncTimestamp(String tableName, DateTime timestamp) =>
+      into(syncWatermarks).insertOnConflictUpdate(
+        SyncWatermarksCompanion.insert(
+          remoteTable: tableName,
+          lastSyncedAt: timestamp,
+        ),
+      );
+
+  /// Local ids of every remote-sourced (catalog) question, used to reconcile
+  /// rows that were removed/deactivated on the server.
+  Future<List<int>> getRemoteQuestionLocalIds() async {
+    final rows = await (select(questions)
+          ..where((t) => t.remoteId.isNotNull()))
+        .get();
+    return rows.map((r) => int.parse(r.id)).toList();
+  }
+
+  // ============= SPACED REPETITION =============
+
+  Future<void> upsertSpacedRepetition(
+    Insertable<SpacedRepetitionData> entry,
+  ) =>
+      into(spacedRepetition).insertOnConflictUpdate(entry);
+
+  Future<List<SpacedRepetitionData>> getSpacedRepetitionCards() =>
+      select(spacedRepetition).get();
+
+  Future<SpacedRepetitionData?> getSpacedRepetition(int questionId) => (select(
+    spacedRepetition,
+  )..where((t) => t.questionId.equals(questionId))).getSingleOrNull();
+
+  Future<List<SpacedRepetitionData>> getDueSpacedRepetition(DateTime now) {
+    final query = select(spacedRepetition)
+      ..where((t) => t.dueAt.isSmallerOrEqualValue(now))
+      ..orderBy([(t) => OrderingTerm(expression: t.dueAt)]);
+    return query.get();
+  }
+
+  Future<void> removeSpacedRepetition(int questionId) =>
+      (delete(spacedRepetition)..where((t) => t.questionId.equals(questionId)))
+          .go();
+
   // ============= RESET DATA =============
 
   Future<void> clearAllProgress() async {
@@ -161,6 +404,7 @@ class AppDatabase extends _$AppDatabase {
       await delete(topicProgressEntries).go();
       await delete(bookmarks).go();
       await delete(dailyGoals).go();
+      await delete(spacedRepetition).go();
     });
   }
 }

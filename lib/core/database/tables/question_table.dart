@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 class Questions extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text()();
   TextColumn get subject => text()();
   TextColumn get chapter => text()();
   TextColumn get topic => text()();
@@ -15,4 +15,15 @@ class Questions extends Table {
   TextColumn get difficulty => text().withDefault(const Constant("Medium"))();
   TextColumn get tags => text().nullable()(); // stored as "tag1|||tag2"
   TextColumn get imageUrl => text().nullable()();
+  TextColumn get type => text().withDefault(const Constant("MCQ"))();
+
+  /// Supabase content-catalog UUID for remote-sourced questions.
+  /// Null for the bundled sample bank.
+  TextColumn get remoteId => text().nullable()();
+
+  /// Last server-modified timestamp (delta sync watermark source).
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+
+  /// False once a catalog question is removed/deactivated on the server.
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
