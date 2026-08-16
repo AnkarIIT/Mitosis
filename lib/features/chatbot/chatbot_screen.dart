@@ -5,10 +5,11 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/database/drift_database.dart';
-import '../../core/database/question_repository.dart';
 import '../settings/settings_screen.dart';
 
 class ChatMessage {
@@ -88,7 +89,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     });
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     final geminiService = ref.read(geminiServiceProvider);
     if (!geminiService.isConfigured) {
       _showSettingsPrompt();
@@ -96,14 +97,87 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     }
 
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(
+      source: source,
+      imageQuality: 80,
+    );
 
     if (pickedFile != null) {
+      final compressedPath = await _compressImage(pickedFile.path);
       _sendMessage(
-        "Please explain the question in this image.",
-        imagePath: pickedFile.path,
+        "Explain this NEET question step-by-step and provide NCERT reference.",
+        imagePath: compressedPath ?? pickedFile.path,
       );
     }
+  }
+
+  Future<String?> _compressImage(String path) async {
+    try {
+      final tempDir = await path_provider.getTemporaryDirectory();
+      final targetPath = '${tempDir.path}/temp_question_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      
+      final result = await FlutterImageCompress.compressAndGetFile(
+        path,
+        targetPath,
+        quality: 70,
+        minWidth: 1024,
+        minHeight: 1024,
+      );
+
+      return result?.path;
+    } catch (e) {
+      debugPrint('❌ Compression failed: $e');
+      return null;
+    }
+  }
+
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.adaptiveBackground(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.adaptiveDivider(context),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Upload Question',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppColors.primary),
+              title: const Text('Take a Photo'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppColors.primary),
+              title: const Text('Choose from Gallery'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _sendMessage(String text, {String? imagePath}) async {
@@ -396,23 +470,52 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     ];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: prompts.map((prompt) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: ActionChip(
-                label: Text(prompt),
-                labelStyle: const TextStyle(color: AppColors.primary, fontSize: 12),
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                onPressed: () => _sendMessage(prompt),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 8),
+            child: Text(
+              "QUICK ACTIONS",
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: AppColors.adaptiveSubtleText(context),
+                letterSpacing: 1.2,
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: ActionChip(
+                    avatar: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
+                    label: const Text("UPLOAD QUESTION"),
+                    labelStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                    backgroundColor: AppColors.primary,
+                    onPressed: _showImagePickerOptions,
+                  ),
+                ),
+                ...prompts.map((prompt) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ActionChip(
+                      label: Text(prompt),
+                      labelStyle: const TextStyle(color: AppColors.primary, fontSize: 12),
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                      side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      onPressed: () => _sendMessage(prompt),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+        ],
       ).animate().fade().slideY(begin: 0.5, end: 0, duration: 400.ms),
     );
   }
@@ -442,7 +545,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               child: IconButton(
                 icon: const Icon(Icons.photo_camera),
                 color: AppColors.primary,
-                onPressed: _pickImage,
+                onPressed: _showImagePickerOptions,
               ),
             ),
             const SizedBox(width: 12),
