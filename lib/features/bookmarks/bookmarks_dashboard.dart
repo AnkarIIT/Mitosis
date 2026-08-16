@@ -10,22 +10,43 @@ class BookmarksDashboard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bookmarks = ref.watch(bookmarksProvider);
-    final allQuestions = ref.watch(allQuestionsProvider);
+    final allQuestionsAsync = ref.watch(allQuestionsProvider);
 
-    // Filter questions that are bookmarked
-    final bookmarkedQuestions = allQuestions.where((question) {
-      return bookmarks.any((b) => b.questionId == question.id);
-    }).toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Revision Vault'),
-        centerTitle: true,
-        elevation: 0,
+    return allQuestionsAsync.when(
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (error, stackTrace) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Revision Vault'),
+          centerTitle: true,
+          elevation: 0,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'Unable to load bookmarked questions right now.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
       ),
-      body: bookmarkedQuestions.isEmpty
-          ? _buildEmptyState(context)
-          : _buildBookmarksList(context, ref, bookmarkedQuestions),
+      data: (allQuestions) {
+        final bookmarkedQuestions = allQuestions.where((question) {
+          return bookmarks.any((b) => b.questionId == question.id);
+        }).toList();
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Revision Vault'),
+            centerTitle: true,
+            elevation: 0,
+          ),
+          body: bookmarkedQuestions.isEmpty
+              ? _buildEmptyState(context)
+              : _buildBookmarksList(context, ref, bookmarkedQuestions),
+        );
+      },
     );
   }
 
