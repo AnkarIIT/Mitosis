@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../home/home_screen.dart';
+import 'batch_onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -50,10 +51,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 _currentPage = index;
               });
             },
-            itemCount: _pages.length + 1, // +1 for the final setup page
+            itemCount: _pages.length + 2, // +1 batch triage, +1 final setup
             itemBuilder: (context, index) {
               if (index < _pages.length) {
                 return _buildIntroPage(_pages[index]);
+              } else if (index == _pages.length) {
+                return BatchOnboardingPage(
+                  onDone: () {
+                    _pageController.animateToPage(
+                      _pages.length + 1,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                );
               } else {
                 return _buildSetupPage();
               }
@@ -63,52 +74,55 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             bottom: 40,
             left: 20,
             right: 20,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (_currentPage < _pages.length)
-                  TextButton(
-                    onPressed: () {
-                      _pageController.animateToPage(
-                        _pages.length,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    child: const Text('SKIP', style: TextStyle(color: AppColors.secondary)),
-                  )
-                else
-                  const SizedBox(width: 60),
-                
-                Row(
-                  children: List.generate(
-                    _pages.length + 1,
-                    (index) => Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: _currentPage == index ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _currentPage == index ? AppColors.primary : AppColors.divider,
-                        borderRadius: BorderRadius.circular(4),
+            // The batch triage page renders its own back/skip/next controls.
+            child: _currentPage == _pages.length
+                ? const SizedBox.shrink()
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (_currentPage < _pages.length)
+                        TextButton(
+                          onPressed: () {
+                            _pageController.animateToPage(
+                              _pages.length + 1,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          child: const Text('SKIP', style: TextStyle(color: AppColors.secondary)),
+                        )
+                      else
+                        const SizedBox(width: 60),
+
+                      Row(
+                        children: List.generate(
+                          _pages.length + 2,
+                          (index) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: _currentPage == index ? 24 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: _currentPage == index ? AppColors.primary : AppColors.divider,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+
+                      if (_currentPage < _pages.length)
+                        IconButton(
+                          icon: const Icon(Icons.arrow_forward, color: AppColors.primary),
+                          onPressed: () {
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                        )
+                      else
+                        const SizedBox(width: 60),
+                    ],
                   ),
-                ),
-                
-                if (_currentPage < _pages.length)
-                  IconButton(
-                    icon: const Icon(Icons.arrow_forward, color: AppColors.primary),
-                    onPressed: () {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                  )
-                else
-                  const SizedBox(width: 60),
-              ],
-            ),
           ),
         ],
       ),
