@@ -4,8 +4,12 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
+import '../../core/services/ncert_book_catalog.dart';
 import '../../core/theme/app_colors.dart';
+import '../chatbot/chatbot_screen.dart';
+import '../pdf/ncert_pdf_screen.dart';
 import '../quiz/enhanced_quiz_screen.dart';
+import '../test_series/test_series_screen.dart';
 
 class TopicDetailScreen extends ConsumerWidget {
   final Topic topic;
@@ -21,7 +25,21 @@ class TopicDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final questions = ref.watch(questionsForTopicProvider(topic.id));
+    final questionsAsync = ref.watch(questionsForTopicProvider(topic.id));
+    final subjects = ref.watch(subjectsProvider);
+    final chapter = subjects
+        .expand((s) => s.chapters)
+        .where((c) => c.id == topic.chapterId)
+        .firstOrNull;
+    final ncertEntry = chapter == null
+        ? null
+        : NcertBookCatalog.entryFor(chapter);
+
+    if (questionsAsync.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final questions = questionsAsync.valueOrNull ?? [];
     final progress = ref.watch(userProgressProvider).topicProgress[topic.id];
     final accuracy = progress?.accuracy ?? 0.0;
     final isCompleted = progress?.isCompleted ?? false;
@@ -33,48 +51,87 @@ class TopicDetailScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text(topic.name), elevation: 0),
+      backgroundColor: AppColors.adaptiveBackground(context),
+      appBar: AppBar(
+        title: Text(topic.name),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: AppColors.adaptiveText(context)),
+        titleTextStyle: TextStyle(
+          color: AppColors.adaptiveText(context),
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- TOPIC OVERVIEW CARD ---
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(16),
+                color: AppColors.adaptiveSurface(context),
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppColors.secondary.withValues(alpha: 0.4),
+                  color: AppColors.adaptiveDivider(
+                    context,
+                  ).withValues(alpha: 0.5),
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    subjectName,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          subjectName.toUpperCase(),
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '•  $chapterName',
+                        style: TextStyle(
+                          color: AppColors.adaptiveSubtleText(context),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
                   Text(
                     topic.name,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppColors.textDark,
+                      color: AppColors.adaptiveText(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Chapter: $chapterName',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.secondary,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -83,11 +140,13 @@ class TopicDetailScreen extends ConsumerWidget {
                         value: '${questions.length}',
                         color: AppColors.primary.withValues(alpha: 0.15),
                       ),
+                      const SizedBox(width: 12),
                       _InfoPill(
                         label: 'Difficulty',
                         value: topic.difficulty,
                         color: AppColors.secondary.withValues(alpha: 0.15),
                       ),
+                      const SizedBox(width: 12),
                       _InfoPill(
                         label: 'Accuracy',
                         value: '${accuracy.toStringAsFixed(0)}%',
@@ -98,53 +157,89 @@ class TopicDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
+
+            // --- NCERT SUMMARY SECTION ---
             Text(
-              'Why this topic matters',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              'NCERT Summary',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.adaptiveText(context),
+              ),
             ),
             const SizedBox(height: 12),
-            Text(
-              topic.description ??
-                  'This topic is essential for building strong NEET fundamentals. Practice questions here reinforce core concepts and help improve accuracy for the related chapter.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.textDark),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.amber.withValues(alpha: 0.2)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    topic.summary ??
+                        'Review the core concepts from the NCERT textbook to prepare for your test.',
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.6,
+                      color: AppColors.adaptiveText(context),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton.icon(
+                    onPressed: () => _showFullSummary(context),
+                    icon: const Icon(Icons.menu_book, size: 18),
+                    label: const Text('Read Full Revision Notes'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.amber.shade800,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 24),
-            // === KEY CONCEPTS SECTION ===
+            const SizedBox(height: 16),
+            if (ncertEntry != null)
+              _buildNcertReaderCard(context, ncertEntry, chapter!),
+            const SizedBox(height: 32),
+
+            // --- KEY REVISION POINTS ---
             Text(
-              'Key Concepts',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              'Quick Revision Points',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.adaptiveText(context),
+              ),
             ),
-            const SizedBox(height: 12),
-            ..._getKeyConceptsForTopic(topic).map((concept) {
+            const SizedBox(height: 16),
+            ...(topic.keyPoints ?? _getDefaultKeyPoints(topic)).map((point) {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
+                      margin: const EdgeInsets.only(top: 2),
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
                         color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(50),
+                        shape: BoxShape.circle,
                       ),
-                      child: const Center(
-                        child: Icon(Icons.check, size: 14, color: Colors.white),
+                      child: const Icon(
+                        Icons.check,
+                        size: 10,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        concept,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textDark,
+                        point,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.adaptiveText(context),
+                          height: 1.4,
                         ),
                       ),
                     ),
@@ -152,242 +247,478 @@ class TopicDetailScreen extends ConsumerWidget {
                 ),
               );
             }),
-            const SizedBox(height: 24),
+
+            const SizedBox(height: 32),
             // === DIFFICULTY BREAKDOWN ===
             Text(
-              'Question Difficulty',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              'Question Breakdown',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.adaptiveText(context),
+              ),
             ),
             const SizedBox(height: 12),
             _buildDifficultyBreakdown(context, questions),
-            const SizedBox(height: 24),
+
+            const SizedBox(height: 32),
+            // === PROGRESS SECTION ===
             Text(
-              'Topic progress',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              'Topic Progress',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.adaptiveText(context),
+              ),
             ),
             const SizedBox(height: 12),
-            LinearProgressIndicator(
-              value: hasQuestions ? (accuracy / 100).clamp(0.0, 1.0) : 0.0,
-              minHeight: 10,
-              backgroundColor: AppColors.secondary.withValues(alpha: 0.2),
-              valueColor: AlwaysStoppedAnimation(AppColors.primary),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: LinearProgressIndicator(
+                value: hasQuestions ? (accuracy / 100).clamp(0.0, 1.0) : 0.0,
+                minHeight: 12,
+                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                valueColor: AlwaysStoppedAnimation(
+                  accuracy >= 70 ? AppColors.success : AppColors.primary,
+                ),
+              ),
             ),
             const SizedBox(height: 10),
             Text(
               isCompleted
-                  ? 'Topic completed'
+                  ? '🎯 Mastery Achieved!'
                   : hasQuestions
-                  ? 'Keep practicing to improve your accuracy'
-                  : 'No practice questions available yet.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.secondary),
+                  ? 'Aim for 70%+ accuracy to master this topic.'
+                  : 'No topic-specific questions are available yet. Try a test series to keep practicing.',
+              style: TextStyle(
+                color: AppColors.adaptiveSubtleText(context),
+                fontSize: 13,
+              ),
             ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: hasQuestions
-                        ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EnhancedQuizScreen(
-                                  questions: questions,
-                                  topicName: topic.name,
-                                  topicId: topic.id,
-                                  subject: subjectName,
-                                ),
-                              ),
-                            );
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.textLight,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: Text(
-                      hasQuestions ? 'Start Topic Quiz' : 'No Questions Yet',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (hasQuestions) ...[
-              const SizedBox(height: 16),
-              OutlinedButton(
+
+            const SizedBox(height: 48),
+            // --- ACTION BUTTONS ---
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
                 onPressed: () {
-                  final question = questions.first;
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Sample Question'),
-                      content: Text(question.questionText),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Close'),
+                  if (hasQuestions) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EnhancedQuizScreen(
+                          questions: questions,
+                          topicName: topic.name,
+                          topicId: topic.id,
+                          subject: subjectName,
                         ),
-                      ],
+                      ),
+                    );
+                    return;
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TestSeriesScreen(),
                     ),
                   );
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  hasQuestions ? 'START TOPIC TEST' : 'TRY TEST SERIES INSTEAD',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: OutlinedButton.icon(
+                onPressed: () => _openAiTutor(context),
+                icon: const Icon(Icons.auto_awesome),
+                label: const Text('ASK AI TUTOR ABOUT THIS'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
-                  side: BorderSide(
-                    color: AppColors.primary.withValues(alpha: 0.6),
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('Preview first question'),
               ),
-            ],
+            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
-}
 
-List<String> _getKeyConceptsForTopic(Topic topic) {
-  // In a real app, this would come from the model or a database
-  // For now, we provide some sample concepts based on the topic
-  final concepts = {
-    'Characteristics of Living Organisms': [
-      'Metabolism: Sum total of all chemical reactions',
-      'Growth: Irreversible increase in mass and number',
-      'Reproduction: Production of progeny similar to parents',
-      'Consciousness: Ability to sense and respond to environment',
-    ],
-    'Diversity in Living Organisms': [
-      'Binomial Nomenclature: Genus and Species naming',
-      'Taxonomic Hierarchy: Kingdom to Species',
-      'Systematics: Study of evolutionary relationships',
-      'Herbaria and Museums: Tools for taxonomic study',
-    ],
-    'Mole Concept': [
-      "Avogadro's Number: 6.022 × 10²³ particles",
-      'Molar Mass: Mass of one mole of substance',
-      'STP Conditions: 22.4 L for 1 mole of gas',
-      'Empirical and Molecular Formulas',
-    ],
-    'Kinematics': [
-      'Scalar vs Vector: Distance vs Displacement',
-      'Average vs Instantaneous Speed/Velocity',
-      'Uniform vs Non-uniform Acceleration',
-      'Relative Motion in 1D',
-    ],
-  };
+  void _openAiTutor(BuildContext context) {
+    final prompt =
+        'Explain ${topic.name} for NEET in a simple, high-yield way. Include the core idea, the most common mistake students make, and one quick practice tip.';
 
-  return concepts[topic.name] ??
-      [
-        'Core principles and definitions of ${topic.name}',
-        'Key mechanisms and processes involved',
-        'Important formulas and relationships',
-        'Common applications and examples',
-      ];
-}
-
-Widget _buildDifficultyBreakdown(BuildContext context, List<Question> questions) {
-  if (questions.isEmpty) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Text('No question data available for breakdown'),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatbotScreen(initialMessage: prompt),
       ),
     );
   }
 
-  int easyCount = questions.where((q) => q.difficulty == 'Easy').length;
-  int mediumCount = questions.where((q) => q.difficulty == 'Medium').length;
-  int hardCount = questions.where((q) => q.difficulty == 'Hard').length;
-
-  return SizedBox(
-    height: 180,
-    child: Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: PieChart(
-            PieChartData(
-              sectionsSpace: 2,
-              centerSpaceRadius: 40,
-              sections: [
-                if (easyCount > 0)
-                  PieChartSectionData(
-                    color: Colors.green.shade400,
-                    value: easyCount.toDouble(),
-                    title: '${(easyCount / questions.length * 100).toInt()}%',
-                    radius: 50,
-                    titleStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                if (mediumCount > 0)
-                  PieChartSectionData(
-                    color: Colors.orange.shade400,
-                    value: mediumCount.toDouble(),
-                    title: '${(mediumCount / questions.length * 100).toInt()}%',
-                    radius: 50,
-                    titleStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                if (hardCount > 0)
-                  PieChartSectionData(
-                    color: Colors.red.shade400,
-                    value: hardCount.toDouble(),
-                    title: '${(hardCount / questions.length * 100).toInt()}%',
-                    radius: 50,
-                    titleStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-              ],
-            ),
+  Widget _buildNcertReaderCard(
+    BuildContext context,
+    NcertBookEntry entry,
+    Chapter chapter,
+  ) {
+    return Material(
+      color: AppColors.primary.withValues(alpha: 0.06),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () => _openNcertPdf(context, entry, chapter),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
           ),
-        ),
-        Expanded(
-          flex: 3,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              _DifficultyLegend(
-                label: 'Easy',
-                count: easyCount,
-                color: Colors.green.shade400,
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.menu_book_outlined,
+                  color: AppColors.primary,
+                  size: 26,
+                ),
               ),
-              const SizedBox(height: 8),
-              _DifficultyLegend(
-                label: 'Medium',
-                count: mediumCount,
-                color: Colors.orange.shade400,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Read the Actual NCERT Chapter',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${entry.subject} • ${entry.classLevel} • '
+                      'Chapter ${entry.chapterNumber}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSubtle,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Tap paragraphs for questions from that section',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.primary.withValues(alpha: 0.9),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              _DifficultyLegend(
-                label: 'Hard',
-                count: hardCount,
-                color: Colors.red.shade400,
+              const Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: AppColors.primary,
               ),
             ],
           ),
         ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
+
+  void _openNcertPdf(
+    BuildContext context,
+    NcertBookEntry entry,
+    Chapter chapter,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NcertPdfScreen(entry: entry, chapter: chapter),
+      ),
+    );
+  }
+
+  void _showFullSummary(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.85,
+        decoration: BoxDecoration(
+          color: AppColors.adaptiveBackground(context),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.adaptiveDivider(context),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                const Icon(Icons.menu_book, color: Colors.amber),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'NCERT Revision Notes',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.adaptiveText(context),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              topic.name,
+              style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
+            ),
+            const Divider(height: 40),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Overview',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.adaptiveText(context),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      topic.summary ?? 'No summary available.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.8,
+                        color: AppColors.adaptiveText(context),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Key Learning Points',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.adaptiveText(context),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ...(topic.keyPoints ?? _getDefaultKeyPoints(topic)).map(
+                      (point) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '• ',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                point,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  height: 1.5,
+                                  color: AppColors.adaptiveText(context),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                        ),
+                      ),
+                      child: const Column(
+                        children: [
+                          Icon(
+                            Icons.lightbulb_outline,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            'NCERT Tip: Many questions from this topic in previous years have focused on the definitions and examples provided in the textbook.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<String> _getDefaultKeyPoints(Topic topic) {
+    return [
+      'Core principles and definitions of ${topic.name}',
+      'Key mechanisms and processes involved',
+      'Important formulas and relationships',
+      'Common applications and examples',
+    ];
+  }
+
+  Widget _buildDifficultyBreakdown(
+    BuildContext context,
+    List<Question> questions,
+  ) {
+    if (questions.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text('No question data available for breakdown'),
+        ),
+      );
+    }
+
+    int easyCount = questions.where((q) => q.difficulty == 'Easy').length;
+    int mediumCount = questions.where((q) => q.difficulty == 'Medium').length;
+    int hardCount = questions.where((q) => q.difficulty == 'Hard').length;
+
+    return SizedBox(
+      height: 140,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 2,
+                centerSpaceRadius: 30,
+                sections: [
+                  if (easyCount > 0)
+                    PieChartSectionData(
+                      color: Colors.green.shade400,
+                      value: easyCount.toDouble(),
+                      title: '${(easyCount / questions.length * 100).toInt()}%',
+                      radius: 40,
+                      titleStyle: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  if (mediumCount > 0)
+                    PieChartSectionData(
+                      color: Colors.orange.shade400,
+                      value: mediumCount.toDouble(),
+                      title:
+                          '${(mediumCount / questions.length * 100).toInt()}%',
+                      radius: 40,
+                      titleStyle: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  if (hardCount > 0)
+                    PieChartSectionData(
+                      color: Colors.red.shade400,
+                      value: hardCount.toDouble(),
+                      title: '${(hardCount / questions.length * 100).toInt()}%',
+                      radius: 40,
+                      titleStyle: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _DifficultyLegend(
+                  label: 'Easy',
+                  count: easyCount,
+                  color: Colors.green.shade400,
+                ),
+                const SizedBox(height: 8),
+                _DifficultyLegend(
+                  label: 'Medium',
+                  count: mediumCount,
+                  color: Colors.orange.shade400,
+                ),
+                const SizedBox(height: 8),
+                _DifficultyLegend(
+                  label: 'Hard',
+                  count: hardCount,
+                  color: Colors.red.shade400,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _DifficultyLegend extends StatelessWidget {
@@ -413,9 +744,10 @@ class _DifficultyLegend extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '$label ($count)',
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: AppColors.textDark),
+          style: TextStyle(
+            color: AppColors.adaptiveText(context),
+            fontSize: 12,
+          ),
         ),
       ],
     );
@@ -447,16 +779,18 @@ class _InfoPill extends StatelessWidget {
           children: [
             Text(
               label,
-              style: Theme.of(
-                context,
-              ).textTheme.labelSmall?.copyWith(color: AppColors.textDark),
+              style: TextStyle(
+                color: AppColors.adaptiveText(context).withValues(alpha: 0.7),
+                fontSize: 10,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
               value,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.textDark,
+              style: TextStyle(
+                color: AppColors.adaptiveText(context),
                 fontWeight: FontWeight.bold,
+                fontSize: 14,
               ),
             ),
           ],
