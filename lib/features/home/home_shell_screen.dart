@@ -24,8 +24,8 @@ class HomeShellScreen extends StatelessWidget {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.style_rounded),
-            label: 'Cards',
+            icon: Icon(Icons.school_rounded),
+            label: 'Subjects',
           ),
           NavigationDestination(
             icon: Icon(Icons.replay_rounded),

@@ -8,9 +8,12 @@ import '../../features/auth/auth_screen.dart';
 import '../../features/auth/otp_screen.dart';
 import '../../features/auth/two_factor_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
-import '../../features/home/neet_home_screen.dart';
-import '../../features/home/home_screen.dart';
 import '../../features/home/home_shell_screen.dart';
+import '../../features/home/home_content/home_tab.dart';
+import '../../features/home/home_content/subjects_tab.dart';
+import '../../features/home/home_content/review_tab.dart';
+import '../../features/home/home_content/progress_tab.dart';
+import '../../features/home/home_content/profile_tab.dart';
 import '../../features/topic_browser/topic_browser_screen.dart';
 import '../../features/topic_browser/topic_detail_screen.dart';
 import '../../features/quiz/enhanced_quiz_screen.dart';
@@ -20,19 +23,17 @@ import '../../features/test_series/question_paper_selector.dart';
 import '../../features/test_series/pdf_picker_screen.dart';
 import '../../features/exam_engine/cbt_test_screen.dart';
 import '../../features/exam_engine/cbt_result_screen.dart';
+import '../../core/services/exam_engine_service.dart';
+import '../../core/models/question_model.dart';
 import '../../features/study_plan/study_plan_screen.dart';
-import '../../features/review/spaced_review_screen.dart';
-import '../../features/progress/progress_dashboard.dart';
 import '../../features/error_book/error_book_screen.dart';
 import '../../features/mark_booster/mark_booster_screen.dart';
-import '../../features/flashcards/flashcard_screen.dart';
 import '../../features/flashcards/flashcard_generate_screen.dart';
 import '../../features/flashcards/flashcard_study_screen.dart';
 import '../../features/chatbot/chatbot_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/settings/import_questions_screen.dart';
 import '../../features/pdf/ncert_pdf_screen.dart';
-import '../../features/profile/profile_screen.dart';
 import '../../features/bookmarks/bookmarks_dashboard.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -130,76 +131,78 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/onboarding',
           builder: (_, _) => const OnboardingScreen()),
 
-      StatefulShellRoute.indexedStack(
-        builder: (_, _, shell) => HomeShellScreen(navigationShell: shell),
-        branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/',
-              builder: (_, _) => Consumer(
-                builder: (ctx, ref, _) {
-                  final premium = ref.watch(usePremiumHomeProvider);
-                  return premium
-                      ? const NeetHomeScreen()
-                      : const HomeScreen();
-                },
-              ),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-                path: '/flashcards',
-                builder: (_, _) => const FlashcardScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-                path: '/review',
-                builder: (_, _) => const SpacedReviewScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-                path: '/progress',
-                builder: (_, _) => const ProgressDashboard()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-                path: '/profile',
-                builder: (_, _) => const ProfileScreen()),
-          ]),
-        ],
-      ),
+  StatefulShellRoute.indexedStack(
+    builder: (_, _, shell) => HomeShellScreen(navigationShell: shell),
+    branches: [
+      StatefulShellBranch(routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => const HomeTab(),
+        ),
+      ]),
+      StatefulShellBranch(routes: [
+        GoRoute(
+            path: '/subjects',
+            builder: (_, _) => const SubjectsTab(),
+        ),
+      ]),
+      StatefulShellBranch(routes: [
+        GoRoute(
+            path: '/review',
+            builder: (_, _) => const ReviewTab(),
+        ),
+      ]),
+      StatefulShellBranch(routes: [
+        GoRoute(
+            path: '/progress',
+            builder: (_, _) => const ProgressTab(),
+        ),
+      ]),
+      StatefulShellBranch(routes: [
+        GoRoute(
+            path: '/profile',
+            builder: (_, _) => const ProfileTab(),
+        ),
+      ]),
+    ],
+  ),
 
       GoRoute(
-        path: '/subjects',
+        path: '/subjects/:subjectId',
         builder: (_, state) {
-          final args = state.extra as Map<String, dynamic>;
+          final subjectId = state.pathParameters['subjectId']!;
+          final subjectName = state.uri.queryParameters['subjectName'] ?? subjectId;
           return TopicBrowserScreen(
-            subjectId: args['subjectId'] as String,
-            subjectName: args['subjectName'] as String,
+            subjectId: subjectId,
+            subjectName: subjectName,
           );
         },
       ),
       GoRoute(
-        path: '/topic',
+        path: '/topic/:topicId',
         builder: (_, state) {
-          final args = state.extra as Map<String, dynamic>;
+          final topicId = state.pathParameters['topicId']!;
+          final subjectName = state.uri.queryParameters['subjectName'] ?? '';
+          final chapterName = state.uri.queryParameters['chapterName'] ?? '';
           return TopicDetailScreen(
-            topic: args['topic'],
-            subjectName: args['subjectName'] as String,
-            chapterName: args['chapterName'] as String,
+            topicId: topicId,
+            subjectName: subjectName,
+            chapterName: chapterName,
           );
         },
       ),
       GoRoute(
         path: '/quiz',
         builder: (_, state) {
-          final args = state.extra as Map<String, dynamic>;
+          final topicId = state.uri.queryParameters['topicId'] ?? '';
+          final topicName = state.uri.queryParameters['topicName'] ?? '';
+          final subject = state.uri.queryParameters['subject'] ?? '';
+          final testType = state.uri.queryParameters['testType'];
           return EnhancedQuizScreen(
-            questions: args['questions'],
-            topicName: args['topicName'] as String,
-            topicId: args['topicId'] as String,
-            subject: args['subject'] as String,
-            testType: args['testType'] as String?,
+            topicId: topicId,
+            topicName: topicName,
+            subject: subject,
+            testType: testType,
           );
         },
       ),
@@ -222,30 +225,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/pdf-picker',
         builder: (_, _) => const PdfPickerScreen(),
       ),
-      GoRoute(
+GoRoute(
         path: '/pdf',
         builder: (_, state) {
-          final args = state.extra as Map<String, dynamic>;
-          return NcertPdfScreen(
-            entry: args['entry'],
-            chapter: args['chapter'],
-          );
+          final entryId = state.uri.queryParameters['entryId'] ?? '';
+          return NcertPdfScreen(entryId: entryId);
         },
       ),
       GoRoute(
         path: '/cbt',
         builder: (_, state) {
-          final args = state.extra as Map<String, dynamic>;
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final config = extra['config'] as ExamConfig? ?? ExamConfig.neet();
+          final questionPool = extra['questionPool'] as List<Question>? ?? [];
           return CbtTestScreen(
-            config: args['config'],
-            questionPool: args['questionPool'],
+            config: config,
+            questionPool: questionPool,
           );
         },
       ),
       GoRoute(
         path: '/cbt/result',
         builder: (_, state) {
-          final args = state.extra as Map<String, dynamic>;
+          final args = state.extra as Map<String, dynamic>? ?? {};
           return CbtResultScreen(
             attempt: args['attempt'],
             analytics: args['analytics'],
@@ -274,7 +276,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/chat',
-        builder: (_, _) => const ChatbotScreen(),
+        builder: (_, state) {
+          final initialMessage = state.uri.queryParameters['initialMessage'];
+          return ChatbotScreen(initialMessage: initialMessage);
+        },
       ),
       GoRoute(
         path: '/settings',
