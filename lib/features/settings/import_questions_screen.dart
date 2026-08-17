@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/database/question_repository.dart';
 import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
-import '../../core/services/database_service.dart';
 import '../../core/services/explanation_seeder.dart';
 import '../../core/services/gemini_proxy_service.dart';
 import '../../core/services/question_importer.dart';
@@ -98,7 +97,8 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
           ? importer.parseCsv(trimmed)
           : importer.parseJson(trimmed);
 
-      final existing = await DatabaseService.instance.getExistingQuestionTexts();
+      final repo = ref.read(questionRepositoryProvider);
+      final existing = await repo.getExistingQuestionTexts();
       final (built, result) = QuestionImporter(
         existingTexts: existing,
       ).buildQuestions(rows);
@@ -124,7 +124,8 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
     setState(() => _isImporting = true);
 
     try {
-      final count = await DatabaseService.instance.bulkInsertQuestions(_built);
+      final repo = ref.read(questionRepositoryProvider);
+      final count = await repo.bulkInsertQuestions(_built);
       ref.invalidate(allQuestionsProvider);
 
       if (!mounted) return;

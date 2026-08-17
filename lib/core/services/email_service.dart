@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,7 +20,7 @@ class EmailSendResult {
 }
 
 class EmailService {
-  static const String _apiKeyPrefsKey = 'resend_api_key';
+  static const String _secureApiKeyKey = 'resend_api_key_secure';
   static const String _senderPrefsKey = 'resend_sender_email';
   static const String _deliveryModePrefsKey = 'email_delivery_mode';
   static const String _backendUrlPrefsKey = 'email_backend_url';
@@ -29,8 +30,11 @@ class EmailService {
   EmailDeliveryMode _deliveryMode = EmailDeliveryMode.clientDirect;
   String? _backendUrl;
   final http.Client _client;
+  final FlutterSecureStorage _secureStorage;
 
-  EmailService({http.Client? client}) : _client = client ?? http.Client();
+  EmailService({http.Client? client, FlutterSecureStorage? secureStorage})
+      : _client = client ?? http.Client(),
+        _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   String? get apiKey => _apiKey;
   String? get senderEmail => _senderEmail;
@@ -49,8 +53,8 @@ class EmailService {
       _backendUrl!.trim().isNotEmpty;
 
   Future<void> loadConfig() async {
+    _apiKey = (await _secureStorage.read(key: _secureApiKeyKey))?.trim();
     final prefs = await SharedPreferences.getInstance();
-    _apiKey = prefs.getString(_apiKeyPrefsKey)?.trim();
     _senderEmail = prefs.getString(_senderPrefsKey)?.trim();
     final savedMode = prefs.getString(_deliveryModePrefsKey);
     _deliveryMode = savedMode == EmailDeliveryMode.backend.name
@@ -60,10 +64,9 @@ class EmailService {
   }
 
   Future<void> saveApiKey(String apiKey) async {
-    final prefs = await SharedPreferences.getInstance();
     final cleaned = apiKey.trim();
     _apiKey = cleaned;
-    await prefs.setString(_apiKeyPrefsKey, cleaned);
+    await _secureStorage.write(key: _secureApiKeyKey, value: cleaned);
   }
 
   Future<void> saveSenderEmail(String senderEmail) async {
@@ -92,7 +95,7 @@ class EmailService {
     _senderEmail = null;
     _deliveryMode = EmailDeliveryMode.clientDirect;
     _backendUrl = null;
-    await prefs.remove(_apiKeyPrefsKey);
+    await _secureStorage.delete(key: _secureApiKeyKey);
     await prefs.remove(_senderPrefsKey);
     await prefs.remove(_deliveryModePrefsKey);
     await prefs.remove(_backendUrlPrefsKey);

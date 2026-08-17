@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/services/pdf_service.dart';
-import '../../core/services/database_service.dart';
+import '../../core/database/question_repository.dart';
 import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
@@ -118,7 +118,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
         return;
       }
 
-      final db = DatabaseService.instance;
+      final repo = ref.read(questionRepositoryProvider);
       for (var qData in generated) {
         final q = Question(
           id: _nextGeneratedId(),
@@ -134,7 +134,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
           tags: [],
           createdAt: DateTime.now(),
         );
-        await db.insertQuestion(q);
+        await repo.insertQuestion(q);
       }
       // Make the freshly generated questions visible to test series & the DB pool.
       ref.invalidate(allQuestionsProvider);

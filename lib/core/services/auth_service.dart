@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:drift/drift.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../database/drift_database.dart' as db;
 import '../config/app_config.dart';
@@ -9,8 +10,10 @@ import 'email_service.dart';
 class AuthService {
   final db.AppDatabase _db;
   final EmailService? _emailService;
+  final FlutterSecureStorage _secureStorage;
 
-  AuthService(this._db, [this._emailService]);
+  AuthService(this._db, [this._emailService, FlutterSecureStorage? secureStorage])
+      : _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   supabase.SupabaseClient? get _supabaseClient =>
       AppConfig.isCloudAuthConfigured ? supabase.Supabase.instance.client : null;
@@ -136,7 +139,7 @@ class AuthService {
       final localUser = await _db.getUserByEmail(email);
       
       // Check 2FA
-      if (localUser != null && (localUser as dynamic).isTwoFactorEnabled == true) {
+      if (localUser != null && localUser.isTwoFactorEnabled == true) {
         return (success: true, message: '2FA_REQUIRED', user: localUser);
       }
 
@@ -177,29 +180,30 @@ class AuthService {
   }
 
   static const Duration _otpLifetime = Duration(minutes: 10);
-
-  String? _pending2FACode;
-  DateTime? _pending2FAExpiry;
+  static const String _secure2FACodeKey = 'pending_2fa_code';
+  static const String _secure2FAExpiryKey = 'pending_2fa_expiry';
 
   Future<({bool success, String message})> send2FAEmail(String email) async {
     final service = _emailService;
     if (service == null) return (success: false, message: 'Email service missing');
     final otp = _generateOtp();
-    _pending2FACode = otp;
-    _pending2FAExpiry = DateTime.now().add(_otpLifetime);
+    final expiry = DateTime.now().add(_otpLifetime);
+    await _secureStorage.write(key: _secure2FACodeKey, value: otp);
+    await _secureStorage.write(key: _secure2FAExpiryKey, value: expiry.toIso8601String());
     final res = await service.sendOtpEmail(to: email, otp: otp, purpose: '2FA');
     return (success: res.success, message: res.message);
   }
 
   Future<({bool success, String message, db.User? user})> verify2FA(String email, String code) async {
-    final pendingCode = _pending2FACode;
-    final expiry = _pending2FAExpiry;
+    final pendingCode = await _secureStorage.read(key: _secure2FACodeKey);
+    final expiryStr = await _secureStorage.read(key: _secure2FAExpiryKey);
+    final expiry = expiryStr != null ? DateTime.tryParse(expiryStr) : null;
 
     if (pendingCode == null ||
         expiry == null ||
         DateTime.now().isAfter(expiry)) {
-      _pending2FACode = null;
-      _pending2FAExpiry = null;
+      await _secureStorage.delete(key: _secure2FACodeKey);
+      await _secureStorage.delete(key: _secure2FAExpiryKey);
       return (success: false, message: 'Code expired. Please request a new one.', user: null);
     }
 
@@ -207,8 +211,8 @@ class AuthService {
       return (success: false, message: 'Invalid code', user: null);
     }
 
-    _pending2FACode = null;
-    _pending2FAExpiry = null;
+    await _secureStorage.delete(key: _secure2FACodeKey);
+    await _secureStorage.delete(key: _secure2FAExpiryKey);
     final user = await _db.getUserByEmail(email);
     return (success: true, message: 'Verified', user: user);
   }

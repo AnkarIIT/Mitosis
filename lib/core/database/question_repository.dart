@@ -176,6 +176,70 @@ class QuestionRepository {
         .write(QuestionsCompanion(explanation: Value<String>(explanation)));
   }
 
+  /// Returns the canonicalized text of every question already stored, so
+  /// imports can skip exact duplicates.
+  Future<Set<String>> getExistingQuestionTexts() async {
+    final results = await db.select(db.questions).get();
+    return results
+        .map((r) => QuestionImporter.normalizeText(r.questionText))
+        .toSet();
+  }
+
+  /// Inserts many questions in a single transaction and returns how many were
+  /// written. Duplicate ids are overwritten (insertOrReplace).
+  Future<int> bulkInsertQuestions(List<model.Question> questions) async {
+    if (questions.isEmpty) return 0;
+    await db.batch((batch) {
+      for (var q in questions) {
+        batch.insert(
+          db.questions,
+          QuestionsCompanion(
+            id: Value<String>(q.id.toString()),
+            subject: Value<String>(q.subject),
+            chapter: Value<String>(q.chapter),
+            topic: Value<String>(q.topic),
+            topicId: Value<String>(q.topicId),
+            questionText: Value<String>(q.questionText),
+            options: Value<String>(q.options.join('|||')),
+            correctAnswer: Value<String>(q.correctAnswer),
+            explanation: Value<String?>(q.explanation),
+            ncertReference: Value<String?>(q.ncertReference),
+            year: Value<int?>(q.year),
+            difficulty: Value<String>(q.difficulty),
+            tags: Value<String>(q.tags.join('|||')),
+            imageUrl: Value<String?>(q.imageUrl),
+            type: Value<String>(q.type),
+          ),
+        );
+      }
+    });
+    return questions.length;
+  }
+
+  /// Inserts a single question. Duplicate ids are overwritten.
+  Future<void> insertQuestion(model.Question question) async {
+    await db.into(db.questions).insert(
+      QuestionsCompanion(
+        id: Value<String>(question.id.toString()),
+        subject: Value<String>(question.subject),
+        chapter: Value<String>(question.chapter),
+        topic: Value<String>(question.topic),
+        topicId: Value<String>(question.topicId),
+        questionText: Value<String>(question.questionText),
+        options: Value<String>(question.options.join('|||')),
+        correctAnswer: Value<String>(question.correctAnswer),
+        explanation: Value<String?>(question.explanation),
+        ncertReference: Value<String?>(question.ncertReference),
+        year: Value<int?>(question.year),
+        difficulty: Value<String>(question.difficulty),
+        tags: Value<String>(question.tags.join('|||')),
+        imageUrl: Value<String?>(question.imageUrl),
+        type: Value<String>(question.type),
+      ),
+      mode: InsertMode.insertOrReplace,
+    );
+  }
+
   List<model.Question> _mapQuestions(List<dynamic> rows) {
     return rows
         .map(

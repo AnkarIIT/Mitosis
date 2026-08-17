@@ -19,11 +19,11 @@ class AppUtils {
   static Color getDifficultyColor(String difficulty) {
     switch (difficulty.toLowerCase()) {
       case 'easy':
-        return AppColors.primary;
+        return const Color(0xFF22C55E); // Green
       case 'medium':
         return AppColors.secondary;
       case 'hard':
-        return AppColors.primary;
+        return const Color(0xFFEF4444); // Red
       default:
         return AppColors.secondary;
     }
@@ -45,10 +45,10 @@ class AppUtils {
 
   /// Calculate accuracy color based on percentage
   static Color getAccuracyColor(double accuracy) {
-    if (accuracy >= 80) return AppColors.primary;
-    if (accuracy >= 60) return AppColors.secondary;
-    if (accuracy >= 40) return AppColors.secondary;
-    return AppColors.primary;
+    if (accuracy >= 80) return const Color(0xFF22C55E); // Green
+    if (accuracy >= 60) return const Color(0xFFF59E0B); // Amber
+    if (accuracy >= 40) return const Color(0xFFF97316); // Orange
+    return const Color(0xFFEF4444); // Red
   }
 
   /// Get subject emoji/icon
@@ -284,9 +284,9 @@ extension DateTimeExtension on DateTime {
 /// Constants for the app
 class AppConstants {
   // NEET related
-  static const int neetTotalQuestions = 200;
-  static const int neetDuration = 180; // minutes
-  static const String neetYear = '2024';
+  static const int neetTotalQuestions = 180; // Questions attempted (out of 200)
+  static const int neetDuration = 200; // minutes (3hr 20min)
+  static const String neetYear = '2026';
 
   // Thresholds
   static const double excellentAccuracy = 80.0;
