@@ -47,7 +47,7 @@ class SeederResult {
 }
 
 typedef GetQuestions = Future<List<Question>> Function();
-typedef UpdateExplanation = Future<void> Function(int questionId, String explanation);
+typedef UpdateExplanation = Future<void> Function(String questionId, String explanation);
 
 class ExplanationSeeder {
   ExplanationSeeder({
@@ -141,7 +141,7 @@ class ExplanationSeeder {
       final result = await proxy.generate(
         prompt: prompt,
         systemPrompt: _systemPrompt,
-        questionId: q.id.toString(),
+        questionId: q.id,
       );
 
       _lastResult = result.source;

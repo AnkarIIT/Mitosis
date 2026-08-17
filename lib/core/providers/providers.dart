@@ -718,8 +718,8 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
         final dbUsers = await _db.select(_db.users).get();
         if (dbUsers.isNotEmpty) {
           final user = dbUsers.first;
-          currentStreak = (user as dynamic).currentStreak ?? 0;
-          lastActivityDate = (user as dynamic).lastActivityDate;
+          currentStreak = user.currentStreak;
+          lastActivityDate = user.lastActivityDate;
         }
       } catch (e) {
         debugPrint('❌ Error loading streak info: $e');
@@ -782,7 +782,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
           await _db.removeFromErrorBook(q.id);
         } else {
           await _db.addToErrorBook(db.ErrorBookCompanion.insert(
-            questionId: Value(q.id),
+            questionId: q.id,
             addedAt: DateTime.now(),
           ));
         }
@@ -1039,7 +1039,7 @@ class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
   }
 
   Future<void> toggleBookmark({
-    required int questionId,
+    required String questionId,
     required String subject,
     required String topicId,
   }) async {
@@ -1064,7 +1064,7 @@ class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
     }
   }
 
-  bool isBookmarked(int questionId) {
+  bool isBookmarked(String questionId) {
     return state.any((b) => b.questionId == questionId);
   }
 }
@@ -1390,7 +1390,7 @@ class SpacedReviewRecorder {
   final Ref _ref;
 
   Future<void> recordAnswer({
-    required int questionId,
+    required String questionId,
     required bool isCorrect,
   }) async {
     final dbInstance = _ref.read(databaseProvider);
@@ -1405,7 +1405,7 @@ class SpacedReviewRecorder {
       await dbInstance.removeFromErrorBook(questionId);
     } else {
       await dbInstance.addToErrorBook(db.ErrorBookCompanion.insert(
-        questionId: Value(questionId),
+        questionId: questionId,
         addedAt: DateTime.now(),
       ));
     }

@@ -30,7 +30,7 @@ void main() {
     test('getQuestionsBySubject should return only questions for that subject',
         () async {
       final q1 = model.Question(
-        id: 1,
+        id: '1',
         subject: 'Biology',
         chapter: 'Cell',
         topic: 'Mitochondria',
@@ -44,7 +44,7 @@ void main() {
         createdAt: DateTime.now(),
       );
       final q2 = model.Question(
-        id: 2,
+        id: '2',
         subject: 'Physics',
         chapter: 'Motion',
         topic: 'Speed',
@@ -92,7 +92,7 @@ void main() {
 
     test('getQuestionsByTopicId should filter correctly', () async {
       final q1 = model.Question(
-        id: 1,
+        id: '1',
         subject: 'Biology',
         chapter: 'Cell',
         topic: 'Mitochondria',

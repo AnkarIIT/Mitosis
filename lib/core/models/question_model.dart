@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class Question {
-  final int id;
+  final String id;
   final String subject;
   final String chapter;
   final String topic;
@@ -60,7 +60,7 @@ class Question {
 
   factory Question.fromMap(Map<String, dynamic> map) {
     return Question(
-      id: map['id'] is String ? int.parse(map['id']) : map['id'],
+      id: map['id']?.toString() ?? '',
       subject: map['subject'] ?? '',
       chapter: map['chapter'] ?? '',
       topic: map['topic'] ?? '',

@@ -51,7 +51,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 20;
+  int get schemaVersion => 21;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -165,6 +165,39 @@ class AppDatabase extends _$AppDatabase {
         // AI-generated + hand-created flashcards with SM-2 scheduling.
         await m.createTable(flashcards);
       }
+      if (from < 21) {
+        // Change questionId from int to text in error_book, spaced_repetition, bookmarks.
+        try {
+          await m.deleteTable('error_book');
+          await m.createTable(errorBook);
+        } catch (_) {}
+        try {
+          await m.deleteTable('spaced_repetition');
+          await m.createTable(spacedRepetition);
+        } catch (_) {}
+        try {
+          await customStatement(
+            'CREATE TABLE IF NOT EXISTS bookmarks_new ('
+            'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+            'question_id TEXT NOT NULL,'
+            'subject TEXT NOT NULL,'
+            'topic_id TEXT NOT NULL,'
+            'bookmarked_at INTEGER NOT NULL,'
+            'updated_at INTEGER'
+            ')',
+          );
+          await customStatement(
+            'INSERT OR IGNORE INTO bookmarks_new (question_id, subject, topic_id, bookmarked_at, updated_at) '
+            "SELECT CAST(question_id AS TEXT), subject, topic_id, bookmarked_at, updated_at FROM bookmarks",
+          );
+          await m.deleteTable('bookmarks');
+          await customStatement('ALTER TABLE bookmarks_new RENAME TO bookmarks');
+          await customStatement(
+            'CREATE UNIQUE INDEX IF NOT EXISTS bookmarks_question_id_unique '
+            'ON bookmarks(question_id)',
+          );
+        } catch (_) {}
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign keys
@@ -191,13 +224,13 @@ class AppDatabase extends _$AppDatabase {
   Future<void> addToErrorBook(ErrorBookCompanion entry) =>
       into(errorBook).insertOnConflictUpdate(entry);
 
-  Future<void> removeFromErrorBook(int questionId) =>
+  Future<void> removeFromErrorBook(String questionId) =>
       (delete(errorBook)..where((t) => t.questionId.equals(questionId))).go();
 
   Future<List<ErrorBookData>> getErrorBookEntries() =>
       select(errorBook).get();
 
-  Future<void> resolveErrorBookEntry(int questionId) async {
+  Future<void> resolveErrorBookEntry(String questionId) async {
     await (update(errorBook)..where((t) => t.questionId.equals(questionId))).write(
       const ErrorBookCompanion(isResolved: Value(true)),
     );
@@ -211,7 +244,7 @@ class AppDatabase extends _$AppDatabase {
       (select(users)..where((t) => t.email.equals(email))).getSingleOrNull();
 
   Future<User?> getUserByPhone(String phone) =>
-      (select(users)..where((t) => (users as dynamic).phone.equals(phone))).getSingleOrNull();
+      (select(users)..where((t) => t.phone.equals(phone))).getSingleOrNull();
 
   Future<User?> getUserById(int id) =>
       (select(users)..where((t) => t.id.equals(id))).getSingleOrNull();
@@ -339,12 +372,12 @@ class AppDatabase extends _$AppDatabase {
         onConflict: DoUpdate((_) => bookmark, target: [bookmarks.questionId]),
       );
 
-  Future<void> removeBookmark(int questionId) =>
+  Future<void> removeBookmark(String questionId) =>
       (delete(bookmarks)..where((t) => t.questionId.equals(questionId))).go();
 
   Future<List<Bookmark>> getAllBookmarks() => select(bookmarks).get();
 
-  Future<bool> isBookmarked(int questionId) async {
+  Future<bool> isBookmarked(String questionId) async {
     final result = await (select(
       bookmarks,
     )..where((t) => t.questionId.equals(questionId))).get();
@@ -370,11 +403,11 @@ class AppDatabase extends _$AppDatabase {
 
   /// Local ids of every remote-sourced (catalog) question, used to reconcile
   /// rows that were removed/deactivated on the server.
-  Future<List<int>> getRemoteQuestionLocalIds() async {
+  Future<List<String>> getRemoteQuestionLocalIds() async {
     final rows = await (select(questions)
           ..where((t) => t.remoteId.isNotNull()))
         .get();
-    return rows.map((r) => int.parse(r.id)).toList();
+    return rows.map((r) => r.id).toList();
   }
 
   // ============= SPACED REPETITION =============
@@ -387,7 +420,7 @@ class AppDatabase extends _$AppDatabase {
   Future<List<SpacedRepetitionData>> getSpacedRepetitionCards() =>
       select(spacedRepetition).get();
 
-  Future<SpacedRepetitionData?> getSpacedRepetition(int questionId) => (select(
+  Future<SpacedRepetitionData?> getSpacedRepetition(String questionId) => (select(
     spacedRepetition,
   )..where((t) => t.questionId.equals(questionId))).getSingleOrNull();
 
@@ -398,7 +431,7 @@ class AppDatabase extends _$AppDatabase {
     return query.get();
   }
 
-  Future<void> removeSpacedRepetition(int questionId) =>
+  Future<void> removeSpacedRepetition(String questionId) =>
       (delete(spacedRepetition)..where((t) => t.questionId.equals(questionId)))
           .go();
 

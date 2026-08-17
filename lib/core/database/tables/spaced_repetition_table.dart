@@ -8,7 +8,7 @@ import 'package:drift/drift.dart';
 /// box and grow the interval; incorrect reviews reset to day 1 and bump the
 /// lapse count.
 class SpacedRepetition extends Table {
-  IntColumn get questionId => integer()();
+  TextColumn get questionId => text()();
   IntColumn get box => integer().withDefault(const Constant(0))();
   RealColumn get easeFactor => real().withDefault(const Constant(2.5))();
   IntColumn get intervalDays => integer().withDefault(const Constant(0))();

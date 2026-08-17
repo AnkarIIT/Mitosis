@@ -41,7 +41,7 @@ final List<Flashcard> sampleFlashcards = [
 // ============= BIOLOGY QUESTIONS =============
 final List<Question> biologyQuestions = [
   Question(
-    id: 1,
+    id: '1',
     subject: "Biology",
     chapter: "The Living World",
     topic: "Characteristics of Living Organisms",
@@ -57,7 +57,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 2,
+    id: '2',
     subject: "Biology",
     chapter: "The Living World",
     topic: "Characteristics of Living Organisms",
@@ -73,7 +73,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 3,
+    id: '3',
     subject: "Biology",
     chapter: "The Living World",
     topic: "Diversity in Living Organisms",
@@ -89,7 +89,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 4,
+    id: '4',
     subject: "Biology",
     chapter: "Biological Classification",
     topic: "Monera",
@@ -105,7 +105,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 5,
+    id: '5',
     subject: "Biology",
     chapter: "Plant Kingdom",
     topic: "Algae",
@@ -121,7 +121,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 6,
+    id: '6',
     subject: "Biology",
     chapter: "Animal Kingdom",
     topic: "Phylum Chordata",
@@ -137,7 +137,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 7,
+    id: '7',
     subject: "Biology",
     chapter: "Cell: The Unit of Life",
     topic: "Prokaryotic Cells",
@@ -153,7 +153,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 8,
+    id: '8',
     subject: "Biology",
     chapter: "Biomolecules",
     topic: "Enzymes",
@@ -169,7 +169,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 9,
+    id: '9',
     subject: "Biology",
     chapter: "Cell Cycle and Cell Division",
     topic: "Meiosis",
@@ -185,7 +185,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 10,
+    id: '10',
     subject: "Biology",
     chapter: "Photosynthesis in Higher Plants",
     topic: "Light Reaction",
@@ -201,7 +201,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 11,
+    id: '11',
     subject: "Biology",
     chapter: "Respiration in Plants",
     topic: "Glycolysis",
@@ -217,7 +217,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 12,
+    id: '12',
     subject: "Biology",
     chapter: "Human Reproduction",
     topic: "Menstrual Cycle",
@@ -233,7 +233,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 13,
+    id: '13',
     subject: "Biology",
     chapter: "Principles of Inheritance and Variation",
     topic: "Mendelian Inheritance",
@@ -249,7 +249,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 14,
+    id: '14',
     subject: "Biology",
     chapter: "Molecular Basis of Inheritance",
     topic: "DNA Structure",
@@ -265,7 +265,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 15,
+    id: '15',
     subject: "Biology",
     chapter: "Evolution",
     topic: "Homologous Structures",
@@ -281,7 +281,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 16,
+    id: '16',
     subject: "Biology",
     chapter: "Human Health and Disease",
     topic: "Immunity",
@@ -297,7 +297,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 17,
+    id: '17',
     subject: "Biology",
     chapter: "Biotechnology: Principles and Processes",
     topic: "Restriction Enzymes",
@@ -313,7 +313,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 18,
+    id: '18',
     subject: "Biology",
     chapter: "Organisms and Populations",
     topic: "Population Growth",
@@ -329,7 +329,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 19,
+    id: '19',
     subject: "Biology",
     chapter: "Ecosystem",
     topic: "Energy Flow",
@@ -345,7 +345,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 20,
+    id: '20',
     subject: "Biology",
     chapter: "Biodiversity and Conservation",
     topic: "In-situ Conservation",
@@ -361,7 +361,7 @@ final List<Question> biologyQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 21,
+    id: '21',
     subject: "Biology",
     chapter: "The Living World",
     topic: "Taxonomy",
@@ -381,7 +381,7 @@ final List<Question> biologyQuestions = [
     tags: ["NCERT", "AR"],
   ),
   Question(
-    id: 22,
+    id: '22',
     subject: "Biology",
     chapter: "Biological Classification",
     topic: "Kingdom Monera",
@@ -405,7 +405,7 @@ final List<Question> biologyQuestions = [
 // ============= CHEMISTRY QUESTIONS =============
 final List<Question> chemistryQuestions = [
   Question(
-    id: 101,
+    id: '101',
     subject: "Chemistry",
     chapter: "Some Basic Concepts of Chemistry",
     topic: "Mole Concept & Calculations",
@@ -421,7 +421,7 @@ final List<Question> chemistryQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 102,
+    id: '102',
     subject: "Chemistry",
     chapter: "Structure of Atom",
     topic: "Quantum Numbers",
@@ -441,7 +441,7 @@ final List<Question> chemistryQuestions = [
 // ============= PHYSICS QUESTIONS =============
 final List<Question> physicsQuestions = [
   Question(
-    id: 201,
+    id: '201',
     subject: "Physics",
     chapter: "Units and Measurements",
     topic: "Dimensions",
@@ -457,7 +457,7 @@ final List<Question> physicsQuestions = [
     type: "mcq",
   ),
   Question(
-    id: 202,
+    id: '202',
     subject: "Physics",
     chapter: "Motion in a Straight Line",
     topic: "Kinematics",

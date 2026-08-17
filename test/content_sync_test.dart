@@ -50,7 +50,7 @@ void main() {
           ));
 
       final active = await repository.getAllQuestionsFromDb();
-      expect(active.where((q) => q.id == 90001), isEmpty);
+      expect(active.where((q) => q.id == '90001'), isEmpty);
     });
 
     test('remote questions are mapped to stable local Question models', () async {
@@ -71,7 +71,7 @@ void main() {
           ));
 
       final all = await repository.getAllQuestionsFromDb();
-      final remote = all.firstWhere((q) => q.id == 4242);
+      final remote = all.firstWhere((q) => q.id == '4242');
       expect(remote.subject, 'Botany');
       expect(remote.options, ['A', 'B', 'C', 'D']);
       expect(remote.correctAnswer, 'B');
@@ -90,7 +90,7 @@ void main() {
     test('getQuestionsBySubject should return only questions for that subject',
         () async {
       final q1 = model.Question(
-        id: 1,
+        id: '1',
         subject: 'Biology',
         chapter: 'Cell',
         topic: 'Mitochondria',
@@ -104,7 +104,7 @@ void main() {
         createdAt: DateTime.now(),
       );
       final q2 = model.Question(
-        id: 2,
+        id: '2',
         subject: 'Physics',
         chapter: 'Motion',
         topic: 'Speed',
@@ -152,7 +152,7 @@ void main() {
 
     test('getQuestionsByTopicId should filter correctly', () async {
       final q1 = model.Question(
-        id: 1,
+        id: '1',
         subject: 'Biology',
         chapter: 'Cell',
         topic: 'Mitochondria',

@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 class ErrorBook extends Table {
-  IntColumn get questionId => integer()();
+  TextColumn get questionId => text()();
   DateTimeColumn get addedAt => dateTime()();
   IntColumn get retryCount => integer().withDefault(const Constant(0))();
   BoolColumn get isResolved => boolean().withDefault(const Constant(false))();

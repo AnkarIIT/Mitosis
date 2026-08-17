@@ -3,7 +3,7 @@ import 'package:neet_mitos/core/models/question_model.dart';
 import 'package:neet_mitos/core/services/paragraph_question_matcher.dart';
 
 Question _q(
-  int id,
+  String id,
   String topic,
   String questionText, {
   String subject = 'Biology',
@@ -42,7 +42,7 @@ void main() {
   group('ParagraphQuestionMatcher.score', () {
     test('counts shared significant tokens', () {
       final q = _q(
-        1,
+        '1',
         'Algae',
         'Which pigment is found in red algae?',
       );
@@ -55,7 +55,7 @@ void main() {
     });
 
     test('returns zero for unrelated text', () {
-      final q = _q(1, 'Newton Laws', 'F equals mass times acceleration');
+      final q = _q('1', 'Newton Laws', 'F equals mass times acceleration');
       final score = ParagraphQuestionMatcher.score(
         'The human heart pumps blood through arteries and veins',
         q,
@@ -67,9 +67,9 @@ void main() {
   group('ParagraphQuestionMatcher.matchingQuestions', () {
     test('returns matches ranked by score', () {
       final questions = [
-        _q(1, 'Algae', 'Which pigment is found in red algae species?'),
-        _q(2, 'Algae', 'Algae reproduce by fragmentation methods in water'),
-        _q(3, 'Metabolism', 'Enzymes catalyse metabolic reactions'),
+        _q('1', 'Algae', 'Which pigment is found in red algae species?'),
+        _q('2', 'Algae', 'Algae reproduce by fragmentation methods in water'),
+        _q('3', 'Metabolism', 'Enzymes catalyse metabolic reactions'),
       ];
       const paragraph =
           'Algae are chlorophyll bearing plants that reproduce by '
@@ -85,7 +85,7 @@ void main() {
 
     test('returns empty when no question meets the threshold', () {
       final questions = [
-        _q(1, 'Vectors', 'Angle between two perpendicular vectors'),
+        _q('1', 'Vectors', 'Angle between two perpendicular vectors'),
       ];
       final matched = ParagraphQuestionMatcher.matchingQuestions(
         'Cell cycle consists of interphase and mitosis division stages',

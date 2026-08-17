@@ -5,7 +5,7 @@ import 'package:neet_mitos/core/database/drift_database.dart';
 import 'package:neet_mitos/core/models/question_model.dart' as model;
 import 'package:neet_mitos/core/services/question_importer.dart';
 
-model.Question _makeQuestion(int id, {String? subject, String? text}) {
+model.Question _makeQuestion(String id, {String? subject, String? text}) {
   return model.Question(
     id: id,
     subject: subject ?? 'Biology',
@@ -35,11 +35,11 @@ void main() {
   test('bulkInsertQuestions writes all questions and getQuestions reads them',
       () async {
     await db.batch((batch) {
-      for (var q in [_makeQuestion(1), _makeQuestion(2), _makeQuestion(3)]) {
+      for (var q in [_makeQuestion('1'), _makeQuestion('2'), _makeQuestion('3')]) {
         batch.insert(
           db.questions,
           QuestionsCompanion(
-            id: Value<String>(q.id.toString()),
+            id: Value<String>(q.id),
             subject: Value<String>(q.subject),
             chapter: Value<String>(q.chapter),
             topic: Value<String>(q.topic),
@@ -61,7 +61,7 @@ void main() {
   });
 
   test('getExistingQuestionTexts returns canonicalized texts', () async {
-    final q = _makeQuestion(1, text: '  Photosynthesis   occurs in? ');
+    final q = _makeQuestion('1', text: '  Photosynthesis   occurs in? ');
     await db.into(db.questions).insert(
       QuestionsCompanion(
         id: const Value('1'),

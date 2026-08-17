@@ -125,7 +125,7 @@ class ContentSyncService {
         if (!activeLocalIds.contains(localId)) {
           await (_localDb.update(
             _localDb.questions,
-          )..where((t) => t.id.equals(localId.toString()))).write(
+          )..where((t) => t.id.equals(localId))).write(
             db.QuestionsCompanion(isActive: Value(false)),
           );
         }
@@ -138,13 +138,13 @@ class ContentSyncService {
   /// Stable cross-platform mapping from a remote UUID to a positive 31-bit
   /// integer local id (FNV-1a). Deterministic so bookmarks/attempts keep
   /// pointing at the same question across re-syncs.
-  static int _remoteToLocalId(String remoteId) {
+  static String _remoteToLocalId(String remoteId) {
     var hash = 0x811C9DC5;
     for (var i = 0; i < remoteId.length; i++) {
       hash ^= remoteId.codeUnitAt(i);
       hash = (hash * 0x01000193) & 0x7FFFFFFF;
     }
-    return hash == 0 ? 1 : hash;
+    return (hash == 0 ? 1 : hash).toString();
   }
 
   static String _asString(dynamic value, {dynamic fallback}) {

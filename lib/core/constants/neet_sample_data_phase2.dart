@@ -3,7 +3,7 @@ import '../models/question_model.dart';
 // ============= BIOLOGY (Class 11) =============
 final List<Question> biologyQuestionsPhase2 = [
   Question(
-    id: 23,
+    id: '23',
     subject: "Biology",
     chapter: "The Living World",
     topic: "Characteristics of Living Organisms",
@@ -19,7 +19,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 24,
+    id: '24',
     subject: "Biology",
     chapter: "The Living World",
     topic: "Characteristics of Living Organisms",
@@ -35,7 +35,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 25,
+    id: '25',
     subject: "Biology",
     chapter: "The Living World",
     topic: "Diversity in Living Organisms",
@@ -51,7 +51,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 26,
+    id: '26',
     subject: "Biology",
     chapter: "The Living World",
     topic: "Diversity in Living Organisms",
@@ -67,7 +67,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 27,
+    id: '27',
     subject: "Biology",
     chapter: "Biological Classification",
     topic: "Monera & Protista",
@@ -83,7 +83,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 28,
+    id: '28',
     subject: "Biology",
     chapter: "Biological Classification",
     topic: "Monera & Protista",
@@ -99,7 +99,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 29,
+    id: '29',
     subject: "Biology",
     chapter: "Plant Kingdom",
     topic: "Algae",
@@ -120,7 +120,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 30,
+    id: '30',
     subject: "Biology",
     chapter: "Plant Kingdom",
     topic: "Algae",
@@ -136,7 +136,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 31,
+    id: '31',
     subject: "Biology",
     chapter: "Animal Kingdom",
     topic: "Phylum Porifera",
@@ -152,7 +152,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 32,
+    id: '32',
     subject: "Biology",
     chapter: "Animal Kingdom",
     topic: "Phylum Annelida",
@@ -168,7 +168,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 33,
+    id: '33',
     subject: "Biology",
     chapter: "Cell: The Unit of Life",
     topic: "Eukaryotic Cell Organelles",
@@ -184,7 +184,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 34,
+    id: '34',
     subject: "Biology",
     chapter: "Cell: The Unit of Life",
     topic: "Eukaryotic Cell Organelles",
@@ -200,7 +200,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 35,
+    id: '35',
     subject: "Biology",
     chapter: "Biomolecules",
     topic: "Enzymes",
@@ -216,7 +216,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 36,
+    id: '36',
     subject: "Biology",
     chapter: "Biomolecules",
     topic: "Structure of Macromolecules",
@@ -232,7 +232,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 37,
+    id: '37',
     subject: "Biology",
     chapter: "Cell Cycle and Cell Division",
     topic: "Cell Cycle",
@@ -248,7 +248,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 38,
+    id: '38',
     subject: "Biology",
     chapter: "Cell Cycle and Cell Division",
     topic: "Meiosis",
@@ -264,7 +264,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 39,
+    id: '39',
     subject: "Biology",
     chapter: "Photosynthesis in Higher Plants",
     topic: "Calvin Cycle",
@@ -280,7 +280,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 40,
+    id: '40',
     subject: "Biology",
     chapter: "Photosynthesis in Higher Plants",
     topic: "Light Reaction",
@@ -296,7 +296,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 41,
+    id: '41',
     subject: "Biology",
     chapter: "Respiration in Plants",
     topic: "Krebs Cycle",
@@ -312,7 +312,7 @@ final List<Question> biologyQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 42,
+    id: '42',
     subject: "Biology",
     chapter: "Respiration in Plants",
     topic: "Electron Transport",
@@ -332,7 +332,7 @@ final List<Question> biologyQuestionsPhase2 = [
 // ============= BIOLOGY (Class 12) =============
 final List<Question> biologyQuestionsPhase2Class12 = [
   Question(
-    id: 43,
+    id: '43',
     subject: "Biology",
     chapter: "Human Reproduction",
     topic: "Menstrual Cycle",
@@ -348,7 +348,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 44,
+    id: '44',
     subject: "Biology",
     chapter: "Human Reproduction",
     topic: "Spermatogenesis",
@@ -364,7 +364,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 45,
+    id: '45',
     subject: "Biology",
     chapter: "Principles of Inheritance and Variation",
     topic: "Mendelian Inheritance",
@@ -380,7 +380,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 46,
+    id: '46',
     subject: "Biology",
     chapter: "Principles of Inheritance and Variation",
     topic: "Mendelian Inheritance",
@@ -396,7 +396,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 47,
+    id: '47',
     subject: "Biology",
     chapter: "Molecular Basis of Inheritance",
     topic: "DNA Replication",
@@ -412,7 +412,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 48,
+    id: '48',
     subject: "Biology",
     chapter: "Molecular Basis of Inheritance",
     topic: "Genetic Code",
@@ -433,7 +433,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 49,
+    id: '49',
     subject: "Biology",
     chapter: "Evolution",
     topic: "Origin of Life",
@@ -454,7 +454,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 50,
+    id: '50',
     subject: "Biology",
     chapter: "Evolution",
     topic: "Homologous & Analogous Organs",
@@ -470,7 +470,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 51,
+    id: '51',
     subject: "Biology",
     chapter: "Human Health and Disease",
     topic: "Immunity",
@@ -491,7 +491,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 52,
+    id: '52',
     subject: "Biology",
     chapter: "Human Health and Disease",
     topic: "Common Diseases",
@@ -507,7 +507,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 53,
+    id: '53',
     subject: "Biology",
     chapter: "Biotechnology: Principles and Processes",
     topic: "Tools of Recombinant DNA",
@@ -523,7 +523,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 54,
+    id: '54',
     subject: "Biology",
     chapter: "Biotechnology: Principles and Processes",
     topic: "Tools of Recombinant DNA",
@@ -539,7 +539,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 55,
+    id: '55',
     subject: "Biology",
     chapter: "Organisms and Populations",
     topic: "Population Interactions",
@@ -555,7 +555,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 56,
+    id: '56',
     subject: "Biology",
     chapter: "Ecosystem",
     topic: "Energy Flow",
@@ -576,7 +576,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
     type: "mcq",
   ),
   Question(
-    id: 57,
+    id: '57',
     subject: "Biology",
     chapter: "Biodiversity and Conservation",
     topic: "Biodiversity",
@@ -596,7 +596,7 @@ final List<Question> biologyQuestionsPhase2Class12 = [
 // ============= CHEMISTRY =============
 final List<Question> chemistryQuestionsPhase2 = [
   Question(
-    id: 103,
+    id: '103',
     subject: "Chemistry",
     chapter: "Some Basic Concepts of Chemistry",
     topic: "Mole Concept & Calculations",
@@ -612,7 +612,7 @@ final List<Question> chemistryQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 104,
+    id: '104',
     subject: "Chemistry",
     chapter: "Some Basic Concepts of Chemistry",
     topic: "Mole Concept & Calculations",
@@ -628,7 +628,7 @@ final List<Question> chemistryQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 105,
+    id: '105',
     subject: "Chemistry",
     chapter: "Some Basic Concepts of Chemistry",
     topic: "Mole Concept & Calculations",
@@ -644,7 +644,7 @@ final List<Question> chemistryQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 106,
+    id: '106',
     subject: "Chemistry",
     chapter: "Some Basic Concepts of Chemistry",
     topic: "Mole Concept & Calculations",
@@ -660,7 +660,7 @@ final List<Question> chemistryQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 107,
+    id: '107',
     subject: "Chemistry",
     chapter: "Structure of Atom",
     topic: "Electronic Configuration",
@@ -676,7 +676,7 @@ final List<Question> chemistryQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 108,
+    id: '108',
     subject: "Chemistry",
     chapter: "Structure of Atom",
     topic: "Quantum Numbers",
@@ -692,7 +692,7 @@ final List<Question> chemistryQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 109,
+    id: '109',
     subject: "Chemistry",
     chapter: "Structure of Atom",
     topic: "Sub-atomic Particles",
@@ -708,7 +708,7 @@ final List<Question> chemistryQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 110,
+    id: '110',
     subject: "Chemistry",
     chapter: "Structure of Atom",
     topic: "Quantum Numbers",
@@ -728,7 +728,7 @@ final List<Question> chemistryQuestionsPhase2 = [
 // ============= PHYSICS =============
 final List<Question> physicsQuestionsPhase2 = [
   Question(
-    id: 203,
+    id: '203',
     subject: "Physics",
     chapter: "Units and Measurements",
     topic: "SI Units",
@@ -744,7 +744,7 @@ final List<Question> physicsQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 204,
+    id: '204',
     subject: "Physics",
     chapter: "Units and Measurements",
     topic: "Dimensions",
@@ -760,7 +760,7 @@ final List<Question> physicsQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 205,
+    id: '205',
     subject: "Physics",
     chapter: "Units and Measurements",
     topic: "SI Units",
@@ -776,7 +776,7 @@ final List<Question> physicsQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 206,
+    id: '206',
     subject: "Physics",
     chapter: "Units and Measurements",
     topic: "Significant Figures",
@@ -792,7 +792,7 @@ final List<Question> physicsQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 207,
+    id: '207',
     subject: "Physics",
     chapter: "Motion in a Straight Line",
     topic: "Kinematics",
@@ -808,7 +808,7 @@ final List<Question> physicsQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 208,
+    id: '208',
     subject: "Physics",
     chapter: "Motion in a Straight Line",
     topic: "Kinematics",
@@ -824,7 +824,7 @@ final List<Question> physicsQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 209,
+    id: '209',
     subject: "Physics",
     chapter: "Motion in a Straight Line",
     topic: "Kinematics",
@@ -840,7 +840,7 @@ final List<Question> physicsQuestionsPhase2 = [
     type: "mcq",
   ),
   Question(
-    id: 210,
+    id: '210',
     subject: "Physics",
     chapter: "Motion in a Straight Line",
     topic: "Kinematics",

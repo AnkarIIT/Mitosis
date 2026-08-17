@@ -26,7 +26,7 @@ class SpacedRepetitionService {
   /// [card] is the current stored card, or null when the question is being
   /// scheduled for the first time (always treated as an incorrect answer).
   static db.SpacedRepetitionData review({
-    required int questionId,
+    required String questionId,
     required db.SpacedRepetitionData? card,
     required bool isCorrect,
     DateTime? now,

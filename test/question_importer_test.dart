@@ -162,7 +162,7 @@ void main() {
       ];
       final importer = QuestionImporter(
         existingTexts: {'existing question'},
-        baseId: 5000000,
+        baseId: '5000000',
       );
       final (questions, result) = importer.buildQuestions(rows);
       expect(questions, isEmpty);
@@ -188,8 +188,8 @@ void main() {
         },
       ];
       final (questions, _) =
-          QuestionImporter(baseId: 9000000).buildQuestions(rows);
-      expect(questions.map((q) => q.id).toList(), [9000000, 9000001, 9000002]);
+          QuestionImporter(baseId: 'q_9').buildQuestions(rows);
+      expect(questions.map((q) => q.id).toList(), ['q_90', 'q_91', 'q_92']);
     });
 
     test('parses options stored as ||| separated string', () {

@@ -3,7 +3,7 @@ import 'package:neet_mitos/core/models/question_model.dart';
 import 'package:neet_mitos/core/services/exam_engine_service.dart';
 
 Question _q(
-  int id,
+  String id,
   String subject,
   String topicId, {
   String correct = 'Option B',
@@ -26,15 +26,15 @@ Question _q(
 
 List<Question> _pool() {
   return [
-    _q(1, 'Physics', 'p1'),
-    _q(2, 'Physics', 'p1'),
-    _q(3, 'Physics', 'p2'),
-    _q(4, 'Chemistry', 'c1'),
-    _q(5, 'Chemistry', 'c1'),
-    _q(6, 'Chemistry', 'c2'),
-    _q(7, 'Biology', 'b1'),
-    _q(8, 'Biology', 'b2'),
-    _q(9, 'Biology', 'b3'),
+    _q('1', 'Physics', 'p1'),
+    _q('2', 'Physics', 'p1'),
+    _q('3', 'Physics', 'p2'),
+    _q('4', 'Chemistry', 'c1'),
+    _q('5', 'Chemistry', 'c1'),
+    _q('6', 'Chemistry', 'c2'),
+    _q('7', 'Biology', 'b1'),
+    _q('8', 'Biology', 'b2'),
+    _q('9', 'Biology', 'b3'),
   ];
 }
 

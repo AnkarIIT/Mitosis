@@ -33,7 +33,7 @@ void main() {
       ));
 
       await db.insertBookmark(BookmarksCompanion.insert(
-        questionId: 101,
+        questionId: '101',
         subject: 'Physics',
         topicId: 'phy1',
         bookmarkedAt: DateTime.now(),
@@ -51,19 +51,19 @@ void main() {
     test('bookmarks are idempotent across repeated upserts', () async {
       final now = DateTime.now();
       await db.insertBookmark(BookmarksCompanion.insert(
-        questionId: 101,
+        questionId: '101',
         subject: 'Botany',
         topicId: 'bio1',
         bookmarkedAt: now,
       ));
       await db.insertBookmark(BookmarksCompanion.insert(
-        questionId: 101,
+        questionId: '101',
         subject: 'Botany',
         topicId: 'bio1',
         bookmarkedAt: now.add(const Duration(hours: 1)),
       ));
       await db.insertBookmark(BookmarksCompanion.insert(
-        questionId: 202,
+        questionId: '202',
         subject: 'Zoology',
         topicId: 'zoo2',
         bookmarkedAt: now,
@@ -71,7 +71,7 @@ void main() {
 
       final rows = await db.getAllBookmarks();
       expect(rows.length, 2);
-      expect(rows.map((b) => b.questionId).toSet(), {101, 202});
+      expect(rows.map((b) => b.questionId).toSet(), {'101', '202'});
     });
 
     test('upsertQuizAttempt updates duplicate rows without throwing', () async {

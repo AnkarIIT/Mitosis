@@ -7,7 +7,7 @@ import 'package:neet_mitos/core/models/subject_model.dart';
 import 'package:neet_mitos/core/models/user_progress_model.dart';
 import 'package:neet_mitos/core/services/mark_booster_service.dart';
 
-Question _makeQuestion(int id, {String topicId = 'weak_topic', String? type}) {
+Question _makeQuestion(String id, {String topicId = 'weak_topic', String? type}) {
   return Question(
     id: id,
     subject: 'Biology',
@@ -54,9 +54,9 @@ MarkBoosterDiagnosis _diagnosis({
 
 void main() {
   test('prioritizes unresolved error book questions in the drill', () {
-    final errorQ1 = _makeQuestion(1);
-    final errorQ2 = _makeQuestion(2);
-    final pool = [_makeQuestion(3), errorQ1, _makeQuestion(4), errorQ2];
+    final errorQ1 = _makeQuestion('1');
+    final errorQ2 = _makeQuestion('2');
+    final pool = [_makeQuestion('3'), errorQ1, _makeQuestion('4'), errorQ2];
     final drill = MarkBoosterService.buildDrill(
       diagnosis: _diagnosis(errorQuestions: [errorQ1, errorQ2]),
       allQuestions: pool,
@@ -69,9 +69,9 @@ void main() {
 
   test('includes questions from weak topics', () {
     final pool = [
-      _makeQuestion(1, topicId: 'weak_topic'),
-      _makeQuestion(2, topicId: 'weak_topic'),
-      _makeQuestion(3, topicId: 'other_topic'),
+      _makeQuestion('1', topicId: 'weak_topic'),
+      _makeQuestion('2', topicId: 'weak_topic'),
+      _makeQuestion('3', topicId: 'other_topic'),
     ];
     final drill = MarkBoosterService.buildDrill(
       diagnosis: _diagnosis(weakTopics: [_weakTopic('weak_topic')]),
@@ -87,7 +87,7 @@ void main() {
   });
 
   test('returns at most the requested size and never duplicates', () {
-    final pool = List.generate(30, (i) => _makeQuestion(i + 1));
+    final pool = List.generate(30, (i) => _makeQuestion('${i + 1}'));
     final drill = MarkBoosterService.buildDrill(
       diagnosis: _diagnosis(),
       allQuestions: pool,
@@ -100,7 +100,7 @@ void main() {
   });
 
   test('returns all available questions when pool is smaller than size', () {
-    final pool = [_makeQuestion(1), _makeQuestion(2)];
+    final pool = [_makeQuestion('1'), _makeQuestion('2')];
     final drill = MarkBoosterService.buildDrill(
       diagnosis: _diagnosis(),
       allQuestions: pool,
@@ -122,7 +122,7 @@ void main() {
 
   test('caps weak-topic contribution and fills with variety', () {
     final rng = Random(42);
-    final pool = List.generate(20, (i) => _makeQuestion(i + 1));
+    final pool = List.generate(20, (i) => _makeQuestion('${i + 1}'));
     final drill = MarkBoosterService.buildDrill(
       diagnosis: _diagnosis(weakTopics: [_weakTopic('weak_topic')]),
       allQuestions: pool,
@@ -135,12 +135,12 @@ void main() {
   });
 
   test('resolveErrorBookEntry maps stored id back to a question', () {
-    final q = _makeQuestion(7);
+    final q = _makeQuestion('7');
     final resolved = MarkBoosterService.resolveErrorBookEntry(
       '7',
-      [_makeQuestion(1), q],
+      [_makeQuestion('1'), q],
     );
-    expect(resolved?.id, 7);
+    expect(resolved?.id, '7');
   });
 
   test('resolveErrorBookEntry returns null for missing question', () {
@@ -151,9 +151,9 @@ void main() {
   group('aggregateTopicResults', () {
     test('groups correctness per topicId', () {
       final questions = [
-        _makeQuestion(1, topicId: 'a'),
-        _makeQuestion(2, topicId: 'b'),
-        _makeQuestion(3, topicId: 'a'),
+        _makeQuestion('1', topicId: 'a'),
+        _makeQuestion('2', topicId: 'b'),
+        _makeQuestion('3', topicId: 'a'),
       ];
       final result = MarkBoosterService.aggregateTopicResults(
         questions: questions,
@@ -165,7 +165,7 @@ void main() {
     });
 
     test('treats unanswered indices as incorrect', () {
-      final questions = [_makeQuestion(1, topicId: 'a')];
+      final questions = [_makeQuestion('1', topicId: 'a')];
       final result = MarkBoosterService.aggregateTopicResults(
         questions: questions,
         answerResults: const {},

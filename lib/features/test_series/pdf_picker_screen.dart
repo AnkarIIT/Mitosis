@@ -180,11 +180,11 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
     return chunks;
   }
 
-  /// Generates a collision-resistant numeric id for AI-created questions.
-  /// Sample question ids are small integers, so generated ids stay far away.
-  int _nextGeneratedId() {
+  /// Generates a collision-resistant string id for AI-created questions.
+  /// Sample question ids are small strings, so generated ids stay far away.
+  String _nextGeneratedId() {
     final base = DateTime.now().microsecondsSinceEpoch % 100000000;
-    return base * 1000 + (_generatedIdSeq++ % 1000);
+    return 'gen_${base * 1000 + (_generatedIdSeq++ % 1000)}';
   }
 
   @override

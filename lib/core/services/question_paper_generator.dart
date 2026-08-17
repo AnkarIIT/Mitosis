@@ -79,7 +79,7 @@ class QuestionPaperGenerator {
     int count,
   ) {
     final selected = <Question>[];
-    final usedIds = <int>{};
+    final usedIds = <String>{};
 
     // Bucket by difficulty
     final easy = availableQuestions
@@ -129,7 +129,7 @@ class QuestionPaperGenerator {
   /// Add up to `count` random unused questions from source list
   void _addRandomQuestions(
     List<Question> selected,
-    Set<int> usedIds,
+    Set<String> usedIds,
     List<Question> source,
     int count,
   ) {

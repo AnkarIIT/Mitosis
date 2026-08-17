@@ -31,7 +31,7 @@ class QuestionRepository {
     ];
 
     final toInsert = allQuestions
-        .where((q) => !existingIds.contains(q.id.toString()))
+        .where((q) => !existingIds.contains(q.id))
         .toList();
 
     if (toInsert.isEmpty) return;
@@ -41,7 +41,7 @@ class QuestionRepository {
         batch.insert(
           db.questions,
           QuestionsCompanion(
-            id: Value<String>(q.id.toString()),
+            id: Value<String>(q.id),
             subject: Value<String>(q.subject),
             chapter: Value<String>(q.chapter),
             topic: Value<String>(q.topic),
@@ -87,7 +87,7 @@ class QuestionRepository {
         batch.insert(
           db.questions,
           QuestionsCompanion(
-            id: Value<String>(q.id.toString()),
+            id: Value<String>(q.id),
             subject: Value<String>(q.subject),
             chapter: Value<String>(q.chapter),
             topic: Value<String>(q.topic),
@@ -147,9 +147,9 @@ class QuestionRepository {
     return _mapQuestions(data);
   }
 
-  Future<model.Question?> getQuestionById(int id) async {
+  Future<model.Question?> getQuestionById(String id) async {
     final row = await (db.select(db.questions)
-          ..where((tbl) => tbl.id.equals(id.toString())))
+          ..where((tbl) => tbl.id.equals(id)))
         .getSingleOrNull();
     if (row == null) return null;
     return model.Question.fromMap({
@@ -171,8 +171,8 @@ class QuestionRepository {
     });
   }
 
-  Future<void> updateQuestionExplanation(int questionId, String explanation) async {
-    await (db.update(db.questions)..where((tbl) => tbl.id.equals(questionId.toString())))
+  Future<void> updateQuestionExplanation(String questionId, String explanation) async {
+    await (db.update(db.questions)..where((tbl) => tbl.id.equals(questionId)))
         .write(QuestionsCompanion(explanation: Value<String>(explanation)));
   }
 
@@ -194,7 +194,7 @@ class QuestionRepository {
         batch.insert(
           db.questions,
           QuestionsCompanion(
-            id: Value<String>(q.id.toString()),
+            id: Value<String>(q.id),
             subject: Value<String>(q.subject),
             chapter: Value<String>(q.chapter),
             topic: Value<String>(q.topic),
@@ -220,7 +220,7 @@ class QuestionRepository {
   Future<void> insertQuestion(model.Question question) async {
     await db.into(db.questions).insert(
       QuestionsCompanion(
-        id: Value<String>(question.id.toString()),
+        id: Value<String>(question.id),
         subject: Value<String>(question.subject),
         chapter: Value<String>(question.chapter),
         topic: Value<String>(question.topic),

@@ -40,12 +40,12 @@ class QuestionImportResult {
 /// CSV files use the same field names as headers (`options` may also be given
 /// as `option1`, `option2`, ... columns, or as one column using `|||`).
 class QuestionImporter {
-  QuestionImporter({Set<String>? existingTexts, int? baseId})
+  QuestionImporter({Set<String>? existingTexts, String? baseId})
       : _existingTexts = existingTexts ?? const {},
-        _baseId = baseId ?? (DateTime.now().microsecondsSinceEpoch ~/ 1000);
+        _baseId = baseId ?? 'imp_${DateTime.now().microsecondsSinceEpoch}';
 
   final Set<String> _existingTexts;
-  final int _baseId;
+  final String _baseId;
 
   static const _subjectAliases = {
     'bio': 'Biology',
@@ -190,7 +190,7 @@ class QuestionImporter {
 
       questions.add(
         Question(
-          id: _baseId + questions.length,
+          id: '$_baseId${questions.length}',
           subject: _canonicalSubject(
             normalized['subject']?.toString().trim() ?? 'General',
           ),

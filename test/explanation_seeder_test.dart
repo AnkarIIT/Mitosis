@@ -4,7 +4,7 @@ import 'package:neet_mitos/core/services/explanation_seeder.dart';
 import 'package:neet_mitos/core/services/gemini_proxy_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Question _q(int id, {String? explanation}) {
+Question _q(String id, {String? explanation}) {
   return Question(
     id: id,
     subject: 'Biology',
@@ -46,8 +46,8 @@ void main() {
 
   group('ExplanationSeeder.seedAll', () {
     test('skips questions that already have an explanation', () async {
-      final questions = [_q(1, explanation: 'Already explained'), _q(2)];
-      var updatedIds = <int>[];
+      final questions = [_q('1', explanation: 'Already explained'), _q('2')];
+      var updatedIds = <String>[];
 
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
@@ -59,12 +59,12 @@ void main() {
 
       expect(result.total, 1);
       expect(result.generated, 1);
-      expect(updatedIds, [2]);
+      expect(updatedIds, ['2']);
     });
 
     test('forceRefresh regenerates all explanations', () async {
-      final questions = [_q(1, explanation: 'Old explanation'), _q(2)];
-      var updatedIds = <int>[];
+      final questions = [_q('1', explanation: 'Old explanation'), _q('2')];
+      var updatedIds = <String>[];
 
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
@@ -75,11 +75,11 @@ void main() {
       final result = await seeder.seedAll(forceRefresh: true);
 
       expect(result.total, 2);
-      expect(updatedIds, [1, 2]);
+      expect(updatedIds, ['1', '2']);
     });
 
     test('rejects responses that are too short', () async {
-      final questions = [_q(1)];
+      final questions = [_q('1')];
       var updated = false;
 
       final seeder = ExplanationSeeder(
@@ -96,7 +96,7 @@ void main() {
     });
 
     test('rejects responses that start with "Error:"', () async {
-      final questions = [_q(1)];
+      final questions = [_q('1')];
 
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
@@ -111,7 +111,7 @@ void main() {
     });
 
     test('retries on error and succeeds on second attempt', () async {
-      final questions = [_q(1)];
+      final questions = [_q('1')];
       var updated = false;
 
       final seeder = ExplanationSeeder(
@@ -131,8 +131,8 @@ void main() {
     });
 
     test('stops early on rate limit', () async {
-      final questions = [_q(1), _q(2), _q(3)];
-      final updatedIds = <int>[];
+      final questions = [_q('1'), _q('2'), _q('3')];
+      final updatedIds = <String>[];
       var callCount = 0;
 
       final seeder = ExplanationSeeder(
@@ -155,11 +155,11 @@ void main() {
 
       expect(result.generated, 1);
       expect(result.rateLimited, 1);
-      expect(updatedIds, [1]);
+      expect(updatedIds, ['1']);
     });
 
     test('progress callback is invoked for each question', () async {
-      final questions = [_q(1), _q(2)];
+      final questions = [_q('1'), _q('2')];
       final progressLog = <(int, int)>[];
 
       final seeder = ExplanationSeeder(
@@ -177,15 +177,15 @@ void main() {
     });
 
     test('cancel stops the seeder early', () async {
-      final questions = [_q(1), _q(2), _q(3)];
-      final updatedIds = <int>[];
+      final questions = [_q('1'), _q('2'), _q('3')];
+      final updatedIds = <String>[];
 
       late ExplanationSeeder seeder;
       seeder = ExplanationSeeder(
         getQuestions: () async => questions,
         updateExplanation: (id, _) async {
           updatedIds.add(id);
-          if (id == 1) seeder.cancel();
+          if (id == '1') seeder.cancel();
         },
         proxy: makeProxy({'source': 'gemini', 'response': 'Explanation text generated for question.'}),
         delayBetweenRequests: Duration.zero,
@@ -199,8 +199,8 @@ void main() {
 
     test('returns all zeros when nothing needs explanation', () async {
       final questions = [
-        _q(1, explanation: 'Already has one'),
-        _q(2, explanation: 'Also done'),
+        _q('1', explanation: 'Already has one'),
+        _q('2', explanation: 'Also done'),
       ];
 
       final seeder = ExplanationSeeder(

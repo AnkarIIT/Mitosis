@@ -8,13 +8,13 @@ void main() {
     test('first incorrect answer creates a card due tomorrow', () {
       final now = DateTime(2026, 8, 17, 10);
       final card = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: null,
         isCorrect: false,
         now: now,
       );
 
-      expect(card.questionId, 1);
+      expect(card.questionId, '1');
       expect(card.box, 0);
       expect(card.repetitions, 0);
       expect(card.intervalDays, 1);
@@ -34,7 +34,7 @@ void main() {
       for (final expected in expectedIntervals) {
         now = now.add(Duration(days: expected));
         card = SpacedRepetitionService.review(
-          questionId: 1,
+          questionId: '1',
           card: card,
           isCorrect: true,
           now: now,
@@ -50,14 +50,14 @@ void main() {
     test('correct answers advance box and ease factor', () {
       final now = DateTime(2026, 8, 17, 10);
       final base = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: null,
         isCorrect: false,
         now: now,
       );
 
       var card = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: base,
         isCorrect: true,
         now: now.add(const Duration(days: 1)),
@@ -66,7 +66,7 @@ void main() {
       expect(card.easeFactor, closeTo(2.28, 0.001));
 
       card = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: card,
         isCorrect: true,
         now: now.add(const Duration(days: 4)),
@@ -78,7 +78,7 @@ void main() {
     test('after the ladder, interval is multiplied by ease factor', () {
       final now = DateTime(2026, 8, 17, 10);
       final card = SpacedRepetitionData(
-        questionId: 1,
+        questionId: '1',
         box: 4,
         easeFactor: 2.5,
         intervalDays: 21,
@@ -88,7 +88,7 @@ void main() {
       );
 
       final next = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: card,
         isCorrect: true,
         now: now,
@@ -99,7 +99,7 @@ void main() {
     test('interval growth is capped at 60 days', () {
       final now = DateTime(2026, 8, 17, 10);
       final card = SpacedRepetitionData(
-        questionId: 1,
+        questionId: '1',
         box: 4,
         easeFactor: 3.0,
         intervalDays: 40,
@@ -109,7 +109,7 @@ void main() {
       );
 
       final next = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: card,
         isCorrect: true,
         now: now,
@@ -120,7 +120,7 @@ void main() {
     test('incorrect answers reset interval and increment lapses', () {
       final now = DateTime(2026, 8, 17, 10);
       final card = SpacedRepetitionData(
-        questionId: 1,
+        questionId: '1',
         box: 3,
         easeFactor: 2.5,
         intervalDays: 21,
@@ -130,7 +130,7 @@ void main() {
       );
 
       final next = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: card,
         isCorrect: false,
         now: now,
@@ -145,7 +145,7 @@ void main() {
     test('ease factor is clamped to [1.3, 3.0]', () {
       final now = DateTime(2026, 8, 17, 10);
       final low = SpacedRepetitionData(
-        questionId: 1,
+        questionId: '1',
         box: 0,
         easeFactor: 1.3,
         intervalDays: 1,
@@ -154,7 +154,7 @@ void main() {
         dueAt: now,
       );
       final afterPenalty = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: low,
         isCorrect: false,
         now: now,
@@ -162,7 +162,7 @@ void main() {
       expect(afterPenalty.easeFactor, 1.3);
 
       final high = SpacedRepetitionData(
-        questionId: 1,
+        questionId: '1',
         box: 4,
         easeFactor: 3.0,
         intervalDays: 21,
@@ -171,7 +171,7 @@ void main() {
         dueAt: now,
       );
       final afterGain = SpacedRepetitionService.review(
-        questionId: 1,
+        questionId: '1',
         card: high,
         isCorrect: true,
         now: now,
@@ -182,7 +182,7 @@ void main() {
     test('isDue returns true when dueAt is in the past or now', () {
       final now = DateTime(2026, 8, 17, 10);
       final past = SpacedRepetitionData(
-        questionId: 1,
+        questionId: '1',
         box: 0,
         easeFactor: 2.5,
         intervalDays: 1,
@@ -191,7 +191,7 @@ void main() {
         dueAt: now.subtract(const Duration(minutes: 1)),
       );
       final future = SpacedRepetitionData(
-        questionId: 1,
+        questionId: '1',
         box: 0,
         easeFactor: 2.5,
         intervalDays: 1,
@@ -200,7 +200,7 @@ void main() {
         dueAt: now.add(const Duration(minutes: 1)),
       );
       final exact = SpacedRepetitionData(
-        questionId: 1,
+        questionId: '1',
         box: 0,
         easeFactor: 2.5,
         intervalDays: 1,
@@ -230,7 +230,7 @@ void main() {
       final now = DateTime(2026, 8, 17, 10);
       await db.upsertSpacedRepetition(
         SpacedRepetitionService.review(
-          questionId: 1,
+          questionId: '1',
           card: null,
           isCorrect: false,
           now: now,
@@ -238,9 +238,9 @@ void main() {
       );
       await db.upsertSpacedRepetition(
         SpacedRepetitionService.review(
-          questionId: 1,
+          questionId: '1',
           card: SpacedRepetitionService.review(
-            questionId: 1,
+            questionId: '1',
             card: null,
             isCorrect: false,
             now: now,
@@ -252,7 +252,7 @@ void main() {
 
       final cards = await db.getSpacedRepetitionCards();
       expect(cards.length, 1);
-      expect(cards.single.questionId, 1);
+      expect(cards.single.questionId, '1');
       expect(cards.single.box, 1);
     });
 
@@ -260,7 +260,7 @@ void main() {
       final now = DateTime(2026, 8, 17, 10);
       await db.upsertSpacedRepetition(
         SpacedRepetitionService.review(
-          questionId: 1,
+          questionId: '1',
           card: null,
           isCorrect: false,
           now: now.subtract(const Duration(days: 2)),
@@ -268,7 +268,7 @@ void main() {
       );
       await db.upsertSpacedRepetition(
         SpacedRepetitionService.review(
-          questionId: 2,
+          questionId: '2',
           card: null,
           isCorrect: false,
           now: now.subtract(const Duration(days: 5)),
@@ -276,7 +276,7 @@ void main() {
       );
       await db.upsertSpacedRepetition(
         SpacedRepetitionService.review(
-          questionId: 3,
+          questionId: '3',
           card: null,
           isCorrect: false,
           now: now.subtract(const Duration(days: 1)),
@@ -285,8 +285,8 @@ void main() {
 
       final due = await db.getDueSpacedRepetition(now);
       expect(due.length, 3);
-      expect(due[0].questionId, 2); // oldest due first
-      expect(due[2].questionId, 3);
+      expect(due[0].questionId, '2'); // oldest due first
+      expect(due[2].questionId, '3');
 
       final noLongerDue = await db.getDueSpacedRepetition(
         now.subtract(const Duration(days: 6)),
@@ -298,15 +298,15 @@ void main() {
       final now = DateTime(2026, 8, 17, 10);
       await db.upsertSpacedRepetition(
         SpacedRepetitionService.review(
-          questionId: 1,
+          questionId: '1',
           card: null,
           isCorrect: false,
           now: now,
         ),
       );
-      await db.removeSpacedRepetition(1);
+      await db.removeSpacedRepetition('1');
 
-      expect(await db.getSpacedRepetition(1), isNull);
+      expect(await db.getSpacedRepetition('1'), isNull);
       expect(await db.getSpacedRepetitionCards(), isEmpty);
     });
 
@@ -314,7 +314,7 @@ void main() {
       final now = DateTime(2026, 8, 17, 10);
       await db.upsertSpacedRepetition(
         SpacedRepetitionService.review(
-          questionId: 1,
+          questionId: '1',
           card: null,
           isCorrect: false,
           now: now,

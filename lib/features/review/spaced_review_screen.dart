@@ -23,7 +23,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
   String? _selected;
   bool _answered = false;
   bool _sessionDone = false;
-  final Map<int, bool> _results = {};
+  final Map<String, bool> _results = {};
 
   @override
   void dispose() {

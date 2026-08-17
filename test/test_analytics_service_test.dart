@@ -4,7 +4,7 @@ import 'package:neet_mitos/core/services/exam_engine_service.dart';
 import 'package:neet_mitos/core/services/test_analytics_service.dart';
 
 Question _q(
-  int id,
+  String id,
   String subject,
   String topicId,
   String topic, {
@@ -71,9 +71,9 @@ void main() {
   group('TestAnalyticsService.compute', () {
     test('builds per-subject breakdown with time', () {
       final questions = [
-        _q(1, 'Physics', 'p1', 'Motion'),
-        _q(2, 'Physics', 'p1', 'Motion'),
-        _q(3, 'Chemistry', 'c1', 'Bonding'),
+        _q('1', 'Physics', 'p1', 'Motion'),
+        _q('2', 'Physics', 'p1', 'Motion'),
+        _q('3', 'Chemistry', 'c1', 'Bonding'),
       ];
       final score = _grade(questions, {
         0: 'Option B',
@@ -97,11 +97,11 @@ void main() {
 
     test('finds and sorts weak topics below 60% accuracy', () {
       final questions = [
-        _q(1, 'Physics', 'weak', 'Weak Topic'),
-        _q(2, 'Physics', 'weak', 'Weak Topic'),
-        _q(3, 'Physics', 'strong', 'Strong Topic'),
-        _q(4, 'Physics', 'strong', 'Strong Topic'),
-        _q(5, 'Physics', 'strong', 'Strong Topic'),
+        _q('1', 'Physics', 'weak', 'Weak Topic'),
+        _q('2', 'Physics', 'weak', 'Weak Topic'),
+        _q('3', 'Physics', 'strong', 'Strong Topic'),
+        _q('4', 'Physics', 'strong', 'Strong Topic'),
+        _q('5', 'Physics', 'strong', 'Strong Topic'),
       ];
       final score = _grade(questions, {
         0: 'Option A', // wrong
@@ -119,8 +119,8 @@ void main() {
 
     test('unanswered questions are excluded from weak topics', () {
       final questions = [
-        _q(1, 'Physics', 'skip', 'Skipped Topic'),
-        _q(2, 'Physics', 'skip', 'Skipped Topic'),
+        _q('1', 'Physics', 'skip', 'Skipped Topic'),
+        _q('2', 'Physics', 'skip', 'Skipped Topic'),
       ];
       final score = _grade(questions, {});
       expect(TestAnalyticsService.findWeakTopics(score), isEmpty);

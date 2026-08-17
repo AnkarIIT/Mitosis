@@ -31,7 +31,7 @@ class MarkBoosterService {
     final rng = random ?? Random();
 
     final priority = <Question>[];
-    final priorityIds = <int>{};
+    final priorityIds = <String>{};
 
     void addQuestion(Question q) {
       if (priorityIds.add(q.id)) {
@@ -52,7 +52,7 @@ class MarkBoosterService {
     }
 
     final selected = <Question>[];
-    final selectedIds = <int>{};
+    final selectedIds = <String>{};
 
     for (final q in priority) {
       if (selected.length >= size) break;
@@ -82,7 +82,7 @@ class MarkBoosterService {
     List<Question> allQuestions,
   ) {
     for (final q in allQuestions) {
-      if (q.id.toString() == questionId) return q;
+      if (q.id == questionId) return q;
     }
     return null;
   }

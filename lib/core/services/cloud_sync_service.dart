@@ -244,12 +244,12 @@ class CloudSyncService {
 
     // Natural key: question_id. The local unique index (v17 migration) makes
     // repeated pulls idempotent.
-    final byKey = <int, (db.Bookmark?, Map<String, dynamic>?)>{};
+    final byKey = <String, (db.Bookmark?, Map<String, dynamic>?)>{};
     for (final row in localRows) {
       byKey[row.questionId] = (row, null);
     }
     for (final row in cloudRows) {
-      final key = _asInt(row['question_id']);
+      final key = _asString(row['question_id']);
       byKey.update(key, (v) => (v.$1, row), ifAbsent: () => (null, row));
     }
 
@@ -294,7 +294,7 @@ class CloudSyncService {
 
   db.BookmarksCompanion _remoteBookmarkToLocal(Map<String, dynamic> row) {
     return db.BookmarksCompanion.insert(
-      questionId: _asInt(row['question_id']),
+      questionId: _asString(row['question_id']),
       subject: _asString(row['subject']),
       topicId: _asString(row['topic_id']),
       bookmarkedAt: _parseDate(row['bookmarked_at'], fallback: DateTime.now()),

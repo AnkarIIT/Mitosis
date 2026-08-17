@@ -2309,11 +2309,11 @@ class $BookmarksTable extends Bookmarks
     'questionId',
   );
   @override
-  late final GeneratedColumn<int> questionId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> questionId = GeneratedColumn<String>(
     'question_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _subjectMeta = const VerificationMeta(
@@ -2440,7 +2440,7 @@ class $BookmarksTable extends Bookmarks
         data['${effectivePrefix}id'],
       )!,
       questionId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}question_id'],
       )!,
       subject: attachedDatabase.typeMapping.read(
@@ -2470,7 +2470,7 @@ class $BookmarksTable extends Bookmarks
 
 class Bookmark extends DataClass implements Insertable<Bookmark> {
   final int id;
-  final int questionId;
+  final String questionId;
   final String subject;
   final String topicId;
   final DateTime bookmarkedAt;
@@ -2487,7 +2487,7 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['question_id'] = Variable<int>(questionId);
+    map['question_id'] = Variable<String>(questionId);
     map['subject'] = Variable<String>(subject);
     map['topic_id'] = Variable<String>(topicId);
     map['bookmarked_at'] = Variable<DateTime>(bookmarkedAt);
@@ -2517,7 +2517,7 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Bookmark(
       id: serializer.fromJson<int>(json['id']),
-      questionId: serializer.fromJson<int>(json['questionId']),
+      questionId: serializer.fromJson<String>(json['questionId']),
       subject: serializer.fromJson<String>(json['subject']),
       topicId: serializer.fromJson<String>(json['topicId']),
       bookmarkedAt: serializer.fromJson<DateTime>(json['bookmarkedAt']),
@@ -2529,7 +2529,7 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'questionId': serializer.toJson<int>(questionId),
+      'questionId': serializer.toJson<String>(questionId),
       'subject': serializer.toJson<String>(subject),
       'topicId': serializer.toJson<String>(topicId),
       'bookmarkedAt': serializer.toJson<DateTime>(bookmarkedAt),
@@ -2539,7 +2539,7 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
 
   Bookmark copyWith({
     int? id,
-    int? questionId,
+    String? questionId,
     String? subject,
     String? topicId,
     DateTime? bookmarkedAt,
@@ -2597,7 +2597,7 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
 
 class BookmarksCompanion extends UpdateCompanion<Bookmark> {
   final Value<int> id;
-  final Value<int> questionId;
+  final Value<String> questionId;
   final Value<String> subject;
   final Value<String> topicId;
   final Value<DateTime> bookmarkedAt;
@@ -2612,7 +2612,7 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
   });
   BookmarksCompanion.insert({
     this.id = const Value.absent(),
-    required int questionId,
+    required String questionId,
     required String subject,
     required String topicId,
     required DateTime bookmarkedAt,
@@ -2623,7 +2623,7 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
        bookmarkedAt = Value(bookmarkedAt);
   static Insertable<Bookmark> custom({
     Expression<int>? id,
-    Expression<int>? questionId,
+    Expression<String>? questionId,
     Expression<String>? subject,
     Expression<String>? topicId,
     Expression<DateTime>? bookmarkedAt,
@@ -2641,7 +2641,7 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
 
   BookmarksCompanion copyWith({
     Value<int>? id,
-    Value<int>? questionId,
+    Value<String>? questionId,
     Value<String>? subject,
     Value<String>? topicId,
     Value<DateTime>? bookmarkedAt,
@@ -2664,7 +2664,7 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
       map['id'] = Variable<int>(id.value);
     }
     if (questionId.present) {
-      map['question_id'] = Variable<int>(questionId.value);
+      map['question_id'] = Variable<String>(questionId.value);
     }
     if (subject.present) {
       map['subject'] = Variable<String>(subject.value);
@@ -4349,12 +4349,12 @@ class $ErrorBookTable extends ErrorBook
     'questionId',
   );
   @override
-  late final GeneratedColumn<int> questionId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> questionId = GeneratedColumn<String>(
     'question_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _addedAtMeta = const VerificationMeta(
     'addedAt',
@@ -4418,6 +4418,8 @@ class $ErrorBookTable extends ErrorBook
         _questionIdMeta,
         questionId.isAcceptableOrUnknown(data['question_id']!, _questionIdMeta),
       );
+    } else if (isInserting) {
+      context.missing(_questionIdMeta);
     }
     if (data.containsKey('added_at')) {
       context.handle(
@@ -4449,7 +4451,7 @@ class $ErrorBookTable extends ErrorBook
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ErrorBookData(
       questionId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}question_id'],
       )!,
       addedAt: attachedDatabase.typeMapping.read(
@@ -4474,7 +4476,7 @@ class $ErrorBookTable extends ErrorBook
 }
 
 class ErrorBookData extends DataClass implements Insertable<ErrorBookData> {
-  final int questionId;
+  final String questionId;
   final DateTime addedAt;
   final int retryCount;
   final bool isResolved;
@@ -4487,7 +4489,7 @@ class ErrorBookData extends DataClass implements Insertable<ErrorBookData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['question_id'] = Variable<int>(questionId);
+    map['question_id'] = Variable<String>(questionId);
     map['added_at'] = Variable<DateTime>(addedAt);
     map['retry_count'] = Variable<int>(retryCount);
     map['is_resolved'] = Variable<bool>(isResolved);
@@ -4509,7 +4511,7 @@ class ErrorBookData extends DataClass implements Insertable<ErrorBookData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ErrorBookData(
-      questionId: serializer.fromJson<int>(json['questionId']),
+      questionId: serializer.fromJson<String>(json['questionId']),
       addedAt: serializer.fromJson<DateTime>(json['addedAt']),
       retryCount: serializer.fromJson<int>(json['retryCount']),
       isResolved: serializer.fromJson<bool>(json['isResolved']),
@@ -4519,7 +4521,7 @@ class ErrorBookData extends DataClass implements Insertable<ErrorBookData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'questionId': serializer.toJson<int>(questionId),
+      'questionId': serializer.toJson<String>(questionId),
       'addedAt': serializer.toJson<DateTime>(addedAt),
       'retryCount': serializer.toJson<int>(retryCount),
       'isResolved': serializer.toJson<bool>(isResolved),
@@ -4527,7 +4529,7 @@ class ErrorBookData extends DataClass implements Insertable<ErrorBookData> {
   }
 
   ErrorBookData copyWith({
-    int? questionId,
+    String? questionId,
     DateTime? addedAt,
     int? retryCount,
     bool? isResolved,
@@ -4576,47 +4578,55 @@ class ErrorBookData extends DataClass implements Insertable<ErrorBookData> {
 }
 
 class ErrorBookCompanion extends UpdateCompanion<ErrorBookData> {
-  final Value<int> questionId;
+  final Value<String> questionId;
   final Value<DateTime> addedAt;
   final Value<int> retryCount;
   final Value<bool> isResolved;
+  final Value<int> rowid;
   const ErrorBookCompanion({
     this.questionId = const Value.absent(),
     this.addedAt = const Value.absent(),
     this.retryCount = const Value.absent(),
     this.isResolved = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ErrorBookCompanion.insert({
-    this.questionId = const Value.absent(),
+    required String questionId,
     required DateTime addedAt,
     this.retryCount = const Value.absent(),
     this.isResolved = const Value.absent(),
-  }) : addedAt = Value(addedAt);
+    this.rowid = const Value.absent(),
+  }) : questionId = Value(questionId),
+       addedAt = Value(addedAt);
   static Insertable<ErrorBookData> custom({
-    Expression<int>? questionId,
+    Expression<String>? questionId,
     Expression<DateTime>? addedAt,
     Expression<int>? retryCount,
     Expression<bool>? isResolved,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (questionId != null) 'question_id': questionId,
       if (addedAt != null) 'added_at': addedAt,
       if (retryCount != null) 'retry_count': retryCount,
       if (isResolved != null) 'is_resolved': isResolved,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   ErrorBookCompanion copyWith({
-    Value<int>? questionId,
+    Value<String>? questionId,
     Value<DateTime>? addedAt,
     Value<int>? retryCount,
     Value<bool>? isResolved,
+    Value<int>? rowid,
   }) {
     return ErrorBookCompanion(
       questionId: questionId ?? this.questionId,
       addedAt: addedAt ?? this.addedAt,
       retryCount: retryCount ?? this.retryCount,
       isResolved: isResolved ?? this.isResolved,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -4624,7 +4634,7 @@ class ErrorBookCompanion extends UpdateCompanion<ErrorBookData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (questionId.present) {
-      map['question_id'] = Variable<int>(questionId.value);
+      map['question_id'] = Variable<String>(questionId.value);
     }
     if (addedAt.present) {
       map['added_at'] = Variable<DateTime>(addedAt.value);
@@ -4635,6 +4645,9 @@ class ErrorBookCompanion extends UpdateCompanion<ErrorBookData> {
     if (isResolved.present) {
       map['is_resolved'] = Variable<bool>(isResolved.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -4644,7 +4657,8 @@ class ErrorBookCompanion extends UpdateCompanion<ErrorBookData> {
           ..write('questionId: $questionId, ')
           ..write('addedAt: $addedAt, ')
           ..write('retryCount: $retryCount, ')
-          ..write('isResolved: $isResolved')
+          ..write('isResolved: $isResolved, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -5520,12 +5534,12 @@ class $SpacedRepetitionTable extends SpacedRepetition
     'questionId',
   );
   @override
-  late final GeneratedColumn<int> questionId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> questionId = GeneratedColumn<String>(
     'question_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _boxMeta = const VerificationMeta('box');
   @override
@@ -5645,6 +5659,8 @@ class $SpacedRepetitionTable extends SpacedRepetition
         _questionIdMeta,
         questionId.isAcceptableOrUnknown(data['question_id']!, _questionIdMeta),
       );
+    } else if (isInserting) {
+      context.missing(_questionIdMeta);
     }
     if (data.containsKey('box')) {
       context.handle(
@@ -5715,7 +5731,7 @@ class $SpacedRepetitionTable extends SpacedRepetition
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return SpacedRepetitionData(
       questionId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}question_id'],
       )!,
       box: attachedDatabase.typeMapping.read(
@@ -5761,7 +5777,7 @@ class $SpacedRepetitionTable extends SpacedRepetition
 
 class SpacedRepetitionData extends DataClass
     implements Insertable<SpacedRepetitionData> {
-  final int questionId;
+  final String questionId;
   final int box;
   final double easeFactor;
   final int intervalDays;
@@ -5784,7 +5800,7 @@ class SpacedRepetitionData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['question_id'] = Variable<int>(questionId);
+    map['question_id'] = Variable<String>(questionId);
     map['box'] = Variable<int>(box);
     map['ease_factor'] = Variable<double>(easeFactor);
     map['interval_days'] = Variable<int>(intervalDays);
@@ -5824,7 +5840,7 @@ class SpacedRepetitionData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SpacedRepetitionData(
-      questionId: serializer.fromJson<int>(json['questionId']),
+      questionId: serializer.fromJson<String>(json['questionId']),
       box: serializer.fromJson<int>(json['box']),
       easeFactor: serializer.fromJson<double>(json['easeFactor']),
       intervalDays: serializer.fromJson<int>(json['intervalDays']),
@@ -5839,7 +5855,7 @@ class SpacedRepetitionData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'questionId': serializer.toJson<int>(questionId),
+      'questionId': serializer.toJson<String>(questionId),
       'box': serializer.toJson<int>(box),
       'easeFactor': serializer.toJson<double>(easeFactor),
       'intervalDays': serializer.toJson<int>(intervalDays),
@@ -5852,7 +5868,7 @@ class SpacedRepetitionData extends DataClass
   }
 
   SpacedRepetitionData copyWith({
-    int? questionId,
+    String? questionId,
     int? box,
     double? easeFactor,
     int? intervalDays,
@@ -5942,7 +5958,7 @@ class SpacedRepetitionData extends DataClass
 }
 
 class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
-  final Value<int> questionId;
+  final Value<String> questionId;
   final Value<int> box;
   final Value<double> easeFactor;
   final Value<int> intervalDays;
@@ -5951,6 +5967,7 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
   final Value<DateTime> dueAt;
   final Value<DateTime?> lastReviewedAt;
   final Value<DateTime?> updatedAt;
+  final Value<int> rowid;
   const SpacedRepetitionCompanion({
     this.questionId = const Value.absent(),
     this.box = const Value.absent(),
@@ -5961,9 +5978,10 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
     this.dueAt = const Value.absent(),
     this.lastReviewedAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   SpacedRepetitionCompanion.insert({
-    this.questionId = const Value.absent(),
+    required String questionId,
     this.box = const Value.absent(),
     this.easeFactor = const Value.absent(),
     this.intervalDays = const Value.absent(),
@@ -5972,9 +5990,11 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
     required DateTime dueAt,
     this.lastReviewedAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-  }) : dueAt = Value(dueAt);
+    this.rowid = const Value.absent(),
+  }) : questionId = Value(questionId),
+       dueAt = Value(dueAt);
   static Insertable<SpacedRepetitionData> custom({
-    Expression<int>? questionId,
+    Expression<String>? questionId,
     Expression<int>? box,
     Expression<double>? easeFactor,
     Expression<int>? intervalDays,
@@ -5983,6 +6003,7 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
     Expression<DateTime>? dueAt,
     Expression<DateTime>? lastReviewedAt,
     Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (questionId != null) 'question_id': questionId,
@@ -5994,11 +6015,12 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
       if (dueAt != null) 'due_at': dueAt,
       if (lastReviewedAt != null) 'last_reviewed_at': lastReviewedAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   SpacedRepetitionCompanion copyWith({
-    Value<int>? questionId,
+    Value<String>? questionId,
     Value<int>? box,
     Value<double>? easeFactor,
     Value<int>? intervalDays,
@@ -6007,6 +6029,7 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
     Value<DateTime>? dueAt,
     Value<DateTime?>? lastReviewedAt,
     Value<DateTime?>? updatedAt,
+    Value<int>? rowid,
   }) {
     return SpacedRepetitionCompanion(
       questionId: questionId ?? this.questionId,
@@ -6018,6 +6041,7 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
       dueAt: dueAt ?? this.dueAt,
       lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -6025,7 +6049,7 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (questionId.present) {
-      map['question_id'] = Variable<int>(questionId.value);
+      map['question_id'] = Variable<String>(questionId.value);
     }
     if (box.present) {
       map['box'] = Variable<int>(box.value);
@@ -6051,6 +6075,9 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -6065,7 +6092,8 @@ class SpacedRepetitionCompanion extends UpdateCompanion<SpacedRepetitionData> {
           ..write('lapses: $lapses, ')
           ..write('dueAt: $dueAt, ')
           ..write('lastReviewedAt: $lastReviewedAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -8241,7 +8269,7 @@ typedef $$TopicProgressEntriesTableProcessedTableManager =
 typedef $$BookmarksTableCreateCompanionBuilder =
     BookmarksCompanion Function({
       Value<int> id,
-      required int questionId,
+      required String questionId,
       required String subject,
       required String topicId,
       required DateTime bookmarkedAt,
@@ -8250,7 +8278,7 @@ typedef $$BookmarksTableCreateCompanionBuilder =
 typedef $$BookmarksTableUpdateCompanionBuilder =
     BookmarksCompanion Function({
       Value<int> id,
-      Value<int> questionId,
+      Value<String> questionId,
       Value<String> subject,
       Value<String> topicId,
       Value<DateTime> bookmarkedAt,
@@ -8271,7 +8299,7 @@ class $$BookmarksTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get questionId => $composableBuilder(
+  ColumnFilters<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => ColumnFilters(column),
   );
@@ -8311,7 +8339,7 @@ class $$BookmarksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get questionId => $composableBuilder(
+  ColumnOrderings<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => ColumnOrderings(column),
   );
@@ -8349,7 +8377,7 @@ class $$BookmarksTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<int> get questionId => $composableBuilder(
+  GeneratedColumn<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => column,
   );
@@ -8398,7 +8426,7 @@ class $$BookmarksTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int> questionId = const Value.absent(),
+                Value<String> questionId = const Value.absent(),
                 Value<String> subject = const Value.absent(),
                 Value<String> topicId = const Value.absent(),
                 Value<DateTime> bookmarkedAt = const Value.absent(),
@@ -8414,7 +8442,7 @@ class $$BookmarksTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required int questionId,
+                required String questionId,
                 required String subject,
                 required String topicId,
                 required DateTime bookmarkedAt,
@@ -9247,17 +9275,19 @@ typedef $$UsersTableProcessedTableManager =
     >;
 typedef $$ErrorBookTableCreateCompanionBuilder =
     ErrorBookCompanion Function({
-      Value<int> questionId,
+      required String questionId,
       required DateTime addedAt,
       Value<int> retryCount,
       Value<bool> isResolved,
+      Value<int> rowid,
     });
 typedef $$ErrorBookTableUpdateCompanionBuilder =
     ErrorBookCompanion Function({
-      Value<int> questionId,
+      Value<String> questionId,
       Value<DateTime> addedAt,
       Value<int> retryCount,
       Value<bool> isResolved,
+      Value<int> rowid,
     });
 
 class $$ErrorBookTableFilterComposer
@@ -9269,7 +9299,7 @@ class $$ErrorBookTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get questionId => $composableBuilder(
+  ColumnFilters<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => ColumnFilters(column),
   );
@@ -9299,7 +9329,7 @@ class $$ErrorBookTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get questionId => $composableBuilder(
+  ColumnOrderings<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => ColumnOrderings(column),
   );
@@ -9329,7 +9359,7 @@ class $$ErrorBookTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get questionId => $composableBuilder(
+  GeneratedColumn<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => column,
   );
@@ -9379,27 +9409,31 @@ class $$ErrorBookTableTableManager
               $$ErrorBookTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> questionId = const Value.absent(),
+                Value<String> questionId = const Value.absent(),
                 Value<DateTime> addedAt = const Value.absent(),
                 Value<int> retryCount = const Value.absent(),
                 Value<bool> isResolved = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => ErrorBookCompanion(
                 questionId: questionId,
                 addedAt: addedAt,
                 retryCount: retryCount,
                 isResolved: isResolved,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> questionId = const Value.absent(),
+                required String questionId,
                 required DateTime addedAt,
                 Value<int> retryCount = const Value.absent(),
                 Value<bool> isResolved = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => ErrorBookCompanion.insert(
                 questionId: questionId,
                 addedAt: addedAt,
                 retryCount: retryCount,
                 isResolved: isResolved,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -9878,7 +9912,7 @@ typedef $$SyncWatermarksTableProcessedTableManager =
     >;
 typedef $$SpacedRepetitionTableCreateCompanionBuilder =
     SpacedRepetitionCompanion Function({
-      Value<int> questionId,
+      required String questionId,
       Value<int> box,
       Value<double> easeFactor,
       Value<int> intervalDays,
@@ -9887,10 +9921,11 @@ typedef $$SpacedRepetitionTableCreateCompanionBuilder =
       required DateTime dueAt,
       Value<DateTime?> lastReviewedAt,
       Value<DateTime?> updatedAt,
+      Value<int> rowid,
     });
 typedef $$SpacedRepetitionTableUpdateCompanionBuilder =
     SpacedRepetitionCompanion Function({
-      Value<int> questionId,
+      Value<String> questionId,
       Value<int> box,
       Value<double> easeFactor,
       Value<int> intervalDays,
@@ -9899,6 +9934,7 @@ typedef $$SpacedRepetitionTableUpdateCompanionBuilder =
       Value<DateTime> dueAt,
       Value<DateTime?> lastReviewedAt,
       Value<DateTime?> updatedAt,
+      Value<int> rowid,
     });
 
 class $$SpacedRepetitionTableFilterComposer
@@ -9910,7 +9946,7 @@ class $$SpacedRepetitionTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get questionId => $composableBuilder(
+  ColumnFilters<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => ColumnFilters(column),
   );
@@ -9965,7 +10001,7 @@ class $$SpacedRepetitionTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get questionId => $composableBuilder(
+  ColumnOrderings<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => ColumnOrderings(column),
   );
@@ -10020,7 +10056,7 @@ class $$SpacedRepetitionTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get questionId => $composableBuilder(
+  GeneratedColumn<String> get questionId => $composableBuilder(
     column: $table.questionId,
     builder: (column) => column,
   );
@@ -10095,7 +10131,7 @@ class $$SpacedRepetitionTableTableManager
               $$SpacedRepetitionTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> questionId = const Value.absent(),
+                Value<String> questionId = const Value.absent(),
                 Value<int> box = const Value.absent(),
                 Value<double> easeFactor = const Value.absent(),
                 Value<int> intervalDays = const Value.absent(),
@@ -10104,6 +10140,7 @@ class $$SpacedRepetitionTableTableManager
                 Value<DateTime> dueAt = const Value.absent(),
                 Value<DateTime?> lastReviewedAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => SpacedRepetitionCompanion(
                 questionId: questionId,
                 box: box,
@@ -10114,10 +10151,11 @@ class $$SpacedRepetitionTableTableManager
                 dueAt: dueAt,
                 lastReviewedAt: lastReviewedAt,
                 updatedAt: updatedAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> questionId = const Value.absent(),
+                required String questionId,
                 Value<int> box = const Value.absent(),
                 Value<double> easeFactor = const Value.absent(),
                 Value<int> intervalDays = const Value.absent(),
@@ -10126,6 +10164,7 @@ class $$SpacedRepetitionTableTableManager
                 required DateTime dueAt,
                 Value<DateTime?> lastReviewedAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => SpacedRepetitionCompanion.insert(
                 questionId: questionId,
                 box: box,
@@ -10136,6 +10175,7 @@ class $$SpacedRepetitionTableTableManager
                 dueAt: dueAt,
                 lastReviewedAt: lastReviewedAt,
                 updatedAt: updatedAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
