@@ -7,7 +7,6 @@ import '../../core/database/drift_database.dart' show FlashcardsCompanion;
 import '../../core/providers/providers.dart';
 import '../../core/services/ncert_book_catalog.dart';
 import '../../core/services/flashcard_generation_service.dart';
-import '../../core/services/gemini_proxy_service.dart';
 import '../../core/theme/app_colors.dart';
 
 import 'package:go_router/go_router.dart';
@@ -339,7 +338,7 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
 
     try {
       final service = FlashcardGenerationService(
-        proxy: GeminiProxyService(),
+        proxy: ref.read(geminiProxyServiceProvider),
         batchSize: 5,
         delayBetweenBatchesMs: 1200,
       );

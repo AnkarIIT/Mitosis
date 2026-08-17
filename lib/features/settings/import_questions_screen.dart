@@ -8,7 +8,6 @@ import '../../core/database/question_repository.dart';
 import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/explanation_seeder.dart';
-import '../../core/services/gemini_proxy_service.dart';
 import '../../core/services/question_importer.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
@@ -455,7 +454,7 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
       updateExplanation: (id, text) async {
         await ref.read(questionRepositoryProvider).updateQuestionExplanation(id, text);
       },
-      proxy: GeminiProxyService(),
+      proxy: ref.read(geminiProxyServiceProvider),
       onProgress: (completed, total) {
         if (mounted) setState(() { _seedCompleted = completed; _seedTotal = total; });
       },

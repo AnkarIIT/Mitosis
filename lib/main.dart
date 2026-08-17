@@ -7,8 +7,8 @@ import 'core/database/question_repository.dart';
 import 'core/providers/providers.dart' as app_providers;
 import 'core/router/app_router.dart';
 import 'core/services/notification_service.dart';
-import 'core/services/biometric_service.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,23 +71,47 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   bool _needsBiometric = false;
+  bool _splashDone = false;
 
   @override
   void initState() {
     super.initState();
-    _checkBiometricLock();
+    WidgetsBinding.instance.addObserver(this);
+    _startSplash();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void _startSplash() {
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() => _splashDone = true);
+        _checkBiometricLock();
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _splashDone) {
+      _checkBiometricLock();
+    }
   }
 
   Future<void> _checkBiometricLock() async {
-    final bioService = BiometricService();
+    final bioService = ref.read(app_providers.biometricServiceProvider);
     final isEnabled = await bioService.isBiometricEnabled();
 
-    if (isEnabled) {
+    if (isEnabled && !_needsBiometric) {
       setState(() => _needsBiometric = true);
       final success = await bioService.authenticate();
-      if (success) {
+      if (success && mounted) {
         setState(() => _needsBiometric = false);
       }
     }
@@ -97,30 +121,13 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(app_providers.themeProvider);
 
-    if (_needsBiometric) {
+    if (!_splashDone) {
       return MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.lock_outline, size: 64, color: Colors.blue),
-                const SizedBox(height: 24),
-                const Text('App Locked',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _checkBiometricLock,
-                  child: const Text('UNLOCK WITH BIOMETRICS'),
-                ),
-              ],
-            ),
-          ),
-        ),
+        home: const _BrandedSplash(),
       );
     }
 
@@ -131,6 +138,253 @@ class _MyAppState extends ConsumerState<MyApp> {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       routerConfig: ref.watch(routerProvider),
+      builder: (context, child) {
+        if (_needsBiometric) {
+          return _BiometricLockOverlay(
+            onUnlock: () => setState(() => _needsBiometric = false),
+          );
+        }
+        return child ?? const SizedBox.shrink();
+      },
     );
+  }
+}
+
+class _BrandedSplash extends StatelessWidget {
+  const _BrandedSplash();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(
+                Icons.school_rounded,
+                size: 48,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'NEET Mitos',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textDark,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Your NEET prep companion',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSubtle,
+              ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BiometricLockOverlay extends ConsumerStatefulWidget {
+  final VoidCallback onUnlock;
+
+  const _BiometricLockOverlay({required this.onUnlock});
+
+  @override
+  ConsumerState<_BiometricLockOverlay> createState() =>
+      _BiometricLockOverlayState();
+}
+
+class _BiometricLockOverlayState extends ConsumerState<_BiometricLockOverlay> {
+  bool _authenticating = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _authenticate();
+  }
+
+  Future<void> _authenticate() async {
+    setState(() {
+      _authenticating = true;
+      _error = null;
+    });
+
+    final bioService = ref.read(app_providers.biometricServiceProvider);
+    final success = await bioService.authenticate();
+
+    if (mounted) {
+      setState(() => _authenticating = false);
+      if (success) {
+        widget.onUnlock();
+      } else {
+        setState(() => _error = 'Authentication failed. Tap to retry.');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: Theme.of(context).brightness == Brightness.dark
+          ? ThemeMode.dark
+          : ThemeMode.light,
+      home: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                AppColors.primary,
+                AppColors.primary.withValues(alpha: 0.8),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(
+                    Icons.lock_outline,
+                    size: 48,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'App Locked',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Authenticate to continue',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                if (_authenticating)
+                  const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                else ...[
+                  SizedBox(
+                    width: 220,
+                    child: ElevatedButton.icon(
+                      onPressed: _authenticate,
+                      icon: const Icon(Icons.fingerprint),
+                      label: const Text('UNLOCK'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: 220,
+                    child: OutlinedButton.icon(
+                      onPressed: _authenticateWithDeviceCredential,
+                      icon: const Icon(Icons.pin_outlined, color: Colors.white),
+                      label: const Text(
+                        'USE PIN',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.4),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                ],
+                if (_error != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    _error!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _authenticateWithDeviceCredential() async {
+    setState(() {
+      _authenticating = true;
+      _error = null;
+    });
+
+    final bioService = ref.read(app_providers.biometricServiceProvider);
+    final success = await bioService.authenticateWithDeviceCredential();
+
+    if (mounted) {
+      setState(() => _authenticating = false);
+      if (success) {
+        widget.onUnlock();
+      } else {
+        setState(() => _error = 'Authentication failed. Tap to retry.');
+      }
+    }
   }
 }

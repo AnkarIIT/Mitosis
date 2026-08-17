@@ -23,7 +23,10 @@ class GeminiChatService {
   /// Tier-2/3 client: shared cache + rate-limited live Gemini via Supabase.
   /// The local Tier-1 tier (questions.explanation in Drift) is resolved by
   /// callers that own a database handle.
-  final GeminiProxyService _proxy = GeminiProxyService();
+  final GeminiProxyService _proxy;
+
+  GeminiChatService({GeminiProxyService? proxy})
+      : _proxy = proxy ?? GeminiProxyService();
 
   // ---------------------------------------------------------------------------
   // Lifecycle

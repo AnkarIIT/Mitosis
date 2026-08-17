@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/config/app_config.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/email_service.dart';
-import '../../core/services/notification_service.dart';
-import '../../core/services/biometric_service.dart';
 import '../../core/theme/app_colors.dart';
 
 
@@ -61,7 +59,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _loadNotificationSettings() async {
-    final service = NotificationService();
+    final service = ref.read(notificationServiceProvider);
     final enabled = await service.areRemindersEnabled();
     final timeStr = await service.getReminderTime();
     final parts = timeStr.split(':');
@@ -85,7 +83,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _reminderTime = picked;
       });
       if (_remindersEnabled) {
-        await NotificationService().scheduleDailyReminder(
+        await ref.read(notificationServiceProvider).scheduleDailyReminder(
           hour: picked.hour,
           minute: picked.minute,
         );
@@ -94,7 +92,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _toggleReminders(bool value) async {
-    final service = NotificationService();
+    final service = ref.read(notificationServiceProvider);
     if (value) {
       final granted = await service.requestPermissions();
       if (granted) {
@@ -121,7 +119,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _loadBiometricSettings() async {
-    final service = BiometricService();
+    final service = ref.read(biometricServiceProvider);
     final available = await service.isBiometricAvailable();
     final enabled = await service.isBiometricEnabled();
     setState(() {
@@ -131,12 +129,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _toggleBiometric(bool value) async {
-    final service = BiometricService();
+    final service = ref.read(biometricServiceProvider);
     if (value) {
       final success = await service.authenticate();
       if (success) {
         await service.setBiometricEnabled(true);
         setState(() => _biometricEnabled = true);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Biometric authentication failed. Lock not enabled.'),
+          ),
+        );
       }
     } else {
       await service.setBiometricEnabled(false);

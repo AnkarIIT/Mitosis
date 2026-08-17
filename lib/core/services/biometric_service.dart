@@ -30,6 +30,20 @@ class BiometricService {
     }
   }
 
+  Future<bool> authenticateWithDeviceCredential() async {
+    try {
+      return await _auth.authenticate(
+        localizedReason: 'Authenticate to access NEET Mitos',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: false,
+        ),
+      );
+    } on PlatformException {
+      return false;
+    }
+  }
+
   Future<void> setBiometricEnabled(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_biometricEnabledKey, enabled);
