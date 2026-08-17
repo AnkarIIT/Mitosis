@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
-import 'topic_detail_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class TopicBrowserScreen extends ConsumerWidget {
   final String subjectId;
@@ -141,17 +141,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                       color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TopicDetailScreen(
-                                                    topic: topic,
-                                                    subjectName: subjectName,
-                                                    chapterName: chapter.name,
-                                                  ),
-                                            ),
-                                          );
+                                          context.push('/topic', extra: {'topic': topic, 'subjectName': subjectName, 'chapterName': chapter.name});
                                         },
                                         borderRadius: BorderRadius.circular(12),
                                         child: Padding(

@@ -4,9 +4,7 @@ import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/exam_engine_service.dart';
-import '../exam_engine/cbt_test_screen.dart';
-import '../quiz/enhanced_quiz_screen.dart';
-import 'question_paper_selector.dart';
+import 'package:go_router/go_router.dart';
 
 class TestSeriesScreen extends ConsumerStatefulWidget {
   const TestSeriesScreen({super.key});
@@ -81,12 +79,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
               icon: Icons.library_add,
               color: AppColors.primary,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const QuestionPaperSelector(),
-                  ),
-                );
+                context.push('/test-series/paper');
               },
             ),
             const SizedBox(height: 24),
@@ -225,19 +218,14 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EnhancedQuizScreen(
-          questions: questions,
-          topicName: title,
-          topicId: type == 'mock'
-              ? 'mock_test'
-              : (subjectName ?? 'custom_test'),
-          subject: subjectName ?? 'Mixed',
-        ),
-      ),
-    );
+    context.push('/quiz', extra: {
+      'questions': questions,
+      'topicName': title,
+      'topicId': type == 'mock'
+          ? 'mock_test'
+          : (subjectName ?? 'custom_test'),
+      'subject': subjectName ?? 'Mixed',
+    });
   }
 
   void _startNeetMock(BuildContext context, List<Question> allQuestions) {
@@ -248,15 +236,10 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CbtTestScreen(
-          config: ExamConfig.neet(),
-          questionPool: allQuestions,
-        ),
-      ),
-    );
+    context.push('/cbt', extra: {
+      'config': ExamConfig.neet(),
+      'questionPool': allQuestions,
+    });
   }
 
   void _showCbtPracticeDialog(
@@ -425,18 +408,13 @@ class _CustomTestBuilderSheetState
     filtered.shuffle();
     final questions = filtered.take(_questionCount).toList();
 
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EnhancedQuizScreen(
-          questions: questions,
-          topicName: 'Custom Practice',
-          topicId: 'custom_builder',
-          subject: 'Mixed',
-        ),
-      ),
-    );
+    context.pop();
+    context.push('/quiz', extra: {
+      'questions': questions,
+      'topicName': 'Custom Practice',
+      'topicId': 'custom_builder',
+      'subject': 'Mixed',
+    });
   }
 }
 
@@ -520,15 +498,10 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
       questionCount: _questionCount,
       durationMinutes: _durationMinutes,
     );
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CbtTestScreen(
-          config: config,
-          questionPool: widget.allQuestions,
-        ),
-      ),
-    );
+    context.pop();
+    context.push('/cbt', extra: {
+      'config': config,
+      'questionPool': widget.allQuestions,
+    });
   }
 }

@@ -6,6 +6,7 @@ import '../../core/models/flashcard_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/flashcard_scheduler_service.dart';
 import '../../core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 /// Dedicated study screen: flip card → rate → next.
 ///
@@ -437,7 +438,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
           ),
           const SizedBox(height: 28),
           FilledButton.icon(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             icon: const Icon(Icons.arrow_back_rounded),
             label: const Text('BACK TO FLASHCARDS'),
           ),
@@ -465,7 +466,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
           ),
           const SizedBox(height: 28),
           FilledButton.icon(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             icon: const Icon(Icons.arrow_back_rounded),
             label: const Text('BACK TO FLASHCARDS'),
           ),

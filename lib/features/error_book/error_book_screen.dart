@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/models/question_model.dart';
-import '../quiz/enhanced_quiz_screen.dart';
 
 class ErrorBookScreen extends ConsumerWidget {
   const ErrorBookScreen({super.key});
@@ -170,16 +170,11 @@ class ErrorBookScreen extends ConsumerWidget {
   }
 
   void _startReTest(BuildContext context, List<Question> questions) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EnhancedQuizScreen(
-          questions: questions,
-          topicName: 'Error Book Re-test',
-          topicId: 'error_retest',
-          subject: 'Mixed',
-        ),
-      ),
-    );
+    context.push('/quiz', extra: {
+      'questions': questions,
+      'topicName': 'Error Book Re-test',
+      'topicId': 'error_retest',
+      'subject': 'Mixed',
+    });
   }
 }

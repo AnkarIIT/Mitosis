@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
   const OtpScreen({super.key});
@@ -46,7 +47,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final otp = _controllers.map((controller) => controller.text).join();
     final success = await ref.read(authProvider.notifier).verifyOtp(otp);
     if (success && mounted) {
-      Navigator.popUntil(context, (route) => route.isFirst);
+      context.go('/');
     }
   }
 

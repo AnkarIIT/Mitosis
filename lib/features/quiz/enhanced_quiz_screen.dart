@@ -6,7 +6,8 @@ import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:confetti/confetti.dart';
 
-import '../test_series/test_result_screen.dart';
+
+import 'package:go_router/go_router.dart';
 
 class EnhancedQuizScreen extends ConsumerStatefulWidget {
   final List<Question> questions;
@@ -148,7 +149,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('Got it'),
           ),
         ],
@@ -200,12 +201,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
 
     ref.read(userProgressProvider.notifier).recordQuizAttempt(attempt);
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TestResultScreen(attempt: attempt),
-      ),
-    );
+    context.go('/quiz/result', extra: attempt);
   }
 
   Future<void> _evaluateShortAnswer(String studentAnswer, String correctAnswer) async {
@@ -282,18 +278,18 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
             content: const Text('Your progress will not be saved.'),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () => context.pop(false),
                 child: const Text('Cancel'),
               ),
               TextButton(
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () => context.pop(true),
                 child: const Text('Exit'),
               ),
             ],
           ),
         );
         if (confirm == true && context.mounted) {
-          Navigator.of(context).pop();
+          context.pop();
         }
       },
       child: Scaffold(

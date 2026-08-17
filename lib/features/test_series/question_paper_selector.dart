@@ -4,7 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/models/question_paper_model.dart';
 import '../../core/services/question_paper_generator.dart';
 import '../../core/providers/providers.dart';
-import '../quiz/enhanced_quiz_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class QuestionPaperSelector extends ConsumerStatefulWidget {
   const QuestionPaperSelector({super.key});
@@ -273,13 +273,13 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
       );
 
       if (!mounted) return;
-      Navigator.pop(context); // Close loading dialog
+      context.pop(); // Close loading dialog
 
       // Show paper summary
       _showPaperSummary(paper);
     } catch (e) {
       if (!mounted) return;
-      Navigator.pop(context);
+      context.pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $e'),
@@ -345,12 +345,12 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('Edit'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
+              context.pop();
               _startQuiz(paper);
             },
             child: const Text('Start Quiz'),
@@ -381,16 +381,11 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
 
   void _startQuiz(QuestionPaper paper) {
     final sub = paper.subjects.length == 1 ? paper.subjects.first : 'Mixed';
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EnhancedQuizScreen(
-          questions: paper.questions,
-          topicName: paper.title,
-          topicId: 'mock_test',
-          subject: sub,
-        ),
-      ),
-    );
+    context.push('/quiz', extra: {
+      'questions': paper.questions,
+      'topicName': paper.title,
+      'topicId': 'mock_test',
+      'subject': sub,
+    });
   }
 }

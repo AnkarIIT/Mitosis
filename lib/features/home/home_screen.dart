@@ -3,22 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/models/user_progress_model.dart';
-import '../topic_browser/topic_browser_screen.dart';
-import '../progress/progress_dashboard.dart';
-import '../bookmarks/bookmarks_dashboard.dart';
-import '../chatbot/chatbot_screen.dart';
-import '../test_series/test_series_screen.dart';
-import '../study_plan/study_plan_screen.dart';
-import '../error_book/error_book_screen.dart';
-import '../mark_booster/mark_booster_screen.dart';
-import '../settings/settings_screen.dart';
-import '../flashcards/flashcard_screen.dart';
-import '../profile/profile_screen.dart';
-import '../topic_browser/topic_detail_screen.dart';
-import '../test_series/pdf_picker_screen.dart';
-import '../review/spaced_review_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -28,8 +15,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _selectedIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     final subjects = ref.watch(subjectsProvider);
@@ -76,10 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
+              context.push('/settings');
             },
           ),
           Padding(
@@ -117,43 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      body: _selectedIndex == 0
-          ? _buildSubjectScreen(context, subjects)
-          : _selectedIndex == 1
-          ? const FlashcardScreen()
-          : _selectedIndex == 2
-          ? const ChatbotScreen()
-          : _selectedIndex == 3
-          ? const ProgressDashboard()
-          : _selectedIndex == 4
-          ? const BookmarksDashboard()
-          : const ProfileScreen(),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Learn'),
-          BottomNavigationBarItem(icon: Icon(Icons.style), label: 'Cards'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.smart_toy),
-            label: 'AI Tutor',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.trending_up),
-            label: 'Progress',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Bookmarks',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
+      body: _buildSubjectScreen(context, subjects),
     );
   }
 
@@ -233,12 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: 'AI PDF Test',
                   color: Colors.deepPurple,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PdfPickerScreen(),
-                      ),
-                    );
+                    context.push('/pdf-picker');
                   },
                 ),
                 const SizedBox(width: 12),
@@ -248,12 +189,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: 'Test Series',
                   color: AppColors.primary,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TestSeriesScreen(),
-                      ),
-                    );
+                    context.push('/test-series');
                   },
                 ),
                 const SizedBox(width: 12),
@@ -263,9 +199,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: 'Weak Topics',
                   color: AppColors.warning,
                   onTap: () {
-                    setState(() {
-                      _selectedIndex = 3; // Go to Progress tab
-                    });
+                    context.push('/progress');
                   },
                 ),
                 const SizedBox(width: 12),
@@ -275,12 +209,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: 'Study Plan',
                   color: AppColors.chemistryAccent,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const StudyPlanScreen(),
-                      ),
-                    );
+                    context.push('/study-plan');
                   },
                 ),
                 const SizedBox(width: 12),
@@ -290,12 +219,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: 'Error Book',
                   color: Colors.red,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ErrorBookScreen(),
-                      ),
-                    );
+                    context.push('/error-book');
                   },
                 ),
                 const SizedBox(width: 12),
@@ -305,12 +229,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: 'Mark Booster',
                   color: AppColors.biologyAccent,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MarkBoosterScreen(),
-                      ),
-                    );
+                    context.push('/mark-booster');
                   },
                 ),
                 const SizedBox(width: 12),
@@ -320,12 +239,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: dueCount > 0 ? 'Review ($dueCount)' : 'Review',
                   color: Colors.teal,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SpacedReviewScreen(),
-                      ),
-                    );
+                    context.push('/review');
                   },
                 ),
               ],
@@ -412,12 +326,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const TestSeriesScreen(),
-                        ),
-                      );
+                      context.push('/test-series');
                     },
                     icon: const Icon(Icons.assignment_turned_in, size: 18),
                     label: const Text('Open Test Series'),
@@ -684,12 +593,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const StudyPlanScreen(),
-                  ),
-                );
+                context.push('/study-plan');
               },
               icon: const Icon(Icons.calendar_today_outlined, size: 18),
               label: const Text('Open Study Planner'),
@@ -714,10 +618,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     List<Subject> subjects,
   ) {
     if (attempt.testType == 'mock') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const TestSeriesScreen()),
-      );
+      context.push('/test-series');
       return;
     }
 
@@ -725,16 +626,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       for (final chapter in subject.chapters) {
         for (final topic in chapter.topics) {
           if (topic.id == attempt.topicId) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TopicDetailScreen(
-                  topic: topic,
-                  subjectName: subject.name,
-                  chapterName: chapter.name,
-                ),
-              ),
-            );
+            context.push('/topic', extra: {'topic': topic, 'subjectName': subject.name, 'chapterName': chapter.name});
             return;
           }
         }
@@ -752,22 +644,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     if (subject.chapters.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TopicBrowserScreen(
-            subjectId: subject.id,
-            subjectName: subject.name,
-          ),
-        ),
-      );
+      context.push('/subjects', extra: {'subjectId': subject.id, 'subjectName': subject.name});
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const TestSeriesScreen()),
-    );
+    context.push('/test-series');
   }
 
   String _buildLastAttemptLabel(QuizAttempt attempt, List<Subject> subjects) {
@@ -798,15 +679,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TopicBrowserScreen(
-              subjectId: subject.id,
-              subjectName: subject.name,
-            ),
-          ),
-        );
+        context.push('/subjects', extra: {'subjectId': subject.id, 'subjectName': subject.name});
       },
       child: Container(
         decoration: BoxDecoration(
@@ -831,15 +704,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TopicBrowserScreen(
-                    subjectId: subject.id,
-                    subjectName: subject.name,
-                  ),
-                ),
-              );
+              context.push('/subjects', extra: {'subjectId': subject.id, 'subjectName': subject.name});
             },
             borderRadius: BorderRadius.circular(16),
             child: Container(

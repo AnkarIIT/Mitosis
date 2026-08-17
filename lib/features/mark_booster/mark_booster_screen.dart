@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/models/mark_booster_model.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/mark_booster_service.dart';
 import '../../core/theme/app_colors.dart';
-import '../quiz/enhanced_quiz_screen.dart';
 
 class MarkBoosterScreen extends ConsumerStatefulWidget {
   const MarkBoosterScreen({super.key});
@@ -40,18 +40,13 @@ class _MarkBoosterScreenState extends ConsumerState<MarkBoosterScreen> {
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EnhancedQuizScreen(
-          questions: drill,
-          topicName: 'Mark Booster Drill',
-          topicId: 'mark_booster',
-          subject: 'Mixed',
-          testType: 'booster',
-        ),
-      ),
-    );
+    context.push('/quiz', extra: {
+      'questions': drill,
+      'topicName': 'Mark Booster Drill',
+      'topicId': 'mark_booster',
+      'subject': 'Mixed',
+      'testType': 'booster',
+    });
   }
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 class TestResultScreen extends ConsumerWidget {
   final QuizAttempt attempt;
@@ -26,7 +27,7 @@ class TestResultScreen extends ConsumerWidget {
             icon: const Icon(Icons.close),
             onPressed: () {
               ref.read(quizProvider.notifier).resetQuiz();
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              context.go('/');
             },
           ),
         ],
@@ -51,7 +52,7 @@ class TestResultScreen extends ConsumerWidget {
             ElevatedButton(
               onPressed: () {
                 ref.read(quizProvider.notifier).resetQuiz();
-                Navigator.of(context).pop();
+                context.pop();
               },
               child: const Text('Review Answers'),
             ),
@@ -59,7 +60,7 @@ class TestResultScreen extends ConsumerWidget {
             OutlinedButton(
               onPressed: () {
                 ref.read(quizProvider.notifier).resetQuiz();
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                context.go('/');
               },
               child: const Text('Back to Home'),
             ),

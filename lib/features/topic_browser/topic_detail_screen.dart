@@ -6,10 +6,7 @@ import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/ncert_book_catalog.dart';
 import '../../core/theme/app_colors.dart';
-import '../chatbot/chatbot_screen.dart';
-import '../pdf/ncert_pdf_screen.dart';
-import '../quiz/enhanced_quiz_screen.dart';
-import '../test_series/test_series_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class TopicDetailScreen extends ConsumerWidget {
   final Topic topic;
@@ -302,26 +299,11 @@ class TopicDetailScreen extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: () {
                   if (hasQuestions) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EnhancedQuizScreen(
-                          questions: questions,
-                          topicName: topic.name,
-                          topicId: topic.id,
-                          subject: subjectName,
-                        ),
-                      ),
-                    );
+                    context.push('/quiz', extra: {'questions': questions, 'topicName': topic.name, 'topicId': topic.id, 'subject': subjectName});
                     return;
                   }
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TestSeriesScreen(),
-                    ),
-                  );
+                  context.push('/test-series');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -368,12 +350,7 @@ class TopicDetailScreen extends ConsumerWidget {
     final prompt =
         'Explain ${topic.name} for NEET in a simple, high-yield way. Include the core idea, the most common mistake students make, and one quick practice tip.';
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChatbotScreen(initialMessage: prompt),
-      ),
-    );
+    context.push('/chat', extra: {'initialMessage': prompt});
   }
 
   Widget _buildNcertReaderCard(
@@ -457,12 +434,7 @@ class TopicDetailScreen extends ConsumerWidget {
     NcertBookEntry entry,
     Chapter chapter,
   ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => NcertPdfScreen(entry: entry, chapter: chapter),
-      ),
-    );
+    context.push('/pdf', extra: {'entry': entry, 'chapter': chapter});
   }
 
   void _showFullSummary(BuildContext context) {

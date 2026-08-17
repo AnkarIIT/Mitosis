@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/database/question_repository.dart';
 import '../../core/models/question_model.dart';
 import '../../core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
   final String subject;
@@ -60,8 +61,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
           content: Text("Your Score: $score / ${questions.length}"),
           actions: [
             TextButton(
-              onPressed: () =>
-                  Navigator.popUntil(context, (route) => route.isFirst),
+              onPressed: () => context.go('/'),
               child: const Text("Back to Home"),
             ),
           ],

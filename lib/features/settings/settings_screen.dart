@@ -7,8 +7,8 @@ import '../../core/services/notification_service.dart';
 import '../../core/services/biometric_service.dart';
 import '../../core/theme/app_colors.dart';
 
-import '../profile/profile_screen.dart';
-import 'import_questions_screen.dart';
+
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -246,15 +246,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('CANCEL'),
           ),
           TextButton(
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
-              final navigator = Navigator.of(context);
               await ref.read(userProgressProvider.notifier).clearAllProgress();
-              navigator.pop();
+              context.pop();
               messenger.showSnackBar(
                 const SnackBar(content: Text('Progress has been reset.')),
               );
@@ -277,22 +276,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('CANCEL'),
           ),
           TextButton(
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
-              final navigator = Navigator.of(context);
               final res = await ref.read(authServiceProvider).deleteAccount();
               if (res.success) {
                 ref.read(authProvider.notifier).logout();
-                navigator.pop();
+                context.pop();
                 messenger.showSnackBar(
                   const SnackBar(content: Text('Account deleted successfully.')),
                 );
               } else {
-                navigator.pop();
+                context.pop();
                 messenger.showSnackBar(
                   SnackBar(content: Text('Error: ${res.message}')),
                 );
@@ -329,12 +327,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               trailing: TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
-                    ),
-                  );
+                  context.push('/profile');
                 },
                 child: const Text('EDIT'),
               ),
@@ -637,12 +630,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               title: const Text('Import Questions'),
               subtitle: const Text('Bulk-load questions from JSON or CSV'),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ImportQuestionsScreen(),
-                  ),
-                );
+                context.push('/settings/import');
               },
             ),
             const Divider(height: 1),

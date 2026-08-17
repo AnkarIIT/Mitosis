@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 class CbtResultScreen extends StatelessWidget {
   final QuizAttempt attempt;
@@ -32,7 +33,7 @@ class CbtResultScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
-            onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+            onPressed: () => context.go('/'),
           ),
         ],
       ),
@@ -57,8 +58,7 @@ class CbtResultScreen extends StatelessWidget {
             ],
             const SizedBox(height: 28),
             ElevatedButton(
-              onPressed: () =>
-                  Navigator.of(context).popUntil((route) => route.isFirst),
+              onPressed: () => context.go('/'),
               child: const Text('Back to Home'),
             ),
             const SizedBox(height: 12),

@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/config/app_config.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
-import 'otp_screen.dart';
+
+import 'package:go_router/go_router.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -36,10 +37,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
 
     if (success) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const OtpScreen()),
-      );
+      context.push('/otp');
     }
   }
 

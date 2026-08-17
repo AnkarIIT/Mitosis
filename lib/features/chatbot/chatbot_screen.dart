@@ -10,7 +10,8 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/database/drift_database.dart';
-import '../settings/settings_screen.dart';
+
+import 'package:go_router/go_router.dart';
 
 class ChatMessage {
   final String text;
@@ -161,7 +162,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               leading: const Icon(Icons.camera_alt, color: AppColors.primary),
               title: const Text('Take a Photo'),
               onTap: () {
-                Navigator.pop(context);
+                context.pop();
                 _pickImage(ImageSource.camera);
               },
             ),
@@ -169,7 +170,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               leading: const Icon(Icons.photo_library, color: AppColors.primary),
               title: const Text('Choose from Gallery'),
               onTap: () {
-                Navigator.pop(context);
+                context.pop();
                 _pickImage(ImageSource.gallery);
               },
             ),
@@ -283,16 +284,13 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
+              context.pop();
+              context.push('/settings');
             },
             child: const Text('Go to Settings'),
           ),
@@ -317,10 +315,10 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                   title: const Text('Clear Chat?'),
                   content: const Text('This will permanently delete your conversation history.'),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                    TextButton(onPressed: () => context.pop(), child: const Text('Cancel')),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        context.pop();
                         _clearChat();
                       },
                       child: const Text('Clear', style: TextStyle(color: Colors.red)),
@@ -333,10 +331,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
+              context.push('/settings');
             },
           ),
         ],

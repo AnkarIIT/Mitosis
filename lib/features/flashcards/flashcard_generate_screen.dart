@@ -9,7 +9,8 @@ import '../../core/services/ncert_book_catalog.dart';
 import '../../core/services/flashcard_generation_service.dart';
 import '../../core/services/gemini_proxy_service.dart';
 import '../../core/theme/app_colors.dart';
-import 'flashcard_study_screen.dart';
+
+import 'package:go_router/go_router.dart';
 
 class FlashcardGenerateScreen extends ConsumerStatefulWidget {
   const FlashcardGenerateScreen({super.key});
@@ -321,10 +322,7 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
     ref.invalidate(dueFlashcardsProvider);
 
     if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const FlashcardStudyScreen()),
-    );
+    context.push('/flashcards/study');
   }
 
   Future<void> _startGeneration() async {

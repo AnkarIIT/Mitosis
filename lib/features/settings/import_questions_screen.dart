@@ -11,6 +11,7 @@ import '../../core/services/explanation_seeder.dart';
 import '../../core/services/gemini_proxy_service.dart';
 import '../../core/services/question_importer.dart';
 import '../../core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 enum _ImportSource { file, paste }
 
@@ -132,7 +133,7 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Imported $count questions successfully!')),
       );
-      Navigator.of(context).pop();
+      context.pop();
     } catch (e) {
       if (!mounted) return;
       setState(() => _isImporting = false);

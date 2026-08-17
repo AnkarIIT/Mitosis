@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../topic_browser/topic_detail_screen.dart';
+
 import '../../core/utils/rank_predictor.dart';
+import 'package:go_router/go_router.dart';
 
 class ProgressDashboard extends ConsumerWidget {
   const ProgressDashboard({super.key});
@@ -249,16 +250,7 @@ class ProgressDashboard extends ConsumerWidget {
                         ),
                         child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TopicDetailScreen(
-                                  topic: topic,
-                                  subjectName: topic.id.startsWith('bio') ? 'Biology' : (topic.id.startsWith('chem') ? 'Chemistry' : 'Physics'),
-                                  chapterName: 'Review Needed',
-                                ),
-                              ),
-                            );
+                            context.push('/topic', extra: {'topic': topic, 'subjectName': topic.id.startsWith('bio') ? 'Biology' : (topic.id.startsWith('chem') ? 'Chemistry' : 'Physics'), 'chapterName': 'Review Needed'});
                           },
                           borderRadius: BorderRadius.circular(12),
                           child: Padding(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../../core/models/question_model.dart';
 import '../../core/models/subject_model.dart';
@@ -91,16 +92,12 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
   }
 
   void _openChapter(NcertBookEntry entry) {
-    Navigator.of(context).pop();
     if (entry.assetPath == widget.entry.assetPath) {
+      context.pop();
       _jumpToChapterStart();
       return;
     }
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => NcertPdfScreen(entry: entry),
-      ),
-    );
+    context.go('/pdf', extra: {'entry': entry, 'chapter': null});
   }
 
   @override

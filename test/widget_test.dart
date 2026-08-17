@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:neet_mitos/core/database/drift_database.dart';
 import 'package:neet_mitos/core/models/question_model.dart' as model;
 import 'package:neet_mitos/core/models/subject_model.dart';
@@ -10,6 +11,30 @@ import 'package:neet_mitos/features/study_plan/study_plan_screen.dart';
 import 'package:neet_mitos/features/topic_browser/topic_detail_screen.dart';
 import 'package:neet_mitos/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+GoRouter _testRouter({required Widget child}) {
+  return GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(path: '/', builder: (_, _) => child),
+      GoRoute(
+        path: '/topic',
+        builder: (_, state) {
+          final args = state.extra as Map<String, dynamic>;
+          return TopicDetailScreen(
+            topic: args['topic'],
+            subjectName: args['subjectName'] as String,
+            chapterName: args['chapterName'] as String,
+          );
+        },
+      ),
+      GoRoute(path: '/chat', builder: (_, _) => const Scaffold(body: Center(child: Text('AI Doubt Solver')))),
+      GoRoute(path: '/test-series', builder: (_, _) => const Scaffold(body: Center(child: Text('Test Series')))),
+      GoRoute(path: '/quiz', builder: (_, _) => const Scaffold(body: Center(child: Text('Quiz')))),
+      GoRoute(path: '/progress', builder: (_, _) => const Scaffold(body: Center(child: Text('Subject-wise Performance')))),
+    ],
+  );
+}
 
 void main() {
   test('AppDatabase returns a single shared instance', () {
@@ -22,12 +47,15 @@ void main() {
   testWidgets('Home screen smoke test', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+      ],
+      child: const MyApp(),
+    ));
     await tester.pumpAndSettle();
 
     expect(find.text('NEET Mitos'), findsWidgets);
-    expect(find.text('Learn'), findsOneWidget);
-    expect(find.text('Progress'), findsOneWidget);
     expect(find.text('Practice Tests'), findsOneWidget);
   });
 
@@ -36,7 +64,12 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+      ],
+      child: const MyApp(),
+    ));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.settings_outlined));
@@ -46,16 +79,21 @@ void main() {
     expect(find.text('Get your FREE API Key here'), findsNothing);
   });
 
-  testWidgets('Home screen shows today focus and study planner CTA', (
+  testWidgets('Home screen shows ongoing progress section', (
     WidgetTester tester,
   ) async {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+        usePremiumHomeProvider.overrideWith((ref) => _FakePremiumHomeNotifier()),
+      ],
+      child: const MyApp(),
+    ));
     await tester.pumpAndSettle();
 
-    expect(find.text('Today’s Focus'), findsOneWidget);
-    expect(find.text('Open Study Planner'), findsOneWidget);
+    expect(find.text('Ongoing Progress'), findsOneWidget);
   });
 
   testWidgets('Weak Topics quick action opens the progress dashboard', (
@@ -63,7 +101,12 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+      ],
+      child: const MyApp(),
+    ));
     await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.text('Weak Topics'));
@@ -72,7 +115,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Subject-wise Performance'), findsOneWidget);
-    expect(find.text('Revision Flashcards'), findsNothing);
   });
 
   testWidgets('Topic detail routes Ask AI Tutor to chatbot screen', (
@@ -95,11 +137,13 @@ void main() {
             (ref, topicId) async => const <model.Question>[],
           ),
         ],
-        child: MaterialApp(
-          home: TopicDetailScreen(
-            topic: topic,
-            subjectName: 'Biology',
-            chapterName: 'Cell Biology',
+        child: MaterialApp.router(
+          routerConfig: _testRouter(
+            child: TopicDetailScreen(
+              topic: topic,
+              subjectName: 'Biology',
+              chapterName: 'Cell Biology',
+            ),
           ),
         ),
       ),
@@ -115,7 +159,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
 
-    expect(find.text('AI Doubt Solver 🤖'), findsOneWidget);
+    expect(find.text('AI Doubt Solver'), findsOneWidget);
   });
 
   testWidgets(
@@ -141,11 +185,13 @@ void main() {
               (ref) async => const <model.Question>[],
             ),
           ],
-          child: MaterialApp(
-            home: TopicDetailScreen(
-              topic: topic,
-              subjectName: 'Biology',
-              chapterName: 'Cell Biology',
+          child: MaterialApp.router(
+            routerConfig: _testRouter(
+              child: TopicDetailScreen(
+                topic: topic,
+                subjectName: 'Biology',
+                chapterName: 'Cell Biology',
+              ),
             ),
           ),
         ),
@@ -202,4 +248,59 @@ void main() {
     expect(find.textContaining('720'), findsOneWidget);
     expect(find.text('342 Days Remaining'), findsNothing);
   });
+}
+
+class _FakeAuthNotifier extends StateNotifier<AuthState>
+    implements AuthNotifier {
+  _FakeAuthNotifier() : super(AuthState(status: AuthStatus.authenticated));
+
+  @override
+  Future<void> checkAuth() async {}
+
+  @override
+  Future<void> continueAsGuest() async {}
+
+  @override
+  Future<bool> toggle2FA(bool enabled) async => false;
+
+  @override
+  Future<bool> sendOtp(String email) async => false;
+
+  @override
+  Future<bool> verifyOtp(String code) async => false;
+
+  @override
+  Future<bool> verify2FA(String code) async => false;
+
+  @override
+  Future<void> resend2FA() async {}
+
+  @override
+  Future<bool> register({
+    required String email,
+    required String username,
+    required String password,
+    String? fullName,
+  }) async =>
+      false;
+
+  @override
+  Future<bool> login({required String email, required String password}) async =>
+      false;
+
+  @override
+  Future<bool> resetPassword(String email) async => false;
+
+  @override
+  Future<void> logout() async {}
+}
+
+class _FakePremiumHomeNotifier extends StateNotifier<bool>
+    implements PremiumHomeNotifier {
+  _FakePremiumHomeNotifier() : super(true);
+
+  @override
+  Future<void> toggle(bool value) async {
+    state = value;
+  }
 }

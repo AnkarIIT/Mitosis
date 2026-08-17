@@ -5,7 +5,8 @@ import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/models/user_preferences_model.dart';
-import '../topic_browser/topic_detail_screen.dart';
+
+import 'package:go_router/go_router.dart';
 
 class StudyPlanScreen extends ConsumerWidget {
   const StudyPlanScreen({super.key});
@@ -248,16 +249,7 @@ class StudyPlanScreen extends ConsumerWidget {
           color: AppColors.adaptiveSubtleText(context),
         ),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TopicDetailScreen(
-                topic: topic,
-                subjectName: 'Review',
-                chapterName: 'Smart Plan',
-              ),
-            ),
-          );
+          context.push('/topic', extra: {'topic': topic, 'subjectName': 'Review', 'chapterName': 'Smart Plan'});
         },
       ),
     );

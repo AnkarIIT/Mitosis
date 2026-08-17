@@ -5,14 +5,7 @@ import '../../core/providers/providers.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/theme/app_colors.dart';
-import '../topic_browser/topic_browser_screen.dart';
-import '../topic_browser/topic_detail_screen.dart';
-import '../flashcards/flashcard_screen.dart';
-import '../study_plan/study_plan_screen.dart';
-import '../review/spaced_review_screen.dart';
-import '../progress/progress_dashboard.dart';
-import '../profile/profile_screen.dart';
-import '../error_book/error_book_screen.dart';
+import 'package:go_router/go_router.dart';
 
 /// Premium redesign demo for the NEET 2026 Home screen.
 /// Uses existing providers — zero breaking changes to current HomeScreen.
@@ -25,7 +18,6 @@ class NeetHomeScreen extends ConsumerStatefulWidget {
 
 class _NeetHomeScreenState extends ConsumerState<NeetHomeScreen> {
   int _selectedChip = 0;
-  int _navIndex = 0;
 
   static const _chipLabels = ['All', 'Botany', 'Zoology', 'Physics', 'Chemistry', 'Error Book'];
 
@@ -55,16 +47,7 @@ class _NeetHomeScreenState extends ConsumerState<NeetHomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.premiumBg,
-      body: _navIndex == 0
-          ? _buildHomeBody(context, subjects, stats, streak, dailyGoal, recentActivity, weakTopics, dueCount)
-          : _navIndex == 1
-              ? const FlashcardScreen()
-              : _navIndex == 2
-                  ? const SpacedReviewScreen()
-                  : _navIndex == 3
-                      ? const ProgressDashboard()
-                      : const ProfileScreen(),
-      bottomNavigationBar: _buildFloatingDock(context, dueCount),
+      body: _buildHomeBody(context, subjects, stats, streak, dailyGoal, recentActivity, weakTopics, dueCount),
     );
   }
 
@@ -295,7 +278,7 @@ class _NeetHomeScreenState extends ConsumerState<NeetHomeScreen> {
           return GestureDetector(
             onTap: () {
               if (_chipLabels[index] == 'Error Book') {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const ErrorBookScreen()));
+                context.push('/error-book');
                 return;
               }
               setState(() => _selectedChip = index);
@@ -401,12 +384,7 @@ class _NeetHomeScreenState extends ConsumerState<NeetHomeScreen> {
   }) {
     final color = _getSubjectAccent(subject.id);
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => TopicBrowserScreen(subjectId: subject.id, subjectName: subject.name),
-        ),
-      ),
+      onTap: () => context.push('/subjects', extra: {'subjectId': subject.id, 'subjectName': subject.name}),
       child: Container(
         width: 155,
         margin: const EdgeInsets.only(right: 14),
@@ -562,17 +540,7 @@ class _NeetHomeScreenState extends ConsumerState<NeetHomeScreen> {
 
     return GestureDetector(
       onTap: () {
-        if (hasActivity) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const StudyPlanScreen()),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const StudyPlanScreen()),
-          );
-        }
+        context.push('/study-plan');
       },
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -727,7 +695,7 @@ class _NeetHomeScreenState extends ConsumerState<NeetHomeScreen> {
   // Due Review Banner
   Widget _buildDueReviewBanner(BuildContext context, int dueCount) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SpacedReviewScreen())),
+      onTap: () => context.push('/review'),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -815,109 +783,6 @@ class _NeetHomeScreenState extends ConsumerState<NeetHomeScreen> {
   }
 
   // ────────────────────────────────────────────────────────────
-  // FLOATING BOTTOM NAV DOCK
-  // ────────────────────────────────────────────────────────────
-  Widget _buildFloatingDock(BuildContext context, int dueCount) {
-    return Container(
-      margin: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.premiumNavDock,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildDockItem(icon: Icons.home_filled, label: 'Home', index: 0),
-          _buildDockItem(
-            icon: Icons.style_rounded,
-            label: 'Cards',
-            index: 1,
-          ),
-          _buildDockItem(
-            icon: Icons.replay_rounded,
-            label: 'Review',
-            index: 2,
-            badge: dueCount > 0 ? dueCount : null,
-          ),
-          _buildDockItem(icon: Icons.bar_chart_rounded, label: 'Progress', index: 3),
-          _buildDockItem(icon: Icons.person_outline_rounded, label: 'Profile', index: 4),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDockItem({
-    required IconData icon,
-    required String label,
-    required int index,
-    int? badge,
-  }) {
-    final isActive = _navIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _navIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: isActive ? 18 : 12,
-          vertical: 8,
-        ),
-        decoration: isActive
-            ? BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(20),
-              )
-            : null,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Icon(
-                  icon,
-                  color: isActive ? Colors.white : Colors.grey,
-                  size: 22,
-                ),
-                if (badge != null)
-                  Positioned(
-                    top: -5,
-                    right: -8,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        color: AppColors.error,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        badge > 9 ? '9+' : '$badge',
-                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            if (isActive) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
   // ────────────────────────────────────────────────────────────
   // HELPERS
   // ────────────────────────────────────────────────────────────
@@ -1078,16 +943,7 @@ class _NeetSearchDelegate extends SearchDelegate<String?> {
           ),
           onTap: () {
             close(context, null);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => TopicDetailScreen(
-                  topic: r.topic,
-                  subjectName: r.subject.name,
-                  chapterName: r.chapter.name,
-                ),
-              ),
-            );
+            context.push('/topic', extra: {'topic': r.topic, 'subjectName': r.subject.name, 'chapterName': r.chapter.name});
           },
         );
       },

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/paragraph_question_matcher.dart';
 import '../../core/services/pdf_service.dart';
 import '../../core/theme/app_colors.dart';
-import '../quiz/enhanced_quiz_screen.dart';
 
 class ParagraphQuestionPoolSheet extends ConsumerStatefulWidget {
   final List<Question> chapterQuestions;
@@ -74,18 +74,12 @@ class _ParagraphQuestionPoolSheetState
   }
 
   void _startQuiz(List<Question> questions, {String? source}) {
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EnhancedQuizScreen(
-          questions: questions,
-          topicName: source ?? 'NCERT Linked Questions',
-          topicId: 'ncert_reader',
-          subject: 'Mixed',
-        ),
-      ),
-    );
+    context.go('/quiz', extra: {
+      'questions': questions,
+      'topicName': source ?? 'NCERT Linked Questions',
+      'topicId': 'ncert_reader',
+      'subject': 'Mixed',
+    });
   }
 
   @override
@@ -143,7 +137,7 @@ class _ParagraphQuestionPoolSheetState
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => context.pop(),
                 ),
               ],
             ),

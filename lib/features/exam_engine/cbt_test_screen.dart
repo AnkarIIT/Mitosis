@@ -7,7 +7,8 @@ import '../../core/providers/providers.dart';
 import '../../core/services/exam_engine_service.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
-import 'cbt_result_screen.dart';
+
+import 'package:go_router/go_router.dart';
 
 enum _SessionPhase { taking, break_ }
 
@@ -229,11 +230,11 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => context.pop(false),
             child: const Text('Keep Trying'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => context.pop(true),
             child: const Text('Submit'),
           ),
         ],
@@ -289,14 +290,10 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
     if (!mounted) return;
     _submitted = true;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => CbtResultScreen(
-          attempt: attempt,
-          analytics: analytics,
-        ),
-      ),
-    );
+    context.go('/cbt/result', extra: {
+      'attempt': attempt,
+      'analytics': analytics,
+    });
   }
 
   @override
@@ -330,11 +327,11 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () => context.pop(false),
                 child: const Text('Stay'),
               ),
               TextButton(
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () => context.pop(true),
                 child: const Text('Exit'),
               ),
             ],
@@ -342,7 +339,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         );
         if (exit == true && context.mounted) {
           _ticker?.cancel();
-          Navigator.of(context).pop();
+          context.pop();
         }
       },
       child: Scaffold(
