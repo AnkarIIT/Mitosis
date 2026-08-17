@@ -424,6 +424,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               },
               secondary: const Icon(Icons.dark_mode_outlined),
             ),
+            const Divider(height: 1),
+            SwitchListTile(
+              title: const Text('Try New Home'),
+              subtitle: const Text('Premium redesigned home screen (preview)'),
+              value: ref.watch(usePremiumHomeProvider),
+              onChanged: (value) {
+                ref.read(usePremiumHomeProvider.notifier).toggle(value);
+              },
+              secondary: const Icon(Icons.auto_awesome_outlined),
+            ),
             if (_biometricAvailable) ...[
               const Divider(height: 1),
               SwitchListTile(

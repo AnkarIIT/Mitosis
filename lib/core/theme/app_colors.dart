@@ -42,6 +42,22 @@ class AppColors {
   static const Color divider = Color(0xFFE2E8F0); // Slate 200
   static const Color dividerDark = Color(0xFF334155); // Slate 700
 
+  // ───────── Premium Palette (for NeetHomeScreen redesign demo) ─────────
+  static const Color premiumBg = Color(0xFFF4F3F8);
+  static const Color premiumCard = Color(0xFFFFFFFF);
+  static const Color premiumNavDock = Color(0xFF0E0E10);
+  static const Color premiumSearchBg = Color(0xFFFFFFFF);
+  static const Color premiumChipBg = Color(0xFFF1F5F9);
+
+  // Subject accents – premium redesign
+  static const Color biologyOrange = Color(0xFFFF7034);
+  static const Color physicsBlue = Color(0xFF5B61F6);
+  static const Color chemistryPurple = Color(0xFF9D4EDD);
+
+  // Nav & interaction
+  static const Color premiumNavActive = Color(0xFFFFFFFF);
+  static const Color premiumNavInactive = Color(0xFF71717A);
+
   // Adaptive Color Helpers for Dynamic Dark/Light Mode
   static Color adaptiveBackground(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark

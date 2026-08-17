@@ -41,6 +41,16 @@ class PdfService {
     }
   }
 
+  static Future<String> extractTextFromAsset(String assetPath) async {
+    final bytes = await _loadAssetBytes(assetPath);
+    final PdfDocument document = PdfDocument(inputBytes: bytes);
+    try {
+      return PdfTextExtractor(document).extractText();
+    } finally {
+      document.dispose();
+    }
+  }
+
   /// Groups extracted page text into paragraphs. Blocks of text separated by
   /// blank lines are treated as distinct paragraphs (used for the paragraph
   /// question pool).

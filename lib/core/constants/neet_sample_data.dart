@@ -10,6 +10,7 @@ final List<Flashcard> sampleFlashcards = [
     back: 'Mitochondria',
     subject: 'Biology',
     topicId: 'bio_ch2_t1',
+    dueAt: DateTime.now(),
   ),
   Flashcard(
     id: 'f2',
@@ -17,6 +18,7 @@ final List<Flashcard> sampleFlashcards = [
     back: '6.022 × 10²³',
     subject: 'Chemistry',
     topicId: 'chem_ch1_t1',
+    dueAt: DateTime.now(),
   ),
   Flashcard(
     id: 'f3',
@@ -24,6 +26,7 @@ final List<Flashcard> sampleFlashcards = [
     back: 'Newton (N)',
     subject: 'Physics',
     topicId: 'phys_ch1_t1',
+    dueAt: DateTime.now(),
   ),
   Flashcard(
     id: 'f4',
@@ -31,6 +34,7 @@ final List<Flashcard> sampleFlashcards = [
     back: 'Carolus Linnaeus',
     subject: 'Biology',
     topicId: 'bio_ch1_t1',
+    dueAt: DateTime.now(),
   ),
 ];
 

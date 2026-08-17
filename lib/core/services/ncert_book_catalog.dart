@@ -55,6 +55,9 @@ class NcertBookCatalog {
 
   static final List<NcertBookEntry> _entries = _buildEntries();
 
+  /// All known NCERT book entries in chapter order.
+  static List<NcertBookEntry> get allEntries => List.unmodifiable(_entries);
+
   static List<NcertBookEntry> _buildEntries() {
     final list = <NcertBookEntry>[];
 
