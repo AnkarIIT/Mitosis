@@ -4,9 +4,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/database/question_repository.dart';
 import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/database_service.dart';
+import '../../core/services/explanation_seeder.dart';
+import '../../core/services/gemini_proxy_service.dart';
 import '../../core/services/question_importer.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -31,6 +34,12 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
   QuestionImportResult? _result;
   String? _formatError;
   bool _isImporting = false;
+
+  // -- explanation seeding state --
+  bool _isSeeding = false;
+  int _seedCompleted = 0;
+  int _seedTotal = 0;
+  SeederResult? _seedResult;
 
   @override
   void dispose() {
@@ -283,6 +292,8 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
           ],
           const SizedBox(height: 24),
           _buildFormatHelp(),
+          const SizedBox(height: 24),
+          _buildExplanationSeedingSection(),
         ],
       ),
     );
@@ -366,6 +377,157 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
         ),
         Text(label, style: const TextStyle(fontSize: 12)),
       ],
+    );
+  }
+
+  // ---------- explanation seeding ----------
+
+  Future<void> _startSeeding() async {
+    final allQuestions = ref.read(allQuestionsProvider).valueOrNull ?? [];
+    final missing = allQuestions.where((q) {
+      final e = q.explanation;
+      return e == null || e.trim().isEmpty;
+    }).toList();
+    if (missing.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('All questions already have explanations.')),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isSeeding = true;
+      _seedCompleted = 0;
+      _seedTotal = missing.length;
+      _seedResult = null;
+    });
+
+    final seeder = ExplanationSeeder(
+      getQuestions: () async => missing,
+      updateExplanation: (id, text) async {
+        await ref.read(questionRepositoryProvider).updateQuestionExplanation(id, text);
+      },
+      proxy: GeminiProxyService(),
+      onProgress: (completed, total) {
+        if (mounted) setState(() { _seedCompleted = completed; _seedTotal = total; });
+      },
+    );
+
+    final result = await seeder.seedAll();
+    ref.invalidate(allQuestionsProvider);
+
+    if (mounted) {
+      setState(() { _isSeeding = false; _seedResult = result; });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Explanations: ${result.generated} generated, '
+            '${result.failed} failed, '
+            '${result.rateLimited} rate-limited.',
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildExplanationSeedingSection() {
+    final allQuestions = ref.watch(allQuestionsProvider).valueOrNull ?? [];
+    final missingCount = allQuestions.where((q) {
+      final e = q.explanation;
+      return e == null || e.trim().isEmpty;
+    }).length;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppColors.divider.withValues(alpha: 0.5)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.auto_awesome, size: 20, color: AppColors.primary),
+                SizedBox(width: 8),
+                Text(
+                  'Explanation Seeding',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Generate NCERT-grounded explanations for every question that '
+              'is missing one. Uses the AI proxy so cache hits are free and '
+              'the rate limit is enforced automatically.',
+              style: const TextStyle(fontSize: 12, color: AppColors.textSubtle),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(
+                  missingCount == 0 ? Icons.check_circle : Icons.info_outline,
+                  size: 16,
+                  color: missingCount == 0 ? AppColors.success : AppColors.warning,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  missingCount == 0
+                      ? 'All questions have explanations.'
+                      : '$missingCount questions missing explanations.',
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+            if (_isSeeding) ...[
+              const SizedBox(height: 12),
+              LinearProgressIndicator(
+                value: _seedTotal > 0 ? _seedCompleted / _seedTotal : 0,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Generating explanation $_seedCompleted / $_seedTotal...',
+                style: const TextStyle(fontSize: 12, color: AppColors.textSubtle),
+              ),
+            ],
+            if (_seedResult != null && !_isSeeding) ...[
+              const SizedBox(height: 12),
+              Card(
+                color: AppColors.primary.withValues(alpha: 0.06),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    'Last run: ${_seedResult!.generated} generated, '
+                    '${_seedResult!.failed} failed, '
+                    '${_seedResult!.rateLimited} rate-limited '
+                    '(of ${_seedResult!.total}).',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: (_isSeeding || missingCount == 0) ? null : _startSeeding,
+                icon: _isSeeding
+                    ? const SizedBox(
+                        width: 16, height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.auto_awesome),
+                label: Text(_isSeeding ? 'Generating...' : 'GENERATE EXPLANATIONS'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
