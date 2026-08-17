@@ -15,6 +15,7 @@ import 'tables/error_book_table.dart';
 import 'tables/evaluations_table.dart';
 import 'tables/sync_watermarks_table.dart';
 import 'tables/spaced_repetition_table.dart';
+import 'tables/flashcards_table.dart';
 
 part 'drift_database.g.dart';
 
@@ -31,6 +32,7 @@ part 'drift_database.g.dart';
     Evaluations,
     SyncWatermarks,
     SpacedRepetition,
+    Flashcards,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -49,7 +51,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 19;
+  int get schemaVersion => 20;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -158,6 +160,10 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(users, users.batch);
         await m.addColumn(users, users.targetYear);
         await m.addColumn(users, users.dailyCommitmentMinutes);
+      }
+      if (from < 20) {
+        // AI-generated + hand-created flashcards with SM-2 scheduling.
+        await m.createTable(flashcards);
       }
     },
     beforeOpen: (details) async {
@@ -395,6 +401,59 @@ class AppDatabase extends _$AppDatabase {
   Future<void> removeSpacedRepetition(int questionId) =>
       (delete(spacedRepetition)..where((t) => t.questionId.equals(questionId)))
           .go();
+
+  // ============= FLASHCARDS =============
+
+  Future<void> insertFlashcard(FlashcardsCompanion card) =>
+      into(flashcards).insert(card, mode: InsertMode.insertOrReplace);
+
+  Future<void> insertFlashcardsBatch(List<FlashcardsCompanion> cards) async {
+    await batch((b) => b.insertAll(flashcards, cards, mode: InsertMode.insertOrReplace));
+  }
+
+  Future<List<Flashcard>> getAllFlashcards() => select(flashcards).get();
+
+  Future<List<Flashcard>> getFlashcardsBySubject(String subject) =>
+      (select(flashcards)..where((t) => t.subject.equals(subject))).get();
+
+  Future<List<Flashcard>> getDueFlashcards(DateTime now) {
+    final query = select(flashcards)
+      ..where((t) => t.dueAt.isSmallerOrEqualValue(now))
+      ..orderBy([(t) => OrderingTerm(expression: t.dueAt)]);
+    return query.get();
+  }
+
+  Future<Flashcard?> getFlashcardById(String id) =>
+      (select(flashcards)..where((t) => t.id.equals(id))).getSingleOrNull();
+
+  Future<void> updateFlashcardSchedule(
+    String id, {
+    required int box,
+    required double easeFactor,
+    required int intervalDays,
+    required int repetitions,
+    required int lapses,
+    required DateTime dueAt,
+    DateTime? lastReviewedAt,
+  }) async {
+    await (update(flashcards)..where((t) => t.id.equals(id))).write(
+      FlashcardsCompanion(
+        box: Value(box),
+        easeFactor: Value(easeFactor),
+        intervalDays: Value(intervalDays),
+        repetitions: Value(repetitions),
+        lapses: Value(lapses),
+        dueAt: Value(dueAt),
+        lastReviewedAt: Value(lastReviewedAt),
+      ),
+    );
+  }
+
+  Future<void> deleteFlashcard(String id) =>
+      (delete(flashcards)..where((t) => t.id.equals(id))).go();
+
+  Future<void> deleteFlashcardsByChapter(String chapterId) =>
+      (delete(flashcards)..where((t) => t.chapterId.equals(chapterId))).go();
 
   // ============= RESET DATA =============
 

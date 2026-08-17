@@ -371,8 +371,59 @@ final topicsProvider = Provider.family<List<Topic>, String>((ref, chapterId) {
 });
 
 // ============= FLASHCARD PROVIDERS =============
+final flashcardsFromDbProvider = FutureProvider<List<Flashcard>>((ref) async {
+  final db = ref.watch(databaseProvider);
+  final rows = await db.getAllFlashcards();
+  if (rows.isEmpty) return sampleFlashcards;
+  return rows.map((r) => Flashcard(
+    id: r.id,
+    front: r.front,
+    back: r.back,
+    subject: r.subject,
+    topicId: r.topicId,
+    imageUrl: r.imageUrl,
+    chapterId: r.chapterId,
+    ncertReference: r.ncertReference,
+    sourcePage: r.sourcePage,
+    difficulty: r.difficulty,
+    isGenerated: r.isGenerated,
+    box: r.box,
+    easeFactor: r.easeFactor,
+    intervalDays: r.intervalDays,
+    repetitions: r.repetitions,
+    lapses: r.lapses,
+    dueAt: r.dueAt,
+    lastReviewedAt: r.lastReviewedAt,
+  )).toList();
+});
+
 final flashcardsProvider = Provider<List<Flashcard>>((ref) {
-  return sampleFlashcards;
+  return ref.watch(flashcardsFromDbProvider).valueOrNull ?? sampleFlashcards;
+});
+
+final dueFlashcardsProvider = FutureProvider<List<Flashcard>>((ref) async {
+  final db = ref.watch(databaseProvider);
+  final rows = await db.getDueFlashcards(DateTime.now());
+  return rows.map((r) => Flashcard(
+    id: r.id,
+    front: r.front,
+    back: r.back,
+    subject: r.subject,
+    topicId: r.topicId,
+    imageUrl: r.imageUrl,
+    chapterId: r.chapterId,
+    ncertReference: r.ncertReference,
+    sourcePage: r.sourcePage,
+    difficulty: r.difficulty,
+    isGenerated: r.isGenerated,
+    box: r.box,
+    easeFactor: r.easeFactor,
+    intervalDays: r.intervalDays,
+    repetitions: r.repetitions,
+    lapses: r.lapses,
+    dueAt: r.dueAt,
+    lastReviewedAt: r.lastReviewedAt,
+  )).toList();
 });
 
 final flashcardsForSubjectProvider = Provider.family<List<Flashcard>, String>((
@@ -1473,3 +1524,28 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
 final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
   return ThemeNotifier();
 });
+
+// ============= PREMIUM HOME TOGGLE =============
+class PremiumHomeNotifier extends StateNotifier<bool> {
+  PremiumHomeNotifier() : super(false) {
+    _load();
+  }
+
+  static const _key = 'use_premium_home';
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getBool(_key) ?? false;
+  }
+
+  Future<void> toggle(bool value) async {
+    state = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_key, value);
+  }
+}
+
+final usePremiumHomeProvider =
+    StateNotifierProvider<PremiumHomeNotifier, bool>((ref) {
+      return PremiumHomeNotifier();
+    });
