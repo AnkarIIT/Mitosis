@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
+import 'gemini_proxy_service.dart';
+
 enum ChatMode { general, conceptExplanation, doubtSolving, quizHint }
 
 /// Manages the Gemini AI session and stores the API key in the OS secure
@@ -18,6 +20,11 @@ class GeminiChatService {
   String? _apiKey;
   GenerativeModel? _model;
   ChatSession? _chatSession;
+
+  /// Tier-2/3 client: shared cache + rate-limited live Gemini via Supabase.
+  /// The local Tier-1 tier (questions.explanation in Drift) is resolved by
+  /// callers that own a database handle.
+  final GeminiProxyService _proxy = GeminiProxyService();
 
   // ---------------------------------------------------------------------------
   // Lifecycle
@@ -43,6 +50,17 @@ class GeminiChatService {
       return;
     }
 
+    _model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: cleanKey,
+      systemInstruction: Content.system(_systemPromptFor(mode)),
+    );
+    _chatSession = _model!.startChat();
+  }
+
+  /// Builds the tutor system prompt for a given [mode]. Shared between the
+  /// direct Gemini session and the proxy request so cache keys stay stable.
+  String _systemPromptFor(ChatMode mode) {
     String systemPrompt =
         'You are an expert NEET (medical entrance exam) tutor. You explain concepts strictly based on the NCERT syllabus. You are patient, concise, and helpful.';
 
@@ -63,12 +81,7 @@ class GeminiChatService {
         break;
     }
 
-    _model = GenerativeModel(
-      model: 'gemini-1.5-flash',
-      apiKey: cleanKey,
-      systemInstruction: Content.system(systemPrompt),
-    );
-    _chatSession = _model!.startChat();
+    return systemPrompt;
   }
 
   // ---------------------------------------------------------------------------
@@ -100,6 +113,35 @@ class GeminiChatService {
     String text, {
     ChatMode mode = ChatMode.general,
   }) async {
+    // Preferred path: Supabase `gemini-proxy` (T2 cache / T3 live).
+    if (_proxy.isConfigured) {
+      final result = await _proxy.generate(
+        prompt: text,
+        systemPrompt: _systemPromptFor(mode),
+      );
+      switch (result.source) {
+        case GeminiProxySource.cache:
+        case GeminiProxySource.live:
+          return result.text;
+        case GeminiProxySource.rateLimited:
+          return "You've reached the AI limit for a while. Please try again later.";
+        case GeminiProxySource.error:
+          return "Sorry, the AI service hit an error. Please try again.";
+        case GeminiProxySource.offline:
+          // The proxy never reached the network — a direct key may still work.
+          if (isConfigured) {
+            final direct = await _directChat(text);
+            if (!direct.startsWith('Error:')) return direct;
+          }
+          return "You're offline. AI Tutor is unavailable — reconnect and try again.";
+      }
+    }
+
+    // Fallback: direct Gemini API call using the user's own key.
+    return _directChat(text);
+  }
+
+  Future<String> _directChat(String text) async {
     if (!isConfigured) {
       if (_apiKey != null && !_apiKey!.trim().startsWith('AIzaSy')) {
         return "Error: The API key you entered doesn't look right. It should start with 'AIzaSy...'. Please check your Settings.";
@@ -141,10 +183,36 @@ class GeminiChatService {
   }
 
   Future<String> getQuizHint(String questionText, String options) async {
-    if (!isConfigured) return "API Key not configured.";
-
     final prompt =
         'I am stuck on this NEET question. Can you give me a small hint? Question: "$questionText" Options: $options. REMEMBER: Do not give the answer.';
+
+    if (_proxy.isConfigured) {
+      final result = await _proxy.generate(
+        prompt: prompt,
+        systemPrompt: _systemPromptFor(ChatMode.quizHint),
+      );
+      switch (result.source) {
+        case GeminiProxySource.cache:
+        case GeminiProxySource.live:
+          return result.text;
+        case GeminiProxySource.rateLimited:
+          return "You've reached the AI limit for a while. Please try again later.";
+        case GeminiProxySource.offline:
+          if (isConfigured) {
+            final direct = await _directQuizHint(prompt);
+            if (!direct.startsWith('Error:')) return direct;
+          }
+          return "You're offline. AI Tutor is unavailable.";
+        case GeminiProxySource.error:
+          break;
+      }
+    }
+
+    return _directQuizHint(prompt);
+  }
+
+  Future<String> _directQuizHint(String prompt) async {
+    if (!isConfigured) return "API Key not configured.";
 
     try {
       final hintModel = GenerativeModel(

@@ -106,16 +106,33 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   }
 
   void _showHint(Question question) async {
+    // T1 offline tier: serve the pre-seeded explanation already stored in the
+    // local database ($0, works with no network). Only falls back to live AI
+    // when the question has no saved explanation.
+    final localExplanation = question.explanation?.trim();
+    if (localExplanation != null && localExplanation.isNotEmpty) {
+      if (!mounted) return;
+      _showHintDialog(
+        '$localExplanation'
+        '\n\n(From your saved explanation — offline.)',
+      );
+      return;
+    }
+
     setState(() => _isGettingHint = true);
-    
+
     final hint = await ref.read(geminiServiceProvider).getQuizHint(
       question.questionText,
       question.options.join(', '),
     );
-    
+
     if (!mounted) return;
     setState(() => _isGettingHint = false);
 
+    _showHintDialog(hint);
+  }
+
+  void _showHintDialog(String content) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -126,7 +143,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
             const Text('Hint'),
           ],
         ),
-        content: Text(hint),
+        content: SingleChildScrollView(
+          child: Text(content),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
