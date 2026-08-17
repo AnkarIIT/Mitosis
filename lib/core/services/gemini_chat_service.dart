@@ -19,7 +19,6 @@ class GeminiChatService {
 
   String? _apiKey;
   GenerativeModel? _model;
-  ChatSession? _chatSession;
 
   /// Tier-2/3 client: shared cache + rate-limited live Gemini via Supabase.
   /// The local Tier-1 tier (questions.explanation in Drift) is resolved by
@@ -38,7 +37,6 @@ class GeminiChatService {
   void _initializeModel({ChatMode mode = ChatMode.general}) {
     if (_apiKey == null || _apiKey!.isEmpty) {
       _model = null;
-      _chatSession = null;
       return;
     }
 
@@ -46,7 +44,6 @@ class GeminiChatService {
 
     if (!cleanKey.startsWith('AIzaSy')) {
       _model = null;
-      _chatSession = null;
       return;
     }
 
@@ -55,7 +52,6 @@ class GeminiChatService {
       apiKey: cleanKey,
       systemInstruction: Content.system(_systemPromptFor(mode)),
     );
-    _chatSession = _model!.startChat();
   }
 
   /// Builds the tutor system prompt for a given [mode]. Shared between the
@@ -113,7 +109,6 @@ class GeminiChatService {
     String text, {
     ChatMode mode = ChatMode.general,
   }) async {
-    // Preferred path: Supabase `gemini-proxy` (T2 cache / T3 live).
     if (_proxy.isConfigured) {
       final result = await _proxy.generate(
         prompt: text,
@@ -128,33 +123,11 @@ class GeminiChatService {
         case GeminiProxySource.error:
           return "Sorry, the AI service hit an error. Please try again.";
         case GeminiProxySource.offline:
-          // The proxy never reached the network — a direct key may still work.
-          if (isConfigured) {
-            final direct = await _directChat(text);
-            if (!direct.startsWith('Error:')) return direct;
-          }
           return "You're offline. AI Tutor is unavailable — reconnect and try again.";
       }
     }
 
-    // Fallback: direct Gemini API call using the user's own key.
-    return _directChat(text);
-  }
-
-  Future<String> _directChat(String text) async {
-    if (!isConfigured) {
-      if (_apiKey != null && !_apiKey!.trim().startsWith('AIzaSy')) {
-        return "Error: The API key you entered doesn't look right. It should start with 'AIzaSy...'. Please check your Settings.";
-      }
-      return "Error: Gemini API Key is not configured. Please add it in Settings.";
-    }
-
-    try {
-      final response = await _chatSession!.sendMessage(Content.text(text));
-      return response.text ?? "Sorry, I couldn't generate a response.";
-    } catch (e) {
-      return "Error: Something went wrong. Please try again.";
-    }
+    return "AI Tutor is not configured. Please set up the Supabase proxy.";
   }
 
   Future<String> sendMultimodalMessage(String text, List<Part> parts) async {
@@ -198,35 +171,13 @@ class GeminiChatService {
         case GeminiProxySource.rateLimited:
           return "You've reached the AI limit for a while. Please try again later.";
         case GeminiProxySource.offline:
-          if (isConfigured) {
-            final direct = await _directQuizHint(prompt);
-            if (!direct.startsWith('Error:')) return direct;
-          }
           return "You're offline. AI Tutor is unavailable.";
         case GeminiProxySource.error:
-          break;
+          return "Sorry, the AI service hit an error. Please try again.";
       }
     }
 
-    return _directQuizHint(prompt);
-  }
-
-  Future<String> _directQuizHint(String prompt) async {
-    if (!isConfigured) return "API Key not configured.";
-
-    try {
-      final hintModel = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: _apiKey!,
-        systemInstruction: Content.system(
-          'You are a helpful NEET tutor. Provide a very short, helpful hint for the question. NEVER give the answer or the correct option letter.',
-        ),
-      );
-      final response = await hintModel.generateContent([Content.text(prompt)]);
-      return response.text ?? "Try thinking about the core concept involved.";
-    } catch (e) {
-      return "Think about the NCERT definition for this topic.";
-    }
+    return "AI Tutor is not configured. Please set up the Supabase proxy.";
   }
 
   Future<String> generateStudyPlan(
