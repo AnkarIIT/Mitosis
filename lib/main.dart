@@ -13,6 +13,7 @@ import 'features/auth/auth_screen.dart';
 import 'features/auth/otp_screen.dart';
 import 'features/auth/two_factor_screen.dart';
 import 'features/home/home_screen.dart';
+import 'features/home/neet_home_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 
 void main() async {
@@ -55,6 +56,7 @@ void main() async {
 Future<void> _backgroundInit(ProviderContainer container) async {
   try {
     final repository = container.read(questionRepositoryProvider);
+    await repository.importBundledQuestions('assets/questions/neet_sample_10.json');
     await repository.insertSampleQuestions();
     debugPrint('Background seeding complete');
   } catch (e) {
@@ -114,6 +116,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(app_providers.themeProvider);
     final authState = ref.watch(app_providers.authProvider);
+    final usePremiumHome = ref.watch(app_providers.usePremiumHomeProvider);
 
     if (_needsBiometric) {
       return MaterialApp(
@@ -146,11 +149,11 @@ class _MyAppState extends ConsumerState<MyApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      home: _isAuthenticated ? _getHome(authState) : const SizedBox(),
+      home: _isAuthenticated ? _getHome(authState, usePremiumHome) : const SizedBox(),
     );
   }
 
-  Widget _getHome(app_providers.AuthState authState) {
+  Widget _getHome(app_providers.AuthState authState, bool usePremiumHome) {
     if (authState.status == app_providers.AuthStatus.loading) {
       return const Scaffold(
         body: Center(
@@ -184,7 +187,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             );
           }
           if (snapshot.data == true) {
-            return const HomeScreen();
+            return usePremiumHome ? const NeetHomeScreen() : const HomeScreen();
           }
           return const OnboardingScreen();
         },

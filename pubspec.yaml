@@ -64,3 +64,4 @@ flutter:
   assets:
     - assets/ml/
     - assets/ncert_books/
+    - assets/questions/

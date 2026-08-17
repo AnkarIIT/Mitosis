@@ -155,6 +155,50 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
             style: const TextStyle(fontSize: 13, color: AppColors.textSubtle),
           ),
           const SizedBox(height: 16),
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.auto_awesome, size: 20, color: AppColors.primary),
+                      SizedBox(width: 8),
+                      Text(
+                        'One-Tap Import',
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Import pre-bundled NEET question banks (no file picker needed). '
+                    'Questions are deduplicated automatically.',
+                    style: TextStyle(fontSize: 13, color: AppColors.textSubtle),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _BundledImportChip(
+                        label: 'Sample (10 Qs)',
+                        asset: 'assets/questions/neet_sample_10.json',
+                        color: AppColors.success,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           SegmentedButton<_ImportSource>(
             segments: const [
               ButtonSegment(
@@ -564,6 +608,37 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _BundledImportChip extends ConsumerWidget {
+  const _BundledImportChip({
+    required this.label,
+    required this.asset,
+    required this.color,
+  });
+
+  final String label;
+  final String asset;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ActionChip(
+      label: Text(label),
+      backgroundColor: color.withValues(alpha: 0.1),
+      side: BorderSide(color: color.withValues(alpha: 0.3)),
+      onPressed: () async {
+        final repo = ref.read(questionRepositoryProvider);
+        final count = await repo.importBundledQuestions(asset);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Imported $count questions from $label')),
+          );
+          ref.invalidate(allQuestionsProvider);
+        }
+      },
     );
   }
 }

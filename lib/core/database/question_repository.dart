@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/question_model.dart' as model; 
+import '../models/question_model.dart' as model;
 import '../constants/neet_sample_data.dart' as sample;
 import '../constants/neet_sample_data_phase2.dart' as sample2;
+import '../services/question_importer.dart';
 import 'drift_database.dart';
 import '../providers/providers.dart';
 
@@ -61,6 +63,54 @@ class QuestionRepository {
     debugPrint('✅ Inserted ${toInsert.length} sample questions');
   }
 
+  /// Imports questions from a bundled Flutter asset (e.g. "assets/questions/neet_sample_10.json").
+  /// Deduplicates against existing question texts in the database.
+  /// Returns the number of newly imported questions.
+  Future<int> importBundledQuestions(String assetPath) async {
+    final existing = await db.select(db.questions).get();
+    final existingTexts = existing
+        .map((q) => QuestionImporter.normalizeText(q.questionText))
+        .toSet();
+
+    final json = await rootBundle.loadString(assetPath);
+    final importer = QuestionImporter();
+    final rows = importer.parseJson(json);
+
+    final (built, result) = QuestionImporter(
+      existingTexts: existingTexts,
+    ).buildQuestions(rows);
+
+    if (built.isEmpty) return 0;
+
+    await db.batch((batch) {
+      for (final q in built) {
+        batch.insert(
+          db.questions,
+          QuestionsCompanion(
+            id: Value<String>(q.id.toString()),
+            subject: Value<String>(q.subject),
+            chapter: Value<String>(q.chapter),
+            topic: Value<String>(q.topic),
+            topicId: Value<String>(q.topicId),
+            questionText: Value<String>(q.questionText),
+            options: Value<String>(q.options.join('|||')),
+            correctAnswer: Value<String>(q.correctAnswer),
+            explanation: Value<String?>(q.explanation),
+            ncertReference: Value<String?>(q.ncertReference),
+            year: Value<int?>(q.year),
+            difficulty: Value<String>(q.difficulty),
+            tags: Value<String>(q.tags.join('|||')),
+            imageUrl: Value<String?>(q.imageUrl),
+            type: Value<String>(q.type),
+          ),
+        );
+      }
+    });
+
+    debugPrint('✅ Imported ${built.length} questions from $assetPath');
+    return built.length;
+  }
+
   Future<List<model.Question>> getAllQuestionsFromDb() async {
     final data = await (db.select(
       db.questions,
@@ -95,6 +145,35 @@ class QuestionRepository {
             .get();
 
     return _mapQuestions(data);
+  }
+
+  Future<model.Question?> getQuestionById(int id) async {
+    final row = await (db.select(db.questions)
+          ..where((tbl) => tbl.id.equals(id.toString())))
+        .getSingleOrNull();
+    if (row == null) return null;
+    return model.Question.fromMap({
+      'id': row.id,
+      'subject': row.subject,
+      'chapter': row.chapter,
+      'topic': row.topic,
+      'topicId': row.topicId,
+      'questionText': row.questionText,
+      'options': row.options,
+      'correctAnswer': row.correctAnswer,
+      'explanation': row.explanation,
+      'ncertReference': row.ncertReference,
+      'year': row.year,
+      'difficulty': row.difficulty,
+      'tags': row.tags ?? '',
+      'imageUrl': row.imageUrl,
+      'type': row.type,
+    });
+  }
+
+  Future<void> updateQuestionExplanation(int questionId, String explanation) async {
+    await (db.update(db.questions)..where((tbl) => tbl.id.equals(questionId.toString())))
+        .write(QuestionsCompanion(explanation: Value<String>(explanation)));
   }
 
   List<model.Question> _mapQuestions(List<dynamic> rows) {
