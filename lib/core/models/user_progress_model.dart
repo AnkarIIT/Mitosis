@@ -81,6 +81,11 @@ class QuizAttempt {
   final DateTime attemptedAt;
   final List<String> selectedAnswers;
 
+  /// Real ±marks persisted from the exam engine (single source of truth).
+  /// Null for legacy rows recorded before these were stored.
+  final int? rawScore;
+  final int? maxMarks;
+
   QuizAttempt({
     required this.id,
     required this.topicId,
@@ -93,13 +98,16 @@ class QuizAttempt {
     required this.timeSpentSeconds,
     required this.attemptedAt,
     required this.selectedAnswers,
+    this.rawScore,
+    this.maxMarks,
   });
 
-  /// NEET Score formula: 4 * Correct - 1 * Incorrect
-  int get neetScore => (score * 4) - incorrectCount;
+  /// NEET score. Uses the persisted raw marks when available; otherwise falls
+  /// back to the legacy 4×correct − incorrect derivation for old rows.
+  int get neetScore => rawScore ?? (score * 4) - incorrectCount;
 
-  /// Maximum possible score for this attempt
-  int get maxScore => totalQuestions * 4;
+  /// Maximum possible score for this attempt (persisted when available).
+  int get maxScore => maxMarks ?? (totalQuestions * 4);
 
   double get accuracy =>
       totalQuestions == 0 ? 0 : (score / totalQuestions) * 100;

@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/database/drift_database.dart' show FlashcardsCompanion;
@@ -8,6 +10,8 @@ import '../../core/providers/providers.dart';
 import '../../core/services/ncert_book_catalog.dart';
 import '../../core/services/flashcard_generation_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -157,7 +161,31 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
           ),
           const SizedBox(height: 16),
 
-          if (_status != null) ...[
+          if (_isGenerating) ...[
+            const SizedBox(height: 16),
+            // Pulsing progress bar while generating
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: (_processed != null && _total != null && _total! > 0)
+                    ? (_processed! / _total!).clamp(0.0, 1.0)
+                    : null,
+                minHeight: 6,
+                backgroundColor: AdaptiveColors.outlineVariant(context).withValues(alpha: 0.3),
+                valueColor: AlwaysStoppedAnimation(AppColors.success),
+              ),
+            ).animate(onPlay: (c) => c.repeat(reverse: true))
+                .scale(
+                  begin: const Offset(1, 0.6),
+                  end: const Offset(1, 1),
+                  duration: AppDuration.normal,
+                  curve: Curves.easeInOut,
+                ),
+            const SizedBox(height: 12),
+            _buildShimmerSkeleton(),
+          ],
+
+          if (_status != null && !_isGenerating) ...[
             Card(
               color: _lastError != null
                   ? AppColors.error.withValues(alpha: 0.08)
@@ -181,7 +209,7 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
                         child: LinearProgressIndicator(
                           value: _processed! / _total!,
                           minHeight: 6,
-                          backgroundColor: AppColors.premiumChipBg,
+                          backgroundColor: AdaptiveColors.outlineVariant(context).withValues(alpha: 0.3),
                           valueColor: AlwaysStoppedAnimation(
                             _lastError != null ? AppColors.error : AppColors.success,
                           ),
@@ -198,6 +226,30 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
                       Text(
                         'Error: $_lastError',
                         style: const TextStyle(fontSize: 12, color: AppColors.error),
+                      ),
+                    ],
+                    if (_generatedCards.isNotEmpty && _lastError == null) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Icon(Icons.check_circle, color: AppColors.success, size: 20)
+                              .animate()
+                              .scale(
+                                begin: Offset.zero,
+                                end: const Offset(1, 1),
+                                curve: Curves.elasticOut,
+                                duration: AppDuration.slow,
+                              ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Done!',
+                            style: TextStyle(
+                              color: AppColors.success,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ],
@@ -225,7 +277,10 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
               ],
             ),
             const SizedBox(height: 12),
-            ..._generatedCards.map((card) => _buildCardPreview(card)),
+            ..._generatedCards.asMap().entries.map((entry) => _buildCardPreview(entry.value)
+                .animate(delay: (entry.key * 80).ms)
+                .fadeIn(duration: AppDuration.slow)
+                .slideY(begin: 0.15, end: 0, duration: AppDuration.slow, curve: Curves.easeOutCubic)),
           ],
         ],
       ),
@@ -243,7 +298,7 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: ExpansionTile(
-        leading: const Icon(Icons.style_rounded, color: AppColors.physicsBlue),
+        leading: Icon(Icons.style_rounded, color: SubjectColors.physics),
         title: Text(
           card.front,
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
@@ -260,6 +315,23 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerSkeleton() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Column(
+        children: List.generate(4, (index) => Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          height: 72,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+        )),
       ),
     );
   }
@@ -331,37 +403,72 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
       _isGenerating = true;
       _status = 'Reading NCERT chapter…';
       _processed = 0;
-      _total = null;
+      _total = _quantity;
       _lastError = null;
       _generatedCards = const [];
     });
 
     try {
+      final proxy = ref.read(geminiProxyServiceProvider);
+      if (proxy == null || !proxy.isConfigured) {
+        setState(() {
+          _isGenerating = false;
+          _status = 'AI flashcard generation requires a Gemini API key.';
+          _lastError = 'ai_unavailable';
+        });
+        return;
+      }
+
       final service = FlashcardGenerationService(
-        proxy: ref.read(geminiProxyServiceProvider),
+        proxy: proxy,
         batchSize: 5,
         delayBetweenBatchesMs: 1200,
       );
 
-      final cards = await service.generate(
+      // Use streaming variant for progress updates.
+      await for (final progress in service.generateFromChapter(
         subject: _selectedSubject!,
         chapterTitle: _selectedChapter!.chapterTitle,
         chapterNumber: _selectedChapter!.chapterNumber,
         classLevel: _selectedClassLevel!,
         count: _quantity,
         assetPathOverride: _selectedChapter!.assetPath,
-      );
+      )) {
+        if (!mounted) return;
+        setState(() {
+          _status = progress.status;
+          _processed = progress.processed;
+          _total = progress.total;
+          _lastError = progress.lastError;
+        });
+      }
 
       if (!mounted) return;
 
-      setState(() {
-        _isGenerating = false;
-        _generatedCards = cards;
-        _status = cards.isEmpty
-            ? 'No flashcards generated. Try again or pick another chapter.'
-            : 'Generated ${cards.length} flashcards';
-        _lastError = cards.isEmpty ? 'empty_generation' : null;
-      });
+      // Streaming yields progress, not cards. Collect final cards via sync path.
+      if (_lastError == null) {
+        final finalCards = await service.generate(
+          subject: _selectedSubject!,
+          chapterTitle: _selectedChapter!.chapterTitle,
+          chapterNumber: _selectedChapter!.chapterNumber,
+          classLevel: _selectedClassLevel!,
+          count: _quantity,
+          assetPathOverride: _selectedChapter!.assetPath,
+        );
+        setState(() {
+          _isGenerating = false;
+          _generatedCards = finalCards;
+          _status = finalCards.isEmpty
+              ? 'No flashcards generated. Try again or pick another chapter.'
+              : 'Generated ${finalCards.length} flashcards';
+          _lastError = finalCards.isEmpty ? 'empty_generation' : null;
+        });
+      } else {
+        setState(() {
+          _isGenerating = false;
+          _generatedCards = const [];
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {

@@ -7,6 +7,7 @@ import '../../core/models/user_progress_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/mark_booster_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 class MarkBoosterScreen extends ConsumerStatefulWidget {
   const MarkBoosterScreen({super.key});
@@ -54,7 +55,7 @@ class _MarkBoosterScreenState extends ConsumerState<MarkBoosterScreen> {
     final diagnosisAsync = ref.watch(markBoosterDiagnosisProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.adaptiveBackground(context),
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
         title: const Text('Mark Booster'),
         centerTitle: false,
@@ -340,9 +341,9 @@ class _WeakTopicCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.adaptiveSurface(context),
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.adaptiveDivider(context)),
+        border: Border.all(color: AdaptiveColors.divider(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,7 +356,7 @@ class _WeakTopicCard extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
-                    color: AppColors.adaptiveText(context),
+                    color: AdaptiveColors.textPrimary(context),
                   ),
                 ),
               ),
@@ -374,7 +375,7 @@ class _WeakTopicCard extends StatelessWidget {
             '${weakness.chapterName} · ${weakness.subjectName}',
             style: TextStyle(
               fontSize: 12,
-              color: AppColors.adaptiveSubtleText(context),
+              color: AdaptiveColors.textSecondary(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -383,7 +384,7 @@ class _WeakTopicCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: weakness.masteryProgress,
               minHeight: 6,
-              backgroundColor: AppColors.adaptiveDivider(context),
+              backgroundColor: AdaptiveColors.divider(context),
               valueColor: AlwaysStoppedAnimation(color),
             ),
           ),
@@ -392,31 +393,31 @@ class _WeakTopicCard extends StatelessWidget {
             '${(weakness.masteryProgress * 100).toStringAsFixed(0)}% of the way to 60% mastery',
             style: TextStyle(
               fontSize: 11,
-              color: AppColors.adaptiveSubtleText(context),
+              color: AdaptiveColors.textSecondary(context),
             ),
           ),
           const SizedBox(height: 8),
           Row(
             children: [
               Icon(Icons.history, size: 14,
-                  color: AppColors.adaptiveSubtleText(context)),
+                  color: AdaptiveColors.textSecondary(context)),
               const SizedBox(width: 4),
               Text(
                 '${weakness.questionsAttempted} attempted',
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.adaptiveSubtleText(context),
+                  color: AdaptiveColors.textSecondary(context),
                 ),
               ),
               const SizedBox(width: 16),
               Icon(Icons.library_books_outlined, size: 14,
-                  color: AppColors.adaptiveSubtleText(context)),
+                  color: AdaptiveColors.textSecondary(context)),
               const SizedBox(width: 4),
               Text(
                 '${weakness.questionsAvailable} in bank',
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.adaptiveSubtleText(context),
+                  color: AdaptiveColors.textSecondary(context),
                 ),
               ),
             ],
@@ -513,9 +514,9 @@ class _SessionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.adaptiveSurface(context),
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.adaptiveDivider(context)),
+        border: Border.all(color: AdaptiveColors.divider(context)),
       ),
       child: Row(
         children: [
@@ -528,7 +529,7 @@ class _SessionCard extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
-                    color: AppColors.adaptiveText(context),
+                    color: AdaptiveColors.textPrimary(context),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -536,7 +537,7 @@ class _SessionCard extends StatelessWidget {
                   '${attempt.score}/${attempt.totalQuestions} correct · ${attempt.incorrectCount} wrong',
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.adaptiveSubtleText(context),
+                    color: AdaptiveColors.textSecondary(context),
                   ),
                 ),
               ],
@@ -557,7 +558,7 @@ class _SessionCard extends StatelessWidget {
                 '${attempt.neetScore} NEET',
                 style: TextStyle(
                   fontSize: 11,
-                  color: AppColors.adaptiveSubtleText(context),
+                  color: AdaptiveColors.textSecondary(context),
                 ),
               ),
             ],
@@ -590,7 +591,7 @@ class _DistributionRow extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
           ),
@@ -598,7 +599,7 @@ class _DistributionRow extends StatelessWidget {
             '$value · ${share.toStringAsFixed(0)}% of errors',
             style: TextStyle(
               fontSize: 12,
-              color: AppColors.adaptiveSubtleText(context),
+              color: AdaptiveColors.textSecondary(context),
             ),
           ),
         ],
@@ -634,14 +635,14 @@ class _SectionHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.adaptiveText(context),
+                  color: AdaptiveColors.textPrimary(context),
                 ),
               ),
               Text(
                 subtitle,
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.adaptiveSubtleText(context),
+                  color: AdaptiveColors.textSecondary(context),
                 ),
               ),
             ],
@@ -663,9 +664,9 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.adaptiveSurface(context),
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.adaptiveDivider(context)),
+        border: Border.all(color: AdaptiveColors.divider(context)),
       ),
       child: Row(
         children: [
@@ -676,7 +677,7 @@ class _InfoCard extends StatelessWidget {
               text,
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
           ),
@@ -700,7 +701,7 @@ class _EmptyState extends StatelessWidget {
             Icon(
               Icons.psychology_outlined,
               size: 72,
-              color: AppColors.adaptiveSubtleText(context),
+              color: AdaptiveColors.textSecondary(context),
             ),
             const SizedBox(height: 16),
             Text(
@@ -708,7 +709,7 @@ class _EmptyState extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -718,7 +719,7 @@ class _EmptyState extends StatelessWidget {
               're-tests. Your weak spots will surface here as personalised drills.',
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.adaptiveSubtleText(context),
+                color: AdaptiveColors.textSecondary(context),
               ),
               textAlign: TextAlign.center,
             ),

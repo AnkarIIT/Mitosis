@@ -8,6 +8,7 @@ import '../../core/database/question_repository.dart';
 import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:uuid/uuid.dart';
 
 
@@ -26,15 +27,16 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
   String _selectedSubject = "Biology";
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    final files = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
     );
 
-    if (result != null) {
+    if (files.isNotEmpty) {
+      final file = files.single;
       setState(() {
-        _selectedFile = File(result.files.single.path!);
-        _status = "File selected: ${result.files.single.name}";
+        _selectedFile = File(file.path!);
+        _status = "File selected: ${file.name}";
       });
       _processPdf();
     }
@@ -191,7 +193,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.adaptiveBackground(context),
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
         title: const Text("AI PDF Engine"),
         backgroundColor: Colors.transparent,
@@ -217,7 +219,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.adaptiveText(context),
+                      color: AdaptiveColors.textPrimary(context),
                     ),
                   ),
                   if (_isProcessing) ...[
@@ -250,7 +252,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 18, 
                       fontWeight: FontWeight.bold,
-                      color: AppColors.adaptiveText(context),
+                      color: AdaptiveColors.textPrimary(context),
                     ),
                   ),
                   DropdownButton<String>(
@@ -270,10 +272,10 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       elevation: 0,
-                      color: AppColors.adaptiveSurface(context),
+                      color: AdaptiveColors.surface(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: AppColors.adaptiveDivider(context)),
+                        side: BorderSide(color: AdaptiveColors.divider(context)),
                       ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16),
@@ -283,7 +285,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                         ),
                         subtitle: Text(
                           "${(_chapters[index]['content']!.length / 1000).toStringAsFixed(1)}k characters of study material",
-                          style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
+                          style: TextStyle(color: AdaptiveColors.textSecondary(context)),
                         ),
                         trailing: ElevatedButton(
                           onPressed: () => _generateQuestions(index),

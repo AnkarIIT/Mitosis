@@ -50,12 +50,12 @@ class GeneratedFlashcard {
 /// 5. Parse JSON response into [GeneratedFlashcard]s
 class FlashcardGenerationService {
   FlashcardGenerationService({
-    required GeminiProxyService proxy,
+    GeminiProxyService? proxy,
     this.batchSize = 5,
     this.delayBetweenBatchesMs = 1200,
   }) : _proxy = proxy;
 
-  final GeminiProxyService _proxy;
+  final GeminiProxyService? _proxy;
   final int batchSize;
   final int delayBetweenBatchesMs;
 
@@ -74,6 +74,17 @@ class FlashcardGenerationService {
       yield const FlashcardGenerationProgress(status: 'No cards requested');
       return;
     }
+
+    if (_proxy == null || !_proxy.isConfigured) {
+      yield FlashcardGenerationProgress(
+        status: 'AI flashcard generation requires cloud sync. Please enable it in Settings.',
+        currentStep: 'ai',
+        lastError: 'ai_unavailable',
+      );
+      return;
+    }
+
+    final proxy = _proxy!;
 
     // 1. Resolve asset path.
     final assetPath = assetPathOverride ??
@@ -127,6 +138,15 @@ class FlashcardGenerationService {
     var processed = 0;
     var failed = 0;
 
+    if (!proxy.isConfigured) {
+      yield FlashcardGenerationProgress(
+        status: 'AI flashcard generation requires cloud sync. Please enable it in Settings.',
+        currentStep: 'ai',
+        lastError: 'ai_unavailable',
+      );
+      return;
+    }
+
     for (var i = 0; i < total; i += batchSize) {
       final batch = chunks.skip(i).take(batchSize).toList();
 
@@ -141,7 +161,7 @@ class FlashcardGenerationService {
           count: 1,
         );
 
-        final result = await _proxy.generate(
+        final result = await proxy.generate(
           prompt: prompt,
           systemPrompt: _systemPrompt,
         );
@@ -212,6 +232,8 @@ class FlashcardGenerationService {
     int count = 20,
     String? assetPathOverride,
   }) async {
+    if (_proxy == null || !_proxy!.isConfigured) return const [];
+
     final cards = <GeneratedFlashcard>[];
 
     final assetPath = assetPathOverride ??
@@ -236,7 +258,7 @@ class FlashcardGenerationService {
           count: 1,
         );
 
-        final result = await _proxy.generate(
+        final result = await _proxy!.generate(
           prompt: prompt,
           systemPrompt: _systemPrompt,
         );

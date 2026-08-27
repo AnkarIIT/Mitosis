@@ -6,27 +6,44 @@ import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/ncert_book_catalog.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 
 class TopicDetailScreen extends ConsumerWidget {
-  final Topic topic;
+  final String topicId;
   final String subjectName;
   final String chapterName;
 
   const TopicDetailScreen({
     super.key,
-    required this.topic,
+    required this.topicId,
     required this.subjectName,
     required this.chapterName,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final questionsAsync = ref.watch(questionsForTopicProvider(topic.id));
+    final allSubjects = ref.watch(subjectsProvider);
+    Topic? topic;
+    for (final subject in allSubjects) {
+      for (final chapter in subject.chapters) {
+        try {
+          topic = chapter.topics.firstWhere((t) => t.id == topicId);
+          break;
+        } catch (_) {}
+      }
+      if (topic != null) break;
+    }
+
+    if (topic == null) {
+      return const Scaffold(body: Center(child: Text('Topic not found')));
+    }
+
+    final questionsAsync = ref.watch(questionsForTopicProvider(topicId));
     final subjects = ref.watch(subjectsProvider);
     final chapter = subjects
         .expand((s) => s.chapters)
-        .where((c) => c.id == topic.chapterId)
+        .where((c) => c.id == topic!.chapterId)
         .firstOrNull;
     final ncertEntry = chapter == null
         ? null
@@ -37,26 +54,21 @@ class TopicDetailScreen extends ConsumerWidget {
     }
 
     final questions = questionsAsync.valueOrNull ?? [];
-    final progress = ref.watch(userProgressProvider).topicProgress[topic.id];
+    final progress = ref.watch(userProgressProvider).topicProgress[topicId];
     final accuracy = progress?.accuracy ?? 0.0;
     final isCompleted = progress?.isCompleted ?? false;
     final hasQuestions = questions.isNotEmpty;
 
-    // Record topic view on build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(userProgressProvider.notifier).recordTopicView(topic.id);
-    });
-
     return Scaffold(
-      backgroundColor: AppColors.adaptiveBackground(context),
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
         title: Text(topic.name),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.adaptiveText(context)),
+        iconTheme: IconThemeData(color: AdaptiveColors.textPrimary(context)),
         titleTextStyle: TextStyle(
-          color: AppColors.adaptiveText(context),
+          color: AdaptiveColors.textPrimary(context),
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -71,12 +83,10 @@ class TopicDetailScreen extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.adaptiveSurface(context),
+                color: AdaptiveColors.surface(context),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppColors.adaptiveDivider(
-                    context,
-                  ).withValues(alpha: 0.5),
+                  color: AdaptiveColors.divider(context).withValues(alpha: 0.5),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -114,7 +124,7 @@ class TopicDetailScreen extends ConsumerWidget {
                       Text(
                         '•  $chapterName',
                         style: TextStyle(
-                          color: AppColors.adaptiveSubtleText(context),
+                          color: AdaptiveColors.textSecondary(context),
                           fontSize: 12,
                         ),
                       ),
@@ -124,7 +134,7 @@ class TopicDetailScreen extends ConsumerWidget {
                   Text(
                     topic.name,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppColors.adaptiveText(context),
+                      color: AdaptiveColors.textPrimary(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -161,7 +171,7 @@ class TopicDetailScreen extends ConsumerWidget {
               'NCERT Summary',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 12),
@@ -181,12 +191,12 @@ class TopicDetailScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 15,
                       height: 1.6,
-                      color: AppColors.adaptiveText(context),
+                      color: AdaptiveColors.textPrimary(context),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextButton.icon(
-                    onPressed: () => _showFullSummary(context),
+                    onPressed: () => _showFullSummary(context, topic!),
                     icon: const Icon(Icons.menu_book, size: 18),
                     label: const Text('Read Full Revision Notes'),
                     style: TextButton.styleFrom(
@@ -206,7 +216,7 @@ class TopicDetailScreen extends ConsumerWidget {
               'Quick Revision Points',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 16),
@@ -235,7 +245,7 @@ class TopicDetailScreen extends ConsumerWidget {
                         point,
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.adaptiveText(context),
+                          color: AdaptiveColors.textPrimary(context),
                           height: 1.4,
                         ),
                       ),
@@ -251,7 +261,7 @@ class TopicDetailScreen extends ConsumerWidget {
               'Question Breakdown',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 12),
@@ -263,7 +273,7 @@ class TopicDetailScreen extends ConsumerWidget {
               'Topic Progress',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 12),
@@ -286,7 +296,7 @@ class TopicDetailScreen extends ConsumerWidget {
                   ? 'Aim for 70%+ accuracy to master this topic.'
                   : 'No topic-specific questions are available yet. Try a test series to keep practicing.',
               style: TextStyle(
-                color: AppColors.adaptiveSubtleText(context),
+                color: AdaptiveColors.textSecondary(context),
                 fontSize: 13,
               ),
             ),
@@ -297,14 +307,14 @@ class TopicDetailScreen extends ConsumerWidget {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {
-                  if (hasQuestions) {
-                    context.push('/quiz', extra: {'questions': questions, 'topicName': topic.name, 'topicId': topic.id, 'subject': subjectName});
-                    return;
-                  }
+onPressed: () {
+                    if (hasQuestions) {
+                      context.push('/quiz?topicId=${Uri.encodeComponent(topic!.id)}&topicName=${Uri.encodeComponent(topic!.name)}&subject=${Uri.encodeComponent(subjectName)}');
+                      return;
+                    }
 
-                  context.push('/test-series');
-                },
+                    context.push('/test-series');
+                  },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -327,7 +337,7 @@ class TopicDetailScreen extends ConsumerWidget {
               width: double.infinity,
               height: 56,
               child: OutlinedButton.icon(
-                onPressed: () => _openAiTutor(context),
+                onPressed: () => _openAiTutor(context, topic!),
                 icon: const Icon(Icons.auto_awesome),
                 label: const Text('ASK AI TUTOR ABOUT THIS'),
                 style: OutlinedButton.styleFrom(
@@ -346,11 +356,11 @@ class TopicDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _openAiTutor(BuildContext context) {
+  void _openAiTutor(BuildContext context, Topic topic) {
     final prompt =
         'Explain ${topic.name} for NEET in a simple, high-yield way. Include the core idea, the most common mistake students make, and one quick practice tip.';
 
-    context.push('/chat', extra: {'initialMessage': prompt});
+    context.push('/chat?initialMessage=${Uri.encodeComponent(prompt)}');
   }
 
   Widget _buildNcertReaderCard(
@@ -434,10 +444,10 @@ class TopicDetailScreen extends ConsumerWidget {
     NcertBookEntry entry,
     Chapter chapter,
   ) {
-    context.push('/pdf', extra: {'entry': entry, 'chapter': chapter});
+    context.push('/pdf?entryId=${Uri.encodeComponent(entry.assetPath)}');
   }
 
-  void _showFullSummary(BuildContext context) {
+  void _showFullSummary(BuildContext context, Topic topic) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -445,7 +455,7 @@ class TopicDetailScreen extends ConsumerWidget {
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
-          color: AppColors.adaptiveBackground(context),
+          color: AdaptiveColors.background(context),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
         padding: const EdgeInsets.all(32),
@@ -457,7 +467,7 @@ class TopicDetailScreen extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.adaptiveDivider(context),
+                  color: AdaptiveColors.divider(context),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -473,7 +483,7 @@ class TopicDetailScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.adaptiveText(context),
+                      color: AdaptiveColors.textPrimary(context),
                     ),
                   ),
                 ),
@@ -482,7 +492,7 @@ class TopicDetailScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             Text(
               topic.name,
-              style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
+              style: TextStyle(color: AdaptiveColors.textSecondary(context)),
             ),
             const Divider(height: 40),
             Expanded(
@@ -495,7 +505,7 @@ class TopicDetailScreen extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.adaptiveText(context),
+                        color: AdaptiveColors.textPrimary(context),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -504,7 +514,7 @@ class TopicDetailScreen extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 16,
                         height: 1.8,
-                        color: AppColors.adaptiveText(context),
+                        color: AdaptiveColors.textPrimary(context),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -513,7 +523,7 @@ class TopicDetailScreen extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.adaptiveText(context),
+                        color: AdaptiveColors.textPrimary(context),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -537,7 +547,7 @@ class TopicDetailScreen extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 15,
                                   height: 1.5,
-                                  color: AppColors.adaptiveText(context),
+                                  color: AdaptiveColors.textPrimary(context),
                                 ),
                               ),
                             ),
@@ -717,7 +727,7 @@ class _DifficultyLegend extends StatelessWidget {
         Text(
           '$label ($count)',
           style: TextStyle(
-            color: AppColors.adaptiveText(context),
+            color: AdaptiveColors.textPrimary(context),
             fontSize: 12,
           ),
         ),
@@ -752,7 +762,7 @@ class _InfoPill extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: AppColors.adaptiveText(context).withValues(alpha: 0.7),
+                color: AdaptiveColors.textPrimary(context).withValues(alpha: 0.7),
                 fontSize: 10,
               ),
             ),
@@ -760,7 +770,7 @@ class _InfoPill extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),

@@ -115,27 +115,6 @@ final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
   return ThemeNotifier();
 });
 
-// ============= PREMIUM HOME TOGGLE =============
-class PremiumHomeNotifier extends StateNotifier<bool> {
-  PremiumHomeNotifier() : super(false) {
-    _load();
-  }
-
-  static const _key = 'use_premium_home';
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    state = prefs.getBool(_key) ?? false;
-  }
-
-  Future<void> toggle(bool value) async {
-    state = value;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_key, value);
-  }
-}
-
-final usePremiumHomeProvider =
-    StateNotifierProvider<PremiumHomeNotifier, bool>((ref) {
-      return PremiumHomeNotifier();
-    });
+// ============= ONBOARDING =============
+// Preloaded synchronously before runApp so GoRouter redirect can read it.
+final onboardingCompleteProvider = StateProvider<bool>((ref) => false);

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/config/app_config.dart';
 import '../../core/providers/providers.dart';
-import '../../core/services/email_service.dart';
 import '../../core/theme/app_colors.dart';
 
 
 import 'package:go_router/go_router.dart';
+import '../../core/theme/app_theme.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -17,12 +17,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _apiKeyController = TextEditingController();
-  final _resendApiKeyController = TextEditingController();
-  final _senderEmailController = TextEditingController();
-  final _backendUrlController = TextEditingController();
-  final _testEmailController = TextEditingController();
-  EmailDeliveryMode _deliveryMode = EmailDeliveryMode.clientDirect;
-  String? _emailStatusMessage;
   bool _remindersEnabled = false;
   TimeOfDay _reminderTime = const TimeOfDay(hour: 20, minute: 0);
   bool _biometricEnabled = false;
@@ -37,23 +31,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final geminiService = ref.read(geminiServiceProvider);
       if (geminiService.apiKey != null) {
         _apiKeyController.text = geminiService.apiKey!;
-      }
-
-      final emailService = ref.read(emailServiceProvider);
-      if (emailService.apiKey != null) {
-        _resendApiKeyController.text = emailService.apiKey!;
-      }
-      if (emailService.senderEmail != null) {
-        _senderEmailController.text = emailService.senderEmail!;
-      }
-      _deliveryMode = emailService.deliveryMode;
-      if (emailService.backendUrl != null) {
-        _backendUrlController.text = emailService.backendUrl!;
-      }
-
-      final authState = ref.read(authProvider);
-      if (authState.user?.email != null) {
-        _testEmailController.text = authState.user!.email!;
       }
     });
   }
@@ -151,10 +128,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   void dispose() {
     _apiKeyController.dispose();
-    _resendApiKeyController.dispose();
-    _senderEmailController.dispose();
-    _backendUrlController.dispose();
-    _testEmailController.dispose();
     super.dispose();
   }
 
@@ -170,74 +143,72 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
-  Future<void> _saveEmailConfig() async {
-    final apiKey = _resendApiKeyController.text.trim();
-    final senderEmail = _senderEmailController.text.trim();
-    final backendUrl = _backendUrlController.text.trim();
-
-    if (_deliveryMode == EmailDeliveryMode.clientDirect) {
-      if (apiKey.isEmpty || senderEmail.isEmpty) {
-        setState(() {
-          _emailStatusMessage =
-              'Enter both the Resend API key and sender email for direct delivery.';
-        });
-        return;
-      }
-    }
-
-    if (_deliveryMode == EmailDeliveryMode.backend && backendUrl.isEmpty) {
-      setState(() {
-        _emailStatusMessage =
-            'Enter a backend endpoint URL for backend delivery.';
-      });
-      return;
-    }
-
-    final emailService = ref.read(emailServiceProvider);
-    if (_deliveryMode == EmailDeliveryMode.clientDirect) {
-      await emailService.saveApiKey(apiKey);
-      await emailService.saveSenderEmail(senderEmail);
-    }
-    await emailService.saveDeliveryMode(_deliveryMode);
-    await emailService.saveBackendUrl(backendUrl);
-
-    if (!mounted) return;
-    setState(() {
-      _emailStatusMessage =
-          'Email settings saved. You can now send test emails.';
-    });
+  void _showBackupInfo() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.backup_outlined, size: 32),
+        title: const Text('Backup Data'),
+        content: const Text(
+          'Your quiz progress, flashcard schedules, and error book are stored locally on this device.\n\n'
+          'A future update will add cloud backup for signed-in users. For now, your data stays safe on this device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
-  Future<void> _sendTestEmail() async {
-    final destination = _testEmailController.text.trim();
-    final authState = ref.read(authProvider);
+  void _showRestoreInfo() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.restore_outlined, size: 32),
+        title: const Text('Restore Data'),
+        content: const Text(
+          'Data restore will be available in a future update when cloud backup is launched.\n\n'
+          'Your current data is preserved as long as you don\'t uninstall the app.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
-    if (destination.isEmpty) {
-      setState(() {
-        _emailStatusMessage = 'Enter a recipient email address first.';
-      });
-      return;
-    }
-
-    setState(() {
-      _emailStatusMessage = 'Sending test email...';
-    });
-
-    final result = await ref
-        .read(emailServiceProvider)
-        .sendWelcomeEmail(
-          to: destination,
-          username: authState.user?.username ?? 'Learner',
-        );
-
-    if (!mounted) return;
-    setState(() {
-      _emailStatusMessage = result.message;
-    });
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(result.message)));
+  void _showPrivacyPolicy() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.policy_outlined, size: 32),
+        title: const Text('Privacy Policy'),
+        content: const SingleChildScrollView(
+          child: Text(
+            'NEET Mitos respects your privacy.\n\n'
+            '• All quiz data, flashcards, and progress are stored locally on your device.\n'
+            '• We do not collect, sell, or share any personal data.\n'
+            '• No analytics or tracking tools are used.\n'
+            '• AI features (when enabled) send chapter text to Google Gemini for flashcard generation only.\n'
+            '• Authentication is handled by Supabase when cloud features are enabled.\n\n'
+            'This is a placeholder policy. A full legal policy will be published before the app\'s public release.',
+            style: TextStyle(fontSize: 13, height: 1.5),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('CLOSE'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showResetConfirmation() {
@@ -321,8 +292,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _buildSectionHeader('Account'),
           _buildSettingsCard([
             ListTile(
-              leading: const CircleAvatar(
-                backgroundColor: AppColors.primary,
+              leading: CircleAvatar(
+                backgroundColor: AdaptiveColors.primary(context),
                 child: Icon(Icons.person, color: Colors.white),
               ),
               title: Text(authState.user?.username ?? 'Guest User'),
@@ -399,11 +370,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   horizontal: 16,
                   vertical: 8,
                 ),
-                child: Text(
+child: Text(
                   AppConfig.cloudAuthHelpText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSubtle,
+                    color: AdaptiveColors.textSecondary(context),
                   ),
                 ),
               ),
@@ -420,16 +391,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ref.read(themeProvider.notifier).toggleTheme(value);
               },
               secondary: const Icon(Icons.dark_mode_outlined),
-            ),
-            const Divider(height: 1),
-            SwitchListTile(
-              title: const Text('Try New Home'),
-              subtitle: const Text('Premium redesigned home screen (preview)'),
-              value: ref.watch(usePremiumHomeProvider),
-              onChanged: (value) {
-                ref.read(usePremiumHomeProvider.notifier).toggle(value);
-              },
-              secondary: const Icon(Icons.auto_awesome_outlined),
             ),
             if (_biometricAvailable) ...[
               const Divider(height: 1),
@@ -458,10 +419,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ListTile(
                 leading: const Icon(Icons.access_time),
                 title: const Text('Reminder Time'),
-                trailing: Text(
+trailing: Text(
                   _reminderTime.format(context),
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: AdaptiveColors.primary(context),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -478,16 +439,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Enter your Gemini API Key to enable the AI Doubt Solver inside the app.',
-                    style: TextStyle(fontSize: 13, color: AppColors.textSubtle),
+                    style: TextStyle(fontSize: 13, color: AdaptiveColors.textSecondary(context)),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Gemini API Key',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textDark,
+                      color: AdaptiveColors.textPrimary(context),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -514,118 +475,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ]),
           const SizedBox(height: 24),
 
-          _buildSectionHeader('Email Delivery'),
-          _buildSettingsCard([
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Choose direct delivery with Resend for demos or switch to a backend endpoint for production-safe sends.',
-                    style: TextStyle(fontSize: 13, color: AppColors.textSubtle),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<EmailDeliveryMode>(
-                    initialValue: _deliveryMode,
-                    decoration: const InputDecoration(
-                      labelText: 'Delivery Mode',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.swap_horiz),
-                    ),
-                    items: EmailDeliveryMode.values
-                        .map(
-                          (mode) => DropdownMenuItem(
-                            value: mode,
-                            child: Text(
-                              mode == EmailDeliveryMode.clientDirect
-                                  ? 'Direct Resend (demo/test)'
-                                  : 'Backend endpoint',
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (mode) {
-                      if (mode != null) {
-                        setState(() {
-                          _deliveryMode = mode;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _resendApiKeyController,
-                    decoration: const InputDecoration(
-                      labelText: 'Resend API Key',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.key),
-                    ),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _senderEmailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Sender Email',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email_outlined),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _backendUrlController,
-                    decoration: const InputDecoration(
-                      labelText: 'Backend Email Endpoint',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.cloud_upload_outlined),
-                      helperText:
-                          'Provide a URL that accepts JSON email payloads when using backend delivery.',
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _saveEmailConfig,
-                      child: const Text('SAVE EMAIL SETTINGS'),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _testEmailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Test Email Recipient',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.send_outlined),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: _sendTestEmail,
-                      child: const Text('SEND TEST EMAIL'),
-                    ),
-                  ),
-                  if (_emailStatusMessage != null) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      _emailStatusMessage!,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ]),
-          const SizedBox(height: 24),
-
           _buildSectionHeader('Data Management'),
           _buildSettingsCard([
+            ListTile(
+              leading: const Icon(
+                Icons.backup_outlined,
+                color: AppColors.primary,
+              ),
+              title: const Text('Backup Data'),
+              subtitle: const Text('Export your quiz history and progress'),
+              onTap: _showBackupInfo,
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(
+                Icons.restore_outlined,
+                color: AppColors.primary,
+              ),
+              title: const Text('Restore Data'),
+              subtitle: const Text('Import a previously exported backup'),
+              onTap: _showRestoreInfo,
+            ),
+            const Divider(height: 1),
             ListTile(
               leading: const Icon(
                 Icons.upload_file_outlined,
@@ -661,7 +532,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ],
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(Icons.logout, color: AppColors.textSubtle),
+              leading: Icon(Icons.logout, color: AdaptiveColors.textSecondary(context)),
               title: const Text('Sign Out'),
               onTap: () {
                 ref.read(authProvider.notifier).logout();
@@ -680,7 +551,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ListTile(
               leading: const Icon(Icons.policy_outlined),
               title: const Text('Privacy Policy'),
-              onTap: () {},
+              onTap: _showPrivacyPolicy,
+            ),
+            ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: const Text('Licenses'),
+              onTap: () => showLicensePage(
+                context: context,
+                applicationName: 'NEET Mitos',
+                applicationVersion: '1.0.0',
+              ),
             ),
           ]),
           const SizedBox(height: 32),
@@ -694,10 +574,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: AppColors.textSubtle,
+          color: AdaptiveColors.textSecondary(context),
           letterSpacing: 1.2,
         ),
       ),
@@ -710,7 +590,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.divider.withValues(alpha: 0.5)),
+        side: BorderSide(color: AdaptiveColors.divider(context).withValues(alpha: 0.5)),
       ),
       child: Column(children: children),
     );

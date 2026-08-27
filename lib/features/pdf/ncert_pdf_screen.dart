@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../../core/models/question_model.dart';
-import '../../core/models/subject_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/ncert_book_catalog.dart';
 import '../../core/services/pdf_service.dart';
@@ -11,13 +10,11 @@ import '../../core/theme/app_colors.dart';
 import 'paragraph_question_pool.dart';
 
 class NcertPdfScreen extends ConsumerStatefulWidget {
-  final NcertBookEntry entry;
-  final Chapter? chapter;
+  final String entryId;
 
   const NcertPdfScreen({
     super.key,
-    required this.entry,
-    this.chapter,
+    required this.entryId,
   });
 
   @override
@@ -33,10 +30,21 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
   int _currentPage = 1;
   String? _scanningChapter;
 
+  NcertBookEntry get _entry {
+    final entry = NcertBookCatalog.entryByChapterKey(widget.entryId);
+    if (entry != null) return entry;
+    // Fallback: find by exact asset path across the full catalog.
+    final asset = widget.entryId;
+    return NcertBookCatalog.allEntries.firstWhere(
+      (e) => e.assetPath == asset,
+      orElse: () => NcertBookCatalog.allEntries.first,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    _bookChapters = NcertBookCatalog.chaptersOfBook(widget.entry);
+    _bookChapters = NcertBookCatalog.chaptersOfBook(_entry);
   }
 
   @override
@@ -46,10 +54,8 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
   }
 
   List<Question> _questionsForChapter(List<Question> all) {
-    final chapter = widget.chapter;
-    if (chapter == null || chapter.topics.isEmpty) return const [];
-    final topicIds = chapter.topics.map((t) => t.id).toSet();
-    return all.where((q) => topicIds.contains(q.topicId)).toList();
+    // Find questions matching this chapter's topics
+    return all.where((q) => q.chapter == _entry.chapterTitle).toList();
   }
 
   void _openQuestionPool(List<Question> questions) {
@@ -60,27 +66,27 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
       builder: (context) => ParagraphQuestionPoolSheet(
         chapterQuestions: questions,
         pageNumber: _currentPage,
-        assetPath: widget.entry.assetPath,
+        assetPath: _entry.assetPath,
       ),
     );
   }
 
   Future<void> _jumpToChapterStart() async {
     if (!_loaded) return;
-    final cached = _chapterPageCache[widget.entry.assetPath];
+    final cached = _chapterPageCache[_entry.assetPath];
     if (cached != null) {
       _controller.jumpToPage(cached + 1);
       return;
     }
-    setState(() => _scanningChapter = widget.entry.chapterTitle);
+    setState(() => _scanningChapter = _entry.chapterTitle);
     final page = await PdfService.findChapterStartPage(
-      widget.entry.assetPath,
-      widget.entry.chapterTitle,
+      _entry.assetPath,
+      _entry.chapterTitle,
     );
     if (!mounted) return;
     setState(() => _scanningChapter = null);
     if (page != null) {
-      _chapterPageCache[widget.entry.assetPath] = page;
+      _chapterPageCache[_entry.assetPath] = page;
       _controller.jumpToPage(page + 1);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,12 +98,12 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
   }
 
   void _openChapter(NcertBookEntry entry) {
-    if (entry.assetPath == widget.entry.assetPath) {
+    if (entry.assetPath == _entry.assetPath) {
       context.pop();
       _jumpToChapterStart();
       return;
     }
-    context.go('/pdf', extra: {'entry': entry, 'chapter': null});
+    context.go('/pdf?entryId=${Uri.encodeComponent(entry.chapterTitle.replaceAll(" ", "_").toLowerCase())}');
   }
 
   @override
@@ -115,7 +121,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              widget.entry.chapterTitle,
+              _entry.chapterTitle,
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -123,8 +129,8 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
               ),
             ),
             Text(
-              '${widget.entry.subject} • ${widget.entry.classLevel} • '
-              'Chapter ${widget.entry.chapterNumber}',
+              '${_entry.subject} • ${_entry.classLevel} • '
+              'Chapter ${_entry.chapterNumber}',
               style: const TextStyle(fontSize: 11, color: AppColors.textSubtle),
             ),
           ],
@@ -146,7 +152,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Text(
-                  widget.entry.bookName,
+                  _entry.bookName,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -161,7 +167,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
                   itemBuilder: (context, index) {
                     final entry = _bookChapters[index];
                     final isCurrent =
-                        entry.assetPath == widget.entry.assetPath;
+                        entry.assetPath == _entry.assetPath;
                     final isActiveChapter =
                         isCurrent && _loaded;
                     return ListTile(
@@ -220,7 +226,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
         children: [
           Expanded(
             child: SfPdfViewer.asset(
-              widget.entry.assetPath,
+              _entry.assetPath,
               controller: _controller,
               canShowScrollHead: true,
               canShowScrollStatus: true,

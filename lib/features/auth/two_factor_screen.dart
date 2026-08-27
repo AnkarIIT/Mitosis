@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 class TwoFactorScreen extends ConsumerStatefulWidget {
   const TwoFactorScreen({super.key});
@@ -51,7 +52,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.adaptiveBackground(context),
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: Padding(
         padding: const EdgeInsets.all(32),
@@ -65,7 +66,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
             const SizedBox(height: 8),
             Text(
               'A verification code has been sent to ${authState.pendingEmail}. Please enter it below.',
-              style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
+              style: TextStyle(color: AdaptiveColors.textSecondary(context)),
             ),
             const SizedBox(height: 48),
             Row(
@@ -79,12 +80,12 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
                     maxLength: 1,
-                    style: TextStyle(color: AppColors.adaptiveText(context)),
+                    style: TextStyle(color: AdaptiveColors.textPrimary(context)),
                     decoration: InputDecoration(
                       counterText: '',
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AppColors.adaptiveDivider(context)),
+                        borderSide: BorderSide(color: AdaptiveColors.divider(context)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),

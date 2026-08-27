@@ -4,6 +4,7 @@ import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/exam_engine_service.dart';
+import '../../core/services/exam_checkpoint_service.dart';
 import 'package:go_router/go_router.dart';
 
 class TestSeriesScreen extends ConsumerStatefulWidget {
@@ -19,6 +20,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
     final allQuestionsAsync = ref.watch(allQuestionsProvider);
     final subjects = ref.watch(subjectsProvider);
     final allQuestions = allQuestionsAsync.valueOrNull ?? [];
+    final resumeCheckpoint = ref.watch(activeCbtCheckpointProvider).valueOrNull;
 
     if (allQuestionsAsync.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -36,6 +38,15 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
       );
     }
 
+    // Subtitle is derived from ExamConfig so it never drifts from the actual
+    // pattern. (Exact NEET numbers live in ExamConfig — verify vs NTA bulletin.)
+    final neetCfg = ExamConfig.neet();
+    final neetSubtitle =
+        '${neetCfg.totalQuestionSlots} Questions • '
+        '${neetCfg.totalDurationSeconds ~/ 60} Minutes • '
+        '+${neetCfg.marksPerCorrect}/${neetCfg.marksPerWrong} • '
+        '${neetCfg.sectionLock ? 'Section lock' : 'Free navigation'}';
+
     return Scaffold(
       appBar: AppBar(title: const Text('Test Series'), elevation: 0),
       body: SingleChildScrollView(
@@ -43,11 +54,15 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (resumeCheckpoint != null) ...[
+              _buildResumeCard(context, resumeCheckpoint, allQuestions),
+              const SizedBox(height: 24),
+            ],
             _buildSectionTitle(context, 'Full Mock Tests'),
             _buildTestCard(
               context,
               title: 'NEET Full Mock Test',
-              subtitle: '180 Questions • 200 Minutes • +4/-1 • Section Lock',
+              subtitle: neetSubtitle,
               icon: Icons.assignment_turned_in,
               color: AppColors.primary,
               onTap: () => _startNeetMock(context, allQuestions),
@@ -218,28 +233,142 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
       return;
     }
 
-    context.push('/quiz', extra: {
-      'questions': questions,
-      'topicName': title,
-      'topicId': type == 'mock'
-          ? 'mock_test'
-          : (subjectName ?? 'custom_test'),
-      'subject': subjectName ?? 'Mixed',
-    });
+    if (type == 'subject' && subjectName != null) {
+      context.push('/quiz', extra: {
+        'questions': questions,
+        'topicName': title,
+        'topicId': 'subject_${Uri.encodeComponent(subjectName)}',
+        'subject': subjectName,
+        'testType': 'subject',
+      });
+    } else {
+      context.push('/quiz', extra: {
+        'questions': questions,
+        'topicName': title,
+        'topicId': type == 'mock'
+            ? 'mock_test'
+            : (subjectName ?? 'custom_test'),
+        'subject': subjectName ?? 'Mixed',
+      });
+    }
   }
 
   void _startNeetMock(BuildContext context, List<Question> allQuestions) {
-    if (allQuestions.isEmpty) {
+    final pool = ExamEngineService.validatePool(allQuestions);
+    if (pool.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No questions available for this test.')),
+        const SnackBar(
+          content: Text(
+            'Not enough valid questions to start a mock test. '
+            'Import or sync more questions and try again.',
+          ),
+        ),
       );
       return;
     }
 
     context.push('/cbt', extra: {
       'config': ExamConfig.neet(),
-      'questionPool': allQuestions,
+      'questionPool': pool,
     });
+  }
+
+  Widget _buildResumeCard(
+    BuildContext context,
+    ExamCheckpoint cp,
+    List<Question> allQuestions,
+  ) {
+    final answered = cp.answersByIndex.values
+        .where((v) => v != null && v.isNotEmpty)
+        .length;
+    final total =
+        cp.sectionQuestionIds.fold<int>(0, (s, ids) => s + ids.length);
+    final remaining = cp.remainingSecondsAt(DateTime.now());
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.history_toggle_off, color: AppColors.primary),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Resume Mock Test',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$answered/$total answered • ${_fmtRemaining(remaining)} left',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _resumeMock(context, cp, allQuestions),
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('Resume'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              OutlinedButton(
+                onPressed: _discardCheckpoint,
+                child: const Text('Discard'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _resumeMock(
+    BuildContext context,
+    ExamCheckpoint cp,
+    List<Question> allQuestions,
+  ) {
+    // Pass the FULL pool so the saved question IDs resolve on restore.
+    context.push('/cbt', extra: {
+      'config': cp.config,
+      'questionPool': allQuestions,
+      'resumeCheckpoint': cp,
+    });
+  }
+
+  Future<void> _discardCheckpoint() async {
+    await ref.read(examCheckpointServiceProvider).clear();
+    ref.invalidate(activeCbtCheckpointProvider);
+  }
+
+  String _fmtRemaining(int seconds) {
+    if (seconds <= 0) return '0m';
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    if (h > 0) return '${h}h ${m}m';
+    final s = seconds % 60;
+    return m > 0 ? '${m}m' : '${s}s';
   }
 
   void _showCbtPracticeDialog(
@@ -494,6 +623,15 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
   }
 
   void _start() {
+    final pool = ExamEngineService.validatePool(widget.allQuestions);
+    if (pool.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Not enough valid questions for a practice test.'),
+        ),
+      );
+      return;
+    }
     final config = ExamConfig.practice(
       questionCount: _questionCount,
       durationMinutes: _durationMinutes,
@@ -501,7 +639,7 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
     context.pop();
     context.push('/cbt', extra: {
       'config': config,
-      'questionPool': widget.allQuestions,
+      'questionPool': pool,
     });
   }
 }

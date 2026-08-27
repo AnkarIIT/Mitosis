@@ -81,7 +81,8 @@ class FlashcardScheduler {
         );
 
       case FlashcardRating.hard:
-        // Keep same interval, small ease penalty, don't advance box.
+        // Keep same interval (minimum 1 day), small ease penalty, don't advance box.
+        interval = interval < 1 ? 1 : interval;
         reps += 1;
         ef = (ef - FlashcardSchedulerService.easePenaltyHard).clamp(
           FlashcardSchedulerService.minEaseFactor,

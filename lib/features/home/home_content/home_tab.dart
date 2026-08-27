@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../core/providers/providers.dart';
 import '../../../core/models/subject_model.dart';
 import '../../../core/models/user_progress_model.dart';
+import '../../../core/services/exam_engine_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/tokens.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
@@ -14,8 +18,36 @@ class HomeTab extends ConsumerStatefulWidget {
   ConsumerState<HomeTab> createState() => _HomeTabState();
 }
 
-class _HomeTabState extends ConsumerState<HomeTab> {
+class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin {
   int _selectedChip = 0;
+  bool _initialized = false;
+  late AnimationController _progressAnimController;
+  Animation<double>? _progressAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _progressAnimController = AnimationController(
+      vsync: this,
+      duration: AppDuration.slow,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _initialized = true);
+      final dailyGoal = ref.read(dailyGoalProvider);
+      final progress = (dailyGoal['percent'] as double).clamp(0.0, 1.0);
+      _progressAnim = Tween<double>(begin: 0.0, end: progress).animate(
+        CurvedAnimation(parent: _progressAnimController, curve: Curves.easeOutCubic),
+      );
+      _progressAnimController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _progressAnimController.dispose();
+    super.dispose();
+  }
 
   static const _chipLabels = ['All', 'Botany', 'Zoology', 'Physics', 'Chemistry', 'Error Book'];
 
@@ -40,11 +72,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final recentActivity = ref.watch(recentActivityProvider);
     final weakTopics = ref.watch(weakTopicsProvider);
     final dueCardsAsync = ref.watch(dueCardsProvider);
-    final dueCount = dueCardsAsync.valueOrNull?.length ?? 0;
+    final dueCount = dueCardsAsync.value?.length ?? 0;
 
     return Scaffold(
-      backgroundColor: AppColors.premiumBg,
-      body: _buildHomeBody(context, subjects, stats, streak, dailyGoal, recentActivity, weakTopics, dueCount),
+      backgroundColor: AdaptiveColors.background(context),
+      body: _initialized
+          ? _buildHomeBody(context, subjects, stats, streak, dailyGoal, recentActivity, weakTopics, dueCount)
+          : _buildShimmerSkeleton(context),
     );
   }
 
@@ -95,6 +129,11 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             _buildContinueStudyingCard(context, recentActivity, subjects),
             const SizedBox(height: 12),
             _buildOngoingRevisionCards(context, recentActivity, subjects),
+            const SizedBox(height: 12),
+            // Resume an in-progress CBT mock (only shows when a checkpoint exists)
+            _buildResumeMockCard(context),
+            // CBT Mock Test CTA
+            _buildCbtMockTestCard(context, subjects),
             if (dueCount > 0) ...[
               const SizedBox(height: 12),
               _buildDueReviewBanner(context, dueCount),
@@ -123,7 +162,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       children: [
         CircleAvatar(
           radius: 22,
-          backgroundColor: AppColors.premiumChipBg,
+          backgroundColor: AdaptiveColors.surface(context),
           child: Text(
             avatarLetter,
             style: TextStyle(
@@ -158,27 +197,32 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           ),
         ),
         // Streak badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: Colors.orange.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.local_fire_department, size: 14, color: Colors.orange),
-              const SizedBox(width: 4),
-              Text(
-                '$streak',
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.orange,
+        AnimatedScale(
+          scale: streak > 0 ? 1.0 : 0.8,
+          duration: AppDuration.normal,
+          curve: Curves.elasticOut,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.orange.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.local_fire_department, size: 14, color: Colors.orange),
+                const SizedBox(width: 4),
+                Text(
+                  '$streak',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         const SizedBox(width: 8),
@@ -186,21 +230,21 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: AppColors.physicsBlue.withValues(alpha: 0.1),
+            color: SubjectColors.physics.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.physicsBlue.withValues(alpha: 0.3)),
+            border: Border.all(color: SubjectColors.physics.withValues(alpha: 0.3)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.trending_up, size: 14, color: AppColors.physicsBlue),
+              Icon(Icons.trending_up, size: 14, color: SubjectColors.physics),
               const SizedBox(width: 4),
               Text(
                 '${accuracy.toStringAsFixed(0)}%',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.physicsBlue,
+                  color: SubjectColors.physics,
                 ),
               ),
             ],
@@ -234,7 +278,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         decoration: BoxDecoration(
-          color: AppColors.premiumSearchBg,
+          color: AdaptiveColors.surface(context),
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
@@ -286,7 +330,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.premiumNavDock : Colors.white,
+                color: isSelected ? AppColors.primary : AdaptiveColors.surface(context),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: isSelected
                     ? [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6, offset: const Offset(0, 2))]
@@ -327,7 +371,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           child: Text(
             'See all',
             style: TextStyle(
-              color: AppColors.physicsBlue,
+              color: SubjectColors.physics,
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -366,6 +410,11 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 begin: const Offset(0.94, 0.94),
                 end: const Offset(1, 1),
                 curve: Curves.easeOutBack,
+              ).then().scale(
+                begin: const Offset(1.03, 1.03),
+                end: const Offset(1, 1),
+                duration: AppDuration.normal,
+                curve: Curves.elasticOut,
               );
         },
       ),
@@ -400,6 +449,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Thin accent bar
+            Container(
+              height: 3,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -454,7 +513,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final completed = dailyGoal['completed'] as int;
     final target = dailyGoal['target'] as int;
     final progress = (dailyGoal['percent'] as double).clamp(0.0, 1.0);
-    final percent = (progress * 100).toInt();
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -471,28 +529,34 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           SizedBox(
             width: 56,
             height: 56,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 5,
-                  backgroundColor: AppColors.premiumChipBg,
-                  valueColor: AlwaysStoppedAnimation(
-                    progress >= 1.0 ? AppColors.success : AppColors.physicsBlue,
-                  ),
-                ),
-                Center(
-                  child: Text(
-                    '$percent%',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: progress >= 1.0 ? AppColors.success : AppColors.physicsBlue,
+            child: AnimatedBuilder(
+              animation: _progressAnimController,
+              builder: (context, child) {
+                final animValue = _progressAnim?.value ?? 0.0;
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CircularProgressIndicator(
+                      value: animValue,
+                      strokeWidth: 5,
+                      backgroundColor: AdaptiveColors.surface(context),
+                      valueColor: AlwaysStoppedAnimation(
+                        animValue >= 1.0 ? AppColors.success : SubjectColors.physics,
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                    Center(
+                      child: Text(
+                        '${(animValue * 100).toInt()}%',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: animValue >= 1.0 ? AppColors.success : SubjectColors.physics,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           const SizedBox(width: 16),
@@ -515,9 +579,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6,
-                    backgroundColor: AppColors.premiumChipBg,
+                    backgroundColor: AdaptiveColors.surface(context),
                     valueColor: AlwaysStoppedAnimation(
-                      progress >= 1.0 ? AppColors.success : AppColors.physicsBlue,
+                      progress >= 1.0 ? AppColors.success : SubjectColors.physics,
                     ),
                   ),
                 ),
@@ -544,8 +608,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.physicsBlue.withValues(alpha: 0.9),
-              AppColors.physicsBlue.withValues(alpha: 0.7),
+              SubjectColors.physics.withValues(alpha: 0.9),
+              SubjectColors.physics.withValues(alpha: 0.7),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -664,7 +728,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       child: LinearProgressIndicator(
                         value: (accuracy / 100).clamp(0.0, 1.0),
                         minHeight: 4,
-                        backgroundColor: AppColors.premiumChipBg,
+                        backgroundColor: AdaptiveColors.surface(context),
                         valueColor: AlwaysStoppedAnimation(
                           accuracy >= 70
                               ? AppColors.success
@@ -689,6 +753,179 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     );
   }
 
+  // CBT Mock Test CTA
+  Widget _buildCbtMockTestCard(BuildContext context, List<Subject> subjects) {
+    // Subtitle derived from ExamConfig so it can't drift from the real pattern.
+    final neet = ExamConfig.neet();
+    final subtitle = '${neet.totalQuestionSlots} questions • '
+        '${neet.totalDurationSeconds ~/ 60} minutes • '
+        '+${neet.marksPerCorrect}/${neet.marksPerWrong}/0 marking';
+    return GestureDetector(
+      onTap: () {
+        final allQuestions = ref.read(allQuestionsProvider).valueOrNull ?? [];
+        final pool = ExamEngineService.validatePool(allQuestions);
+        if (pool.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No valid questions available for the mock test.'),
+            ),
+          );
+          return;
+        }
+        context.push('/cbt', extra: {
+          'config': neet,
+          'questionPool': pool,
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              SubjectColors.physics.withValues(alpha: 0.9),
+              SubjectColors.physics.withValues(alpha: 0.7),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.quiz_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Start CBT Mock Test',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white60, size: 16),
+          ],
+        ),
+      ),
+    ).animate().fade(delay: 300.ms, duration: 400.ms);
+  }
+
+  // Resume Mock Test card — visible only while an in-progress checkpoint exists.
+  Widget _buildResumeMockCard(BuildContext context) {
+    final cp = ref.watch(activeCbtCheckpointProvider).valueOrNull;
+    if (cp == null) return const SizedBox.shrink();
+
+    final answered = cp.answersByIndex.values
+        .where((v) => v != null && v.isNotEmpty)
+        .length;
+    final total =
+        cp.sectionQuestionIds.fold<int>(0, (s, ids) => s + ids.length);
+    final remaining = cp.remainingSecondsAt(DateTime.now());
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GestureDetector(
+        onTap: () {
+          // Full pool so saved question IDs resolve on restore.
+          final allQuestions =
+              ref.read(allQuestionsProvider).valueOrNull ?? [];
+          context.push('/cbt', extra: {
+            'config': cp.config,
+            'questionPool': allQuestions,
+            'resumeCheckpoint': cp,
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.success.withValues(alpha: 0.9),
+                AppColors.success.withValues(alpha: 0.7),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.history_toggle_off,
+                    color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Resume Mock Test',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '$answered/$total answered • ${_fmtRemaining(remaining)} left',
+                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: 'Discard',
+                icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                onPressed: () async {
+                  await ref.read(examCheckpointServiceProvider).clear();
+                  ref.invalidate(activeCbtCheckpointProvider);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _fmtRemaining(int seconds) {
+    if (seconds <= 0) return '0m';
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    if (h > 0) return '${h}h ${m}m';
+    final s = seconds % 60;
+    return m > 0 ? '${m}m' : '${s}s';
+  }
+
   // Due Review Banner
   Widget _buildDueReviewBanner(BuildContext context, int dueCount) {
     return GestureDetector(
@@ -698,8 +935,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.chemistryPurple.withValues(alpha: 0.9),
-              AppColors.chemistryPurple.withValues(alpha: 0.7),
+              SubjectColors.chemistry.withValues(alpha: 0.9),
+              SubjectColors.chemistry.withValues(alpha: 0.7),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -780,6 +1017,102 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 
   // ────────────────────────────────────────────────────────────
+  // SHIMMER LOADING SKELETON
+  // ────────────────────────────────────────────────────────────
+  Widget _buildShimmerSkeleton(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile row skeleton
+              Row(
+                children: [
+                  CircleAvatar(radius: 22, backgroundColor: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(height: 14, width: 120, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(7))),
+                        const SizedBox(height: 6),
+                        Container(height: 10, width: 80, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5))),
+                      ],
+                    ),
+                  ),
+                  Container(width: 48, height: 28, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14))),
+                  const SizedBox(width: 8),
+                  Container(width: 48, height: 28, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14))),
+                ],
+              ),
+              const SizedBox(height: 20),
+              // Search bar skeleton
+              Container(height: 46, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30))),
+              const SizedBox(height: 16),
+              // Chip row skeleton
+              SizedBox(
+                height: 38,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 4,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (_, __) => Container(width: 70, height: 34, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20))),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Featured subjects header skeleton
+              Container(height: 18, width: 160, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(9))),
+              const SizedBox(height: 14),
+              // Featured cards skeleton
+              SizedBox(
+                height: 175,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  separatorBuilder: (_, __) => const SizedBox(width: 14),
+                  itemBuilder: (_, __) => Container(
+                    width: 155,
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              // Ongoing header skeleton
+              Container(height: 18, width: 140, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(9))),
+              const SizedBox(height: 14),
+              // Daily goal card skeleton
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                child: Row(
+                  children: [
+                    Container(width: 56, height: 56, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(height: 14, width: 100, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(7))),
+                          const SizedBox(height: 8),
+                          Container(height: 6, width: double.infinity, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3))),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────
   // ────────────────────────────────────────────────────────────
   // HELPERS
   // ────────────────────────────────────────────────────────────
@@ -787,15 +1120,15 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     switch (id.toLowerCase()) {
       case 'biology':
       case 'bio':
-        return AppColors.biologyOrange;
+        return SubjectColors.biology;
       case 'physics':
       case 'phys':
-        return AppColors.physicsBlue;
+        return SubjectColors.physics;
       case 'chemistry':
       case 'chem':
-        return AppColors.chemistryPurple;
+        return SubjectColors.chemistry;
       default:
-        return AppColors.physicsBlue;
+        return SubjectColors.physics;
     }
   }
 
@@ -951,15 +1284,15 @@ class _NeetSearchDelegate extends SearchDelegate<String?> {
     switch (id.toLowerCase()) {
       case 'biology':
       case 'bio':
-        return AppColors.biologyOrange;
+        return SubjectColors.biology;
       case 'physics':
       case 'phys':
-        return AppColors.physicsBlue;
+        return SubjectColors.physics;
       case 'chemistry':
       case 'chem':
-        return AppColors.chemistryPurple;
+        return SubjectColors.chemistry;
       default:
-        return AppColors.physicsBlue;
+        return SubjectColors.physics;
     }
   }
 

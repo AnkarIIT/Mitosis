@@ -19,9 +19,12 @@ class CbtResultScreen extends StatelessWidget {
     final raw = analytics.score.rawScore;
     final maxScore = analytics.score.maxScore;
     final accuracy = analytics.score.accuracy;
-    final color = raw >= 360
+    // Colour by score ratio, not a 720-based threshold: practice tests and
+    // optional-section mocks have a smaller maxScore.
+    final ratio = maxScore <= 0 ? 0.0 : raw / maxScore;
+    final color = ratio >= 0.5
         ? AppColors.success
-        : (raw >= 180 ? AppColors.warning : AppColors.error);
+        : (ratio >= 0.25 ? AppColors.warning : AppColors.error);
 
     return Scaffold(
       backgroundColor: AppColors.surfaceWarm,
@@ -44,8 +47,22 @@ class CbtResultScreen extends StatelessWidget {
           children: [
             _buildScoreHeader(context, raw, maxScore, accuracy, color),
             const SizedBox(height: 16),
-            _buildRankEstimates(context),
-            const SizedBox(height: 20),
+            // Percentile/AIR are only defensible for a full-length mock, and even
+            // then they're a rough model — gate + label them (never claim an
+            // official NEET rank).
+            if (analytics.showRankEstimate) ...[
+              _buildRankEstimates(context),
+              const SizedBox(height: 8),
+              Text(
+                'Rough estimate — not an official NEET rank/percentile.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.textSubtle,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
             _buildSectionTitle(context, 'Subject Analysis'),
             _buildSubjectBreakdown(context),
             const SizedBox(height: 20),
@@ -118,7 +135,9 @@ class CbtResultScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '+4 / -1 • ${analytics.score.correct} correct • '
+                    '+${analytics.score.config.marksPerCorrect} / '
+                    '${analytics.score.config.marksPerWrong} • '
+                    '${analytics.score.correct} correct • '
                     '${analytics.score.incorrect} wrong',
                     style: Theme.of(
                       context,
@@ -419,16 +438,14 @@ class CbtResultScreen extends StatelessWidget {
   }
 
   Color _subjectColor(String subject) {
-    switch (subject.toLowerCase()) {
-      case 'physics':
-        return AppColors.physicsAccent;
-      case 'chemistry':
-        return AppColors.chemistryAccent;
-      case 'biology':
-        return AppColors.biologyAccent;
-      default:
-        return AppColors.primary;
+    final s = subject.toLowerCase();
+    if (s.contains('physics')) return AppColors.physicsAccent;
+    if (s.contains('chem')) return AppColors.chemistryAccent;
+    // Botany and Zoology are both Biology sections.
+    if (s.contains('bot') || s.contains('zoo') || s.contains('bio')) {
+      return AppColors.biologyAccent;
     }
+    return AppColors.primary;
   }
 
   String _formatTime(int seconds) {

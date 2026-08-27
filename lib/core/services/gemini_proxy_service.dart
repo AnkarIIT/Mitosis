@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/app_config.dart';
+import '../models/chat_context.dart';
 
 /// Where a [GeminiProxyResult] came from.
 enum GeminiProxySource {
@@ -40,9 +41,18 @@ class GeminiProxyResult {
 typedef GeminiInvoker = Future<dynamic> Function(String name, {Object? body});
 
 Future<dynamic> _defaultInvoker(String name, {Object? body}) async {
-  final res = await Supabase.instance.client.functions.invoke(name, body: body);
-  return res.data;
+  if (!AppConfig.enableAiProxy) {
+    throw Exception('AI proxy is disabled');
+  }
+  try {
+    final res = await Supabase.instance.client.functions.invoke(name, body: body);
+    return res.data;
+  } on Exception catch (e) {
+    debugPrint('Supabase not initialized or function failed: $e');
+    rethrow;
+  }
 }
+
 
 /// Client for the `gemini-proxy` Supabase Edge Function.
 ///
@@ -60,18 +70,52 @@ class GeminiProxyService {
   final GeminiInvoker _invoker;
   final bool? _configured;
 
-  /// Whether a Supabase backend is wired up via --dart-define.
-  bool get isConfigured => _configured ?? AppConfig.isCloudAuthConfigured;
+  bool get isConfigured => _configured ?? (AppConfig.enableAiProxy && AppConfig.isCloudAuthConfigured);
+
+  /// Build a context-aware system prompt for the AI tutor.
+  String _buildSystemPrompt(ChatContext context) {
+    final buffer = StringBuffer();
+    buffer.write('You are an expert NEET tutor for a ${context.userBatch} student. ');
+    buffer.write('They are currently studying ${context.currentChapter}. ');
+
+    if (context.weakTopics.isNotEmpty) {
+      buffer.write('Their weak topics are: ${context.weakTopics.join(', ')}. ');
+      buffer.write('Prioritize explaining these with extra examples and memory tricks. ');
+    }
+
+    buffer.write('They have ${context.daysToExam} days until NEET 2026. ');
+    buffer.write('Accuracy: ${(context.accuracy * 100).toInt()}% (${context.questionsSolved} questions solved). ');
+
+    if (context.studyMode == StudyMode.coachingStudent) {
+      buffer.write('Assume they have coaching notes — reference NCERT first, then coaching material. ');
+    } else {
+      buffer.write('They are self-studying — make explanations self-contained with NCERT references. ');
+    }
+
+    buffer.write('Use simple Hindi-English mix if the question is in Hinglish. ');
+    buffer.write('For Biology: use mnemonics and diagrams descriptions. ');
+    buffer.write('For Physics: show step-by-step formulas with units. ');
+    buffer.write('For Chemistry: show reaction mechanisms for organic, periodic trends for inorganic. ');
+
+    return buffer.toString();
+  }
 
   /// Sends [prompt] to the proxy. Never throws — errors are mapped onto
   /// [GeminiProxyResult.source] so callers can pick a graceful fallback.
   Future<GeminiProxyResult> generate({
     required String prompt,
-    String? systemPrompt,
+    ChatContext? context,
     String? questionId,
+    String? systemPrompt,
   }) async {
     if (!isConfigured) {
       return const GeminiProxyResult('', GeminiProxySource.offline);
+    }
+
+    // Build context-aware system prompt if context is provided
+    String? finalSystemPrompt = systemPrompt;
+    if (finalSystemPrompt == null && context != null) {
+      finalSystemPrompt = _buildSystemPrompt(context);
     }
 
     try {
@@ -79,8 +123,8 @@ class GeminiProxyService {
         'gemini-proxy',
         body: {
           'prompt': prompt,
-          if (systemPrompt != null && systemPrompt.isNotEmpty)
-            'systemPrompt': systemPrompt,
+          if (finalSystemPrompt != null && finalSystemPrompt.isNotEmpty)
+            'systemPrompt': finalSystemPrompt,
           if (questionId != null && questionId.isNotEmpty)
             'questionId': questionId,
         },

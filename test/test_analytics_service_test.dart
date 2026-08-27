@@ -25,7 +25,8 @@ Question _q(
   );
 }
 
-ExamScore _grade(
+/// Grade a flat practice attempt (single 'All Subjects' section).
+ExamScore _gradePractice(
   List<Question> questions,
   Map<int, String?> answers,
 ) {
@@ -35,7 +36,7 @@ ExamScore _grade(
   );
   return ExamEngineService.grade(
     config: config,
-    questions: questions,
+    sectionQuestions: [questions],
     answersByIndex: answers,
   );
 }
@@ -69,17 +70,32 @@ void main() {
   });
 
   group('TestAnalyticsService.compute', () {
-    test('builds per-subject breakdown with time', () {
-      final questions = [
-        _q('1', 'Physics', 'p1', 'Motion'),
-        _q('2', 'Physics', 'p1', 'Motion'),
-        _q('3', 'Chemistry', 'c1', 'Bonding'),
-      ];
-      final score = _grade(questions, {
-        0: 'Option B',
-        1: 'Option A',
-        // 2 unanswered
-      });
+    test('breaks scores down by section name (Physics vs Chemistry)', () {
+      // A section-named config is what produces per-subject grouping; a flat
+      // practice test groups everything under its single section instead.
+      final config = ExamConfig.neet(
+        physicsCount: 2,
+        chemistryCount: 1,
+        botanyCount: 0,
+        zoologyCount: 0,
+      );
+      final score = ExamEngineService.grade(
+        config: config,
+        sectionQuestions: [
+          [
+            _q('1', 'Physics', 'p1', 'Motion'),
+            _q('2', 'Physics', 'p1', 'Motion'),
+          ],
+          [_q('3', 'Chemistry', 'c1', 'Bonding')],
+          [],
+          [],
+        ],
+        answersByIndex: {
+          0: 'Option B', // correct
+          1: 'Option A', // wrong
+          // 2 unanswered
+        },
+      );
       final analytics = TestAnalyticsService.compute(
         score: score,
         secondsPerQuestion: [30, 45, 60],
@@ -95,6 +111,70 @@ void main() {
       expect(chemistry.unanswered, 1);
     });
 
+    test('splits Biology into Botany and Zoology sections', () {
+      final config = ExamConfig.neet(
+        physicsCount: 0,
+        chemistryCount: 0,
+        botanyCount: 1,
+        zoologyCount: 1,
+      );
+      final score = ExamEngineService.grade(
+        config: config,
+        sectionQuestions: [
+          [],
+          [],
+          [_q('b', 'Biology', 'bo1', 'Cell')],
+          [_q('z', 'Biology', 'zo1', 'Heart')],
+        ],
+        answersByIndex: {0: 'Option B', 1: 'Option B'},
+      );
+      final analytics = TestAnalyticsService.compute(
+        score: score,
+        secondsPerQuestion: [20, 20],
+      );
+      expect(analytics.subjects.containsKey('Botany'), isTrue);
+      expect(analytics.subjects.containsKey('Zoology'), isTrue);
+      expect(analytics.subjects['Botany']!.correct, 1);
+      expect(analytics.subjects['Zoology']!.correct, 1);
+    });
+
+    test('rank estimate is gated to full-length mocks', () {
+      final practice = _gradePractice(
+        [_q('1', 'Physics', 'p', 'Motion')],
+        {0: 'Option B'},
+      );
+      final practiceA = TestAnalyticsService.compute(
+        score: practice,
+        secondsPerQuestion: [10],
+      );
+      expect(practiceA.showRankEstimate, isFalse);
+      expect(practiceA.percentileEstimate, 0.0);
+      expect(practiceA.airEstimate, 0);
+
+      final mockConfig = ExamConfig.neet(
+        physicsCount: 1,
+        chemistryCount: 0,
+        botanyCount: 0,
+        zoologyCount: 0,
+      );
+      final mock = ExamEngineService.grade(
+        config: mockConfig,
+        sectionQuestions: [
+          [_q('1', 'Physics', 'p', 'Motion')],
+          [],
+          [],
+          [],
+        ],
+        answersByIndex: {0: 'Option B'},
+      );
+      final mockA = TestAnalyticsService.compute(
+        score: mock,
+        secondsPerQuestion: [10],
+      );
+      expect(mockA.showRankEstimate, isTrue);
+      expect(mockA.percentileEstimate, greaterThan(0));
+    });
+
     test('finds and sorts weak topics below 60% accuracy', () {
       final questions = [
         _q('1', 'Physics', 'weak', 'Weak Topic'),
@@ -103,7 +183,7 @@ void main() {
         _q('4', 'Physics', 'strong', 'Strong Topic'),
         _q('5', 'Physics', 'strong', 'Strong Topic'),
       ];
-      final score = _grade(questions, {
+      final score = _gradePractice(questions, {
         0: 'Option A', // wrong
         1: 'Option B', // correct -> 50% accuracy weak
         2: 'Option B', // correct
@@ -122,7 +202,7 @@ void main() {
         _q('1', 'Physics', 'skip', 'Skipped Topic'),
         _q('2', 'Physics', 'skip', 'Skipped Topic'),
       ];
-      final score = _grade(questions, {});
+      final score = _gradePractice(questions, {});
       expect(TestAnalyticsService.findWeakTopics(score), isEmpty);
     });
   });

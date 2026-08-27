@@ -12,6 +12,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/database/drift_database.dart';
 
 import 'package:go_router/go_router.dart';
+import '../../core/theme/app_theme.dart';
 
 class ChatMessage {
   final String text;
@@ -135,7 +136,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
   void _showImagePickerOptions() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.adaptiveBackground(context),
+      backgroundColor: AdaptiveColors.background(context),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -148,7 +149,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.adaptiveDivider(context),
+                color: AdaptiveColors.divider(context),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -159,7 +160,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
             ),
             const SizedBox(height: 20),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppColors.primary),
+              leading: Icon(Icons.camera_alt, color: AdaptiveColors.primary(context)),
               title: const Text('Take a Photo'),
               onTap: () {
                 context.pop();
@@ -167,7 +168,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppColors.primary),
+              leading: Icon(Icons.photo_library, color: AdaptiveColors.primary(context)),
               title: const Text('Choose from Gallery'),
               onTap: () {
                 context.pop();
@@ -358,11 +359,11 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
-                children: [
-                  const Text(
+children: [
+                  Text(
                     'AI is thinking',
                     style: TextStyle(
-                      color: AppColors.primary,
+                      color: AdaptiveColors.primary(context),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -373,10 +374,10 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: 2),
                         width: 6,
                         height: 6,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
+decoration: BoxDecoration(
+                  color: AdaptiveColors.primary(context),
+                  shape: BoxShape.circle,
+                ),
                       )
                           .animate(
                             onPlay: (controller) => controller.repeat(),
@@ -417,8 +418,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
         ),
         decoration: BoxDecoration(
           color: message.isUser
-              ? AppColors.primary
-              : (isError ? AppColors.errorLight : AppColors.secondary.withValues(alpha: 0.3)),
+              ? AdaptiveColors.primary(context)
+              : (isError ? AppColors.errorLight : AdaptiveColors.secondary(context).withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(16).copyWith(
             bottomRight: message.isUser ? const Radius.circular(0) : null,
             bottomLeft: !message.isUser ? const Radius.circular(0) : null,
@@ -446,8 +447,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               styleSheet: MarkdownStyleSheet(
                 p: TextStyle(
                   color: message.isUser
-                      ? AppColors.textLight
-                      : (isError ? AppColors.error : AppColors.textDark),
+                      ? AdaptiveColors.onPrimary(context)
+                      : (isError ? AppColors.error : AdaptiveColors.textPrimary(context)),
                 ),
               ),
             ),
@@ -475,7 +476,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: AppColors.adaptiveSubtleText(context),
+                color: AdaptiveColors.textSecondary(context),
                 letterSpacing: 1.2,
               ),
             ),
@@ -490,7 +491,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                     avatar: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
                     label: const Text("UPLOAD QUESTION"),
                     labelStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                    backgroundColor: AppColors.primary,
+backgroundColor: AdaptiveColors.primary(context),
                     onPressed: _showImagePickerOptions,
                   ),
                 ),
@@ -499,9 +500,9 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                     padding: const EdgeInsets.only(right: 8.0),
                     child: ActionChip(
                       label: Text(prompt),
-                      labelStyle: const TextStyle(color: AppColors.primary, fontSize: 12),
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                      side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
+                      labelStyle: TextStyle(color: AdaptiveColors.onPrimary(context), fontSize: 12),
+                      backgroundColor: AdaptiveColors.primary(context).withValues(alpha: 0.1),
+                      side: BorderSide(color: AdaptiveColors.primary(context).withValues(alpha: 0.3)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       onPressed: () => _sendMessage(prompt),
                     ),
@@ -519,7 +520,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: AdaptiveColors.background(context),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withValues(alpha: 0.2),
@@ -534,12 +535,12 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AdaptiveColors.primary(context).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 icon: const Icon(Icons.photo_camera),
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
                 onPressed: _showImagePickerOptions,
               ),
             ),
@@ -554,7 +555,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: AppColors.secondary.withValues(alpha: 0.3),
+                  fillColor: AdaptiveColors.secondary(context).withValues(alpha: 0.3),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
@@ -567,9 +568,9 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
             const SizedBox(width: 12),
             CircleAvatar(
                   radius: 24,
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AdaptiveColors.primary(context),
                   child: IconButton(
-                    icon: const Icon(Icons.send, color: AppColors.textLight),
+                    icon: Icon(Icons.send, color: AdaptiveColors.onPrimary(context)),
                     onPressed: () => _sendMessage(_messageController.text),
                   ),
                 )

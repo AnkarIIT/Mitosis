@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../database/drift_database.dart' as db;
@@ -18,9 +19,14 @@ final authServiceProvider = Provider<AuthService>((ref) {
 });
 
 final cloudSyncServiceProvider = Provider<CloudSyncService?>((ref) {
-  if (!AppConfig.isCloudAuthConfigured) return null;
-  final database = ref.watch(databaseProvider);
-  return CloudSyncService(database, supabase.Supabase.instance.client);
+  if (!AppConfig.enableCloudAuth || !AppConfig.isCloudAuthConfigured) return null;
+  try {
+    final database = ref.watch(databaseProvider);
+    return CloudSyncService(database, supabase.Supabase.instance.client);
+  } catch (e) {
+    log('Supabase not initialized: $e');
+    return null;
+  }
 });
 
 enum AuthStatus {

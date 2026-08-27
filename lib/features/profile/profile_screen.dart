@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -81,6 +83,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             _buildAchievementSection(stats),
             const SizedBox(height: 24),
             _buildStatsOverview(stats),
+            const SizedBox(height: 24),
+            _buildSettingsCard(context),
           ],
         ),
       ),
@@ -322,6 +326,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsCard(BuildContext context) {
+    return Card(
+      elevation: 0,
+      color: AdaptiveColors.surface(context),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: AppColors.divider.withValues(alpha: 0.5)),
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(Icons.settings_rounded, color: AppColors.primary, size: 22),
+        ),
+        title: const Text('Settings', style: TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: const Text('Appearance, sync, AI preferences'),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
+        onTap: () => context.push('/settings'),
       ),
     );
   }

@@ -51,7 +51,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 21;
+  int get schemaVersion => 22;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -107,12 +107,9 @@ class AppDatabase extends _$AppDatabase {
         } catch (_) {}
       }
       if (from < 13) {
-        await _addColumnSafely(m, users, (users as dynamic).phone);
-        await _addColumnSafely(m, users, (users as dynamic).isEmailVerified);
-        await _addColumnSafely(m, users, (users as dynamic).isPhoneVerified);
-        try {
-          await m.alterTable(TableMigration(users));
-        } catch (_) {}
+        // SQLite does not allow adding a UNIQUE column via ALTER TABLE directly in many versions.
+        // We use alterTable with TableMigration which handles recreating the table safely.
+        await m.alterTable(TableMigration(users));
       }
       if (from < 14) {
         await _addColumnSafely(m, users, (users as dynamic).isTwoFactorEnabled);
@@ -167,13 +164,48 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 21) {
         // Change questionId from int to text in error_book, spaced_repetition, bookmarks.
+        // Preserve data by copying to new tables before dropping old ones.
         try {
+          await customStatement(
+            'CREATE TABLE IF NOT EXISTS error_book_new ('
+            'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+            'question_id TEXT NOT NULL,'
+            'subject TEXT NOT NULL,'
+            'topic_id TEXT NOT NULL,'
+            'added_at INTEGER NOT NULL,'
+            'is_resolved INTEGER NOT NULL DEFAULT 0,'
+            'notes TEXT'
+            ')',
+          );
+          await customStatement(
+            'INSERT OR IGNORE INTO error_book_new (id, question_id, subject, topic_id, added_at, is_resolved, notes) '
+            "SELECT id, CAST(question_id AS TEXT), subject, topic_id, added_at, is_resolved, notes FROM error_book",
+          );
           await m.deleteTable('error_book');
-          await m.createTable(errorBook);
+          await customStatement('ALTER TABLE error_book_new RENAME TO error_book');
         } catch (_) {}
         try {
+          await customStatement(
+            'CREATE TABLE IF NOT EXISTS spaced_repetition_new ('
+            'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+            'question_id TEXT NOT NULL,'
+            'subject TEXT NOT NULL,'
+            'topic_id TEXT NOT NULL,'
+            'box INTEGER NOT NULL DEFAULT 1,'
+            'ease_factor REAL NOT NULL DEFAULT 2.5,'
+            'interval_days INTEGER NOT NULL DEFAULT 0,'
+            'repetitions INTEGER NOT NULL DEFAULT 0,'
+            'lapses INTEGER NOT NULL DEFAULT 0,'
+            'due_at INTEGER NOT NULL,'
+            'last_reviewed_at INTEGER'
+            ')',
+          );
+          await customStatement(
+            'INSERT OR IGNORE INTO spaced_repetition_new (id, question_id, subject, topic_id, box, ease_factor, interval_days, repetitions, lapses, due_at, last_reviewed_at) '
+            "SELECT id, CAST(question_id AS TEXT), subject, topic_id, box, ease_factor, interval_days, repetitions, lapses, due_at, last_reviewed_at FROM spaced_repetition",
+          );
           await m.deleteTable('spaced_repetition');
-          await m.createTable(spacedRepetition);
+          await customStatement('ALTER TABLE spaced_repetition_new RENAME TO spaced_repetition');
         } catch (_) {}
         try {
           await customStatement(
@@ -197,6 +229,14 @@ class AppDatabase extends _$AppDatabase {
             'ON bookmarks(question_id)',
           );
         } catch (_) {}
+      }
+      if (from < 22) {
+        // Persist real ±marks on each attempt (single source of truth for the
+        // NEET score, instead of re-deriving with a hardcoded 4/−1 formula).
+        await _addColumnSafely(
+            m, quizAttempts, (quizAttempts as dynamic).rawScore);
+        await _addColumnSafely(
+            m, quizAttempts, (quizAttempts as dynamic).maxMarks);
       }
     },
     beforeOpen: (details) async {
@@ -497,6 +537,8 @@ class AppDatabase extends _$AppDatabase {
       await delete(bookmarks).go();
       await delete(dailyGoals).go();
       await delete(spacedRepetition).go();
+      await delete(errorBook).go();
+      await delete(flashcards).go();
     });
   }
 }

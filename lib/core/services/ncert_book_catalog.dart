@@ -58,6 +58,17 @@ class NcertBookCatalog {
   /// All known NCERT book entries in chapter order.
   static List<NcertBookEntry> get allEntries => List.unmodifiable(_entries);
 
+  /// Find an entry by its chapter key (e.g., 'bio_ch1', 'chem_ch1', 'phys_ch2').
+  static NcertBookEntry? entryByChapterKey(String chapterKey) {
+    final path = _appChapterPdf[chapterKey];
+    if (path == null) return null;
+    try {
+      return _entries.firstWhere((e) => e.assetPath == path);
+    } catch (_) {
+      return null;
+    }
+  }
+
   static List<NcertBookEntry> _buildEntries() {
     final list = <NcertBookEntry>[];
 

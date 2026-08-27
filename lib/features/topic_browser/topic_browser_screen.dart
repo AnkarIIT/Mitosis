@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 
 class TopicBrowserScreen extends ConsumerWidget {
@@ -19,14 +20,14 @@ class TopicBrowserScreen extends ConsumerWidget {
     final chapters = ref.watch(chaptersProvider(subjectId));
 
     return Scaffold(
-      backgroundColor: AppColors.adaptiveBackground(context),
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
         title: Text(subjectName),
         elevation: 0,
         backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: AppColors.adaptiveText(context)),
+        iconTheme: IconThemeData(color: AdaptiveColors.textPrimary(context)),
         titleTextStyle: TextStyle(
-          color: AppColors.adaptiveText(context),
+          color: AdaptiveColors.textPrimary(context),
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -63,7 +64,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
-                    color: AppColors.adaptiveSurface(context),
+                    color: AdaptiveColors.surface(context),
                     child: ExpansionTile(
                       title: Text(
                         chapter.name,
@@ -71,7 +72,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                             ?.copyWith(
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.2,
-                              color: AppColors.adaptiveText(context),
+                              color: AdaptiveColors.textPrimary(context),
                             ),
                       ),
                       subtitle: Padding(
@@ -81,16 +82,14 @@ class TopicBrowserScreen extends ConsumerWidget {
                             Icon(
                               Icons.topic,
                               size: 14,
-                              color: AppColors.adaptiveSubtleText(context),
+                              color: AdaptiveColors.textSecondary(context),
                             ),
                             const SizedBox(width: 4),
                             Text(
                               '${chapter.topics.length} topics',
                               style: Theme.of(context).textTheme.labelSmall
                                   ?.copyWith(
-                                    color: AppColors.adaptiveSubtleText(
-                                      context,
-                                    ),
+                                    color: AdaptiveColors.textSecondary(context),
                                   ),
                             ),
                           ],
@@ -99,7 +98,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                       collapsedBackgroundColor: Colors.transparent,
                       backgroundColor: Colors.transparent,
                       iconColor: AppColors.primary,
-                      collapsedIconColor: AppColors.adaptiveSubtleText(context),
+                      collapsedIconColor: AdaptiveColors.textSecondary(context),
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(
@@ -127,9 +126,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                   padding: const EdgeInsets.only(bottom: 12),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: AppColors.adaptiveBackground(
-                                        context,
-                                      ),
+                                       color: AdaptiveColors.background(context),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color: AppColors.primary.withValues(
@@ -141,7 +138,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                       color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
-                                          context.push('/topic', extra: {'topic': topic, 'subjectName': subjectName, 'chapterName': chapter.name});
+                                          context.push('/topic/${topic.id}?subjectName=${Uri.encodeComponent(subjectName)}&chapterName=${Uri.encodeComponent(chapter.name)}');
                                         },
                                         borderRadius: BorderRadius.circular(12),
                                         child: Padding(
@@ -178,14 +175,12 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                       : Text(
                                                           topicQuestions.length
                                                               .toString(),
-                                                          style: TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color:
-                                                                AppColors.adaptiveText(
-                                                                  context,
-                                                                ),
+                                                           style: TextStyle(
+                                                             fontSize: 14,
+                                                             fontWeight:
+                                                                 FontWeight.bold,
+                                                             color:
+                                                                 AdaptiveColors.textPrimary(context),
                                                           ),
                                                         ),
                                                 ),
@@ -202,13 +197,11 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .bodyMedium
-                                                          ?.copyWith(
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            color:
-                                                                AppColors.adaptiveText(
-                                                                  context,
-                                                                ),
+                                                           ?.copyWith(
+                                                             fontWeight:
+                                                                 FontWeight.w600,
+                                                             color:
+                                                                 AdaptiveColors.textPrimary(context),
                                                           ),
                                                       maxLines: 1,
                                                       overflow:
@@ -221,10 +214,8 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                           Icons
                                                               .help_outline_rounded,
                                                           size: 12,
-                                                          color:
-                                                              AppColors.adaptiveSubtleText(
-                                                                context,
-                                                              ),
+                                                             color:
+                                                                AdaptiveColors.textPrimary(context),
                                                         ),
                                                         const SizedBox(
                                                           width: 4,
@@ -235,10 +226,8 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                               .textTheme
                                                               .labelSmall
                                                               ?.copyWith(
-                                                                color:
-                                                                    AppColors.adaptiveSubtleText(
-                                                                      context,
-                                                                    ),
+                                                             color:
+                                                                AdaptiveColors.textPrimary(context),
                                                               ),
                                                         ),
                                                       ],

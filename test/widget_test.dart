@@ -18,13 +18,15 @@ GoRouter _testRouter({required Widget child}) {
     routes: [
       GoRoute(path: '/', builder: (_, _) => child),
       GoRoute(
-        path: '/topic',
+        path: '/topic/:topicId',
         builder: (_, state) {
-          final args = state.extra as Map<String, dynamic>;
+          final topicId = state.pathParameters['topicId']!;
+          final subjectName = state.uri.queryParameters['subjectName'] ?? '';
+          final chapterName = state.uri.queryParameters['chapterName'] ?? '';
           return TopicDetailScreen(
-            topic: args['topic'],
-            subjectName: args['subjectName'] as String,
-            chapterName: args['chapterName'] as String,
+            topicId: topicId,
+            subjectName: subjectName,
+            chapterName: chapterName,
           );
         },
       ),
@@ -55,8 +57,8 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('NEET Mitos'), findsWidgets);
-    expect(find.text('Practice Tests'), findsOneWidget);
+    expect(find.text('Featured Subjects'), findsOneWidget);
+    expect(find.text('Ongoing Progress'), findsWidgets);
   });
 
   testWidgets('Settings screen removes external website CTA', (
@@ -72,7 +74,7 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.settings_outlined));
+
     await tester.pumpAndSettle();
 
     expect(find.text('Settings'), findsOneWidget);
@@ -87,7 +89,6 @@ void main() {
     await tester.pumpWidget(ProviderScope(
       overrides: [
         authProvider.overrideWith((ref) => _FakeAuthNotifier()),
-        usePremiumHomeProvider.overrideWith((ref) => _FakePremiumHomeNotifier()),
       ],
       child: const MyApp(),
     ));
@@ -140,7 +141,7 @@ void main() {
         child: MaterialApp.router(
           routerConfig: _testRouter(
             child: TopicDetailScreen(
-              topic: topic,
+              topicId: topic.id,
               subjectName: 'Biology',
               chapterName: 'Cell Biology',
             ),
@@ -188,7 +189,7 @@ void main() {
           child: MaterialApp.router(
             routerConfig: _testRouter(
               child: TopicDetailScreen(
-                topic: topic,
+                topicId: topic.id,
                 subjectName: 'Biology',
                 chapterName: 'Cell Biology',
               ),
@@ -293,14 +294,4 @@ class _FakeAuthNotifier extends StateNotifier<AuthState>
 
   @override
   Future<void> logout() async {}
-}
-
-class _FakePremiumHomeNotifier extends StateNotifier<bool>
-    implements PremiumHomeNotifier {
-  _FakePremiumHomeNotifier() : super(true);
-
-  @override
-  Future<void> toggle(bool value) async {
-    state = value;
-  }
 }

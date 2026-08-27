@@ -1145,6 +1145,28 @@ class $QuizAttemptsTable extends QuizAttempts
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _rawScoreMeta = const VerificationMeta(
+    'rawScore',
+  );
+  @override
+  late final GeneratedColumn<int> rawScore = GeneratedColumn<int>(
+    'raw_score',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maxMarksMeta = const VerificationMeta(
+    'maxMarks',
+  );
+  @override
+  late final GeneratedColumn<int> maxMarks = GeneratedColumn<int>(
+    'max_marks',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -1170,6 +1192,8 @@ class $QuizAttemptsTable extends QuizAttempts
     selectedAnswers,
     testType,
     subjectScores,
+    rawScore,
+    maxMarks,
     updatedAt,
   ];
   @override
@@ -1279,6 +1303,18 @@ class $QuizAttemptsTable extends QuizAttempts
         ),
       );
     }
+    if (data.containsKey('raw_score')) {
+      context.handle(
+        _rawScoreMeta,
+        rawScore.isAcceptableOrUnknown(data['raw_score']!, _rawScoreMeta),
+      );
+    }
+    if (data.containsKey('max_marks')) {
+      context.handle(
+        _maxMarksMeta,
+        maxMarks.isAcceptableOrUnknown(data['max_marks']!, _maxMarksMeta),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -1338,6 +1374,14 @@ class $QuizAttemptsTable extends QuizAttempts
         DriftSqlType.string,
         data['${effectivePrefix}subject_scores'],
       ),
+      rawScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}raw_score'],
+      ),
+      maxMarks: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}max_marks'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -1363,6 +1407,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
   final String selectedAnswers;
   final String testType;
   final String? subjectScores;
+  final int? rawScore;
+  final int? maxMarks;
   final DateTime? updatedAt;
   const QuizAttempt({
     required this.id,
@@ -1376,6 +1422,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     required this.selectedAnswers,
     required this.testType,
     this.subjectScores,
+    this.rawScore,
+    this.maxMarks,
     this.updatedAt,
   });
   @override
@@ -1393,6 +1441,12 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     map['test_type'] = Variable<String>(testType);
     if (!nullToAbsent || subjectScores != null) {
       map['subject_scores'] = Variable<String>(subjectScores);
+    }
+    if (!nullToAbsent || rawScore != null) {
+      map['raw_score'] = Variable<int>(rawScore);
+    }
+    if (!nullToAbsent || maxMarks != null) {
+      map['max_marks'] = Variable<int>(maxMarks);
     }
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -1415,6 +1469,12 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       subjectScores: subjectScores == null && nullToAbsent
           ? const Value.absent()
           : Value(subjectScores),
+      rawScore: rawScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rawScore),
+      maxMarks: maxMarks == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxMarks),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -1438,6 +1498,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       selectedAnswers: serializer.fromJson<String>(json['selectedAnswers']),
       testType: serializer.fromJson<String>(json['testType']),
       subjectScores: serializer.fromJson<String?>(json['subjectScores']),
+      rawScore: serializer.fromJson<int?>(json['rawScore']),
+      maxMarks: serializer.fromJson<int?>(json['maxMarks']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
   }
@@ -1456,6 +1518,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       'selectedAnswers': serializer.toJson<String>(selectedAnswers),
       'testType': serializer.toJson<String>(testType),
       'subjectScores': serializer.toJson<String?>(subjectScores),
+      'rawScore': serializer.toJson<int?>(rawScore),
+      'maxMarks': serializer.toJson<int?>(maxMarks),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
   }
@@ -1472,6 +1536,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     String? selectedAnswers,
     String? testType,
     Value<String?> subjectScores = const Value.absent(),
+    Value<int?> rawScore = const Value.absent(),
+    Value<int?> maxMarks = const Value.absent(),
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => QuizAttempt(
     id: id ?? this.id,
@@ -1487,6 +1553,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     subjectScores: subjectScores.present
         ? subjectScores.value
         : this.subjectScores,
+    rawScore: rawScore.present ? rawScore.value : this.rawScore,
+    maxMarks: maxMarks.present ? maxMarks.value : this.maxMarks,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
   QuizAttempt copyWithCompanion(QuizAttemptsCompanion data) {
@@ -1514,6 +1582,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       subjectScores: data.subjectScores.present
           ? data.subjectScores.value
           : this.subjectScores,
+      rawScore: data.rawScore.present ? data.rawScore.value : this.rawScore,
+      maxMarks: data.maxMarks.present ? data.maxMarks.value : this.maxMarks,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1532,6 +1602,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
           ..write('selectedAnswers: $selectedAnswers, ')
           ..write('testType: $testType, ')
           ..write('subjectScores: $subjectScores, ')
+          ..write('rawScore: $rawScore, ')
+          ..write('maxMarks: $maxMarks, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -1550,6 +1622,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     selectedAnswers,
     testType,
     subjectScores,
+    rawScore,
+    maxMarks,
     updatedAt,
   );
   @override
@@ -1567,6 +1641,8 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
           other.selectedAnswers == this.selectedAnswers &&
           other.testType == this.testType &&
           other.subjectScores == this.subjectScores &&
+          other.rawScore == this.rawScore &&
+          other.maxMarks == this.maxMarks &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -1582,6 +1658,8 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
   final Value<String> selectedAnswers;
   final Value<String> testType;
   final Value<String?> subjectScores;
+  final Value<int?> rawScore;
+  final Value<int?> maxMarks;
   final Value<DateTime?> updatedAt;
   const QuizAttemptsCompanion({
     this.id = const Value.absent(),
@@ -1595,6 +1673,8 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     this.selectedAnswers = const Value.absent(),
     this.testType = const Value.absent(),
     this.subjectScores = const Value.absent(),
+    this.rawScore = const Value.absent(),
+    this.maxMarks = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   QuizAttemptsCompanion.insert({
@@ -1609,6 +1689,8 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     required String selectedAnswers,
     this.testType = const Value.absent(),
     this.subjectScores = const Value.absent(),
+    this.rawScore = const Value.absent(),
+    this.maxMarks = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : topicId = Value(topicId),
        subject = Value(subject),
@@ -1629,6 +1711,8 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     Expression<String>? selectedAnswers,
     Expression<String>? testType,
     Expression<String>? subjectScores,
+    Expression<int>? rawScore,
+    Expression<int>? maxMarks,
     Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
@@ -1643,6 +1727,8 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
       if (selectedAnswers != null) 'selected_answers': selectedAnswers,
       if (testType != null) 'test_type': testType,
       if (subjectScores != null) 'subject_scores': subjectScores,
+      if (rawScore != null) 'raw_score': rawScore,
+      if (maxMarks != null) 'max_marks': maxMarks,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
@@ -1659,6 +1745,8 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     Value<String>? selectedAnswers,
     Value<String>? testType,
     Value<String?>? subjectScores,
+    Value<int?>? rawScore,
+    Value<int?>? maxMarks,
     Value<DateTime?>? updatedAt,
   }) {
     return QuizAttemptsCompanion(
@@ -1673,6 +1761,8 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
       selectedAnswers: selectedAnswers ?? this.selectedAnswers,
       testType: testType ?? this.testType,
       subjectScores: subjectScores ?? this.subjectScores,
+      rawScore: rawScore ?? this.rawScore,
+      maxMarks: maxMarks ?? this.maxMarks,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -1713,6 +1803,12 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     if (subjectScores.present) {
       map['subject_scores'] = Variable<String>(subjectScores.value);
     }
+    if (rawScore.present) {
+      map['raw_score'] = Variable<int>(rawScore.value);
+    }
+    if (maxMarks.present) {
+      map['max_marks'] = Variable<int>(maxMarks.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -1733,6 +1829,8 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
           ..write('selectedAnswers: $selectedAnswers, ')
           ..write('testType: $testType, ')
           ..write('subjectScores: $subjectScores, ')
+          ..write('rawScore: $rawScore, ')
+          ..write('maxMarks: $maxMarks, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -7655,6 +7753,8 @@ typedef $$QuizAttemptsTableCreateCompanionBuilder =
       required String selectedAnswers,
       Value<String> testType,
       Value<String?> subjectScores,
+      Value<int?> rawScore,
+      Value<int?> maxMarks,
       Value<DateTime?> updatedAt,
     });
 typedef $$QuizAttemptsTableUpdateCompanionBuilder =
@@ -7670,6 +7770,8 @@ typedef $$QuizAttemptsTableUpdateCompanionBuilder =
       Value<String> selectedAnswers,
       Value<String> testType,
       Value<String?> subjectScores,
+      Value<int?> rawScore,
+      Value<int?> maxMarks,
       Value<DateTime?> updatedAt,
     });
 
@@ -7734,6 +7836,16 @@ class $$QuizAttemptsTableFilterComposer
 
   ColumnFilters<String> get subjectScores => $composableBuilder(
     column: $table.subjectScores,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rawScore => $composableBuilder(
+    column: $table.rawScore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get maxMarks => $composableBuilder(
+    column: $table.maxMarks,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7807,6 +7919,16 @@ class $$QuizAttemptsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get rawScore => $composableBuilder(
+    column: $table.rawScore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get maxMarks => $composableBuilder(
+    column: $table.maxMarks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -7867,6 +7989,12 @@ class $$QuizAttemptsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get rawScore =>
+      $composableBuilder(column: $table.rawScore, builder: (column) => column);
+
+  GeneratedColumn<int> get maxMarks =>
+      $composableBuilder(column: $table.maxMarks, builder: (column) => column);
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -7913,6 +8041,8 @@ class $$QuizAttemptsTableTableManager
                 Value<String> selectedAnswers = const Value.absent(),
                 Value<String> testType = const Value.absent(),
                 Value<String?> subjectScores = const Value.absent(),
+                Value<int?> rawScore = const Value.absent(),
+                Value<int?> maxMarks = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => QuizAttemptsCompanion(
                 id: id,
@@ -7926,6 +8056,8 @@ class $$QuizAttemptsTableTableManager
                 selectedAnswers: selectedAnswers,
                 testType: testType,
                 subjectScores: subjectScores,
+                rawScore: rawScore,
+                maxMarks: maxMarks,
                 updatedAt: updatedAt,
               ),
           createCompanionCallback:
@@ -7941,6 +8073,8 @@ class $$QuizAttemptsTableTableManager
                 required String selectedAnswers,
                 Value<String> testType = const Value.absent(),
                 Value<String?> subjectScores = const Value.absent(),
+                Value<int?> rawScore = const Value.absent(),
+                Value<int?> maxMarks = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => QuizAttemptsCompanion.insert(
                 id: id,
@@ -7954,6 +8088,8 @@ class $$QuizAttemptsTableTableManager
                 selectedAnswers: selectedAnswers,
                 testType: testType,
                 subjectScores: subjectScores,
+                rawScore: rawScore,
+                maxMarks: maxMarks,
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0

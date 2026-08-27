@@ -48,19 +48,14 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
 
   Future<void> _pickFile() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final files = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['json', 'csv'],
-        withData: true,
       );
-      if (result == null || result.files.isEmpty) return;
+      if (files.isEmpty) return;
 
-      final file = result.files.single;
-      final bytes = file.bytes;
-      if (bytes == null) {
-        setState(() => _formatError = 'Could not read the selected file.');
-        return;
-      }
+      final file = files.single;
+      final bytes = await file.readAsBytes();
       var text = utf8.decode(bytes, allowMalformed: true);
       if (text.startsWith('\uFEFF')) text = text.substring(1);
 

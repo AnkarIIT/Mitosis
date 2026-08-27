@@ -6,6 +6,7 @@ import '../models/question_model.dart';
 import '../models/subject_model.dart';
 import '../models/user_progress_model.dart';
 import '../database/drift_database.dart' as db;
+import '../services/exam_engine_service.dart';
 import '../services/mark_booster_service.dart';
 import '../services/spaced_repetition_service.dart';
 import 'core_providers.dart';
@@ -93,6 +94,8 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
               selectedAnswers: (jsonDecode(a.selectedAnswers) as List)
                   .cast<String>(),
               subject: a.subject,
+              rawScore: a.rawScore,
+              maxMarks: a.maxMarks,
             ),
           )
           .toList();
@@ -144,54 +147,62 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     state = state.copyWith(quizAttempts: [...state.quizAttempts, attempt]);
 
     try {
-      await _db.insertQuizAttempt(
-        db.QuizAttemptsCompanion.insert(
-          topicId: attempt.topicId,
-          subject: attempt.subject,
-          testType: Value(attempt.testType),
-          subjectScores: Value(
-            attempt.subjectScores != null
-                ? jsonEncode(attempt.subjectScores)
-                : null,
-          ),
-          score: attempt.score,
-          incorrectCount: Value(attempt.incorrectCount),
-          totalQuestions: attempt.totalQuestions,
-          timeSpentSeconds: attempt.timeSpentSeconds,
-          attemptedAt: attempt.attemptedAt,
-          selectedAnswers: jsonEncode(attempt.selectedAnswers),
-        ),
-      );
-
       final sourceQuestions = questions ?? _ref.read(quizProvider).questions;
       final sourceAnswers =
           answersByIndex ?? _ref.read(quizProvider).selectedAnswers;
-      final existingCards = await _db.getSpacedRepetitionCards();
-      final srByQuestion = {
-        for (final card in existingCards) card.questionId: card,
-      };
       var srTouched = false;
-      for (int i = 0; i < sourceQuestions.length; i++) {
-        final q = sourceQuestions[i];
-        final answer = sourceAnswers[i];
-        if (answer == null) continue;
-        final isCorrect = answer == q.correctAnswer;
-        if (isCorrect) {
-          await _db.removeFromErrorBook(q.id);
-        } else {
-          await _db.addToErrorBook(db.ErrorBookCompanion.insert(
-            questionId: q.id,
-            addedAt: DateTime.now(),
-          ));
-        }
-        final nextCard = SpacedRepetitionService.review(
-          questionId: q.id,
-          card: srByQuestion[q.id],
-          isCorrect: isCorrect,
+
+      // Attempt insert + error-book + spaced-repetition writes are one atomic
+      // unit, so a mid-write failure can't leave a half-recorded attempt.
+      await _db.transaction(() async {
+        await _db.insertQuizAttempt(
+          db.QuizAttemptsCompanion.insert(
+            topicId: attempt.topicId,
+            subject: attempt.subject,
+            testType: Value(attempt.testType),
+            subjectScores: Value(
+              attempt.subjectScores != null
+                  ? jsonEncode(attempt.subjectScores)
+                  : null,
+            ),
+            score: attempt.score,
+            incorrectCount: Value(attempt.incorrectCount),
+            totalQuestions: attempt.totalQuestions,
+            timeSpentSeconds: attempt.timeSpentSeconds,
+            attemptedAt: attempt.attemptedAt,
+            selectedAnswers: jsonEncode(attempt.selectedAnswers),
+            rawScore: Value(attempt.rawScore),
+            maxMarks: Value(attempt.maxMarks),
+          ),
         );
-        await _db.upsertSpacedRepetition(nextCard);
-        srTouched = true;
-      }
+
+        final existingCards = await _db.getSpacedRepetitionCards();
+        final srByQuestion = {
+          for (final card in existingCards) card.questionId: card,
+        };
+        for (int i = 0; i < sourceQuestions.length; i++) {
+          final q = sourceQuestions[i];
+          final answer = sourceAnswers[i];
+          if (answer == null) continue;
+          final isCorrect = ExamEngineService.isAnswerCorrect(answer, q);
+          if (isCorrect) {
+            await _db.removeFromErrorBook(q.id);
+          } else {
+            await _db.addToErrorBook(db.ErrorBookCompanion.insert(
+              questionId: q.id,
+              addedAt: DateTime.now(),
+            ));
+          }
+          final nextCard = SpacedRepetitionService.review(
+            questionId: q.id,
+            card: srByQuestion[q.id],
+            isCorrect: isCorrect,
+          );
+          await _db.upsertSpacedRepetition(nextCard);
+          srTouched = true;
+        }
+      });
+
       if (srTouched) {
         _ref.invalidate(spacedRepetitionCardsProvider);
         _ref.invalidate(dueCardsProvider);

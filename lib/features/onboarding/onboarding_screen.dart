@@ -218,6 +218,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
+    ref.read(onboardingCompleteProvider.notifier).state = true;
     
     if (!mounted) return;
     context.go('/');

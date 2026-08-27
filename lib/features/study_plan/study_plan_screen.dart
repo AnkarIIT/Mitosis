@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/models/user_preferences_model.dart';
 
@@ -18,15 +19,15 @@ class StudyPlanScreen extends ConsumerWidget {
     final prefs = ref.watch(userPreferencesProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.adaptiveBackground(context),
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
         title: const Text('Study Planner'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.adaptiveText(context)),
+        iconTheme: IconThemeData(color: AdaptiveColors.textPrimary(context)),
         titleTextStyle: TextStyle(
-          color: AppColors.adaptiveText(context),
+          color: AdaptiveColors.textPrimary(context),
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -112,7 +113,7 @@ class StudyPlanScreen extends ConsumerWidget {
 
     return Card(
       elevation: 0,
-      color: AppColors.adaptiveSurface(context),
+      color: AdaptiveColors.surface(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
@@ -129,7 +130,7 @@ class StudyPlanScreen extends ConsumerWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
-                    color: AppColors.adaptiveText(context),
+                    color: AdaptiveColors.textPrimary(context),
                   ),
                 ),
                 Text(
@@ -156,7 +157,7 @@ class StudyPlanScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               '$completed of $target questions solved today',
-              style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
+              style: TextStyle(color: AdaptiveColors.textSecondary(context)),
             ),
           ],
         ),
@@ -182,14 +183,14 @@ class StudyPlanScreen extends ConsumerWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: AppColors.adaptiveText(context),
+            color: AdaptiveColors.textPrimary(context),
           ),
         ),
         const SizedBox(height: 8),
         Text(
           batchSubtitle,
           style: TextStyle(
-            color: AppColors.adaptiveSubtleText(context),
+            color: AdaptiveColors.textSecondary(context),
             fontSize: 14,
           ),
         ),
@@ -217,10 +218,10 @@ class StudyPlanScreen extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
-      color: AppColors.adaptiveSurface(context),
+      color: AdaptiveColors.surface(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.adaptiveDivider(context)),
+        side: BorderSide(color: AdaptiveColors.divider(context)),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -236,20 +237,20 @@ class StudyPlanScreen extends ConsumerWidget {
           topic.name,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: AppColors.adaptiveText(context),
+            color: AdaptiveColors.textPrimary(context),
           ),
         ),
         subtitle: Text(
           'Accuracy < 50% • Recommended: 10 Questions',
-          style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
+          style: TextStyle(color: AdaptiveColors.textSecondary(context)),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
           size: 14,
-          color: AppColors.adaptiveSubtleText(context),
+          color: AdaptiveColors.textSecondary(context),
         ),
         onTap: () {
-          context.push('/topic', extra: {'topic': topic, 'subjectName': 'Review', 'chapterName': 'Smart Plan'});
+          context.push('/topic/${topic.id}?subjectName=${Uri.encodeComponent('Review')}&chapterName=${Uri.encodeComponent('Smart Plan')}');
         },
       ),
     );
@@ -274,7 +275,7 @@ class StudyPlanScreen extends ConsumerWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: AppColors.adaptiveText(context),
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 16),
@@ -337,7 +338,7 @@ class StudyPlanScreen extends ConsumerWidget {
                 title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.adaptiveText(context),
+                  color: AdaptiveColors.textPrimary(context),
                 ),
               ),
               Text(subtitle, style: TextStyle(color: color, fontSize: 12)),
@@ -353,9 +354,9 @@ class StudyPlanScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.adaptiveSurface(context),
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.adaptiveDivider(context)),
+        border: Border.all(color: AdaptiveColors.divider(context)),
       ),
       child: Column(
         children: [
@@ -364,7 +365,7 @@ class StudyPlanScreen extends ConsumerWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.adaptiveSubtleText(context)),
+            style: TextStyle(color: AdaptiveColors.textSecondary(context)),
           ),
         ],
       ),

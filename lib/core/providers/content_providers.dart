@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../models/question_model.dart';
@@ -130,15 +131,19 @@ final questionsForSubjectProvider = FutureProvider.family<List<Question>, String
 });
 
 // ============= CONTENT CATALOG SYNC =============
-final contentSyncServiceProvider = Provider<ContentSyncService>((ref) {
-  final database = ref.watch(databaseProvider);
-  final supabaseClient = AppConfig.isCloudAuthConfigured
-      ? supabase.Supabase.instance.client
-      : null;
-  return ContentSyncService(database, supabaseClient);
+final contentSyncServiceProvider = Provider<ContentSyncService?>((ref) {
+  if (!AppConfig.enableCloudAuth || !AppConfig.isCloudAuthConfigured) return null;
+  try {
+    final database = ref.watch(databaseProvider);
+    return ContentSyncService(database, supabase.Supabase.instance.client);
+  } catch (e) {
+    log('Supabase not initialized: $e');
+    return null;
+  }
 });
 
 final contentSyncProvider = FutureProvider<void>((ref) async {
   final service = ref.watch(contentSyncServiceProvider);
+  if (service == null) return;
   await service.syncCatalog();
 });

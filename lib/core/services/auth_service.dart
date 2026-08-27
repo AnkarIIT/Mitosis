@@ -16,7 +16,9 @@ class AuthService {
       : _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   supabase.SupabaseClient? get _supabaseClient =>
-      AppConfig.isCloudAuthConfigured ? supabase.Supabase.instance.client : null;
+      AppConfig.enableCloudAuth && AppConfig.isCloudAuthConfigured
+          ? supabase.Supabase.instance.client
+          : null;
 
   bool get _cloudAuthEnabled => _supabaseClient != null;
 
@@ -140,6 +142,8 @@ class AuthService {
       
       // Check 2FA
       if (localUser != null && localUser.isTwoFactorEnabled == true) {
+        // Sign out the Supabase session — 2FA must be verified first.
+        await _supabaseClient!.auth.signOut();
         return (success: true, message: '2FA_REQUIRED', user: localUser);
       }
 
@@ -157,7 +161,13 @@ class AuthService {
     final email = session.user.email;
     if (email == null) return null;
 
-    return await _db.getUserByEmail(email);
+    final user = await _db.getUserByEmail(email);
+    // If 2FA was enabled after login, sign out and force re-auth.
+    if (user != null && user.isTwoFactorEnabled == true) {
+      await _supabaseClient!.auth.signOut();
+      return null;
+    }
+    return user;
   }
 
   Future<void> logout() async {

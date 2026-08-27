@@ -1,43 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import 'core/config/app_config.dart';
 import 'core/database/question_repository.dart';
 import 'core/providers/providers.dart' as app_providers;
+import 'core/providers/settings_providers.dart';
 import 'core/router/app_router.dart';
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_colors.dart';
+import 'core/constants/starter_flashcards.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('⚠️ .env not loaded: $e');
+  }
+
+  if (AppConfig.enableCloudAuth) {
+    try {
+      await supabase.Supabase.initialize(
+        url: AppConfig.supabaseUrl,
+        anonKey: AppConfig.supabaseAnonKey,
+      );
+      debugPrint('✅ Supabase connected: ${AppConfig.supabaseUrl}');
+    } catch (e) {
+      debugPrint('❌ Supabase init failed: $e');
+    }
+  }
 
   try {
     await NotificationService().init().timeout(
       const Duration(seconds: 5),
       onTimeout: () => debugPrint('⚠️ Notification Service Timeout'),
     );
-
-    if (AppConfig.isCloudAuthConfigured) {
-      await Supabase.initialize(
-        url: AppConfig.supabaseUrl,
-        anonKey: AppConfig.supabaseAnonKey,
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Supabase Timeout'),
-      );
-    }
   } catch (e) {
     debugPrint('❌ Initialization Error: $e');
   }
 
   final container = ProviderContainer();
 
-  runApp(UncontrolledProviderScope(
-    container: container,
-    child: const MyApp(),
-  ));
+  // Preload onboarding flag so GoRouter redirect stays synchronous.
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    container.read(onboardingCompleteProvider.notifier).state =
+        prefs.getBool('onboarding_complete') ?? false;
+  } catch (e) {
+    debugPrint('❌ Onboarding preload failed: $e');
+  }
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const MyApp(),
+    ),
+  );
 
   _backgroundInit(container);
 }
@@ -47,20 +70,36 @@ Future<void> _backgroundInit(ProviderContainer container) async {
     final repository = container.read(questionRepositoryProvider);
     await repository.importBundledQuestions('assets/questions/neet_sample_10.json');
     await repository.insertSampleQuestions();
+
+    // Seed starter flashcard deck if empty.
+    final db = container.read(app_providers.databaseProvider);
+    final existing = await db.getAllFlashcards();
+    if (existing.isEmpty) {
+      await db.insertFlashcardsBatch(getStarterFlashcards());
+      debugPrint('Seeded ${getStarterFlashcards().length} starter flashcards');
+    }
+
     debugPrint('Background seeding complete');
   } catch (e) {
     debugPrint('Background seeding failed: $e');
   }
 
-  try {
-    final contentSync = container.read(
-      app_providers.contentSyncServiceProvider,
-    );
-    await contentSync.syncCatalog();
-    container.invalidate(app_providers.allQuestionsProvider);
-    debugPrint('Content catalog sync complete');
-  } catch (e) {
-    debugPrint('Content catalog sync failed: $e');
+  // Cloud content sync is optional and OFF by default.
+  // If the user later enables cloud sync in Settings, the provider
+  // will initialize Supabase and sync at that time.
+  if (AppConfig.enableCloudSync) {
+    try {
+      final contentSync = container.read(
+        app_providers.contentSyncServiceProvider,
+      );
+      if (contentSync != null) {
+        await contentSync.syncCatalog();
+        container.invalidate(app_providers.allQuestionsProvider);
+        debugPrint('Content catalog sync complete');
+      }
+    } catch (e) {
+      debugPrint('Content catalog sync failed: $e');
+    }
   }
 }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/providers.dart';
 import '../../features/auth/auth_screen.dart';
@@ -24,7 +23,10 @@ import '../../features/test_series/pdf_picker_screen.dart';
 import '../../features/exam_engine/cbt_test_screen.dart';
 import '../../features/exam_engine/cbt_result_screen.dart';
 import '../../core/services/exam_engine_service.dart';
+import '../../core/services/exam_checkpoint_service.dart';
+import '../../core/services/test_analytics_service.dart';
 import '../../core/models/question_model.dart';
+import '../../core/models/user_progress_model.dart';
 import '../../features/study_plan/study_plan_screen.dart';
 import '../../features/error_book/error_book_screen.dart';
 import '../../features/mark_booster/mark_booster_screen.dart';
@@ -41,7 +43,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: '/',
-    redirect: (context, state) async {
+    redirect: (context, state) {
       final path = state.matchedLocation;
       final isAuthenticated = authState.status == AuthStatus.authenticated;
       final isLoading = authState.status == AuthStatus.loading;
@@ -74,9 +76,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (authState.status == AuthStatus.awaitingOtp) return '/otp';
 
       if (isAuthenticated) {
-        final prefs = await SharedPreferences.getInstance();
-        final onboardingComplete =
-            prefs.getBool('onboarding_complete') ?? false;
+        final onboardingComplete = ref.read(onboardingCompleteProvider);
         if (!onboardingComplete) return '/onboarding';
         return null;
       }
@@ -238,19 +238,32 @@ GoRoute(
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final config = extra['config'] as ExamConfig? ?? ExamConfig.neet();
           final questionPool = extra['questionPool'] as List<Question>? ?? [];
+          final resumeFrom = extra['resumeCheckpoint'] as ExamCheckpoint?;
           return CbtTestScreen(
             config: config,
             questionPool: questionPool,
+            resumeFrom: resumeFrom,
           );
         },
       ),
       GoRoute(
         path: '/cbt/result',
+        // Guard against a hot-restart / deep-link with no result payload: the
+        // screen's fields are non-nullable, so redirect home instead of crashing.
+        redirect: (context, state) {
+          final args = state.extra as Map<String, dynamic>?;
+          if (args == null ||
+              args['attempt'] == null ||
+              args['analytics'] == null) {
+            return '/';
+          }
+          return null;
+        },
         builder: (_, state) {
-          final args = state.extra as Map<String, dynamic>? ?? {};
+          final args = state.extra as Map<String, dynamic>;
           return CbtResultScreen(
-            attempt: args['attempt'],
-            analytics: args['analytics'],
+            attempt: args['attempt'] as QuizAttempt,
+            analytics: args['analytics'] as TestAnalytics,
           );
         },
       ),

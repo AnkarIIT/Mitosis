@@ -53,7 +53,7 @@ class ExplanationSeeder {
   ExplanationSeeder({
     required this.getQuestions,
     required this.updateExplanation,
-    required this.proxy,
+    this.proxy,
     this.onProgress,
     this.delayBetweenRequests = const Duration(seconds: 2),
     this.maxRetries = 2,
@@ -61,7 +61,7 @@ class ExplanationSeeder {
 
   final GetQuestions getQuestions;
   final UpdateExplanation updateExplanation;
-  final GeminiProxyService proxy;
+  final GeminiProxyService? proxy;
   final void Function(int completed, int total)? onProgress;
   final Duration delayBetweenRequests;
   final int maxRetries;
@@ -78,6 +78,15 @@ class ExplanationSeeder {
   /// Iterates every active question missing an explanation, generates one
   /// via the proxy, and writes it to the local database.
   Future<SeederResult> seedAll({bool forceRefresh = false}) async {
+    final effectiveProxy = proxy;
+    if (effectiveProxy == null || !effectiveProxy.isConfigured) {
+      return const SeederResult(
+        total: 0,
+        generated: 0,
+        failed: 0,
+        rateLimited: 0,
+      );
+    }
     _cancelled = false;
     final all = await getQuestions();
     final needsExplanation = forceRefresh
@@ -135,10 +144,12 @@ class ExplanationSeeder {
   GeminiProxySource _lastResult = GeminiProxySource.cache;
 
   Future<String?> _generateForQuestion(Question q) async {
+    final effectiveProxy = proxy;
+    if (effectiveProxy == null || !effectiveProxy.isConfigured) return null;
     final prompt = _buildPrompt(q);
 
     for (var attempt = 0; attempt <= maxRetries; attempt++) {
-      final result = await proxy.generate(
+      final result = await effectiveProxy.generate(
         prompt: prompt,
         systemPrompt: _systemPrompt,
         questionId: q.id,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 
 class SubjectsTab extends ConsumerWidget {
@@ -12,14 +13,14 @@ class SubjectsTab extends ConsumerWidget {
     final subjects = ref.watch(subjectsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.adaptiveBackground(context),
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
         title: const Text('Subjects'),
         elevation: 0,
         backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: AppColors.adaptiveText(context)),
+        iconTheme: IconThemeData(color: AdaptiveColors.textPrimary(context)),
         titleTextStyle: TextStyle(
-          color: AppColors.adaptiveText(context),
+          color: AdaptiveColors.textPrimary(context),
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),

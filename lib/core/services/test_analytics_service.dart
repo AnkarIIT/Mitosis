@@ -47,6 +47,10 @@ class TestAnalytics {
   final double percentileEstimate;
   final int airEstimate;
 
+  /// Whether a percentile/AIR estimate should be shown. Only true for
+  /// full-length mocks — short practice tests carry too little signal.
+  final bool showRankEstimate;
+
   const TestAnalytics({
     required this.score,
     required this.averageTimePerQuestion,
@@ -54,6 +58,7 @@ class TestAnalytics {
     required this.weakTopics,
     required this.percentileEstimate,
     required this.airEstimate,
+    this.showRankEstimate = false,
   });
 }
 
@@ -87,58 +92,38 @@ class TestAnalyticsService {
         ? secondsPerQuestion
         : List<int>.filled(score.results.length, 0);
 
-    final bySubject = <String, List<int>>{};
+    // Group by section name (Physics/Chemistry/Botany/Zoology) so Biology
+    // splits into its two sections; fall back to the raw question subject when
+    // no section mapping is available (e.g. a mixed practice test).
+    final subjects = <String, SubjectAnalytics>{};
+    final byGroupTime = <String, List<int>>{};
     for (int i = 0; i < score.results.length; i++) {
       final r = score.results[i];
-      bySubject.putIfAbsent(r.question.subject, () => []).add(normalized[i]);
-    }
-
-    final subjects = <String, SubjectAnalytics>{};
-    for (final r in score.results) {
-      final s = r.question.subject;
-      final entry = subjects.putIfAbsent(
-        s,
-        () => SubjectAnalytics(
-          subject: s,
-          correct: 0,
-          incorrect: 0,
-          unanswered: 0,
-          averageTimeSeconds: 0,
-        ),
+      final key = _groupKey(score, i);
+      byGroupTime.putIfAbsent(key, () => []).add(normalized[i]);
+      final entry = subjects[key] ??
+          SubjectAnalytics(
+            subject: key,
+            correct: 0,
+            incorrect: 0,
+            unanswered: 0,
+            averageTimeSeconds: 0,
+          );
+      subjects[key] = SubjectAnalytics(
+        subject: key,
+        correct: entry.correct + (r.isCorrect ? 1 : 0),
+        incorrect: entry.incorrect + (r.isIncorrect ? 1 : 0),
+        unanswered: entry.unanswered + (r.isUnanswered ? 1 : 0),
+        averageTimeSeconds: 0,
       );
-      if (r.isCorrect) {
-        subjects[s] = SubjectAnalytics(
-          subject: s,
-          correct: entry.correct + 1,
-          incorrect: entry.incorrect,
-          unanswered: entry.unanswered,
-          averageTimeSeconds: entry.averageTimeSeconds,
-        );
-      } else if (r.isIncorrect) {
-        subjects[s] = SubjectAnalytics(
-          subject: s,
-          correct: entry.correct,
-          incorrect: entry.incorrect + 1,
-          unanswered: entry.unanswered,
-          averageTimeSeconds: entry.averageTimeSeconds,
-        );
-      } else {
-        subjects[s] = SubjectAnalytics(
-          subject: s,
-          correct: entry.correct,
-          incorrect: entry.incorrect,
-          unanswered: entry.unanswered + 1,
-          averageTimeSeconds: entry.averageTimeSeconds,
-        );
-      }
     }
 
-    for (final subject in subjects.keys) {
-      final times = bySubject[subject] ?? [];
+    for (final key in subjects.keys.toList()) {
+      final times = byGroupTime[key] ?? [];
       final totalTime = times.fold(0, (a, b) => a + b);
-      final old = subjects[subject]!;
-      subjects[subject] = SubjectAnalytics(
-        subject: subject,
+      final old = subjects[key]!;
+      subjects[key] = SubjectAnalytics(
+        subject: key,
         correct: old.correct,
         incorrect: old.incorrect,
         unanswered: old.unanswered,
@@ -150,10 +135,11 @@ class TestAnalyticsService {
         ? 0.0
         : normalized.fold(0, (a, b) => a + b) / normalized.length;
 
-    final percentile = estimatePercentile(
-      score.rawScore,
-      score.maxScore,
-    );
+    // Rank estimate is only defensible for a full-length mock.
+    final showRank = score.config.isFullLengthMock;
+    final percentile =
+        showRank ? estimatePercentile(score.rawScore, score.maxScore) : 0.0;
+    final air = showRank ? estimateAir(percentile) : 0;
 
     return TestAnalytics(
       score: score,
@@ -161,8 +147,21 @@ class TestAnalyticsService {
       subjects: subjects,
       weakTopics: findWeakTopics(score),
       percentileEstimate: percentile,
-      airEstimate: estimateAir(percentile),
+      airEstimate: air,
+      showRankEstimate: showRank,
     );
+  }
+
+  /// The breakdown group for result [i]: the section name when the score
+  /// carries a section mapping, else the raw question subject.
+  static String _groupKey(ExamScore score, int i) {
+    if (score.sectionIndexByResult.length == score.results.length) {
+      final sIdx = score.sectionIndexByResult[i];
+      if (sIdx >= 0 && sIdx < score.config.sections.length) {
+        return score.config.sections[sIdx].name;
+      }
+    }
+    return score.results[i].question.subject;
   }
 
   static double estimatePercentile(int rawScore, int maxScore) {

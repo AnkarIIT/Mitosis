@@ -5,10 +5,12 @@ import '../../core/models/question_model.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/exam_engine_service.dart';
+import '../../core/services/exam_checkpoint_service.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
 
 import 'package:go_router/go_router.dart';
+import '../../core/theme/app_theme.dart';
 
 enum _SessionPhase { taking, break_ }
 
@@ -16,10 +18,15 @@ class CbtTestScreen extends ConsumerStatefulWidget {
   final ExamConfig config;
   final List<Question> questionPool;
 
+  /// When present, the screen restores this exact in-progress attempt (same
+  /// questions, answers, flags and remaining time) instead of starting fresh.
+  final ExamCheckpoint? resumeFrom;
+
   const CbtTestScreen({
     super.key,
     required this.config,
     required this.questionPool,
+    this.resumeFrom,
   });
 
   @override
@@ -30,30 +37,87 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     with WidgetsBindingObserver {
   static const _optionLabels = ['A', 'B', 'C', 'D'];
 
+  // Palette state colours (NTA-style).
+  static const Color _cMarked = Color(0xFF7E57C2); // purple
+
+  late final String _attemptId;
+  late final DateTime _startedAt;
   late final List<List<Question>> _sectionQuestions;
   late final List<Question> _questions;
   late final List<int> _sectionStart;
   final Map<int, String> _answers = {};
   final Set<int> _flagged = {};
+  final Set<int> _visited = {};
   late final List<int> _secondsPerQuestion;
 
   Timer? _ticker;
+  Timer? _autosaveTimer;
   _SessionPhase _phase = _SessionPhase.taking;
-  int _remainingSeconds = 0;
-  int _breakRemaining = 0;
+
+  /// Absolute wall-clock deadlines. Remaining time is always `deadline - now`,
+  /// so there is no drift and no background truncation to compensate for.
+  late DateTime _deadline;
+  DateTime? _breakDeadline;
+
+  /// When the user entered the current question — used to bank per-question
+  /// time on leave/submit, which is accurate across backgrounding.
+  DateTime? _questionEnteredAt;
+
   int _currentSection = 0;
   int _currentIndex = 0;
   bool _submitting = false;
   bool _submitted = false;
+  bool _confirmDialogOpen = false;
+
+  bool get _checkpointable => widget.config.isFullLengthMock;
+
+  int get _remainingSeconds {
+    final diff = _deadline.difference(DateTime.now()).inSeconds;
+    return diff < 0 ? 0 : diff;
+  }
+
+  int get _breakRemainingSeconds {
+    final d = _breakDeadline;
+    if (d == null) return 0;
+    final diff = d.difference(DateTime.now()).inSeconds;
+    return diff < 0 ? 0 : diff;
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _sectionQuestions = ExamEngineService.allocateQuestions(
-      widget.questionPool,
-      widget.config,
-    );
+
+    final resume = widget.resumeFrom;
+    final rebuilt = resume != null ? _rebuildSections(resume) : null;
+
+    if (resume != null && rebuilt != null) {
+      _attemptId = resume.attemptId;
+      _startedAt = DateTime.fromMillisecondsSinceEpoch(resume.startedAtEpochMs);
+      _sectionQuestions = rebuilt;
+      _deadline = DateTime.fromMillisecondsSinceEpoch(resume.deadlineEpochMs);
+      _breakDeadline = resume.breakDeadlineEpochMs != null
+          ? DateTime.fromMillisecondsSinceEpoch(resume.breakDeadlineEpochMs!)
+          : null;
+      _phase =
+          resume.phase == 'break_' ? _SessionPhase.break_ : _SessionPhase.taking;
+      for (final entry in resume.answersByIndex.entries) {
+        final v = entry.value;
+        if (v != null && v.isNotEmpty) _answers[entry.key] = v;
+      }
+      _flagged.addAll(resume.flagged);
+      _visited.addAll(resume.visited);
+    } else {
+      _attemptId = 'cbt_${DateTime.now().millisecondsSinceEpoch}';
+      _startedAt = DateTime.now();
+      _sectionQuestions = ExamEngineService.allocateQuestions(
+        widget.questionPool,
+        widget.config,
+      );
+      _deadline = DateTime.now()
+          .add(Duration(seconds: widget.config.totalDurationSeconds));
+    }
+
     _questions = ExamEngineService.flattenAllocated(_sectionQuestions);
     _sectionStart = [];
     var acc = 0;
@@ -62,29 +126,102 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       acc += section.length;
     }
     _secondsPerQuestion = List<int>.filled(_questions.length, 0);
-    _remainingSeconds = widget.config.totalDurationSeconds;
-    _skipEmptySections();
-    _ticker = Timer.periodic(const Duration(seconds: 1), _onTick);
+
+    if (resume != null && rebuilt != null) {
+      _currentSection = _sectionQuestions.isEmpty
+          ? 0
+          : resume.currentSection.clamp(0, _sectionQuestions.length - 1);
+      _currentIndex = _questions.isEmpty
+          ? 0
+          : resume.currentIndex.clamp(0, _questions.length - 1);
+    } else {
+      _skipEmptySections();
+      _currentIndex = _questions.isEmpty ? 0 : _sectionStart[_currentSection];
+    }
+
+    // 0.1: never start the ticker on an empty allocation — build() shows the
+    // empty state and _onTick would otherwise index an empty list every second.
+    if (_questions.isNotEmpty) {
+      _visited.add(_currentIndex);
+      _questionEnteredAt = DateTime.now();
+      _startTicker();
+      _startAutosave();
+      if (_phase == _SessionPhase.taking && _remainingSeconds <= 0) {
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _submitTest(auto: true));
+      }
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _ticker?.cancel();
+    _autosaveTimer?.cancel();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_questions.isEmpty || _submitted) return;
+
     if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      // Bank the current question's time and persist before we may be killed.
+      _accrueTimeOnLeave();
+      _questionEnteredAt = null;
       _ticker?.cancel();
       _ticker = null;
-    } else if (state == AppLifecycleState.resumed &&
-        _ticker == null &&
-        !_submitted) {
-      _ticker = Timer.periodic(const Duration(seconds: 1), _onTick);
+      _saveCheckpoint();
+    } else if (state == AppLifecycleState.resumed) {
+      _questionEnteredAt = DateTime.now();
+      if (_phase == _SessionPhase.taking && _remainingSeconds <= 0) {
+        _submitTest(auto: true);
+        return;
+      }
+      if (_phase == _SessionPhase.break_ && _breakRemainingSeconds <= 0) {
+        _advanceToSection(_currentSection + 1);
+        return;
+      }
+      _startTicker();
+      if (mounted) setState(() {});
     }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Setup helpers
+  // ─────────────────────────────────────────────────────────────
+
+  /// Rebuilds the per-section allocation from the checkpoint's saved question
+  /// IDs. Returns null if any ID is missing from the pool (content changed),
+  /// so we fall back to a fresh allocation rather than drift the indices.
+  List<List<Question>>? _rebuildSections(ExamCheckpoint cp) {
+    final byId = {for (final q in widget.questionPool) q.id: q};
+    final rebuilt = <List<Question>>[];
+    for (final ids in cp.sectionQuestionIds) {
+      final sec = <Question>[];
+      for (final id in ids) {
+        final q = byId[id];
+        if (q == null) return null;
+        sec.add(q);
+      }
+      rebuilt.add(sec);
+    }
+    return rebuilt;
+  }
+
+  void _startTicker() {
+    _ticker?.cancel();
+    _ticker = Timer.periodic(const Duration(seconds: 1), _onTick);
+  }
+
+  void _startAutosave() {
+    if (!_checkpointable) return;
+    _autosaveTimer?.cancel();
+    _autosaveTimer =
+        Timer.periodic(const Duration(seconds: 15), (_) => _saveCheckpoint());
+    _saveCheckpoint(); // initial save so a resume card exists immediately
   }
 
   void _skipEmptySections() {
@@ -114,39 +251,60 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   bool get _isLastSection => _currentSection == _sectionQuestions.length - 1;
 
+  bool get _isLastQuestionOverall => widget.config.sectionLock
+      ? _isLastSection && _isLastQuestionInSection
+      : _currentIndex + 1 >= _questions.length;
+
+  // ─────────────────────────────────────────────────────────────
+  // Timekeeping
+  // ─────────────────────────────────────────────────────────────
+
   void _onTick(Timer timer) {
     if (!mounted || _submitted) return;
 
     if (_phase == _SessionPhase.break_) {
-      if (_breakRemaining > 0) {
-        setState(() {
-          _breakRemaining--;
-        });
-        if (_breakRemaining <= 0) {
-          _advanceToSection(_currentSection + 1);
-        }
+      if (_breakRemainingSeconds <= 0) {
+        _advanceToSection(_currentSection + 1);
+      } else {
+        setState(() {}); // repaint break countdown
       }
       return;
     }
 
-    setState(() {
-      _remainingSeconds--;
-      _secondsPerQuestion[_currentIndex] =
-          _secondsPerQuestion[_currentIndex] + 1;
-    });
     if (_remainingSeconds <= 0) {
       _submitTest(auto: true);
+      return;
+    }
+    setState(() {}); // repaint from wall clock — no arithmetic, no drift
+  }
+
+  void _accrueTimeOnLeave() {
+    final enteredAt = _questionEnteredAt;
+    if (enteredAt == null) return;
+    if (_currentIndex >= 0 && _currentIndex < _secondsPerQuestion.length) {
+      final delta = DateTime.now().difference(enteredAt).inSeconds;
+      if (delta > 0 && delta < 86400) {
+        _secondsPerQuestion[_currentIndex] += delta;
+      }
     }
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // Answering & navigation
+  // ─────────────────────────────────────────────────────────────
+
   void _selectAnswer(String option) {
     setState(() {
-      if (_answers[_currentIndex] == option) {
-        _answers.remove(_currentIndex);
-      } else {
-        _answers[_currentIndex] = option;
-      }
+      _answers[_currentIndex] = option;
     });
+    _saveCheckpoint();
+  }
+
+  void _clearResponse() {
+    setState(() {
+      _answers.remove(_currentIndex);
+    });
+    _saveCheckpoint();
   }
 
   void _toggleFlag() {
@@ -157,35 +315,49 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         _flagged.add(_currentIndex);
       }
     });
+    _saveCheckpoint();
+  }
+
+  void _markForReviewAndNext() {
+    setState(() {
+      _flagged.add(_currentIndex);
+    });
+    _saveCheckpoint();
+    _advance();
   }
 
   void _goTo(int globalIndex) {
+    _accrueTimeOnLeave();
     setState(() {
       _currentIndex = globalIndex;
       _currentSection = _sectionOf(globalIndex);
+      _visited.add(globalIndex);
     });
+    _questionEnteredAt = DateTime.now();
+    _saveCheckpoint();
   }
 
-  void _next() {
-    if (!widget.config.sectionLock) {
-      if (_currentIndex + 1 < _questions.length) {
-        _goTo(_currentIndex + 1);
-      }
-      return;
-    }
-    if (!_isLastQuestionInSection) {
-      _goTo(_currentIndex + 1);
-      return;
-    }
-    if (_isLastSection) {
+  /// Save & Next / Next Section / Submit, depending on position.
+  void _advance() {
+    if (_isLastQuestionOverall) {
       _confirmSubmit();
       return;
     }
-    _goToNextSection();
+    if (widget.config.sectionLock && _isLastQuestionInSection) {
+      _goToNextSection();
+      return;
+    }
+    if (_currentIndex + 1 < _questions.length) {
+      _goTo(_currentIndex + 1);
+    }
   }
 
   void _previous() {
-    if (_currentIndex > 0) {
+    // 1.5: respect the section lock — never step before the section's first
+    // question when locked.
+    final lowerBound =
+        widget.config.sectionLock ? _sectionStart[_currentSection] : 0;
+    if (_currentIndex > lowerBound) {
       _goTo(_currentIndex - 1);
     }
   }
@@ -193,33 +365,91 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   void _goToNextSection() {
     if (widget.config.breaksEnabled &&
         _currentSection == widget.config.breakAfterSectionIndex) {
+      _accrueTimeOnLeave();
+      _questionEnteredAt = null;
       setState(() {
         _phase = _SessionPhase.break_;
-        _breakRemaining = widget.config.breakDurationSeconds;
+        _breakDeadline = DateTime.now()
+            .add(Duration(seconds: widget.config.breakDurationSeconds));
       });
+      _saveCheckpoint();
       return;
     }
     _advanceToSection(_currentSection + 1);
   }
 
   void _advanceToSection(int index) {
-    if (index >= _sectionQuestions.length) {
+    _accrueTimeOnLeave();
+    var target = index;
+    while (target < _sectionQuestions.length &&
+        _sectionQuestions[target].isEmpty) {
+      target++;
+    }
+    if (target >= _sectionQuestions.length) {
       _confirmSubmit();
       return;
     }
     setState(() {
-      _currentSection = index;
-      _currentIndex = _sectionStart[index];
+      _currentSection = target;
+      _currentIndex = _sectionStart[target];
+      _visited.add(_currentIndex);
       _phase = _SessionPhase.taking;
+      _breakDeadline = null;
     });
+    _questionEnteredAt = DateTime.now();
+    _saveCheckpoint();
   }
 
   void _skipBreak() {
     _advanceToSection(_currentSection + 1);
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // Checkpointing
+  // ─────────────────────────────────────────────────────────────
+
+  void _saveCheckpoint() {
+    if (!_checkpointable || _submitted || !mounted || _questions.isEmpty) {
+      return;
+    }
+    final cp = ExamCheckpoint(
+      attemptId: _attemptId,
+      configJson: widget.config.toJson(),
+      sectionQuestionIds: [
+        for (final sec in _sectionQuestions) [for (final q in sec) q.id],
+      ],
+      answersByIndex: {
+        for (int i = 0; i < _questions.length; i++) i: _answers[i],
+      },
+      flagged: _flagged.toList(),
+      visited: _visited.toList(),
+      currentIndex: _currentIndex,
+      currentSection: _currentSection,
+      phase: _phase == _SessionPhase.break_ ? 'break_' : 'taking',
+      deadlineEpochMs: _deadline.millisecondsSinceEpoch,
+      breakDeadlineEpochMs: _breakDeadline?.millisecondsSinceEpoch,
+      startedAtEpochMs: _startedAt.millisecondsSinceEpoch,
+      savedAtEpochMs: DateTime.now().millisecondsSinceEpoch,
+    );
+    // Fire-and-forget; a failed autosave must never interrupt the test.
+    ref.read(examCheckpointServiceProvider).save(cp).catchError((_) {});
+  }
+
+  Future<void> _clearCheckpoint() async {
+    if (!_checkpointable) return;
+    try {
+      await ref.read(examCheckpointServiceProvider).clear();
+    } catch (_) {}
+    ref.invalidate(activeCbtCheckpointProvider);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Submission
+  // ─────────────────────────────────────────────────────────────
+
   Future<void> _confirmSubmit() async {
     if (_submitting || _submitted) return;
+    _confirmDialogOpen = true;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -240,46 +470,62 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         ],
       ),
     );
-    if (confirmed == true && context.mounted) {
+    _confirmDialogOpen = false;
+    // The deadline may have fired (auto-submit) while the dialog was open.
+    if (_submitted || !mounted) return;
+    if (confirmed == true) {
       await _submitTest();
     }
   }
 
   Future<void> _submitTest({bool auto = false}) async {
-    if (_submitting || _submitted) return;
-    _submitting = true;
+    if (_submitted) return;
+    _submitted = true; // 1.6: synchronous guard — exactly one submit
+    _accrueTimeOnLeave();
+    _questionEnteredAt = null;
     _ticker?.cancel();
     _ticker = null;
+    _autosaveTimer?.cancel();
+    _autosaveTimer = null;
+    if (mounted) setState(() => _submitting = true);
 
-    final timeSpent =
-        widget.config.totalDurationSeconds - _remainingSeconds;
+    final elapsed = widget.config.totalDurationSeconds - _remainingSeconds;
+    final timeSpent = elapsed < 0 ? 0 : elapsed;
+
     final score = ExamEngineService.grade(
       config: widget.config,
-      questions: _questions,
+      sectionQuestions: _sectionQuestions,
       answersByIndex: _answers,
     );
     final analytics = TestAnalyticsService.compute(
       score: score,
       secondsPerQuestion: _secondsPerQuestion,
     );
+
+    // 2.3: per-section correct counts keyed by section name (analytics.subjects
+    // is now section-keyed, so Botany and Zoology stay distinct).
+    final subjectScores = {
+      for (final entry in analytics.subjects.entries)
+        entry.key: entry.value.correct,
+    };
+
     final attempt = QuizAttempt(
-      id: 'cbt_${DateTime.now().millisecondsSinceEpoch}',
+      id: _attemptId,
       topicId: widget.config.topicId,
       subject: widget.config.subjectLabel,
       testType: widget.config.testType,
-      subjectScores: {
-        for (final entry in analytics.subjects.entries)
-          entry.key: entry.value.correct,
-      },
+      subjectScores: subjectScores,
       score: score.correct,
       incorrectCount: score.incorrect,
       totalQuestions: score.results.length,
-      timeSpentSeconds: timeSpent < 0 ? 0 : timeSpent,
+      timeSpentSeconds: timeSpent,
       attemptedAt: DateTime.now(),
       selectedAnswers: List.generate(
         _questions.length,
         (i) => _answers[i] ?? '',
       ),
+      rawScore: score.rawScore,
+      maxMarks: score.maxScore,
     );
 
     await ref.read(userProgressProvider.notifier).recordQuizAttempt(
@@ -287,14 +533,23 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
           questions: _questions,
           answersByIndex: _answers,
         );
+    await _clearCheckpoint();
 
     if (!mounted) return;
-    _submitted = true;
+    // Close the confirm dialog if the deadline fired while it was open.
+    if (_confirmDialogOpen && Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      _confirmDialogOpen = false;
+    }
     context.go('/cbt/result', extra: {
       'attempt': attempt,
       'analytics': analytics,
     });
   }
+
+  // ─────────────────────────────────────────────────────────────
+  // UI
+  // ─────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +559,11 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         body: const Center(
           child: Padding(
             padding: EdgeInsets.all(24),
-            child: Text('No questions available for this test.'),
+            child: Text(
+              'No questions available for this test.\n\n'
+              'Import or sync more questions and try again.',
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       );
@@ -339,16 +598,18 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         );
         if (exit == true && context.mounted) {
           _ticker?.cancel();
-          context.pop();
+          _autosaveTimer?.cancel();
+          await _clearCheckpoint();
+          if (context.mounted) context.pop();
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.surfaceWarm,
+        backgroundColor: AdaptiveColors.surfaceWarm(context),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.close, color: AppColors.textDark),
+            icon: Icon(Icons.close, color: AdaptiveColors.textPrimary(context)),
             onPressed: () => Navigator.maybePop(context),
           ),
           title: Column(
@@ -358,8 +619,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
                 widget.config.mode == ExamMode.neet
                     ? 'NEET Mock Test'
                     : 'CBT Practice',
-                style: const TextStyle(
-                  color: AppColors.textDark,
+                style: TextStyle(
+                  color: AdaptiveColors.textPrimary(context),
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
@@ -369,8 +630,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
                     ? 'Section ${_currentSection + 1} of '
                         '${_sectionQuestions.length} • ${_activeSection.name}'
                     : _activeSection.name,
-                style: const TextStyle(
-                  color: AppColors.textSubtle,
+                style: TextStyle(
+                  color: AdaptiveColors.textSecondary(context),
                   fontSize: 12,
                 ),
               ),
@@ -412,7 +673,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   }
 
   Widget _buildTimerBar() {
-    final remaining = _remainingSeconds < 0 ? 0 : _remainingSeconds;
+    final remaining = _remainingSeconds;
     final total = widget.config.totalDurationSeconds;
     final progress = total <= 0 ? 1.0 : remaining / total;
     final color = remaining < 300
@@ -422,7 +683,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             : AppColors.primary;
 
     return Container(
-      color: AppColors.surface,
+      color: AdaptiveColors.surface(context),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       child: Column(
         children: [
@@ -433,7 +694,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
                 'Time Remaining',
                 style: Theme.of(
                   context,
-                ).textTheme.labelSmall?.copyWith(color: AppColors.textSubtle),
+                ).textTheme.labelSmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
               ),
               Text(
                 _formatTime(remaining),
@@ -450,7 +711,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             value: progress.clamp(0.0, 1.0),
             minHeight: 6,
             borderRadius: BorderRadius.circular(3),
-            backgroundColor: AppColors.divider,
+            backgroundColor: AdaptiveColors.divider(context),
             valueColor: AlwaysStoppedAnimation(color),
           ),
         ],
@@ -492,18 +753,38 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
                 child: Text(
                   question.chapter,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.textSubtle,
+                  style: TextStyle(
+                    color: AdaptiveColors.textSecondary(context),
                     fontSize: 12,
                   ),
                 ),
               ),
               Text(
                 'Q${_currentIndex + 1}/${_questions.length}',
-                style: const TextStyle(
-                  color: AppColors.textSubtle,
+                style: TextStyle(
+                  color: AdaptiveColors.textSecondary(context),
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+              // Bookmark-style flag toggle: mark/unmark for review without
+              // leaving the question (Mark & Next below both flags and advances).
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                tooltip: _flagged.contains(_currentIndex)
+                    ? 'Unmark for review'
+                    : 'Mark for review',
+                onPressed: _toggleFlag,
+                icon: Icon(
+                  _flagged.contains(_currentIndex)
+                      ? Icons.flag
+                      : Icons.flag_outlined,
+                  size: 18,
+                  color: _flagged.contains(_currentIndex)
+                      ? _cMarked
+                      : AdaptiveColors.textSecondary(context),
                 ),
               ),
             ],
@@ -512,7 +793,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
           Text(
             question.questionText,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.textDark,
+              color: AdaptiveColors.textPrimary(context),
               fontWeight: FontWeight.w600,
               height: 1.4,
             ),
@@ -524,7 +805,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: _buildOptionTile(
-                label: _optionLabels[i],
+                label: i < _optionLabels.length ? _optionLabels[i] : '${i + 1}',
                 option: option,
                 isSelected: isSelected,
                 onTap: () => _selectAnswer(option),
@@ -542,10 +823,10 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    final borderColor = isSelected ? AppColors.primary : AppColors.divider;
+    final borderColor = isSelected ? AdaptiveColors.primary(context) : AdaptiveColors.divider(context);
     final bgColor = isSelected
-        ? AppColors.primary.withValues(alpha: 0.08)
-        : AppColors.surface;
+        ? AdaptiveColors.primary(context).withValues(alpha: 0.08)
+        : AdaptiveColors.surface(context);
 
     return Material(
       color: bgColor,
@@ -567,11 +848,11 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.primary
-                      : AppColors.background,
+                      ? AdaptiveColors.primary(context)
+                      : AdaptiveColors.background(context),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : AppColors.divider,
+                    color: isSelected ? AdaptiveColors.primary(context) : AdaptiveColors.divider(context),
                   ),
                 ),
                 child: Text(
@@ -581,7 +862,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
                     fontWeight: FontWeight.bold,
                     color: isSelected
                         ? Colors.white
-                        : AppColors.textSubtle,
+                        : AdaptiveColors.textSecondary(context),
                   ),
                 ),
               ),
@@ -589,17 +870,17 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               Expanded(
                 child: Text(
                   option,
-                  style: const TextStyle(
-                    color: AppColors.textDark,
+                  style: TextStyle(
+                    color: AdaptiveColors.textPrimary(context),
                     fontSize: 14,
                     height: 1.35,
                   ),
                 ),
               ),
               if (isSelected)
-                const Icon(
+                Icon(
                   Icons.check_circle,
-                  color: AppColors.primary,
+                  color: AdaptiveColors.primary(context),
                   size: 20,
                 ),
             ],
@@ -618,12 +899,18 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             _sectionQuestions[_currentSection].length
         : _questions.length;
 
+    final hasAnswer = _answers.containsKey(_currentIndex);
+    final lowerBound =
+        widget.config.sectionLock ? _sectionStart[_currentSection] : 0;
+
     return Container(
-      color: AppColors.surface,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      color: AdaptiveColors.surface(context),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          _buildPaletteLegend(),
+          const SizedBox(height: 8),
           SizedBox(
             height: 44,
             child: ListView.separated(
@@ -636,47 +923,45 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               },
             ),
           ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: hasAnswer ? _clearResponse : null,
+                  icon: const Icon(Icons.backspace_outlined, size: 16),
+                  label: const Text('Clear', overflow: TextOverflow.ellipsis),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _markForReviewAndNext,
+                  icon: Icon(
+                    _flagged.contains(_currentIndex)
+                        ? Icons.flag
+                        : Icons.flag_outlined,
+                    size: 16,
+                    color: _cMarked,
+                  ),
+                  label: const Text(
+                    'Mark & Next',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
           Row(
             children: [
-              _buildControlButton(
-                icon: Icons.flag_outlined,
-                label: _flagged.contains(_currentIndex) ? 'Flagged' : 'Flag',
-                color: _flagged.contains(_currentIndex)
-                    ? AppColors.warning
-                    : AppColors.textSubtle,
-                onTap: _toggleFlag,
-              ),
-              const Spacer(),
               IconButton(
-                onPressed: _currentIndex > 0 ? _previous : null,
+                onPressed: _currentIndex > lowerBound ? _previous : null,
                 icon: const Icon(Icons.chevron_left),
                 tooltip: 'Previous',
               ),
-              const SizedBox(width: 4),
-              if (widget.config.sectionLock &&
-                  _isLastQuestionInSection &&
-                  !_isLastSection)
-                ElevatedButton(
-                  onPressed: _goToNextSection,
-                  child: Text(
-                    widget.config.breaksEnabled &&
-                            _currentSection ==
-                                widget.config.breakAfterSectionIndex
-                        ? 'Break ▸'
-                        : 'Next Section ▸',
-                  ),
-                )
-              else
-                ElevatedButton.icon(
-                  onPressed: _next,
-                  icon: const Icon(Icons.chevron_right),
-                  label: Text(
-                    widget.config.sectionLock && _isLastSection
-                        ? 'Submit'
-                        : 'Next',
-                  ),
-                ),
+              const Spacer(),
+              _buildPrimaryAdvanceButton(),
             ],
           ),
         ],
@@ -684,24 +969,84 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     );
   }
 
+  Widget _buildPrimaryAdvanceButton() {
+    if (_isLastQuestionOverall) {
+      return ElevatedButton.icon(
+        onPressed: _confirmSubmit,
+        icon: const Icon(Icons.check_circle_outline),
+        label: const Text('Submit'),
+      );
+    }
+    if (widget.config.sectionLock && _isLastQuestionInSection) {
+      final isBreak = widget.config.breaksEnabled &&
+          _currentSection == widget.config.breakAfterSectionIndex;
+      return ElevatedButton(
+        onPressed: _goToNextSection,
+        child: Text(isBreak ? 'Break ▸' : 'Next Section ▸'),
+      );
+    }
+    return ElevatedButton.icon(
+      onPressed: _advance,
+      icon: const Icon(Icons.chevron_right),
+      label: const Text('Save & Next'),
+    );
+  }
+
+  Widget _buildPaletteLegend() {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 4,
+      alignment: WrapAlignment.center,
+      children: [
+        _legendDot(AppColors.success, 'Answered'),
+        _legendDot(AppColors.error, 'Not answered'),
+        _legendDot(_cMarked, 'Marked'),
+        _legendDot(AdaptiveColors.divider(context), 'Not visited'),
+      ],
+    );
+  }
+
+  Widget _legendDot(Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: AdaptiveColors.textSecondary(context),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPaletteChip(int globalIndex) {
     final isCurrent = globalIndex == _currentIndex;
     final isAnswered = _answers.containsKey(globalIndex);
     final isFlagged = _flagged.contains(globalIndex);
+    final isVisited = _visited.contains(globalIndex);
 
-    Color bg = AppColors.background;
-    Color fg = AppColors.textDark;
-    if (isAnswered) {
-      bg = AppColors.primary;
-      fg = Colors.white;
-    }
-    if (isCurrent) {
-      bg = AppColors.warning.withValues(alpha: 0.9);
-      fg = Colors.white;
-    }
-    if (isFlagged && !isCurrent) {
-      bg = AppColors.warning;
-      fg = Colors.white;
+    // Five NTA-style states.
+    Color bg;
+    Color fg = Colors.white;
+    if (isAnswered && isFlagged) {
+      bg = AppColors.success; // answered + marked (badge added below)
+    } else if (isAnswered) {
+      bg = AppColors.success;
+    } else if (isFlagged) {
+      bg = _cMarked;
+    } else if (isVisited) {
+      bg = AppColors.error;
+    } else {
+      bg = AdaptiveColors.background(context);
+      fg = AdaptiveColors.textPrimary(context);
     }
 
     return InkWell(
@@ -713,41 +1058,47 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         _goTo(globalIndex);
       },
       borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: 36,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isCurrent ? AppColors.primary : AppColors.divider,
-            width: isCurrent ? 2 : 1,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isCurrent
+                    ? AdaptiveColors.primary(context)
+                    : AdaptiveColors.divider(context),
+                width: isCurrent ? 2.5 : 1,
+              ),
+            ),
+            child: Text(
+              '${globalIndex + 1}',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: fg,
+              ),
+            ),
           ),
-        ),
-        child: Text(
-          '${globalIndex + 1}',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: fg,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControlButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return TextButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, color: color, size: 18),
-      label: Text(
-        label,
-        style: TextStyle(color: color, fontSize: 12),
+          if (isAnswered && isFlagged)
+            Positioned(
+              right: -3,
+              top: -3,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: _cMarked,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 1),
+                ),
+                child: const Icon(Icons.flag, size: 8, color: Colors.white),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -769,7 +1120,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               'Break Time',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.textDark,
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -778,15 +1129,15 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               'Stretch, hydrate, and get ready for the next section.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSubtle,
+                color: AdaptiveColors.textSecondary(context),
               ),
             ),
             const SizedBox(height: 28),
             Text(
-              _formatTime(_breakRemaining),
+              _formatTime(_breakRemainingSeconds),
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
@@ -795,7 +1146,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               'Next section starts automatically',
               style: Theme.of(
                 context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textSubtle),
+              ).textTheme.bodySmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
             ),
             const SizedBox(height: 28),
             OutlinedButton.icon(

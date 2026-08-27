@@ -12,6 +12,10 @@ class QuizAttempts extends Table {
   TextColumn get selectedAnswers => text()(); // stored as JSON array string
   TextColumn get testType => text().withDefault(const Constant("topic"))();
   TextColumn get subjectScores => text().nullable()(); // stored as JSON map string
+  // Persisted ±marks so history reflects the real scoring scheme instead of
+  // re-deriving it with a hardcoded formula. Nullable for pre-v22 rows.
+  IntColumn get rawScore => integer().nullable()();
+  IntColumn get maxMarks => integer().nullable()();
   DateTimeColumn get updatedAt =>
       dateTime().nullable().clientDefault(() => DateTime.now())();
 }
