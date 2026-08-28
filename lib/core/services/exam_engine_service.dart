@@ -403,9 +403,11 @@ class ExamEngineService {
     List<Question> pool,
     ExamConfig config, {
     int? seed,
+    Set<String>? excludedIds,
   }) {
-    final remaining = List<Question>.from(pool)
-      ..shuffle(Random(seed ?? DateTime.now().millisecondsSinceEpoch));
+    var remaining = pool.where((q) => excludedIds == null || !excludedIds.contains(q.id)).toList();
+    if (remaining.isEmpty) remaining = List<Question>.from(pool);
+    remaining.shuffle(Random(seed ?? DateTime.now().millisecondsSinceEpoch));
     final allocated =
         List.generate(config.sections.length, (_) => <Question>[]);
     final takenIds = <String>{};
