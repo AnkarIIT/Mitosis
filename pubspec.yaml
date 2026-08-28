@@ -31,7 +31,7 @@ dependencies:
   shared_preferences: ^2.5.5
   flutter_secure_storage: ^10.2.0
   supabase_flutter: ^2.12.4
-  flutter_dotenv: ^2.0.0
+  flutter_dotenv: ^6.0.1
   internet_connection_checker: ^1.0.0+1
   
   # UI & UX Components
@@ -48,6 +48,7 @@ dependencies:
   intl: ^0.18.1
   permission_handler: ^11.3.1
   crypto: ^3.0.7
+  google_sign_in: ^6.2.1
   flutter_hooks: ^0.21.3+1
   state_notifier: ^1.0.0
   http: ^1.5.0
