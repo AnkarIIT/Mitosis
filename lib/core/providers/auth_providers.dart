@@ -6,6 +6,7 @@ import '../config/app_config.dart';
 import '../services/auth_service.dart';
 import '../services/email_service.dart';
 import '../services/cloud_sync_service.dart';
+import '../services/google_auth_service.dart';
 import 'core_providers.dart';
 
 final emailServiceProvider = Provider<EmailService>((ref) {
@@ -16,6 +17,11 @@ final authServiceProvider = Provider<AuthService>((ref) {
   final database = ref.watch(databaseProvider);
   final emailService = ref.watch(emailServiceProvider);
   return AuthService(database, emailService);
+});
+
+final googleAuthServiceProvider = Provider<GoogleAuthService>((ref) {
+  final database = ref.watch(databaseProvider);
+  return GoogleAuthService(database);
 });
 
 final cloudSyncServiceProvider = Provider<CloudSyncService?>((ref) {
@@ -80,10 +86,13 @@ class AuthState {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService;
+  final GoogleAuthService _googleAuthService;
   final db.AppDatabase _db;
   final Ref _ref;
 
-  AuthNotifier(this._authService, this._db, this._ref) : super(AuthState()) {
+  AuthNotifier(this._authService, this._db, this._ref, [GoogleAuthService? googleAuthService])
+      : _googleAuthService = googleAuthService ?? GoogleAuthService(_db),
+        super(AuthState()) {
     checkAuth();
   }
 
@@ -288,12 +297,50 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     await _authService.logout();
+    await _googleAuthService.signOut();
     state = AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  Future<bool> signInWithGoogle() async {
+    if (!AppConfig.googleSignInAvailable) {
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        error: 'Google sign-in is not configured.',
+      );
+      return false;
+    }
+
+    state = state.copyWith(status: AuthStatus.authenticating, error: null);
+    final result = await _googleAuthService.signInWithGoogle();
+    if (result.success) {
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: result.user,
+        isGuest: false,
+        error: null,
+      );
+      _ref.read(cloudSyncServiceProvider)?.syncAll();
+      return true;
+    }
+
+    state = state.copyWith(
+      status: AuthStatus.unauthenticated,
+      error: result.message,
+      isGuest: false,
+    );
+    return false;
+  }
+
+  Future<({bool success, String message})> deleteAccount() async {
+    await _authService.deleteAccount();
+    state = AuthState(status: AuthStatus.unauthenticated);
+    return (success: true, message: 'Account deleted');
   }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final authService = ref.watch(authServiceProvider);
   final db = ref.watch(databaseProvider);
-  return AuthNotifier(authService, db, ref);
+  final googleAuthService = ref.watch(googleAuthServiceProvider);
+  return AuthNotifier(authService, db, ref, googleAuthService);
 });
