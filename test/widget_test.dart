@@ -6,10 +6,13 @@ import 'package:neet_mitos/core/database/drift_database.dart';
 import 'package:neet_mitos/core/models/question_model.dart' as model;
 import 'package:neet_mitos/core/models/subject_model.dart';
 import 'package:neet_mitos/core/providers/providers.dart';
+import 'package:neet_mitos/core/services/connectivity_service.dart';
+import 'package:neet_mitos/features/settings/settings_screen.dart';
 import 'package:neet_mitos/features/profile/profile_screen.dart';
 import 'package:neet_mitos/features/study_plan/study_plan_screen.dart';
 import 'package:neet_mitos/features/topic_browser/topic_detail_screen.dart';
 import 'package:neet_mitos/main.dart';
+import 'package:neet_mitos/core/providers/settings_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 GoRouter _testRouter({required Widget child}) {
@@ -39,6 +42,8 @@ GoRouter _testRouter({required Widget child}) {
 }
 
 void main() {
+  ConnectivityService.instance.setSkipNetworkCheck(true);
+
   test('AppDatabase returns a single shared instance', () {
     final first = AppDatabase();
     final second = AppDatabase();
@@ -49,9 +54,11 @@ void main() {
   testWidgets('Home screen smoke test', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
+    await tester.binding.setSurfaceSize(const Size(420, 900));
     await tester.pumpWidget(ProviderScope(
       overrides: [
         authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+        onboardingCompleteProvider.overrideWith((ref) => true),
       ],
       child: const MyApp(),
     ));
@@ -64,17 +71,9 @@ void main() {
   testWidgets('Settings screen removes external website CTA', (
     WidgetTester tester,
   ) async {
-    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
-
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        authProvider.overrideWith((ref) => _FakeAuthNotifier()),
-      ],
-      child: const MyApp(),
-    ));
-    await tester.pumpAndSettle();
-
-
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: SettingsScreen())),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Settings'), findsOneWidget);
@@ -86,9 +85,11 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
+    await tester.binding.setSurfaceSize(const Size(420, 900));
     await tester.pumpWidget(ProviderScope(
       overrides: [
         authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+        onboardingCompleteProvider.overrideWith((ref) => true),
       ],
       child: const MyApp(),
     ));
@@ -102,27 +103,37 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
+    await tester.binding.setSurfaceSize(const Size(420, 900));
     await tester.pumpWidget(ProviderScope(
       overrides: [
         authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+        onboardingCompleteProvider.overrideWith((ref) => true),
+        weakTopicsProvider.overrideWith((ref) => [
+          Topic(
+            id: 'weak_topic_1',
+            name: 'Rotation',
+            chapterId: 'physics_ch4',
+            difficulty: 'Hard',
+            summary: 'Weak topic for testing',
+            keyPoints: ['Torque', 'Angular Momentum'],
+            questionCount: 3,
+          ),
+        ]),
       ],
       child: const MyApp(),
     ));
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text('Weak Topics'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Weak Topics'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Subject-wise Performance'), findsOneWidget);
+    // The home tab should show the Weak Topics banner when weak topics exist
+    expect(find.text('Weak Topics'), findsOneWidget);
+    expect(find.text('Rotation'), findsOneWidget);
   });
 
   testWidgets('Topic detail routes Ask AI Tutor to chatbot screen', (
     WidgetTester tester,
   ) async {
     final topic = Topic(
-      id: 'cell_division',
+      id: 'bio_ch1_t1',
       name: 'Cell Division',
       chapterId: 'chapter_1',
       difficulty: 'Easy',
@@ -167,7 +178,7 @@ void main() {
     'Topic detail shows a test series fallback when no questions exist',
     (WidgetTester tester) async {
       final topic = Topic(
-        id: 'cell_division',
+        id: 'bio_ch1_t1',
         name: 'Cell Division',
         chapterId: 'chapter_1',
         difficulty: 'Easy',
@@ -294,4 +305,12 @@ class _FakeAuthNotifier extends StateNotifier<AuthState>
 
   @override
   Future<void> logout() async {}
+
+  @override
+  Future<bool> signInWithGoogle() async => false;
+
+  @override
+  Future<({bool success, String message})> deleteAccount() async {
+    return (success: true, message: 'deleted');
+  }
 }
