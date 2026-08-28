@@ -154,8 +154,8 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
 
       // Attempt insert + error-book + spaced-repetition writes are one atomic
       // unit, so a mid-write failure can't leave a half-recorded attempt.
-      await _db.transaction(() async {
-        await _db.insertQuizAttempt(
+      await _db.transaction<int>(() async {
+        final id = await _db.insertQuizAttempt(
           db.QuizAttemptsCompanion.insert(
             topicId: attempt.topicId,
             subject: attempt.subject,
@@ -173,6 +173,9 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
             selectedAnswers: jsonEncode(attempt.selectedAnswers),
             rawScore: Value(attempt.rawScore),
             maxMarks: Value(attempt.maxMarks),
+            questionIds: Value(
+              jsonEncode(sourceQuestions.map((q) => q.id).toList()),
+            ),
           ),
         );
 
@@ -201,6 +204,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
           await _db.upsertSpacedRepetition(nextCard);
           srTouched = true;
         }
+        return id;
       });
 
       if (srTouched) {
