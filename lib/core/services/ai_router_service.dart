@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/chat_context.dart';
-import '../providers/providers.dart';
 import 'gemini_proxy_service.dart';
 
 enum AiSource { rag, groq, gemini, onDevice, error, offline }
@@ -32,10 +31,9 @@ class AiResponse {
 }
 
 class AiRouterService {
-  final Ref _ref;
   final GeminiProxyService _geminiProxy;
 
-  AiRouterService(this._ref) 
+  AiRouterService()
       : _geminiProxy = GeminiProxyService();
 
   double _calculateConfidence(AiSource source, {double ragScore = 0.0}) {
@@ -98,5 +96,5 @@ class AiRouterService {
 }
 
 final aiRouterProvider = Provider<AiRouterService>((ref) {
-  return AiRouterService(ref);
+  return AiRouterService();
 });
