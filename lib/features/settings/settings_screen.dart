@@ -279,6 +279,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  Future<void> _downloadPyqs() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final downloader = ref.read(pyqDownloaderProvider);
+    
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Downloading NEET PYQs... This may take a while.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    
+    try {
+      final count = await downloader.downloadAll();
+      if (!mounted) return;
+      
+      if (count > 0) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Successfully downloaded $count NEET PYQ questions!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('No new questions downloaded. Sources may be unavailable.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Download failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
@@ -507,6 +548,16 @@ trailing: Text(
               onTap: () {
                 context.push('/settings/import');
               },
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(
+                Icons.download_outlined,
+                color: AppColors.primary,
+              ),
+              title: const Text('Download NEET PYQs'),
+              subtitle: const Text('Fetch previous year questions from configured sources'),
+              onTap: _downloadPyqs,
             ),
             const Divider(height: 1),
             ListTile(
