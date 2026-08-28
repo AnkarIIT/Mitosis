@@ -16,6 +16,7 @@ import 'tables/evaluations_table.dart';
 import 'tables/sync_watermarks_table.dart';
 import 'tables/spaced_repetition_table.dart';
 import 'tables/flashcards_table.dart';
+import 'tables/dpp_tables.dart';
 
 part 'drift_database.g.dart';
 
@@ -33,6 +34,8 @@ part 'drift_database.g.dart';
     SyncWatermarks,
     SpacedRepetition,
     Flashcards,
+    DppSets,
+    DppQuestions,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -51,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 22;
+  int get schemaVersion => 23;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -238,6 +241,18 @@ class AppDatabase extends _$AppDatabase {
         await _addColumnSafely(
             m, quizAttempts, (quizAttempts as dynamic).maxMarks);
       }
+      if (from < 23) {
+        // Track which question IDs were presented per attempt so later
+        // sessions can exclude them and avoid repeats across quizzes/mocks.
+        await _addColumnSafely(
+            m, quizAttempts, (quizAttempts as dynamic).questionIds);
+        // Mark the origin of each question: bundled sample, downloaded PYQ,
+        // generated DPP, or user-imported file.
+        await _addColumnSafely(m, questions, (questions as dynamic).source);
+        // Daily Practice Paper tables.
+        await m.createTable(dppSets);
+        await m.createTable(dppQuestions);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign keys
@@ -361,7 +376,7 @@ class AppDatabase extends _$AppDatabase {
 
   // ============= QUIZ ATTEMPTS =============
 
-  Future<void> insertQuizAttempt(Insertable<QuizAttempt> attempt) =>
+  Future<int> insertQuizAttempt(Insertable<QuizAttempt> attempt) =>
       into(quizAttempts).insert(attempt);
 
   Future<void> upsertQuizAttempt(QuizAttemptsCompanion attempt) async {
@@ -528,6 +543,53 @@ class AppDatabase extends _$AppDatabase {
   Future<void> deleteFlashcardsByChapter(String chapterId) =>
       (delete(flashcards)..where((t) => t.chapterId.equals(chapterId))).go();
 
+  // ============= QUIZ ATTEMPT QUESTION IDS =============
+
+  Future<List> getRecentQuizAttempts(int maxAttempts) async {
+    final query = select(quizAttempts)
+      ..orderBy([(t) => OrderingTerm(expression: t.attemptedAt, mode: OrderingMode.desc)])
+      ..limit(maxAttempts);
+    return query.get();
+  }
+
+  Future<void> updateQuizAttemptQuestionIds(int attemptId, String questionIdsJson) async {
+    await (update(quizAttempts)..where((t) => t.id.equals(attemptId))).write(
+      QuizAttemptsCompanion(
+        questionIds: Value(questionIdsJson),
+      ),
+    );
+  }
+
+  // ============= DPP SETS =============
+
+  Future<List> getDppSets() => select(dppSets).get();
+
+  Future getTodayDppSet(String subject) async {
+    final today = DateTime.now();
+    final dateStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final query = select(dppSets)
+      ..where((t) => t.date.equals(dateStr) & t.subject.equals(subject));
+    return query.getSingleOrNull();
+  }
+
+  Future<int> insertDppSet(dppSet) => into(dppSets).insert(dppSet);
+
+  Future<void> updateDppSet(dppSet) async {
+    await update(dppSets).replace(dppSet);
+  }
+
+  Future<List> getDppQuestions(int dppSetId) async {
+    final query = select(dppQuestions)
+      ..where((t) => t.dppSetId.equals(dppSetId));
+    return query.get();
+  }
+
+  Future<void> insertDppQuestions(List questions) async {
+    await batch((batch) {
+      batch.insertAll(dppQuestions, questions as Iterable<Insertable>);
+    });
+  }
+
   // ============= RESET DATA =============
 
   Future<void> clearAllProgress() async {
@@ -539,6 +601,8 @@ class AppDatabase extends _$AppDatabase {
       await delete(spacedRepetition).go();
       await delete(errorBook).go();
       await delete(flashcards).go();
+      await delete(dppSets).go();
+      await delete(dppQuestions).go();
     });
   }
 }

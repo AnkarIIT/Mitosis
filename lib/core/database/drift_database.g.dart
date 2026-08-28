@@ -204,6 +204,16 @@ class $QuestionsTable extends Questions
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('seeded'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -224,6 +234,7 @@ class $QuestionsTable extends Questions
     remoteId,
     updatedAt,
     isActive,
+    source,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -368,6 +379,12 @@ class $QuestionsTable extends Questions
         isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
       );
     }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    }
     return context;
   }
 
@@ -449,6 +466,10 @@ class $QuestionsTable extends Questions
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
       )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
     );
   }
 
@@ -484,6 +505,9 @@ class Question extends DataClass implements Insertable<Question> {
 
   /// False once a catalog question is removed/deactivated on the server.
   final bool isActive;
+
+  /// Origin of the question: 'seeded', 'pyq', 'dpp', 'imported'.
+  final String source;
   const Question({
     required this.id,
     required this.subject,
@@ -503,6 +527,7 @@ class Question extends DataClass implements Insertable<Question> {
     this.remoteId,
     this.updatedAt,
     required this.isActive,
+    required this.source,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -539,6 +564,7 @@ class Question extends DataClass implements Insertable<Question> {
       map['updated_at'] = Variable<DateTime>(updatedAt);
     }
     map['is_active'] = Variable<bool>(isActive);
+    map['source'] = Variable<String>(source);
     return map;
   }
 
@@ -572,6 +598,7 @@ class Question extends DataClass implements Insertable<Question> {
           ? const Value.absent()
           : Value(updatedAt),
       isActive: Value(isActive),
+      source: Value(source),
     );
   }
 
@@ -599,6 +626,7 @@ class Question extends DataClass implements Insertable<Question> {
       remoteId: serializer.fromJson<String?>(json['remoteId']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
       isActive: serializer.fromJson<bool>(json['isActive']),
+      source: serializer.fromJson<String>(json['source']),
     );
   }
   @override
@@ -623,6 +651,7 @@ class Question extends DataClass implements Insertable<Question> {
       'remoteId': serializer.toJson<String?>(remoteId),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
       'isActive': serializer.toJson<bool>(isActive),
+      'source': serializer.toJson<String>(source),
     };
   }
 
@@ -645,6 +674,7 @@ class Question extends DataClass implements Insertable<Question> {
     Value<String?> remoteId = const Value.absent(),
     Value<DateTime?> updatedAt = const Value.absent(),
     bool? isActive,
+    String? source,
   }) => Question(
     id: id ?? this.id,
     subject: subject ?? this.subject,
@@ -666,6 +696,7 @@ class Question extends DataClass implements Insertable<Question> {
     remoteId: remoteId.present ? remoteId.value : this.remoteId,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
     isActive: isActive ?? this.isActive,
+    source: source ?? this.source,
   );
   Question copyWithCompanion(QuestionsCompanion data) {
     return Question(
@@ -697,6 +728,7 @@ class Question extends DataClass implements Insertable<Question> {
       remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      source: data.source.present ? data.source.value : this.source,
     );
   }
 
@@ -720,7 +752,8 @@ class Question extends DataClass implements Insertable<Question> {
           ..write('type: $type, ')
           ..write('remoteId: $remoteId, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('isActive: $isActive')
+          ..write('isActive: $isActive, ')
+          ..write('source: $source')
           ..write(')'))
         .toString();
   }
@@ -745,6 +778,7 @@ class Question extends DataClass implements Insertable<Question> {
     remoteId,
     updatedAt,
     isActive,
+    source,
   );
   @override
   bool operator ==(Object other) =>
@@ -767,7 +801,8 @@ class Question extends DataClass implements Insertable<Question> {
           other.type == this.type &&
           other.remoteId == this.remoteId &&
           other.updatedAt == this.updatedAt &&
-          other.isActive == this.isActive);
+          other.isActive == this.isActive &&
+          other.source == this.source);
 }
 
 class QuestionsCompanion extends UpdateCompanion<Question> {
@@ -789,6 +824,7 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
   final Value<String?> remoteId;
   final Value<DateTime?> updatedAt;
   final Value<bool> isActive;
+  final Value<String> source;
   final Value<int> rowid;
   const QuestionsCompanion({
     this.id = const Value.absent(),
@@ -809,6 +845,7 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
     this.remoteId = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isActive = const Value.absent(),
+    this.source = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   QuestionsCompanion.insert({
@@ -830,6 +867,7 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
     this.remoteId = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isActive = const Value.absent(),
+    this.source = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        subject = Value(subject),
@@ -857,6 +895,7 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
     Expression<String>? remoteId,
     Expression<DateTime>? updatedAt,
     Expression<bool>? isActive,
+    Expression<String>? source,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -878,6 +917,7 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
       if (remoteId != null) 'remote_id': remoteId,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isActive != null) 'is_active': isActive,
+      if (source != null) 'source': source,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -901,6 +941,7 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
     Value<String?>? remoteId,
     Value<DateTime?>? updatedAt,
     Value<bool>? isActive,
+    Value<String>? source,
     Value<int>? rowid,
   }) {
     return QuestionsCompanion(
@@ -922,6 +963,7 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
       remoteId: remoteId ?? this.remoteId,
       updatedAt: updatedAt ?? this.updatedAt,
       isActive: isActive ?? this.isActive,
+      source: source ?? this.source,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -983,6 +1025,9 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
     }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1010,6 +1055,7 @@ class QuestionsCompanion extends UpdateCompanion<Question> {
           ..write('remoteId: $remoteId, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isActive: $isActive, ')
+          ..write('source: $source, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1167,6 +1213,17 @@ class $QuizAttemptsTable extends QuizAttempts
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _questionIdsMeta = const VerificationMeta(
+    'questionIds',
+  );
+  @override
+  late final GeneratedColumn<String> questionIds = GeneratedColumn<String>(
+    'question_ids',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -1194,6 +1251,7 @@ class $QuizAttemptsTable extends QuizAttempts
     subjectScores,
     rawScore,
     maxMarks,
+    questionIds,
     updatedAt,
   ];
   @override
@@ -1315,6 +1373,15 @@ class $QuizAttemptsTable extends QuizAttempts
         maxMarks.isAcceptableOrUnknown(data['max_marks']!, _maxMarksMeta),
       );
     }
+    if (data.containsKey('question_ids')) {
+      context.handle(
+        _questionIdsMeta,
+        questionIds.isAcceptableOrUnknown(
+          data['question_ids']!,
+          _questionIdsMeta,
+        ),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -1382,6 +1449,10 @@ class $QuizAttemptsTable extends QuizAttempts
         DriftSqlType.int,
         data['${effectivePrefix}max_marks'],
       ),
+      questionIds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_ids'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -1409,6 +1480,10 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
   final String? subjectScores;
   final int? rawScore;
   final int? maxMarks;
+
+  /// Ordered IDs of the questions presented in this attempt, JSON-encoded.
+  /// Used to avoid repeating the same questions in later quizzes/mocks.
+  final String? questionIds;
   final DateTime? updatedAt;
   const QuizAttempt({
     required this.id,
@@ -1424,6 +1499,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     this.subjectScores,
     this.rawScore,
     this.maxMarks,
+    this.questionIds,
     this.updatedAt,
   });
   @override
@@ -1447,6 +1523,9 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     }
     if (!nullToAbsent || maxMarks != null) {
       map['max_marks'] = Variable<int>(maxMarks);
+    }
+    if (!nullToAbsent || questionIds != null) {
+      map['question_ids'] = Variable<String>(questionIds);
     }
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -1475,6 +1554,9 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       maxMarks: maxMarks == null && nullToAbsent
           ? const Value.absent()
           : Value(maxMarks),
+      questionIds: questionIds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(questionIds),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -1500,6 +1582,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       subjectScores: serializer.fromJson<String?>(json['subjectScores']),
       rawScore: serializer.fromJson<int?>(json['rawScore']),
       maxMarks: serializer.fromJson<int?>(json['maxMarks']),
+      questionIds: serializer.fromJson<String?>(json['questionIds']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
   }
@@ -1520,6 +1603,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       'subjectScores': serializer.toJson<String?>(subjectScores),
       'rawScore': serializer.toJson<int?>(rawScore),
       'maxMarks': serializer.toJson<int?>(maxMarks),
+      'questionIds': serializer.toJson<String?>(questionIds),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
   }
@@ -1538,6 +1622,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     Value<String?> subjectScores = const Value.absent(),
     Value<int?> rawScore = const Value.absent(),
     Value<int?> maxMarks = const Value.absent(),
+    Value<String?> questionIds = const Value.absent(),
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => QuizAttempt(
     id: id ?? this.id,
@@ -1555,6 +1640,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
         : this.subjectScores,
     rawScore: rawScore.present ? rawScore.value : this.rawScore,
     maxMarks: maxMarks.present ? maxMarks.value : this.maxMarks,
+    questionIds: questionIds.present ? questionIds.value : this.questionIds,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
   QuizAttempt copyWithCompanion(QuizAttemptsCompanion data) {
@@ -1584,6 +1670,9 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
           : this.subjectScores,
       rawScore: data.rawScore.present ? data.rawScore.value : this.rawScore,
       maxMarks: data.maxMarks.present ? data.maxMarks.value : this.maxMarks,
+      questionIds: data.questionIds.present
+          ? data.questionIds.value
+          : this.questionIds,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1604,6 +1693,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
           ..write('subjectScores: $subjectScores, ')
           ..write('rawScore: $rawScore, ')
           ..write('maxMarks: $maxMarks, ')
+          ..write('questionIds: $questionIds, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -1624,6 +1714,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     subjectScores,
     rawScore,
     maxMarks,
+    questionIds,
     updatedAt,
   );
   @override
@@ -1643,6 +1734,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
           other.subjectScores == this.subjectScores &&
           other.rawScore == this.rawScore &&
           other.maxMarks == this.maxMarks &&
+          other.questionIds == this.questionIds &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -1660,6 +1752,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
   final Value<String?> subjectScores;
   final Value<int?> rawScore;
   final Value<int?> maxMarks;
+  final Value<String?> questionIds;
   final Value<DateTime?> updatedAt;
   const QuizAttemptsCompanion({
     this.id = const Value.absent(),
@@ -1675,6 +1768,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     this.subjectScores = const Value.absent(),
     this.rawScore = const Value.absent(),
     this.maxMarks = const Value.absent(),
+    this.questionIds = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   QuizAttemptsCompanion.insert({
@@ -1691,6 +1785,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     this.subjectScores = const Value.absent(),
     this.rawScore = const Value.absent(),
     this.maxMarks = const Value.absent(),
+    this.questionIds = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : topicId = Value(topicId),
        subject = Value(subject),
@@ -1713,6 +1808,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     Expression<String>? subjectScores,
     Expression<int>? rawScore,
     Expression<int>? maxMarks,
+    Expression<String>? questionIds,
     Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
@@ -1729,6 +1825,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
       if (subjectScores != null) 'subject_scores': subjectScores,
       if (rawScore != null) 'raw_score': rawScore,
       if (maxMarks != null) 'max_marks': maxMarks,
+      if (questionIds != null) 'question_ids': questionIds,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
@@ -1747,6 +1844,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     Value<String?>? subjectScores,
     Value<int?>? rawScore,
     Value<int?>? maxMarks,
+    Value<String?>? questionIds,
     Value<DateTime?>? updatedAt,
   }) {
     return QuizAttemptsCompanion(
@@ -1763,6 +1861,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
       subjectScores: subjectScores ?? this.subjectScores,
       rawScore: rawScore ?? this.rawScore,
       maxMarks: maxMarks ?? this.maxMarks,
+      questionIds: questionIds ?? this.questionIds,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -1809,6 +1908,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     if (maxMarks.present) {
       map['max_marks'] = Variable<int>(maxMarks.value);
     }
+    if (questionIds.present) {
+      map['question_ids'] = Variable<String>(questionIds.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -1831,6 +1933,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
           ..write('subjectScores: $subjectScores, ')
           ..write('rawScore: $rawScore, ')
           ..write('maxMarks: $maxMarks, ')
+          ..write('questionIds: $questionIds, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -7246,6 +7349,1576 @@ class FlashcardsCompanion extends UpdateCompanion<Flashcard> {
   }
 }
 
+class $DppSetsTable extends DppSets with TableInfo<$DppSetsTable, DppSet> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DppSetsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _subjectMeta = const VerificationMeta(
+    'subject',
+  );
+  @override
+  late final GeneratedColumn<String> subject = GeneratedColumn<String>(
+    'subject',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterIdMeta = const VerificationMeta(
+    'chapterId',
+  );
+  @override
+  late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
+    'chapter_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _topicIdMeta = const VerificationMeta(
+    'topicId',
+  );
+  @override
+  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
+    'topic_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _totalQuestionsMeta = const VerificationMeta(
+    'totalQuestions',
+  );
+  @override
+  late final GeneratedColumn<int> totalQuestions = GeneratedColumn<int>(
+    'total_questions',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _correctCountMeta = const VerificationMeta(
+    'correctCount',
+  );
+  @override
+  late final GeneratedColumn<int> correctCount = GeneratedColumn<int>(
+    'correct_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _incorrectCountMeta = const VerificationMeta(
+    'incorrectCount',
+  );
+  @override
+  late final GeneratedColumn<int> incorrectCount = GeneratedColumn<int>(
+    'incorrect_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _unattemptedCountMeta = const VerificationMeta(
+    'unattemptedCount',
+  );
+  @override
+  late final GeneratedColumn<int> unattemptedCount = GeneratedColumn<int>(
+    'unattempted_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _timeSpentSecondsMeta = const VerificationMeta(
+    'timeSpentSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> timeSpentSeconds = GeneratedColumn<int>(
+    'time_spent_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isCompletedMeta = const VerificationMeta(
+    'isCompleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isCompleted = GeneratedColumn<bool>(
+    'is_completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    subject,
+    chapterId,
+    topicId,
+    totalQuestions,
+    correctCount,
+    incorrectCount,
+    unattemptedCount,
+    timeSpentSeconds,
+    isCompleted,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dpp_sets';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DppSet> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('subject')) {
+      context.handle(
+        _subjectMeta,
+        subject.isAcceptableOrUnknown(data['subject']!, _subjectMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_subjectMeta);
+    }
+    if (data.containsKey('chapter_id')) {
+      context.handle(
+        _chapterIdMeta,
+        chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta),
+      );
+    }
+    if (data.containsKey('topic_id')) {
+      context.handle(
+        _topicIdMeta,
+        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
+      );
+    }
+    if (data.containsKey('total_questions')) {
+      context.handle(
+        _totalQuestionsMeta,
+        totalQuestions.isAcceptableOrUnknown(
+          data['total_questions']!,
+          _totalQuestionsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_totalQuestionsMeta);
+    }
+    if (data.containsKey('correct_count')) {
+      context.handle(
+        _correctCountMeta,
+        correctCount.isAcceptableOrUnknown(
+          data['correct_count']!,
+          _correctCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('incorrect_count')) {
+      context.handle(
+        _incorrectCountMeta,
+        incorrectCount.isAcceptableOrUnknown(
+          data['incorrect_count']!,
+          _incorrectCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('unattempted_count')) {
+      context.handle(
+        _unattemptedCountMeta,
+        unattemptedCount.isAcceptableOrUnknown(
+          data['unattempted_count']!,
+          _unattemptedCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('time_spent_seconds')) {
+      context.handle(
+        _timeSpentSecondsMeta,
+        timeSpentSeconds.isAcceptableOrUnknown(
+          data['time_spent_seconds']!,
+          _timeSpentSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_completed')) {
+      context.handle(
+        _isCompletedMeta,
+        isCompleted.isAcceptableOrUnknown(
+          data['is_completed']!,
+          _isCompletedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DppSet map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DppSet(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      subject: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject'],
+      )!,
+      chapterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chapter_id'],
+      ),
+      topicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic_id'],
+      ),
+      totalQuestions: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_questions'],
+      )!,
+      correctCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}correct_count'],
+      )!,
+      incorrectCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}incorrect_count'],
+      )!,
+      unattemptedCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}unattempted_count'],
+      )!,
+      timeSpentSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}time_spent_seconds'],
+      )!,
+      isCompleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_completed'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $DppSetsTable createAlias(String alias) {
+    return $DppSetsTable(attachedDatabase, alias);
+  }
+}
+
+class DppSet extends DataClass implements Insertable<DppSet> {
+  final int id;
+  final String date;
+  final String subject;
+  final String? chapterId;
+  final String? topicId;
+  final int totalQuestions;
+  final int correctCount;
+  final int incorrectCount;
+  final int unattemptedCount;
+  final int timeSpentSeconds;
+  final bool isCompleted;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  const DppSet({
+    required this.id,
+    required this.date,
+    required this.subject,
+    this.chapterId,
+    this.topicId,
+    required this.totalQuestions,
+    required this.correctCount,
+    required this.incorrectCount,
+    required this.unattemptedCount,
+    required this.timeSpentSeconds,
+    required this.isCompleted,
+    this.createdAt,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['date'] = Variable<String>(date);
+    map['subject'] = Variable<String>(subject);
+    if (!nullToAbsent || chapterId != null) {
+      map['chapter_id'] = Variable<String>(chapterId);
+    }
+    if (!nullToAbsent || topicId != null) {
+      map['topic_id'] = Variable<String>(topicId);
+    }
+    map['total_questions'] = Variable<int>(totalQuestions);
+    map['correct_count'] = Variable<int>(correctCount);
+    map['incorrect_count'] = Variable<int>(incorrectCount);
+    map['unattempted_count'] = Variable<int>(unattemptedCount);
+    map['time_spent_seconds'] = Variable<int>(timeSpentSeconds);
+    map['is_completed'] = Variable<bool>(isCompleted);
+    if (!nullToAbsent || createdAt != null) {
+      map['created_at'] = Variable<DateTime>(createdAt);
+    }
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  DppSetsCompanion toCompanion(bool nullToAbsent) {
+    return DppSetsCompanion(
+      id: Value(id),
+      date: Value(date),
+      subject: Value(subject),
+      chapterId: chapterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapterId),
+      topicId: topicId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(topicId),
+      totalQuestions: Value(totalQuestions),
+      correctCount: Value(correctCount),
+      incorrectCount: Value(incorrectCount),
+      unattemptedCount: Value(unattemptedCount),
+      timeSpentSeconds: Value(timeSpentSeconds),
+      isCompleted: Value(isCompleted),
+      createdAt: createdAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory DppSet.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DppSet(
+      id: serializer.fromJson<int>(json['id']),
+      date: serializer.fromJson<String>(json['date']),
+      subject: serializer.fromJson<String>(json['subject']),
+      chapterId: serializer.fromJson<String?>(json['chapterId']),
+      topicId: serializer.fromJson<String?>(json['topicId']),
+      totalQuestions: serializer.fromJson<int>(json['totalQuestions']),
+      correctCount: serializer.fromJson<int>(json['correctCount']),
+      incorrectCount: serializer.fromJson<int>(json['incorrectCount']),
+      unattemptedCount: serializer.fromJson<int>(json['unattemptedCount']),
+      timeSpentSeconds: serializer.fromJson<int>(json['timeSpentSeconds']),
+      isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+      createdAt: serializer.fromJson<DateTime?>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date': serializer.toJson<String>(date),
+      'subject': serializer.toJson<String>(subject),
+      'chapterId': serializer.toJson<String?>(chapterId),
+      'topicId': serializer.toJson<String?>(topicId),
+      'totalQuestions': serializer.toJson<int>(totalQuestions),
+      'correctCount': serializer.toJson<int>(correctCount),
+      'incorrectCount': serializer.toJson<int>(incorrectCount),
+      'unattemptedCount': serializer.toJson<int>(unattemptedCount),
+      'timeSpentSeconds': serializer.toJson<int>(timeSpentSeconds),
+      'isCompleted': serializer.toJson<bool>(isCompleted),
+      'createdAt': serializer.toJson<DateTime?>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  DppSet copyWith({
+    int? id,
+    String? date,
+    String? subject,
+    Value<String?> chapterId = const Value.absent(),
+    Value<String?> topicId = const Value.absent(),
+    int? totalQuestions,
+    int? correctCount,
+    int? incorrectCount,
+    int? unattemptedCount,
+    int? timeSpentSeconds,
+    bool? isCompleted,
+    Value<DateTime?> createdAt = const Value.absent(),
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => DppSet(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    subject: subject ?? this.subject,
+    chapterId: chapterId.present ? chapterId.value : this.chapterId,
+    topicId: topicId.present ? topicId.value : this.topicId,
+    totalQuestions: totalQuestions ?? this.totalQuestions,
+    correctCount: correctCount ?? this.correctCount,
+    incorrectCount: incorrectCount ?? this.incorrectCount,
+    unattemptedCount: unattemptedCount ?? this.unattemptedCount,
+    timeSpentSeconds: timeSpentSeconds ?? this.timeSpentSeconds,
+    isCompleted: isCompleted ?? this.isCompleted,
+    createdAt: createdAt.present ? createdAt.value : this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  DppSet copyWithCompanion(DppSetsCompanion data) {
+    return DppSet(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      subject: data.subject.present ? data.subject.value : this.subject,
+      chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
+      topicId: data.topicId.present ? data.topicId.value : this.topicId,
+      totalQuestions: data.totalQuestions.present
+          ? data.totalQuestions.value
+          : this.totalQuestions,
+      correctCount: data.correctCount.present
+          ? data.correctCount.value
+          : this.correctCount,
+      incorrectCount: data.incorrectCount.present
+          ? data.incorrectCount.value
+          : this.incorrectCount,
+      unattemptedCount: data.unattemptedCount.present
+          ? data.unattemptedCount.value
+          : this.unattemptedCount,
+      timeSpentSeconds: data.timeSpentSeconds.present
+          ? data.timeSpentSeconds.value
+          : this.timeSpentSeconds,
+      isCompleted: data.isCompleted.present
+          ? data.isCompleted.value
+          : this.isCompleted,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DppSet(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('subject: $subject, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('topicId: $topicId, ')
+          ..write('totalQuestions: $totalQuestions, ')
+          ..write('correctCount: $correctCount, ')
+          ..write('incorrectCount: $incorrectCount, ')
+          ..write('unattemptedCount: $unattemptedCount, ')
+          ..write('timeSpentSeconds: $timeSpentSeconds, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    date,
+    subject,
+    chapterId,
+    topicId,
+    totalQuestions,
+    correctCount,
+    incorrectCount,
+    unattemptedCount,
+    timeSpentSeconds,
+    isCompleted,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DppSet &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.subject == this.subject &&
+          other.chapterId == this.chapterId &&
+          other.topicId == this.topicId &&
+          other.totalQuestions == this.totalQuestions &&
+          other.correctCount == this.correctCount &&
+          other.incorrectCount == this.incorrectCount &&
+          other.unattemptedCount == this.unattemptedCount &&
+          other.timeSpentSeconds == this.timeSpentSeconds &&
+          other.isCompleted == this.isCompleted &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DppSetsCompanion extends UpdateCompanion<DppSet> {
+  final Value<int> id;
+  final Value<String> date;
+  final Value<String> subject;
+  final Value<String?> chapterId;
+  final Value<String?> topicId;
+  final Value<int> totalQuestions;
+  final Value<int> correctCount;
+  final Value<int> incorrectCount;
+  final Value<int> unattemptedCount;
+  final Value<int> timeSpentSeconds;
+  final Value<bool> isCompleted;
+  final Value<DateTime?> createdAt;
+  final Value<DateTime?> updatedAt;
+  const DppSetsCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.subject = const Value.absent(),
+    this.chapterId = const Value.absent(),
+    this.topicId = const Value.absent(),
+    this.totalQuestions = const Value.absent(),
+    this.correctCount = const Value.absent(),
+    this.incorrectCount = const Value.absent(),
+    this.unattemptedCount = const Value.absent(),
+    this.timeSpentSeconds = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  DppSetsCompanion.insert({
+    this.id = const Value.absent(),
+    required String date,
+    required String subject,
+    this.chapterId = const Value.absent(),
+    this.topicId = const Value.absent(),
+    required int totalQuestions,
+    this.correctCount = const Value.absent(),
+    this.incorrectCount = const Value.absent(),
+    this.unattemptedCount = const Value.absent(),
+    this.timeSpentSeconds = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : date = Value(date),
+       subject = Value(subject),
+       totalQuestions = Value(totalQuestions);
+  static Insertable<DppSet> custom({
+    Expression<int>? id,
+    Expression<String>? date,
+    Expression<String>? subject,
+    Expression<String>? chapterId,
+    Expression<String>? topicId,
+    Expression<int>? totalQuestions,
+    Expression<int>? correctCount,
+    Expression<int>? incorrectCount,
+    Expression<int>? unattemptedCount,
+    Expression<int>? timeSpentSeconds,
+    Expression<bool>? isCompleted,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (subject != null) 'subject': subject,
+      if (chapterId != null) 'chapter_id': chapterId,
+      if (topicId != null) 'topic_id': topicId,
+      if (totalQuestions != null) 'total_questions': totalQuestions,
+      if (correctCount != null) 'correct_count': correctCount,
+      if (incorrectCount != null) 'incorrect_count': incorrectCount,
+      if (unattemptedCount != null) 'unattempted_count': unattemptedCount,
+      if (timeSpentSeconds != null) 'time_spent_seconds': timeSpentSeconds,
+      if (isCompleted != null) 'is_completed': isCompleted,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  DppSetsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? date,
+    Value<String>? subject,
+    Value<String?>? chapterId,
+    Value<String?>? topicId,
+    Value<int>? totalQuestions,
+    Value<int>? correctCount,
+    Value<int>? incorrectCount,
+    Value<int>? unattemptedCount,
+    Value<int>? timeSpentSeconds,
+    Value<bool>? isCompleted,
+    Value<DateTime?>? createdAt,
+    Value<DateTime?>? updatedAt,
+  }) {
+    return DppSetsCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      subject: subject ?? this.subject,
+      chapterId: chapterId ?? this.chapterId,
+      topicId: topicId ?? this.topicId,
+      totalQuestions: totalQuestions ?? this.totalQuestions,
+      correctCount: correctCount ?? this.correctCount,
+      incorrectCount: incorrectCount ?? this.incorrectCount,
+      unattemptedCount: unattemptedCount ?? this.unattemptedCount,
+      timeSpentSeconds: timeSpentSeconds ?? this.timeSpentSeconds,
+      isCompleted: isCompleted ?? this.isCompleted,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (subject.present) {
+      map['subject'] = Variable<String>(subject.value);
+    }
+    if (chapterId.present) {
+      map['chapter_id'] = Variable<String>(chapterId.value);
+    }
+    if (topicId.present) {
+      map['topic_id'] = Variable<String>(topicId.value);
+    }
+    if (totalQuestions.present) {
+      map['total_questions'] = Variable<int>(totalQuestions.value);
+    }
+    if (correctCount.present) {
+      map['correct_count'] = Variable<int>(correctCount.value);
+    }
+    if (incorrectCount.present) {
+      map['incorrect_count'] = Variable<int>(incorrectCount.value);
+    }
+    if (unattemptedCount.present) {
+      map['unattempted_count'] = Variable<int>(unattemptedCount.value);
+    }
+    if (timeSpentSeconds.present) {
+      map['time_spent_seconds'] = Variable<int>(timeSpentSeconds.value);
+    }
+    if (isCompleted.present) {
+      map['is_completed'] = Variable<bool>(isCompleted.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DppSetsCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('subject: $subject, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('topicId: $topicId, ')
+          ..write('totalQuestions: $totalQuestions, ')
+          ..write('correctCount: $correctCount, ')
+          ..write('incorrectCount: $incorrectCount, ')
+          ..write('unattemptedCount: $unattemptedCount, ')
+          ..write('timeSpentSeconds: $timeSpentSeconds, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DppQuestionsTable extends DppQuestions
+    with TableInfo<$DppQuestionsTable, DppQuestion> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DppQuestionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _dppSetIdMeta = const VerificationMeta(
+    'dppSetId',
+  );
+  @override
+  late final GeneratedColumn<int> dppSetId = GeneratedColumn<int>(
+    'dpp_set_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _questionIdMeta = const VerificationMeta(
+    'questionId',
+  );
+  @override
+  late final GeneratedColumn<String> questionId = GeneratedColumn<String>(
+    'question_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _subjectMeta = const VerificationMeta(
+    'subject',
+  );
+  @override
+  late final GeneratedColumn<String> subject = GeneratedColumn<String>(
+    'subject',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterMeta = const VerificationMeta(
+    'chapter',
+  );
+  @override
+  late final GeneratedColumn<String> chapter = GeneratedColumn<String>(
+    'chapter',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _topicMeta = const VerificationMeta('topic');
+  @override
+  late final GeneratedColumn<String> topic = GeneratedColumn<String>(
+    'topic',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _topicIdMeta = const VerificationMeta(
+    'topicId',
+  );
+  @override
+  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
+    'topic_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _difficultyMeta = const VerificationMeta(
+    'difficulty',
+  );
+  @override
+  late final GeneratedColumn<String> difficulty = GeneratedColumn<String>(
+    'difficulty',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _questionTextMeta = const VerificationMeta(
+    'questionText',
+  );
+  @override
+  late final GeneratedColumn<String> questionText = GeneratedColumn<String>(
+    'question_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _optionsMeta = const VerificationMeta(
+    'options',
+  );
+  @override
+  late final GeneratedColumn<String> options = GeneratedColumn<String>(
+    'options',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _correctAnswerMeta = const VerificationMeta(
+    'correctAnswer',
+  );
+  @override
+  late final GeneratedColumn<String> correctAnswer = GeneratedColumn<String>(
+    'correct_answer',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _explanationMeta = const VerificationMeta(
+    'explanation',
+  );
+  @override
+  late final GeneratedColumn<String> explanation = GeneratedColumn<String>(
+    'explanation',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _yearMeta = const VerificationMeta('year');
+  @override
+  late final GeneratedColumn<int> year = GeneratedColumn<int>(
+    'year',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('dpp'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    dppSetId,
+    questionId,
+    subject,
+    chapter,
+    topic,
+    topicId,
+    difficulty,
+    questionText,
+    options,
+    correctAnswer,
+    explanation,
+    year,
+    source,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dpp_questions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DppQuestion> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('dpp_set_id')) {
+      context.handle(
+        _dppSetIdMeta,
+        dppSetId.isAcceptableOrUnknown(data['dpp_set_id']!, _dppSetIdMeta),
+      );
+    }
+    if (data.containsKey('question_id')) {
+      context.handle(
+        _questionIdMeta,
+        questionId.isAcceptableOrUnknown(data['question_id']!, _questionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_questionIdMeta);
+    }
+    if (data.containsKey('subject')) {
+      context.handle(
+        _subjectMeta,
+        subject.isAcceptableOrUnknown(data['subject']!, _subjectMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_subjectMeta);
+    }
+    if (data.containsKey('chapter')) {
+      context.handle(
+        _chapterMeta,
+        chapter.isAcceptableOrUnknown(data['chapter']!, _chapterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chapterMeta);
+    }
+    if (data.containsKey('topic')) {
+      context.handle(
+        _topicMeta,
+        topic.isAcceptableOrUnknown(data['topic']!, _topicMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_topicMeta);
+    }
+    if (data.containsKey('topic_id')) {
+      context.handle(
+        _topicIdMeta,
+        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_topicIdMeta);
+    }
+    if (data.containsKey('difficulty')) {
+      context.handle(
+        _difficultyMeta,
+        difficulty.isAcceptableOrUnknown(data['difficulty']!, _difficultyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_difficultyMeta);
+    }
+    if (data.containsKey('question_text')) {
+      context.handle(
+        _questionTextMeta,
+        questionText.isAcceptableOrUnknown(
+          data['question_text']!,
+          _questionTextMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_questionTextMeta);
+    }
+    if (data.containsKey('options')) {
+      context.handle(
+        _optionsMeta,
+        options.isAcceptableOrUnknown(data['options']!, _optionsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_optionsMeta);
+    }
+    if (data.containsKey('correct_answer')) {
+      context.handle(
+        _correctAnswerMeta,
+        correctAnswer.isAcceptableOrUnknown(
+          data['correct_answer']!,
+          _correctAnswerMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_correctAnswerMeta);
+    }
+    if (data.containsKey('explanation')) {
+      context.handle(
+        _explanationMeta,
+        explanation.isAcceptableOrUnknown(
+          data['explanation']!,
+          _explanationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('year')) {
+      context.handle(
+        _yearMeta,
+        year.isAcceptableOrUnknown(data['year']!, _yearMeta),
+      );
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DppQuestion map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DppQuestion(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      dppSetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}dpp_set_id'],
+      ),
+      questionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_id'],
+      )!,
+      subject: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject'],
+      )!,
+      chapter: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chapter'],
+      )!,
+      topic: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic'],
+      )!,
+      topicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic_id'],
+      )!,
+      difficulty: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}difficulty'],
+      )!,
+      questionText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_text'],
+      )!,
+      options: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}options'],
+      )!,
+      correctAnswer: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}correct_answer'],
+      )!,
+      explanation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}explanation'],
+      ),
+      year: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}year'],
+      ),
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+    );
+  }
+
+  @override
+  $DppQuestionsTable createAlias(String alias) {
+    return $DppQuestionsTable(attachedDatabase, alias);
+  }
+}
+
+class DppQuestion extends DataClass implements Insertable<DppQuestion> {
+  final int id;
+  final int? dppSetId;
+  final String questionId;
+  final String subject;
+  final String chapter;
+  final String topic;
+  final String topicId;
+  final String difficulty;
+  final String questionText;
+  final String options;
+  final String correctAnswer;
+  final String? explanation;
+  final int? year;
+  final String source;
+  const DppQuestion({
+    required this.id,
+    this.dppSetId,
+    required this.questionId,
+    required this.subject,
+    required this.chapter,
+    required this.topic,
+    required this.topicId,
+    required this.difficulty,
+    required this.questionText,
+    required this.options,
+    required this.correctAnswer,
+    this.explanation,
+    this.year,
+    required this.source,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || dppSetId != null) {
+      map['dpp_set_id'] = Variable<int>(dppSetId);
+    }
+    map['question_id'] = Variable<String>(questionId);
+    map['subject'] = Variable<String>(subject);
+    map['chapter'] = Variable<String>(chapter);
+    map['topic'] = Variable<String>(topic);
+    map['topic_id'] = Variable<String>(topicId);
+    map['difficulty'] = Variable<String>(difficulty);
+    map['question_text'] = Variable<String>(questionText);
+    map['options'] = Variable<String>(options);
+    map['correct_answer'] = Variable<String>(correctAnswer);
+    if (!nullToAbsent || explanation != null) {
+      map['explanation'] = Variable<String>(explanation);
+    }
+    if (!nullToAbsent || year != null) {
+      map['year'] = Variable<int>(year);
+    }
+    map['source'] = Variable<String>(source);
+    return map;
+  }
+
+  DppQuestionsCompanion toCompanion(bool nullToAbsent) {
+    return DppQuestionsCompanion(
+      id: Value(id),
+      dppSetId: dppSetId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dppSetId),
+      questionId: Value(questionId),
+      subject: Value(subject),
+      chapter: Value(chapter),
+      topic: Value(topic),
+      topicId: Value(topicId),
+      difficulty: Value(difficulty),
+      questionText: Value(questionText),
+      options: Value(options),
+      correctAnswer: Value(correctAnswer),
+      explanation: explanation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(explanation),
+      year: year == null && nullToAbsent ? const Value.absent() : Value(year),
+      source: Value(source),
+    );
+  }
+
+  factory DppQuestion.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DppQuestion(
+      id: serializer.fromJson<int>(json['id']),
+      dppSetId: serializer.fromJson<int?>(json['dppSetId']),
+      questionId: serializer.fromJson<String>(json['questionId']),
+      subject: serializer.fromJson<String>(json['subject']),
+      chapter: serializer.fromJson<String>(json['chapter']),
+      topic: serializer.fromJson<String>(json['topic']),
+      topicId: serializer.fromJson<String>(json['topicId']),
+      difficulty: serializer.fromJson<String>(json['difficulty']),
+      questionText: serializer.fromJson<String>(json['questionText']),
+      options: serializer.fromJson<String>(json['options']),
+      correctAnswer: serializer.fromJson<String>(json['correctAnswer']),
+      explanation: serializer.fromJson<String?>(json['explanation']),
+      year: serializer.fromJson<int?>(json['year']),
+      source: serializer.fromJson<String>(json['source']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'dppSetId': serializer.toJson<int?>(dppSetId),
+      'questionId': serializer.toJson<String>(questionId),
+      'subject': serializer.toJson<String>(subject),
+      'chapter': serializer.toJson<String>(chapter),
+      'topic': serializer.toJson<String>(topic),
+      'topicId': serializer.toJson<String>(topicId),
+      'difficulty': serializer.toJson<String>(difficulty),
+      'questionText': serializer.toJson<String>(questionText),
+      'options': serializer.toJson<String>(options),
+      'correctAnswer': serializer.toJson<String>(correctAnswer),
+      'explanation': serializer.toJson<String?>(explanation),
+      'year': serializer.toJson<int?>(year),
+      'source': serializer.toJson<String>(source),
+    };
+  }
+
+  DppQuestion copyWith({
+    int? id,
+    Value<int?> dppSetId = const Value.absent(),
+    String? questionId,
+    String? subject,
+    String? chapter,
+    String? topic,
+    String? topicId,
+    String? difficulty,
+    String? questionText,
+    String? options,
+    String? correctAnswer,
+    Value<String?> explanation = const Value.absent(),
+    Value<int?> year = const Value.absent(),
+    String? source,
+  }) => DppQuestion(
+    id: id ?? this.id,
+    dppSetId: dppSetId.present ? dppSetId.value : this.dppSetId,
+    questionId: questionId ?? this.questionId,
+    subject: subject ?? this.subject,
+    chapter: chapter ?? this.chapter,
+    topic: topic ?? this.topic,
+    topicId: topicId ?? this.topicId,
+    difficulty: difficulty ?? this.difficulty,
+    questionText: questionText ?? this.questionText,
+    options: options ?? this.options,
+    correctAnswer: correctAnswer ?? this.correctAnswer,
+    explanation: explanation.present ? explanation.value : this.explanation,
+    year: year.present ? year.value : this.year,
+    source: source ?? this.source,
+  );
+  DppQuestion copyWithCompanion(DppQuestionsCompanion data) {
+    return DppQuestion(
+      id: data.id.present ? data.id.value : this.id,
+      dppSetId: data.dppSetId.present ? data.dppSetId.value : this.dppSetId,
+      questionId: data.questionId.present
+          ? data.questionId.value
+          : this.questionId,
+      subject: data.subject.present ? data.subject.value : this.subject,
+      chapter: data.chapter.present ? data.chapter.value : this.chapter,
+      topic: data.topic.present ? data.topic.value : this.topic,
+      topicId: data.topicId.present ? data.topicId.value : this.topicId,
+      difficulty: data.difficulty.present
+          ? data.difficulty.value
+          : this.difficulty,
+      questionText: data.questionText.present
+          ? data.questionText.value
+          : this.questionText,
+      options: data.options.present ? data.options.value : this.options,
+      correctAnswer: data.correctAnswer.present
+          ? data.correctAnswer.value
+          : this.correctAnswer,
+      explanation: data.explanation.present
+          ? data.explanation.value
+          : this.explanation,
+      year: data.year.present ? data.year.value : this.year,
+      source: data.source.present ? data.source.value : this.source,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DppQuestion(')
+          ..write('id: $id, ')
+          ..write('dppSetId: $dppSetId, ')
+          ..write('questionId: $questionId, ')
+          ..write('subject: $subject, ')
+          ..write('chapter: $chapter, ')
+          ..write('topic: $topic, ')
+          ..write('topicId: $topicId, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('questionText: $questionText, ')
+          ..write('options: $options, ')
+          ..write('correctAnswer: $correctAnswer, ')
+          ..write('explanation: $explanation, ')
+          ..write('year: $year, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    dppSetId,
+    questionId,
+    subject,
+    chapter,
+    topic,
+    topicId,
+    difficulty,
+    questionText,
+    options,
+    correctAnswer,
+    explanation,
+    year,
+    source,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DppQuestion &&
+          other.id == this.id &&
+          other.dppSetId == this.dppSetId &&
+          other.questionId == this.questionId &&
+          other.subject == this.subject &&
+          other.chapter == this.chapter &&
+          other.topic == this.topic &&
+          other.topicId == this.topicId &&
+          other.difficulty == this.difficulty &&
+          other.questionText == this.questionText &&
+          other.options == this.options &&
+          other.correctAnswer == this.correctAnswer &&
+          other.explanation == this.explanation &&
+          other.year == this.year &&
+          other.source == this.source);
+}
+
+class DppQuestionsCompanion extends UpdateCompanion<DppQuestion> {
+  final Value<int> id;
+  final Value<int?> dppSetId;
+  final Value<String> questionId;
+  final Value<String> subject;
+  final Value<String> chapter;
+  final Value<String> topic;
+  final Value<String> topicId;
+  final Value<String> difficulty;
+  final Value<String> questionText;
+  final Value<String> options;
+  final Value<String> correctAnswer;
+  final Value<String?> explanation;
+  final Value<int?> year;
+  final Value<String> source;
+  const DppQuestionsCompanion({
+    this.id = const Value.absent(),
+    this.dppSetId = const Value.absent(),
+    this.questionId = const Value.absent(),
+    this.subject = const Value.absent(),
+    this.chapter = const Value.absent(),
+    this.topic = const Value.absent(),
+    this.topicId = const Value.absent(),
+    this.difficulty = const Value.absent(),
+    this.questionText = const Value.absent(),
+    this.options = const Value.absent(),
+    this.correctAnswer = const Value.absent(),
+    this.explanation = const Value.absent(),
+    this.year = const Value.absent(),
+    this.source = const Value.absent(),
+  });
+  DppQuestionsCompanion.insert({
+    this.id = const Value.absent(),
+    this.dppSetId = const Value.absent(),
+    required String questionId,
+    required String subject,
+    required String chapter,
+    required String topic,
+    required String topicId,
+    required String difficulty,
+    required String questionText,
+    required String options,
+    required String correctAnswer,
+    this.explanation = const Value.absent(),
+    this.year = const Value.absent(),
+    this.source = const Value.absent(),
+  }) : questionId = Value(questionId),
+       subject = Value(subject),
+       chapter = Value(chapter),
+       topic = Value(topic),
+       topicId = Value(topicId),
+       difficulty = Value(difficulty),
+       questionText = Value(questionText),
+       options = Value(options),
+       correctAnswer = Value(correctAnswer);
+  static Insertable<DppQuestion> custom({
+    Expression<int>? id,
+    Expression<int>? dppSetId,
+    Expression<String>? questionId,
+    Expression<String>? subject,
+    Expression<String>? chapter,
+    Expression<String>? topic,
+    Expression<String>? topicId,
+    Expression<String>? difficulty,
+    Expression<String>? questionText,
+    Expression<String>? options,
+    Expression<String>? correctAnswer,
+    Expression<String>? explanation,
+    Expression<int>? year,
+    Expression<String>? source,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (dppSetId != null) 'dpp_set_id': dppSetId,
+      if (questionId != null) 'question_id': questionId,
+      if (subject != null) 'subject': subject,
+      if (chapter != null) 'chapter': chapter,
+      if (topic != null) 'topic': topic,
+      if (topicId != null) 'topic_id': topicId,
+      if (difficulty != null) 'difficulty': difficulty,
+      if (questionText != null) 'question_text': questionText,
+      if (options != null) 'options': options,
+      if (correctAnswer != null) 'correct_answer': correctAnswer,
+      if (explanation != null) 'explanation': explanation,
+      if (year != null) 'year': year,
+      if (source != null) 'source': source,
+    });
+  }
+
+  DppQuestionsCompanion copyWith({
+    Value<int>? id,
+    Value<int?>? dppSetId,
+    Value<String>? questionId,
+    Value<String>? subject,
+    Value<String>? chapter,
+    Value<String>? topic,
+    Value<String>? topicId,
+    Value<String>? difficulty,
+    Value<String>? questionText,
+    Value<String>? options,
+    Value<String>? correctAnswer,
+    Value<String?>? explanation,
+    Value<int?>? year,
+    Value<String>? source,
+  }) {
+    return DppQuestionsCompanion(
+      id: id ?? this.id,
+      dppSetId: dppSetId ?? this.dppSetId,
+      questionId: questionId ?? this.questionId,
+      subject: subject ?? this.subject,
+      chapter: chapter ?? this.chapter,
+      topic: topic ?? this.topic,
+      topicId: topicId ?? this.topicId,
+      difficulty: difficulty ?? this.difficulty,
+      questionText: questionText ?? this.questionText,
+      options: options ?? this.options,
+      correctAnswer: correctAnswer ?? this.correctAnswer,
+      explanation: explanation ?? this.explanation,
+      year: year ?? this.year,
+      source: source ?? this.source,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (dppSetId.present) {
+      map['dpp_set_id'] = Variable<int>(dppSetId.value);
+    }
+    if (questionId.present) {
+      map['question_id'] = Variable<String>(questionId.value);
+    }
+    if (subject.present) {
+      map['subject'] = Variable<String>(subject.value);
+    }
+    if (chapter.present) {
+      map['chapter'] = Variable<String>(chapter.value);
+    }
+    if (topic.present) {
+      map['topic'] = Variable<String>(topic.value);
+    }
+    if (topicId.present) {
+      map['topic_id'] = Variable<String>(topicId.value);
+    }
+    if (difficulty.present) {
+      map['difficulty'] = Variable<String>(difficulty.value);
+    }
+    if (questionText.present) {
+      map['question_text'] = Variable<String>(questionText.value);
+    }
+    if (options.present) {
+      map['options'] = Variable<String>(options.value);
+    }
+    if (correctAnswer.present) {
+      map['correct_answer'] = Variable<String>(correctAnswer.value);
+    }
+    if (explanation.present) {
+      map['explanation'] = Variable<String>(explanation.value);
+    }
+    if (year.present) {
+      map['year'] = Variable<int>(year.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DppQuestionsCompanion(')
+          ..write('id: $id, ')
+          ..write('dppSetId: $dppSetId, ')
+          ..write('questionId: $questionId, ')
+          ..write('subject: $subject, ')
+          ..write('chapter: $chapter, ')
+          ..write('topic: $topic, ')
+          ..write('topicId: $topicId, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('questionText: $questionText, ')
+          ..write('options: $options, ')
+          ..write('correctAnswer: $correctAnswer, ')
+          ..write('explanation: $explanation, ')
+          ..write('year: $year, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7264,6 +8937,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $FlashcardsTable flashcards = $FlashcardsTable(this);
+  late final $DppSetsTable dppSets = $DppSetsTable(this);
+  late final $DppQuestionsTable dppQuestions = $DppQuestionsTable(this);
   late final Index bookmarksQuestionIdUnique = Index(
     'bookmarks_question_id_unique',
     'CREATE UNIQUE INDEX bookmarks_question_id_unique ON bookmarks (question_id)',
@@ -7285,6 +8960,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     syncWatermarks,
     spacedRepetition,
     flashcards,
+    dppSets,
+    dppQuestions,
     bookmarksQuestionIdUnique,
   ];
 }
@@ -7309,6 +8986,7 @@ typedef $$QuestionsTableCreateCompanionBuilder =
       Value<String?> remoteId,
       Value<DateTime?> updatedAt,
       Value<bool> isActive,
+      Value<String> source,
       Value<int> rowid,
     });
 typedef $$QuestionsTableUpdateCompanionBuilder =
@@ -7331,6 +9009,7 @@ typedef $$QuestionsTableUpdateCompanionBuilder =
       Value<String?> remoteId,
       Value<DateTime?> updatedAt,
       Value<bool> isActive,
+      Value<String> source,
       Value<int> rowid,
     });
 
@@ -7430,6 +9109,11 @@ class $$QuestionsTableFilterComposer
 
   ColumnFilters<bool> get isActive => $composableBuilder(
     column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -7532,6 +9216,11 @@ class $$QuestionsTableOrderingComposer
     column: $table.isActive,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$QuestionsTableAnnotationComposer
@@ -7606,6 +9295,9 @@ class $$QuestionsTableAnnotationComposer
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
 }
 
 class $$QuestionsTableTableManager
@@ -7654,6 +9346,7 @@ class $$QuestionsTableTableManager
                 Value<String?> remoteId = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
+                Value<String> source = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => QuestionsCompanion(
                 id: id,
@@ -7674,6 +9367,7 @@ class $$QuestionsTableTableManager
                 remoteId: remoteId,
                 updatedAt: updatedAt,
                 isActive: isActive,
+                source: source,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7696,6 +9390,7 @@ class $$QuestionsTableTableManager
                 Value<String?> remoteId = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
+                Value<String> source = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => QuestionsCompanion.insert(
                 id: id,
@@ -7716,6 +9411,7 @@ class $$QuestionsTableTableManager
                 remoteId: remoteId,
                 updatedAt: updatedAt,
                 isActive: isActive,
+                source: source,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -7755,6 +9451,7 @@ typedef $$QuizAttemptsTableCreateCompanionBuilder =
       Value<String?> subjectScores,
       Value<int?> rawScore,
       Value<int?> maxMarks,
+      Value<String?> questionIds,
       Value<DateTime?> updatedAt,
     });
 typedef $$QuizAttemptsTableUpdateCompanionBuilder =
@@ -7772,6 +9469,7 @@ typedef $$QuizAttemptsTableUpdateCompanionBuilder =
       Value<String?> subjectScores,
       Value<int?> rawScore,
       Value<int?> maxMarks,
+      Value<String?> questionIds,
       Value<DateTime?> updatedAt,
     });
 
@@ -7846,6 +9544,11 @@ class $$QuizAttemptsTableFilterComposer
 
   ColumnFilters<int> get maxMarks => $composableBuilder(
     column: $table.maxMarks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionIds => $composableBuilder(
+    column: $table.questionIds,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7929,6 +9632,11 @@ class $$QuizAttemptsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get questionIds => $composableBuilder(
+    column: $table.questionIds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -7995,6 +9703,11 @@ class $$QuizAttemptsTableAnnotationComposer
   GeneratedColumn<int> get maxMarks =>
       $composableBuilder(column: $table.maxMarks, builder: (column) => column);
 
+  GeneratedColumn<String> get questionIds => $composableBuilder(
+    column: $table.questionIds,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -8043,6 +9756,7 @@ class $$QuizAttemptsTableTableManager
                 Value<String?> subjectScores = const Value.absent(),
                 Value<int?> rawScore = const Value.absent(),
                 Value<int?> maxMarks = const Value.absent(),
+                Value<String?> questionIds = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => QuizAttemptsCompanion(
                 id: id,
@@ -8058,6 +9772,7 @@ class $$QuizAttemptsTableTableManager
                 subjectScores: subjectScores,
                 rawScore: rawScore,
                 maxMarks: maxMarks,
+                questionIds: questionIds,
                 updatedAt: updatedAt,
               ),
           createCompanionCallback:
@@ -8075,6 +9790,7 @@ class $$QuizAttemptsTableTableManager
                 Value<String?> subjectScores = const Value.absent(),
                 Value<int?> rawScore = const Value.absent(),
                 Value<int?> maxMarks = const Value.absent(),
+                Value<String?> questionIds = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => QuizAttemptsCompanion.insert(
                 id: id,
@@ -8090,6 +9806,7 @@ class $$QuizAttemptsTableTableManager
                 subjectScores: subjectScores,
                 rawScore: rawScore,
                 maxMarks: maxMarks,
+                questionIds: questionIds,
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
@@ -10821,6 +12538,733 @@ typedef $$FlashcardsTableProcessedTableManager =
       Flashcard,
       PrefetchHooks Function()
     >;
+typedef $$DppSetsTableCreateCompanionBuilder =
+    DppSetsCompanion Function({
+      Value<int> id,
+      required String date,
+      required String subject,
+      Value<String?> chapterId,
+      Value<String?> topicId,
+      required int totalQuestions,
+      Value<int> correctCount,
+      Value<int> incorrectCount,
+      Value<int> unattemptedCount,
+      Value<int> timeSpentSeconds,
+      Value<bool> isCompleted,
+      Value<DateTime?> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+typedef $$DppSetsTableUpdateCompanionBuilder =
+    DppSetsCompanion Function({
+      Value<int> id,
+      Value<String> date,
+      Value<String> subject,
+      Value<String?> chapterId,
+      Value<String?> topicId,
+      Value<int> totalQuestions,
+      Value<int> correctCount,
+      Value<int> incorrectCount,
+      Value<int> unattemptedCount,
+      Value<int> timeSpentSeconds,
+      Value<bool> isCompleted,
+      Value<DateTime?> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+
+class $$DppSetsTableFilterComposer
+    extends Composer<_$AppDatabase, $DppSetsTable> {
+  $$DppSetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chapterId => $composableBuilder(
+    column: $table.chapterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalQuestions => $composableBuilder(
+    column: $table.totalQuestions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get correctCount => $composableBuilder(
+    column: $table.correctCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get incorrectCount => $composableBuilder(
+    column: $table.incorrectCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get unattemptedCount => $composableBuilder(
+    column: $table.unattemptedCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get timeSpentSeconds => $composableBuilder(
+    column: $table.timeSpentSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DppSetsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DppSetsTable> {
+  $$DppSetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chapterId => $composableBuilder(
+    column: $table.chapterId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalQuestions => $composableBuilder(
+    column: $table.totalQuestions,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get correctCount => $composableBuilder(
+    column: $table.correctCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get incorrectCount => $composableBuilder(
+    column: $table.incorrectCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get unattemptedCount => $composableBuilder(
+    column: $table.unattemptedCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get timeSpentSeconds => $composableBuilder(
+    column: $table.timeSpentSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DppSetsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DppSetsTable> {
+  $$DppSetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get subject =>
+      $composableBuilder(column: $table.subject, builder: (column) => column);
+
+  GeneratedColumn<String> get chapterId =>
+      $composableBuilder(column: $table.chapterId, builder: (column) => column);
+
+  GeneratedColumn<String> get topicId =>
+      $composableBuilder(column: $table.topicId, builder: (column) => column);
+
+  GeneratedColumn<int> get totalQuestions => $composableBuilder(
+    column: $table.totalQuestions,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get correctCount => $composableBuilder(
+    column: $table.correctCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get incorrectCount => $composableBuilder(
+    column: $table.incorrectCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get unattemptedCount => $composableBuilder(
+    column: $table.unattemptedCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get timeSpentSeconds => $composableBuilder(
+    column: $table.timeSpentSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$DppSetsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DppSetsTable,
+          DppSet,
+          $$DppSetsTableFilterComposer,
+          $$DppSetsTableOrderingComposer,
+          $$DppSetsTableAnnotationComposer,
+          $$DppSetsTableCreateCompanionBuilder,
+          $$DppSetsTableUpdateCompanionBuilder,
+          (DppSet, BaseReferences<_$AppDatabase, $DppSetsTable, DppSet>),
+          DppSet,
+          PrefetchHooks Function()
+        > {
+  $$DppSetsTableTableManager(_$AppDatabase db, $DppSetsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DppSetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DppSetsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DppSetsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> date = const Value.absent(),
+                Value<String> subject = const Value.absent(),
+                Value<String?> chapterId = const Value.absent(),
+                Value<String?> topicId = const Value.absent(),
+                Value<int> totalQuestions = const Value.absent(),
+                Value<int> correctCount = const Value.absent(),
+                Value<int> incorrectCount = const Value.absent(),
+                Value<int> unattemptedCount = const Value.absent(),
+                Value<int> timeSpentSeconds = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                Value<DateTime?> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => DppSetsCompanion(
+                id: id,
+                date: date,
+                subject: subject,
+                chapterId: chapterId,
+                topicId: topicId,
+                totalQuestions: totalQuestions,
+                correctCount: correctCount,
+                incorrectCount: incorrectCount,
+                unattemptedCount: unattemptedCount,
+                timeSpentSeconds: timeSpentSeconds,
+                isCompleted: isCompleted,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String date,
+                required String subject,
+                Value<String?> chapterId = const Value.absent(),
+                Value<String?> topicId = const Value.absent(),
+                required int totalQuestions,
+                Value<int> correctCount = const Value.absent(),
+                Value<int> incorrectCount = const Value.absent(),
+                Value<int> unattemptedCount = const Value.absent(),
+                Value<int> timeSpentSeconds = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                Value<DateTime?> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => DppSetsCompanion.insert(
+                id: id,
+                date: date,
+                subject: subject,
+                chapterId: chapterId,
+                topicId: topicId,
+                totalQuestions: totalQuestions,
+                correctCount: correctCount,
+                incorrectCount: incorrectCount,
+                unattemptedCount: unattemptedCount,
+                timeSpentSeconds: timeSpentSeconds,
+                isCompleted: isCompleted,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DppSetsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DppSetsTable,
+      DppSet,
+      $$DppSetsTableFilterComposer,
+      $$DppSetsTableOrderingComposer,
+      $$DppSetsTableAnnotationComposer,
+      $$DppSetsTableCreateCompanionBuilder,
+      $$DppSetsTableUpdateCompanionBuilder,
+      (DppSet, BaseReferences<_$AppDatabase, $DppSetsTable, DppSet>),
+      DppSet,
+      PrefetchHooks Function()
+    >;
+typedef $$DppQuestionsTableCreateCompanionBuilder =
+    DppQuestionsCompanion Function({
+      Value<int> id,
+      Value<int?> dppSetId,
+      required String questionId,
+      required String subject,
+      required String chapter,
+      required String topic,
+      required String topicId,
+      required String difficulty,
+      required String questionText,
+      required String options,
+      required String correctAnswer,
+      Value<String?> explanation,
+      Value<int?> year,
+      Value<String> source,
+    });
+typedef $$DppQuestionsTableUpdateCompanionBuilder =
+    DppQuestionsCompanion Function({
+      Value<int> id,
+      Value<int?> dppSetId,
+      Value<String> questionId,
+      Value<String> subject,
+      Value<String> chapter,
+      Value<String> topic,
+      Value<String> topicId,
+      Value<String> difficulty,
+      Value<String> questionText,
+      Value<String> options,
+      Value<String> correctAnswer,
+      Value<String?> explanation,
+      Value<int?> year,
+      Value<String> source,
+    });
+
+class $$DppQuestionsTableFilterComposer
+    extends Composer<_$AppDatabase, $DppQuestionsTable> {
+  $$DppQuestionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dppSetId => $composableBuilder(
+    column: $table.dppSetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get topic => $composableBuilder(
+    column: $table.topic,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionText => $composableBuilder(
+    column: $table.questionText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get options => $composableBuilder(
+    column: $table.options,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get correctAnswer => $composableBuilder(
+    column: $table.correctAnswer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get explanation => $composableBuilder(
+    column: $table.explanation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get year => $composableBuilder(
+    column: $table.year,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DppQuestionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DppQuestionsTable> {
+  $$DppQuestionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dppSetId => $composableBuilder(
+    column: $table.dppSetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get topic => $composableBuilder(
+    column: $table.topic,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questionText => $composableBuilder(
+    column: $table.questionText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get options => $composableBuilder(
+    column: $table.options,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get correctAnswer => $composableBuilder(
+    column: $table.correctAnswer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get explanation => $composableBuilder(
+    column: $table.explanation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get year => $composableBuilder(
+    column: $table.year,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DppQuestionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DppQuestionsTable> {
+  $$DppQuestionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get dppSetId =>
+      $composableBuilder(column: $table.dppSetId, builder: (column) => column);
+
+  GeneratedColumn<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get subject =>
+      $composableBuilder(column: $table.subject, builder: (column) => column);
+
+  GeneratedColumn<String> get chapter =>
+      $composableBuilder(column: $table.chapter, builder: (column) => column);
+
+  GeneratedColumn<String> get topic =>
+      $composableBuilder(column: $table.topic, builder: (column) => column);
+
+  GeneratedColumn<String> get topicId =>
+      $composableBuilder(column: $table.topicId, builder: (column) => column);
+
+  GeneratedColumn<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get questionText => $composableBuilder(
+    column: $table.questionText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get options =>
+      $composableBuilder(column: $table.options, builder: (column) => column);
+
+  GeneratedColumn<String> get correctAnswer => $composableBuilder(
+    column: $table.correctAnswer,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get explanation => $composableBuilder(
+    column: $table.explanation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get year =>
+      $composableBuilder(column: $table.year, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+}
+
+class $$DppQuestionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DppQuestionsTable,
+          DppQuestion,
+          $$DppQuestionsTableFilterComposer,
+          $$DppQuestionsTableOrderingComposer,
+          $$DppQuestionsTableAnnotationComposer,
+          $$DppQuestionsTableCreateCompanionBuilder,
+          $$DppQuestionsTableUpdateCompanionBuilder,
+          (
+            DppQuestion,
+            BaseReferences<_$AppDatabase, $DppQuestionsTable, DppQuestion>,
+          ),
+          DppQuestion,
+          PrefetchHooks Function()
+        > {
+  $$DppQuestionsTableTableManager(_$AppDatabase db, $DppQuestionsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DppQuestionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DppQuestionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DppQuestionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> dppSetId = const Value.absent(),
+                Value<String> questionId = const Value.absent(),
+                Value<String> subject = const Value.absent(),
+                Value<String> chapter = const Value.absent(),
+                Value<String> topic = const Value.absent(),
+                Value<String> topicId = const Value.absent(),
+                Value<String> difficulty = const Value.absent(),
+                Value<String> questionText = const Value.absent(),
+                Value<String> options = const Value.absent(),
+                Value<String> correctAnswer = const Value.absent(),
+                Value<String?> explanation = const Value.absent(),
+                Value<int?> year = const Value.absent(),
+                Value<String> source = const Value.absent(),
+              }) => DppQuestionsCompanion(
+                id: id,
+                dppSetId: dppSetId,
+                questionId: questionId,
+                subject: subject,
+                chapter: chapter,
+                topic: topic,
+                topicId: topicId,
+                difficulty: difficulty,
+                questionText: questionText,
+                options: options,
+                correctAnswer: correctAnswer,
+                explanation: explanation,
+                year: year,
+                source: source,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> dppSetId = const Value.absent(),
+                required String questionId,
+                required String subject,
+                required String chapter,
+                required String topic,
+                required String topicId,
+                required String difficulty,
+                required String questionText,
+                required String options,
+                required String correctAnswer,
+                Value<String?> explanation = const Value.absent(),
+                Value<int?> year = const Value.absent(),
+                Value<String> source = const Value.absent(),
+              }) => DppQuestionsCompanion.insert(
+                id: id,
+                dppSetId: dppSetId,
+                questionId: questionId,
+                subject: subject,
+                chapter: chapter,
+                topic: topic,
+                topicId: topicId,
+                difficulty: difficulty,
+                questionText: questionText,
+                options: options,
+                correctAnswer: correctAnswer,
+                explanation: explanation,
+                year: year,
+                source: source,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DppQuestionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DppQuestionsTable,
+      DppQuestion,
+      $$DppQuestionsTableFilterComposer,
+      $$DppQuestionsTableOrderingComposer,
+      $$DppQuestionsTableAnnotationComposer,
+      $$DppQuestionsTableCreateCompanionBuilder,
+      $$DppQuestionsTableUpdateCompanionBuilder,
+      (
+        DppQuestion,
+        BaseReferences<_$AppDatabase, $DppQuestionsTable, DppQuestion>,
+      ),
+      DppQuestion,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -10849,4 +13293,8 @@ class $AppDatabaseManager {
       $$SpacedRepetitionTableTableManager(_db, _db.spacedRepetition);
   $$FlashcardsTableTableManager get flashcards =>
       $$FlashcardsTableTableManager(_db, _db.flashcards);
+  $$DppSetsTableTableManager get dppSets =>
+      $$DppSetsTableTableManager(_db, _db.dppSets);
+  $$DppQuestionsTableTableManager get dppQuestions =>
+      $$DppQuestionsTableTableManager(_db, _db.dppQuestions);
 }
