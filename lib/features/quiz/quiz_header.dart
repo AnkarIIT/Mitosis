@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/providers/providers.dart';
 import '../../core/models/question_model.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_colors.dart';
@@ -22,7 +21,6 @@ class QuizHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final quizState = ref.watch(quizProvider);
 
     return Column(
       children: [
@@ -162,7 +160,6 @@ class QuizAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final quizState = ref.watch(quizProvider);
 
     return AppBar(
       backgroundColor: Colors.transparent,
