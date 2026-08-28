@@ -27,7 +27,9 @@ class SubjectsTab extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () {
+              // TODO: subject search
+            },
           ),
         ],
       ),
@@ -66,100 +68,96 @@ class SubjectsTab extends ConsumerWidget {
                 final accuracy = subjectStats['accuracy'] as double;
                 final chapterCount = subject.chapters.length;
 
-                return GestureDetector(
-                  onTap: () {
-                    context.push('/subjects', extra: {'subjectId': subject.id, 'subjectName': subject.name});
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          _getSubjectColor(subject.id).withValues(alpha: 0.95),
-                          _getSubjectColor(subject.id).withValues(alpha: 0.65),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _getSubjectColor(subject.id).withValues(alpha: 0.2),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      context.push(
+                        '/subjects/${subject.id}',
+                        extra: {'subjectName': subject.name},
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            _getSubjectColor(subject.id).withValues(alpha: 0.95),
+                            _getSubjectColor(subject.id).withValues(alpha: 0.65),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          context.push('/subjects', extra: {'subjectId': subject.id, 'subjectName': subject.name});
-                        },
                         borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        boxShadow: [
+                          BoxShadow(
+                            color: _getSubjectColor(subject.id).withValues(alpha: 0.2),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      subject.icon,
+                                      style: const TextStyle(fontSize: 28),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      subject.name,
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                        color: AppColors.textLight,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          subject.icon,
-                                          style: const TextStyle(fontSize: 28),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          subject.name,
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                            color: AppColors.textLight,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.secondary.withValues(alpha: 0.3),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      '$accuracy%',
+                                      style: const TextStyle(
+                                        color: AppColors.textLight,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.secondary.withValues(alpha: 0.3),
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        child: Text(
-                                          '$accuracy%',
-                                          style: const TextStyle(
-                                            color: AppColors.textLight,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        '$chapterCount chapters',
-                                        style: const TextStyle(
-                                          color: AppColors.textLight,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '$chapterCount chapters',
+                                    style: const TextStyle(
+                                      color: AppColors.textLight,
+                                      fontSize: 11,
+                                    ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
