@@ -30,7 +30,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
   int? _commitment;
   bool _saving = false;
 
-  static const List<int> _yearOptions = [2027, 2028, 2029];
+  static const List<int> _yearOptions = [2026, 2027, 2028, 2029];
   static const List<int> _commitmentOptions = [30, 60, 90, 120];
 
   bool get _canProceed {
