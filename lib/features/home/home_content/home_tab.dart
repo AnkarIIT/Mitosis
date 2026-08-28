@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../core/providers/providers.dart';
 import '../../../core/models/subject_model.dart';
 import '../../../core/models/user_progress_model.dart';
+import '../../../core/models/batch_model.dart';
 import '../../../core/services/exam_engine_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
@@ -134,6 +135,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
             _buildResumeMockCard(context),
             // CBT Mock Test CTA
             _buildCbtMockTestCard(context, subjects),
+            _buildDppBanner(context),
             if (dueCount > 0) ...[
               const SizedBox(height: 12),
               _buildDueReviewBanner(context, dueCount),
@@ -158,6 +160,10 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
     final user = authState.user;
     final displayName = user?.fullName ?? user?.username ?? 'Guest';
     final avatarLetter = displayName[0].toUpperCase();
+    final batch = ref.watch(batchServiceProvider);
+    final batchSubtitle = batch != null
+        ? '${batch.type.displayName} • ${batch.studyMode.label}'
+        : 'NEET Aspirant';
     return Row(
       children: [
         CircleAvatar(
@@ -187,7 +193,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               ),
               const SizedBox(height: 2),
               Text(
-                'NEET 2026 Aspirant',
+                batchSubtitle,
                 style: TextStyle(
                   color: AppColors.textSubtle,
                   fontSize: 12,
@@ -356,14 +362,15 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   // ────────────────────────────────────────────────────────────
   Widget _buildFeaturedSubjectsHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'Featured Subjects',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textDark,
+        Expanded(
+          child: Text(
+            'Featured Subjects',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textDark,
+            ),
           ),
         ),
         GestureDetector(
@@ -434,16 +441,16 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
       child: Container(
         width: 155,
         margin: const EdgeInsets.only(right: 14),
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [color, color.withValues(alpha: 0.72)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 14, offset: const Offset(0, 6)),
+            BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 5)),
           ],
         ),
         child: Column(
@@ -452,37 +459,43 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
             // Thin accent bar
             Container(
               height: 3,
-              width: 40,
+              width: 32,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(_getSubjectIcon(subject.id), color: Colors.white, size: 30),
-                Icon(Icons.bookmark_border_rounded, color: Colors.white70, size: 20),
+                Icon(_getSubjectIcon(subject.id), color: Colors.white, size: 26),
+                Icon(Icons.bookmark_border_rounded, color: Colors.white70, size: 18),
               ],
             ),
             const Spacer(),
-            Text(
-              subject.name,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+            Expanded(
+              child: Text(
+                subject.name,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Text(
               '$chapterCount Chapters • $mcqCount MCQs',
-              style: const TextStyle(color: Colors.white70, fontSize: 11),
+              style: const TextStyle(color: Colors.white70, fontSize: 10),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             if (accuracy > 0) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               ClipRRect(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(3),
                 child: LinearProgressIndicator(
                   value: (accuracy / 100).clamp(0.0, 1.0),
-                  minHeight: 4,
+                  minHeight: 3,
                   backgroundColor: Colors.white24,
                   valueColor: const AlwaysStoppedAnimation(Colors.white),
                 ),
@@ -968,6 +981,67 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
         ),
       ),
     ).animate().fade(delay: 300.ms, duration: 400.ms);
+  }
+
+  // DPP Banner
+  Widget _buildDppBanner(BuildContext context) {
+    final subjects = ref.watch(subjectsProvider);
+    final labels = subjects.map((s) => s.name).toList();
+    return GestureDetector(
+      onTap: () {
+        if (labels.isNotEmpty) {
+          context.push('/dpp/${labels.first}');
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.secondary.withValues(alpha: 0.9),
+              AppColors.secondary.withValues(alpha: 0.7),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.edit_note_rounded, color: Colors.white, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Daily Practice Paper',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${labels.join(', ')} • 20 mixed questions',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white60, size: 16),
+          ],
+        ),
+      ),
+    ).animate().fade(delay: 280.ms, duration: 400.ms);
   }
 
   // Weak Topics Banner
