@@ -11,7 +11,6 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import 'quiz_header.dart';
 import 'question_card.dart';
-import 'option_tile.dart';
 import 'quiz_footer.dart';
 
 class EnhancedQuizScreen extends ConsumerStatefulWidget {
@@ -43,7 +42,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   bool _isEvaluatingShortAnswer = false;
   double? _shortAnswerScore;
   String? _shortAnswerFeedback;
-  bool _isGettingHint = false;
+
   bool _hasNavigatedToResults = false;
 
   @override
@@ -112,13 +111,10 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
       return;
     }
 
-    setState(() => _isGettingHint = true);
     final hint = await ref.read(geminiServiceProvider).getQuizHint(
           question.questionText,
           question.options.join(', '),
         );
-    if (!mounted) return;
-    setState(() => _isGettingHint = false);
     _showHintDialog(hint);
   }
 
