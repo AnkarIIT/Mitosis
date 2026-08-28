@@ -84,7 +84,7 @@ class FlashcardGenerationService {
       return;
     }
 
-    final proxy = _proxy!;
+    final proxy = _proxy;
 
     // 1. Resolve asset path.
     final assetPath = assetPathOverride ??
@@ -232,7 +232,7 @@ class FlashcardGenerationService {
     int count = 20,
     String? assetPathOverride,
   }) async {
-    if (_proxy == null || !_proxy!.isConfigured) return const [];
+    if (_proxy == null || !_proxy.isConfigured) return const [];
 
     final cards = <GeneratedFlashcard>[];
 
@@ -258,7 +258,7 @@ class FlashcardGenerationService {
           count: 1,
         );
 
-        final result = await _proxy!.generate(
+        final result = await _proxy.generate(
           prompt: prompt,
           systemPrompt: _systemPrompt,
         );
