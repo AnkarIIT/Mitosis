@@ -26,4 +26,7 @@ class Questions extends Table {
 
   /// False once a catalog question is removed/deactivated on the server.
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+
+  /// Origin of the question: 'seeded', 'pyq', 'dpp', 'imported'.
+  TextColumn get source => text().withDefault(const Constant('seeded'))();
 }

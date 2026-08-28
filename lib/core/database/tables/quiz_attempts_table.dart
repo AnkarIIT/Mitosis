@@ -16,6 +16,11 @@ class QuizAttempts extends Table {
   // re-deriving it with a hardcoded formula. Nullable for pre-v22 rows.
   IntColumn get rawScore => integer().nullable()();
   IntColumn get maxMarks => integer().nullable()();
+
+  /// Ordered IDs of the questions presented in this attempt, JSON-encoded.
+  /// Used to avoid repeating the same questions in later quizzes/mocks.
+  TextColumn get questionIds => text().nullable()();
+
   DateTimeColumn get updatedAt =>
       dateTime().nullable().clientDefault(() => DateTime.now())();
 }
