@@ -6,6 +6,8 @@ import '../providers/providers.dart';
 import '../../features/auth/auth_screen.dart';
 import '../../features/auth/otp_screen.dart';
 import '../../features/auth/two_factor_screen.dart';
+import '../../features/auth/terms_screen.dart';
+import '../../features/auth/privacy_policy_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/home/home_shell_screen.dart';
 import '../../features/home/home_content/home_tab.dart';
@@ -37,6 +39,7 @@ import '../../features/settings/settings_screen.dart';
 import '../../features/settings/import_questions_screen.dart';
 import '../../features/pdf/ncert_pdf_screen.dart';
 import '../../features/bookmarks/bookmarks_dashboard.dart';
+import '../../features/dpp/dpp_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -127,6 +130,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/auth', builder: (_, _) => const AuthScreen()),
       GoRoute(path: '/otp', builder: (_, _) => const OtpScreen()),
       GoRoute(path: '/2fa', builder: (_, _) => const TwoFactorScreen()),
+      GoRoute(path: '/terms', builder: (_, _) => const TermsScreen()),
+      GoRoute(path: '/privacy', builder: (_, _) => const PrivacyPolicyScreen()),
       GoRoute(
           path: '/onboarding',
           builder: (_, _) => const OnboardingScreen()),
@@ -305,6 +310,13 @@ GoRoute(
       GoRoute(
         path: '/study-plan',
         builder: (_, _) => const StudyPlanScreen(),
+      ),
+      GoRoute(
+        path: '/dpp/:subject',
+        builder: (_, state) {
+          final subject = state.pathParameters['subject'] ?? 'physics';
+          return DppScreen(subject: subject);
+        },
       ),
     ],
   );
