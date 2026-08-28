@@ -25,9 +25,13 @@ void main() async {
 
   if (AppConfig.enableCloudAuth) {
     try {
+      final url = AppConfig.supabaseUrl;
+      final key = AppConfig.supabaseAnonKey;
+      debugPrint('🔧 Supabase URL: $url');
+      debugPrint('🔧 Supabase key prefix: ${key.substring(0, key.length > 10 ? 10 : key.length)}...');
       await supabase.Supabase.initialize(
-        url: AppConfig.supabaseUrl,
-        anonKey: AppConfig.supabaseAnonKey,
+        url: url,
+        publishableKey: key,
       );
       debugPrint('✅ Supabase connected: ${AppConfig.supabaseUrl}');
     } catch (e) {
