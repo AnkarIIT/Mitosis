@@ -1,7 +1,13 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AppConfig {
-  static String? get _env(String key) => dotenv.env[key];
+  static String? _env(String key) {
+    try {
+      return dotenv.env[key];
+    } on Object {
+      return null;
+    }
+  }
 
   static String get supabaseUrl =>
       _env('SUPABASE_URL') ??
@@ -24,5 +30,10 @@ class AppConfig {
   static bool get enableCloudAuth => isCloudAuthConfigured;
   static const bool enableCloudSync = false;
   static const bool enableAiProxy = false;
+
+  static bool get googleSignInAvailable =>
+      isCloudAuthConfigured && supabaseUrl.trim().isNotEmpty;
+
+  static String? get googleServerClientId => _env('GOOGLE_SERVER_CLIENT_ID');
 }
 
