@@ -38,12 +38,12 @@ class TopicDetailScreen extends ConsumerWidget {
     if (topic == null) {
       return const Scaffold(body: Center(child: Text('Topic not found')));
     }
-
+    final resolvedTopic = topic;
     final questionsAsync = ref.watch(questionsForTopicProvider(topicId));
     final subjects = ref.watch(subjectsProvider);
     final chapter = subjects
         .expand((s) => s.chapters)
-        .where((c) => c.id == topic!.chapterId)
+        .where((c) => c.id == resolvedTopic.chapterId)
         .firstOrNull;
     final ncertEntry = chapter == null
         ? null
@@ -62,7 +62,7 @@ class TopicDetailScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
-        title: Text(topic.name),
+        title: Text(resolvedTopic.name),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -132,7 +132,7 @@ class TopicDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    topic.name,
+                    resolvedTopic.name,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: AdaptiveColors.textPrimary(context),
                       fontWeight: FontWeight.bold,
@@ -150,7 +150,7 @@ class TopicDetailScreen extends ConsumerWidget {
                       const SizedBox(width: 12),
                       _InfoPill(
                         label: 'Difficulty',
-                        value: topic.difficulty,
+                        value: resolvedTopic.difficulty,
                         color: AppColors.secondary.withValues(alpha: 0.15),
                       ),
                       const SizedBox(width: 12),
@@ -186,7 +186,7 @@ class TopicDetailScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    topic.summary ??
+                    resolvedTopic.summary ??
                         'Review the core concepts from the NCERT textbook to prepare for your test.',
                     style: TextStyle(
                       fontSize: 15,
@@ -220,7 +220,7 @@ class TopicDetailScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            ...(topic.keyPoints ?? _getDefaultKeyPoints(topic)).map((point) {
+            ...(resolvedTopic.keyPoints ?? _getDefaultKeyPoints(topic)).map((point) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
@@ -309,7 +309,7 @@ class TopicDetailScreen extends ConsumerWidget {
               child: ElevatedButton(
 onPressed: () {
                     if (hasQuestions) {
-                      context.push('/quiz?topicId=${Uri.encodeComponent(topic!.id)}&topicName=${Uri.encodeComponent(topic!.name)}&subject=${Uri.encodeComponent(subjectName)}');
+                      context.push('/quiz?topicId=${Uri.encodeComponent(resolvedTopic.id)}&topicName=${Uri.encodeComponent(resolvedTopic.name)}&subject=${Uri.encodeComponent(subjectName)}');
                       return;
                     }
 
