@@ -37,6 +37,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     with WidgetsBindingObserver {
   static const _optionLabels = ['A', 'B', 'C', 'D'];
 
+  Set<String>? _excludedIds;
+
   // Palette state colours (NTA-style).
   static const Color _cMarked = Color(0xFF7E57C2); // purple
 
@@ -88,6 +90,14 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    // Exclude recently seen questions so each mock test feels fresh.
+    final seen = ref.read(recentlySeenQuestionIdsProvider(null).future);
+    seen.then((ids) {
+      if (mounted) {
+        setState(() => _excludedIds = ids);
+      }
+    });
+
     final resume = widget.resumeFrom;
     final rebuilt = resume != null ? _rebuildSections(resume) : null;
 
@@ -113,6 +123,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _sectionQuestions = ExamEngineService.allocateQuestions(
         widget.questionPool,
         widget.config,
+        excludedIds: _excludedIds,
       );
       _deadline = DateTime.now()
           .add(Duration(seconds: widget.config.totalDurationSeconds));
