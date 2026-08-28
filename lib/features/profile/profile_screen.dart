@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/models/achievement_model.dart';
+import '../../core/services/achievement_service.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -85,7 +87,41 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             _buildStatsOverview(stats),
             const SizedBox(height: 24),
             _buildSettingsCard(context),
+            const SizedBox(height: 24),
+            _buildLogoutButton(context),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () async {
+          final confirm = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Logout'),
+              content: const Text('Are you sure you want to logout?'),
+              actions: [
+                TextButton(onPressed: () => context.pop(false), child: const Text('CANCEL')),
+                TextButton(onPressed: () => context.pop(true), child: const Text('LOGOUT')),
+              ],
+            ),
+          );
+          if (confirm != true) return;
+          await ref.read(authProvider.notifier).logout();
+          if (!context.mounted) return;
+          context.go('/auth');
+        },
+        icon: const Icon(Icons.logout_rounded),
+        label: const Text('Logout'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.red.shade400,
+          side: BorderSide(color: Colors.red.shade400.withValues(alpha: 0.3)),
+          padding: const EdgeInsets.symmetric(vertical: 14),
         ),
       ),
     );
@@ -147,24 +183,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'NEET Target Score',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'NEET Target Score',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Aim high, work hard',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSubtle,
+                      Text(
+                        'Aim high, work hard',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSubtle,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 if (!_isEditing)
                   Text(
@@ -204,9 +242,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Current Est: ${currentAccuracy.toStringAsFixed(0)}',
-                  style: const TextStyle(fontSize: 12),
+                Expanded(
+                  child: Text(
+                    'Current Est: ${currentAccuracy.toStringAsFixed(0)}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -228,48 +268,124 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildAchievementSection(Map<String, dynamic> stats) {
+    final progress = ref.read(userProgressProvider);
+    final board = AchievementService.achievementBoard(progress);
+    final earned = board.where((item) => item['earned'] == true).toList();
+    final locked = board.where((item) => item['earned'] != true).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Achievements',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        const SizedBox(height: 16),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildBadge(
-              Icons.local_fire_department,
-              '3 Day Streak',
-              Colors.orange,
+            const Expanded(
+              child: Text(
+                'Achievements',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
             ),
-            _buildBadge(Icons.verified, 'Quick Learner', Colors.blue),
-            _buildBadge(Icons.emoji_events, '70% Accuracy', Colors.amber),
+            if (locked.isNotEmpty)
+              TextButton.icon(
+                onPressed: () => _showAllAchievements(context, board),
+                icon: const Icon(Icons.lock_open, size: 16),
+                label: const Text('View all'),
+              ),
           ],
         ),
+        const SizedBox(height: 16),
+        if (earned.isEmpty)
+          _GitHubStyleAchievementTile(
+            icon: Icons.lock_outline,
+            title: 'No achievements yet',
+            description: 'Start solving questions to earn your first trophy.',
+            color: AppColors.divider,
+            locked: true,
+          )
+        else
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: earned
+                  .map((item) {
+                    final achievement = item['achievement'] as Achievement;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: _GitHubStyleAchievementTile(
+                        icon: achievement.icon,
+                        title: achievement.title,
+                        description: achievement.description,
+                        color: achievement.color,
+                        locked: false,
+                      ),
+                    );
+                  })
+                  .toList(),
+            ),
+          ),
+        if (locked.isNotEmpty) const SizedBox(height: 12),
+        if (locked.isNotEmpty)
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: locked
+                .take(6)
+                .map((item) {
+                  final achievement = item['achievement'] as Achievement;
+                  return _LockedAchievementChip(achievement: achievement);
+                })
+                .toList(),
+          ),
       ],
     );
   }
 
-  Widget _buildBadge(IconData icon, String label, Color color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 28),
+  void _showAllAchievements(
+    BuildContext context,
+    List<Map<String, dynamic>> board,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (context, scrollController) => Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(20),
+              child: Text(
+                'All Achievements',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: board.length,
+                itemBuilder: (context, index) {
+                  final item = board[index];
+                  final achievement = item['achievement'] as Achievement;
+                  final earned = item['earned'] == true;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _GitHubStyleAchievementTile(
+                      icon: achievement.icon,
+                      title: achievement.title,
+                      description: achievement.description,
+                      color: achievement.color,
+                      locked: !earned,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
-          textAlign: TextAlign.center,
-        ),
-      ],
+      ),
     );
   }
 
@@ -351,6 +467,130 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         subtitle: const Text('Appearance, sync, AI preferences'),
         trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
         onTap: () => context.push('/settings'),
+      ),
+    );
+  }
+}
+
+class _GitHubStyleAchievementTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String description;
+  final Color color;
+  final bool locked;
+
+  const _GitHubStyleAchievementTile({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.color,
+    required this.locked,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minWidth: 180, maxWidth: 220),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: locked
+            ? AppColors.surface
+            : color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: locked
+              ? AppColors.divider.withValues(alpha: 0.4)
+              : color.withValues(alpha: 0.25),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: (locked ? AppColors.divider : color)
+                  .withValues(alpha: locked ? 0.1 : 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              locked ? Icons.lock_outline : icon,
+              color: locked ? AppColors.divider : color,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: locked ? AppColors.divider : AppColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: locked
+                        ? AppColors.divider
+                        : AppColors.textSubtle,
+                    height: 1.3,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          if (!locked)
+            Icon(Icons.verified_rounded, color: color, size: 18),
+        ],
+      ),
+    );
+  }
+}
+
+class _LockedAchievementChip extends StatelessWidget {
+  final Achievement achievement;
+
+  const _LockedAchievementChip({required this.achievement});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.divider.withValues(alpha: 0.4),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.lock_outline,
+            size: 14,
+            color: AppColors.divider,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            achievement.title,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.divider,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
