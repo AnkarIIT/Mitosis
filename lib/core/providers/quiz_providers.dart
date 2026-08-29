@@ -18,6 +18,9 @@ class QuizState {
   final int timeElapsedSeconds;
   final bool isCompleted;
   final Map<int, int> timeSpentPerQuestion;
+  final Set<int> flaggedQuestions;
+  final Set<int> visitedQuestions;
+  final int seed;
 
   QuizState({
     required this.questions,
@@ -29,6 +32,9 @@ class QuizState {
     this.timeElapsedSeconds = 0,
     this.isCompleted = false,
     this.timeSpentPerQuestion = const {},
+    this.flaggedQuestions = const {},
+    this.visitedQuestions = const {},
+    this.seed = 0,
   });
 
   QuizState copyWith({
@@ -41,6 +47,9 @@ class QuizState {
     int? timeElapsedSeconds,
     bool? isCompleted,
     Map<int, int>? timeSpentPerQuestion,
+    Set<int>? flaggedQuestions,
+    Set<int>? visitedQuestions,
+    int? seed,
   }) {
     return QuizState(
       questions: questions ?? this.questions,
@@ -52,6 +61,9 @@ class QuizState {
       timeElapsedSeconds: timeElapsedSeconds ?? this.timeElapsedSeconds,
       isCompleted: isCompleted ?? this.isCompleted,
       timeSpentPerQuestion: timeSpentPerQuestion ?? this.timeSpentPerQuestion,
+      flaggedQuestions: flaggedQuestions ?? this.flaggedQuestions,
+      visitedQuestions: visitedQuestions ?? this.visitedQuestions,
+      seed: seed ?? this.seed,
     );
   }
 
@@ -66,8 +78,8 @@ class QuizState {
 class QuizNotifier extends StateNotifier<QuizState> {
   QuizNotifier() : super(QuizState(questions: const []));
 
-  void initializeQuiz(List<Question> questions) {
-    final random = Random(DateTime.now().microsecondsSinceEpoch);
+  void initializeQuiz(List<Question> questions, {int? seed}) {
+    final random = Random(seed ?? DateTime.now().microsecondsSinceEpoch);
     final randomizedQuestions = questions.map((q) {
       final shuffledOptions = List<String>.from(q.options)..shuffle(random);
       return Question(
@@ -88,7 +100,7 @@ class QuizNotifier extends StateNotifier<QuizState> {
         type: q.type,
       );
     }).toList();
-    state = QuizState(questions: randomizedQuestions);
+    state = QuizState(questions: randomizedQuestions, seed: seed ?? random.nextInt(1 << 30));
   }
 
   void selectAnswer(
@@ -126,31 +138,64 @@ class QuizNotifier extends StateNotifier<QuizState> {
     final newTimeSpent = Map<int, int>.from(state.timeSpentPerQuestion);
     newTimeSpent[questionIndex] = timeSpent;
 
+    final visited = Set<int>.from(state.visitedQuestions)..add(questionIndex);
+
     state = state.copyWith(
       selectedAnswers: {...state.selectedAnswers, questionIndex: answer},
       answerResults: results,
       score: score,
       incorrectCount: incorrectCount,
       timeSpentPerQuestion: newTimeSpent,
+      visitedQuestions: visited,
     );
   }
 
   void nextQuestion() {
     if (state.currentIndex < state.questions.length - 1) {
-      state = state.copyWith(currentIndex: state.currentIndex + 1);
+      final visited = Set<int>.from(state.visitedQuestions)..add(state.currentIndex + 1);
+      state = state.copyWith(
+        currentIndex: state.currentIndex + 1,
+        visitedQuestions: visited,
+      );
     } else {
       state = state.copyWith(isCompleted: true);
     }
-  }
-
-  void completeQuiz() {
-    state = state.copyWith(isCompleted: true);
   }
 
   void previousQuestion() {
     if (state.currentIndex > 0) {
       state = state.copyWith(currentIndex: state.currentIndex - 1);
     }
+  }
+
+  void goToQuestion(int index) {
+    if (index >= 0 && index < state.questions.length) {
+      final visited = Set<int>.from(state.visitedQuestions)..add(index);
+      state = state.copyWith(
+        currentIndex: index,
+        visitedQuestions: visited,
+      );
+    }
+  }
+
+  void toggleFlag(int questionIndex) {
+    if (questionIndex < 0 || questionIndex >= state.questions.length) return;
+    final flagged = Set<int>.from(state.flaggedQuestions);
+    if (flagged.contains(questionIndex)) {
+      flagged.remove(questionIndex);
+    } else {
+      flagged.add(questionIndex);
+    }
+    state = state.copyWith(flaggedQuestions: flagged);
+  }
+
+  void markForReviewAndNext() {
+    toggleFlag(state.currentIndex);
+    nextQuestion();
+  }
+
+  void completeQuiz() {
+    state = state.copyWith(isCompleted: true);
   }
 
   void updateTimeElapsed(int seconds) {
