@@ -12,6 +12,7 @@ import '../services/content_sync_service.dart';
 import '../services/question_history_service.dart';
 import '../services/dpp_engine.dart';
 import 'core_providers.dart';
+import '../database/drift_database.dart' as db;
 
 // ============= SUBJECT & CONTENT =============
 final subjectsProvider = Provider<List<Subject>>((ref) {
@@ -180,3 +181,93 @@ final todayDppProvider = FutureProvider.family<DppResult?, String>((ref, subject
   final engine = ref.watch(dppEngineProvider);
   return await engine.generate(DppConfig.single(subject: subject));
 });
+
+// ============= DPP ANALYTICS =============
+
+final dppStreakProvider = FutureProvider<int>((ref) async {
+  final database = ref.watch(databaseProvider);
+  return await _computeDppStreak(database);
+});
+
+final dppWeeklyAccuracyProvider = FutureProvider<Map<DateTime, double>>((ref) async {
+  final database = ref.watch(databaseProvider);
+  return await _computeWeeklyAccuracy(database);
+});
+
+Future<int> _computeDppStreak(db.AppDatabase database) async {
+  try {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final rows = await database.getDppSets();
+    final allSets = List.from(rows);
+
+    final byDate = <DateTime, dynamic>{};
+    for (final s in allSets) {
+      final parts = (s as dynamic).date.split('-');
+      if (parts.length != 3) continue;
+      final d = DateTime(
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+        int.parse(parts[2]),
+      );
+      final existing = byDate[d];
+      if (existing == null || (s as dynamic).updatedAt.isAfter((existing as dynamic).updatedAt)) {
+        byDate[d] = s;
+      }
+    }
+
+    int streak = 0;
+    DateTime check = today;
+    while (true) {
+      final key = DateTime(check.year, check.month, check.day);
+      final daySet = byDate[key];
+      if (daySet != null && (daySet as dynamic).isCompleted) {
+        streak += 1;
+        check = key.subtract(const Duration(days: 1));
+      } else if (key == today) {
+        check = key.subtract(const Duration(days: 1));
+        continue;
+      } else {
+        break;
+      }
+    }
+
+    return streak;
+  } catch (e) {
+    return 0;
+  }
+}
+
+Future<Map<DateTime, double>> _computeWeeklyAccuracy(db.AppDatabase database) async {
+  try {
+    final now = DateTime.now();
+    final result = <DateTime, double>{};
+
+    for (int i = 6; i >= 0; i--) {
+      final day = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
+      final dateStr = '${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}';
+      final sets = await (database.select(database.dppSets)..where((t) => t.date.equals(dateStr))).get();
+
+      if (sets.isEmpty) {
+        result[DateTime(day.year, day.month, day.day)] = 0.0;
+        continue;
+      }
+
+      int totalCorrect = 0;
+      int totalQuestions = 0;
+      for (final s in sets) {
+        if (!(s as dynamic).isCompleted) continue;
+        totalCorrect += (s as dynamic).correctCount as int;
+        totalQuestions += (s as dynamic).totalQuestions as int;
+      }
+
+      final accuracy = totalQuestions == 0 ? 0.0 : (totalCorrect / totalQuestions) * 100;
+      result[DateTime(day.year, day.month, day.day)] = accuracy;
+    }
+
+    return result;
+  } catch (e) {
+    return {};
+  }
+}

@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/database/drift_database.dart' as db;
+import '../../core/providers/core_providers.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/theme/app_colors.dart';
+import 'package:drift/drift.dart' hide Column;
 
 class DppAttemptScreen extends ConsumerStatefulWidget {
   final DppResult dppResult;
@@ -117,8 +121,56 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
       ),
     );
 
+    await _persistDppResult(
+      correctCount: correct.length,
+      incorrectCount: incorrect.length,
+      unattemptedCount: unattempted.length,
+    );
+
     if (!mounted) return;
     context.go('/');
+  }
+
+  Future<void> _persistDppResult({
+    required int correctCount,
+    required int incorrectCount,
+    required int unattemptedCount,
+  }) async {
+    try {
+      final database = ref.read(databaseProvider);
+      final set = widget.dppResult.set;
+      final timeSpent = _durationSeconds - _deadline!.difference(DateTime.now()).inSeconds;
+      final safeTime = timeSpent > 0 ? timeSpent : _durationSeconds;
+
+      await (database.update(database.dppSets)..where((t) => t.id.equals(set.id))).write(
+        db.DppSetsCompanion(
+          correctCount: Value(correctCount),
+          incorrectCount: Value(incorrectCount),
+          unattemptedCount: Value(unattemptedCount),
+          timeSpentSeconds: Value(safeTime),
+          isCompleted: Value(true),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+
+      await database.insertQuizAttempt(
+        db.QuizAttemptsCompanion.insert(
+          topicId: 'dpp_${set.subject.toLowerCase()}',
+          subject: set.subject,
+          testType: const Value('dpp'),
+          score: correctCount,
+          incorrectCount: Value(incorrectCount),
+          totalQuestions: _questions.length,
+          timeSpentSeconds: safeTime,
+          attemptedAt: DateTime.now(),
+          selectedAnswers: jsonEncode(List<String>.filled(_questions.length, '')),
+          rawScore: Value(correctCount * 4 - incorrectCount),
+          maxMarks: Value(_questions.length * 4),
+        ),
+      );
+    } catch (e) {
+      debugPrint('❌ Error persisting DPP result: $e');
+    }
   }
 
   @override

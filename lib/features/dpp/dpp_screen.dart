@@ -20,14 +20,18 @@ class _DppScreenState extends ConsumerState<DppScreen> {
   DppResult? _currentResult;
 
   Future<void> _startDpp(DppResult result, DppConfig config) async {
-    final durationMinutes = result.set.durationMinutes ?? config.durationMinutes;
+    final durationMinutes =
+        result.set.durationMinutes ?? config.durationMinutes;
     if (!mounted) return;
 
-    await context.push('/dpp/attempt', extra: {
-      'dppResult': result,
-      'durationMinutes': durationMinutes,
-      'config': config,
-    });
+    await context.push(
+      '/dpp/attempt',
+      extra: {
+        'dppResult': result,
+        'durationMinutes': durationMinutes,
+        'config': config,
+      },
+    );
   }
 
   Future<void> _generateDpp(DppConfig config) async {
@@ -46,7 +50,9 @@ class _DppScreenState extends ConsumerState<DppScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Not enough questions available for DPP. Please import more questions.'),
+            content: Text(
+              'Not enough questions available for DPP. Please import more questions.',
+            ),
             backgroundColor: Colors.orange,
           ),
         );
@@ -112,10 +118,12 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
-              if (widget.subject == 'Physics' || widget.subject == 'Chemistry' || widget.subject == 'Biology')
+              if (widget.subject == 'Physics' ||
+                  widget.subject == 'Chemistry' ||
+                  widget.subject == 'Biology')
                 PopupMenuItem(
                   value: DppConfig.mixed(
-                    subjects: ['Physics', 'Chemistry', 'Biology'],
+                    subjects: const ['Physics', 'Chemistry', 'Biology'],
                     weights: const {
                       'Physics': 45,
                       'Chemistry': 45,
@@ -147,7 +155,11 @@ class _DppScreenState extends ConsumerState<DppScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.edit_note_rounded, size: 64, color: Theme.of(context).primaryColor.withValues(alpha: 0.5)),
+              Icon(
+                Icons.edit_note_rounded,
+                size: 64,
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
+              ),
               const SizedBox(height: 16),
               Text(
                 'No DPP available yet',
@@ -163,7 +175,14 @@ class _DppScreenState extends ConsumerState<DppScreen> {
               ElevatedButton.icon(
                 onPressed: _isGenerating ? null : _regenerateLast,
                 icon: _isGenerating
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
                     : const Icon(Icons.auto_fix_high_rounded),
                 label: Text(_isGenerating ? 'Generating...' : 'Generate DPP'),
               ),
@@ -182,7 +201,6 @@ class _DppScreenState extends ConsumerState<DppScreen> {
     final isCompleted = dppSet.isCompleted;
     final duration = dppSet.durationMinutes ?? 20;
 
-    // Calculate subject-wise breakdown
     final subjectBreakdown = _calculateSubjectBreakdown(result);
 
     return SingleChildScrollView(
@@ -198,7 +216,10 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_rounded, color: Theme.of(context).primaryColor),
+                      Icon(
+                        Icons.calendar_today_rounded,
+                        color: Theme.of(context).primaryColor,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'DPP - ${dppSet.date}',
@@ -211,9 +232,24 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _buildStat('Total', '$total', context),
-                      _buildStat('Correct', '$correct', context, color: Colors.green),
-                      _buildStat('Incorrect', '$incorrect', context, color: Colors.red),
-                      _buildStat('Skipped', '$unattempted', context, color: Colors.orange),
+                      _buildStat(
+                        'Correct',
+                        '$correct',
+                        context,
+                        color: Colors.green,
+                      ),
+                      _buildStat(
+                        'Incorrect',
+                        '$incorrect',
+                        context,
+                        color: Colors.red,
+                      ),
+                      _buildStat(
+                        'Skipped',
+                        '$unattempted',
+                        context,
+                        color: Colors.orange,
+                      ),
                     ],
                   ),
                   if (isCompleted) ...[
@@ -221,17 +257,20 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                     LinearProgressIndicator(
                       value: total > 0 ? correct / total : 0,
                       backgroundColor: Colors.grey[300],
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.green,
+                      ),
                     ),
                   ],
-                  // Subject-wise breakdown
                   if (subjectBreakdown.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     const Divider(),
                     const SizedBox(height: 8),
                     Text(
                       'Subject Breakdown',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
@@ -242,19 +281,30 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                         final stats = entry.value;
                         final subjTotal = stats['total']!;
                         final subjCorrect = stats['correct']!;
-                        final subjAccuracy = subjTotal > 0 ? (subjCorrect / subjTotal * 100) : 0.0;
+                        final subjAccuracy = subjTotal > 0
+                            ? (subjCorrect / subjTotal * 100)
+                            : 0.0;
                         final color = _subjectColor(subj);
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: color.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: color.withValues(alpha: 0.3)),
+                            border: Border.all(
+                              color: color.withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.circle_rounded, size: 10, color: color),
+                              Icon(
+                                Icons.circle_rounded,
+                                size: 10,
+                                color: color,
+                              ),
                               const SizedBox(width: 6),
                               Text(
                                 '$subj: $subjCorrect/$subjTotal (${subjAccuracy.toStringAsFixed(1)}%)',
@@ -270,15 +320,12 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                       }).toList(),
                     ),
                   ],
-                ),
+                ],
               ),
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'Questions',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('Questions', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           ListView.builder(
             shrinkWrap: true,
@@ -294,14 +341,19 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  subtitle: Text('${q.subject} • ${q.difficulty} • ${q.year ?? "No year"}'),
+                  subtitle: Text(
+                    '${q.subject} • ${q.difficulty} • ${q.year ?? 'No year'}',
+                  ),
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(q.questionText, style: const TextStyle(fontSize: 16)),
+                          Text(
+                            q.questionText,
+                            style: const TextStyle(fontSize: 16),
+                          ),
                           const SizedBox(height: 12),
                           ...q.options.asMap().entries.map((entry) {
                             final idx = entry.key;
@@ -316,13 +368,17 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                                     height: 28,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: isCorrect ? Colors.green : Colors.grey[300],
+                                      color: isCorrect
+                                          ? Colors.green
+                                          : Colors.grey[300],
                                     ),
                                     child: Center(
                                       child: Text(
                                         String.fromCharCode(65 + idx),
                                         style: TextStyle(
-                                          color: isCorrect ? Colors.white : Colors.black87,
+                                          color: isCorrect
+                                              ? Colors.white
+                                              : Colors.black87,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 12,
                                         ),
@@ -340,7 +396,10 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                             const Divider(),
                             Text(
                               'Explanation:',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).primaryColor,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(q.explanation!),
@@ -355,11 +414,17 @@ class _DppScreenState extends ConsumerState<DppScreen> {
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
-            onPressed: _isGenerating ? null : () async {
-              await _startDpp(result, _lastConfig!);
-            },
-            icon: Icon(isCompleted ? Icons.play_arrow_rounded : Icons.timer_rounded),
-            label: Text(isCompleted ? 'Retake DPP' : 'Start DPP ($duration min)'),
+            onPressed: _isGenerating
+                ? null
+                : () async {
+                    await _startDpp(result, _lastConfig!);
+                  },
+            icon: Icon(
+              isCompleted ? Icons.play_arrow_rounded : Icons.timer_rounded,
+            ),
+            label: Text(
+              isCompleted ? 'Retake DPP' : 'Start DPP ($duration min)',
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).primaryColor,
               foregroundColor: Colors.white,
@@ -378,7 +443,10 @@ class _DppScreenState extends ConsumerState<DppScreen> {
   Map<String, Map<String, int>> _calculateSubjectBreakdown(DppResult result) {
     final breakdown = <String, Map<String, int>>{};
     for (final q in result.questions) {
-      breakdown.putIfAbsent(q.subject, () => {'total': 0, 'correct': 0, 'incorrect': 0, 'unattempted': 0});
+      breakdown.putIfAbsent(
+        q.subject,
+        () => {'total': 0, 'correct': 0, 'incorrect': 0, 'unattempted': 0},
+      );
       breakdown[q.subject]!['total'] = breakdown[q.subject]!['total']! + 1;
     }
     return breakdown;
@@ -391,11 +459,29 @@ class _DppScreenState extends ConsumerState<DppScreen> {
     return Colors.green;
   }
 
-  Widget _buildStat(String label, String value, BuildContext context, {Color? color}) {
+  Widget _buildStat(
+    String label,
+    String value,
+    BuildContext context, {
+    Color? color,
+  }) {
     return Column(
       children: [
-        Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-        Text(label, style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodySmall?.color)),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Theme.of(context).textTheme.bodySmall?.color,
+          ),
+        ),
       ],
     );
   }
