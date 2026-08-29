@@ -42,6 +42,7 @@ import '../../features/pdf/ncert_pdf_screen.dart';
 import '../../features/bookmarks/bookmarks_dashboard.dart';
 import '../../features/dpp/dpp_screen.dart';
 import '../../features/dpp/dpp_attempt_screen.dart';
+import '../../features/dpp/dpp_neet_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -326,6 +327,12 @@ GoRoute(
       GoRoute(
         path: '/study-plan',
         builder: (_, _) => const StudyPlanScreen(),
+      ),
+      GoRoute(
+        path: '/dpp/neet',
+        builder: (_, _) {
+          return const DppNeetScreen();
+        },
       ),
       GoRoute(
         path: '/dpp/:subject',
