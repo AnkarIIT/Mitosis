@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/models/question_model.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
@@ -7,11 +8,15 @@ import 'package:go_router/go_router.dart';
 class CbtResultScreen extends StatelessWidget {
   final QuizAttempt attempt;
   final TestAnalytics analytics;
+  final List<Question>? questions;
+  final Map<int, String?>? answersByIndex;
 
   const CbtResultScreen({
     super.key,
     required this.attempt,
     required this.analytics,
+    this.questions,
+    this.answersByIndex,
   });
 
   @override
@@ -19,8 +24,6 @@ class CbtResultScreen extends StatelessWidget {
     final raw = analytics.score.rawScore;
     final maxScore = analytics.score.maxScore;
     final accuracy = analytics.score.accuracy;
-    // Colour by score ratio, not a 720-based threshold: practice tests and
-    // optional-section mocks have a smaller maxScore.
     final ratio = maxScore <= 0 ? 0.0 : raw / maxScore;
     final color = ratio >= 0.5
         ? AppColors.success
@@ -47,9 +50,6 @@ class CbtResultScreen extends StatelessWidget {
           children: [
             _buildScoreHeader(context, raw, maxScore, accuracy, color),
             const SizedBox(height: 16),
-            // Percentile/AIR are only defensible for a full-length mock, and even
-            // then they're a rough model — gate + label them (never claim an
-            // official NEET rank).
             if (analytics.showRankEstimate) ...[
               _buildRankEstimates(context),
               const SizedBox(height: 8),
@@ -72,6 +72,11 @@ class CbtResultScreen extends StatelessWidget {
               const SizedBox(height: 20),
               _buildSectionTitle(context, 'Weak Topics to Revise'),
               _buildWeakTopics(context),
+            ],
+            if (questions != null && questions!.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              _buildSectionTitle(context, 'Question Review'),
+              _buildQuestionReview(context),
             ],
             const SizedBox(height: 28),
             ElevatedButton(
@@ -437,11 +442,171 @@ class CbtResultScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildQuestionReview(BuildContext context) {
+    final allQuestions = questions ?? const <Question>[];
+    final answers = answersByIndex ?? const <int, String?>{};
+
+    if (allQuestions.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final correct = <int>[];
+    final incorrect = <int>[];
+    final unattempted = <int>[];
+
+    for (var i = 0; i < allQuestions.length; i++) {
+      final q = allQuestions[i];
+      final answer = answers[i];
+      if (answer == null || answer.isEmpty) {
+        unattempted.add(i);
+      } else if (answer.trim() == q.correctAnswer.trim()) {
+        correct.add(i);
+      } else {
+        incorrect.add(i);
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            _buildReviewChip(context, 'Correct', correct.length, AppColors.success),
+            const SizedBox(width: 8),
+            _buildReviewChip(context, 'Incorrect', incorrect.length, AppColors.error),
+            const SizedBox(width: 8),
+            _buildReviewChip(context, 'Skipped', unattempted.length, AppColors.warning),
+          ],
+        ),
+        const SizedBox(height: 12),
+        ...List.generate(allQuestions.length, (index) {
+          final q = allQuestions[index];
+          final userAnswer = answers[index];
+          final isCorrect = correct.contains(index);
+          final isIncorrect = incorrect.contains(index);
+          // Unattached logic is intentionally folded into the else branch below.
+
+          Color statusColor;
+          IconData statusIcon;
+          String statusText;
+          if (isCorrect) {
+            statusColor = AppColors.success;
+            statusIcon = Icons.check_circle_rounded;
+            statusText = 'Correct';
+          } else if (isIncorrect) {
+            statusColor = AppColors.error;
+            statusIcon = Icons.cancel_rounded;
+            statusText = 'Incorrect';
+          } else {
+            statusColor = AppColors.warning;
+            statusIcon = Icons.remove_circle_rounded;
+            statusText = 'Skipped';
+          }
+
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            color: statusColor.withValues(alpha: 0.06),
+            child: ExpansionTile(
+              leading: Icon(statusIcon, color: statusColor, size: 22),
+              title: Text(
+                'Q${index + 1}. ${q.questionText}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(statusText),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...q.options.asMap().entries.map((entry) {
+                        final idx = entry.key;
+                        final option = entry.value;
+                        final isUserChoice = userAnswer == String.fromCharCode(65 + idx);
+                        final isCorrectOption = idx.toString() == q.correctAnswer;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: isCorrectOption
+                                      ? AppColors.success
+                                      : (isUserChoice ? AppColors.error : AppColors.divider),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    String.fromCharCode(65 + idx),
+                                    style: TextStyle(
+                                      color: isCorrectOption || isUserChoice
+                                          ? Colors.white
+                                          : AppColors.textDark,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(child: Text(option)),
+                            ],
+                          ),
+                        );
+                      }),
+                      if (q.explanation != null && q.explanation!.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        const Divider(),
+                        Text(
+                          'Explanation',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(q.explanation!),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildReviewChip(BuildContext context, String label, int count, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.circle, size: 8, color: color),
+          const SizedBox(width: 6),
+          Text(
+            '$label $count',
+            style: TextStyle(fontWeight: FontWeight.w600, color: color, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
   Color _subjectColor(String subject) {
     final s = subject.toLowerCase();
     if (s.contains('physics')) return AppColors.physicsAccent;
     if (s.contains('chem')) return AppColors.chemistryAccent;
-    // Botany and Zoology are both Biology sections.
     if (s.contains('bot') || s.contains('zoo') || s.contains('bio')) {
       return AppColors.biologyAccent;
     }
