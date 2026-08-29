@@ -23,6 +23,7 @@ class ExamCheckpoint {
   final String phase;
   final int deadlineEpochMs;
   final int? breakDeadlineEpochMs;
+  final int? sectionDeadlineEpochMs;
   final int startedAtEpochMs;
   final int savedAtEpochMs;
 
@@ -40,6 +41,7 @@ class ExamCheckpoint {
     required this.startedAtEpochMs,
     required this.savedAtEpochMs,
     this.breakDeadlineEpochMs,
+    this.sectionDeadlineEpochMs,
   });
 
   ExamConfig get config => ExamConfig.fromJson(configJson);
@@ -62,6 +64,7 @@ class ExamCheckpoint {
         'phase': phase,
         'deadlineEpochMs': deadlineEpochMs,
         'breakDeadlineEpochMs': breakDeadlineEpochMs,
+        'sectionDeadlineEpochMs': sectionDeadlineEpochMs,
         'startedAtEpochMs': startedAtEpochMs,
         'savedAtEpochMs': savedAtEpochMs,
       };
@@ -85,6 +88,8 @@ class ExamCheckpoint {
         deadlineEpochMs: (json['deadlineEpochMs'] as num).toInt(),
         breakDeadlineEpochMs:
             (json['breakDeadlineEpochMs'] as num?)?.toInt(),
+        sectionDeadlineEpochMs:
+            (json['sectionDeadlineEpochMs'] as num?)?.toInt(),
         startedAtEpochMs: (json['startedAtEpochMs'] as num).toInt(),
         savedAtEpochMs: (json['savedAtEpochMs'] as num).toInt(),
       );

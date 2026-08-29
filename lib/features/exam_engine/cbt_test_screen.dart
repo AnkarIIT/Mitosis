@@ -10,6 +10,7 @@ import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
 
 import 'package:go_router/go_router.dart';
+import '../../core/database/drift_database.dart' as db;
 import '../../core/theme/app_theme.dart';
 
 enum _SessionPhase { taking, break_ }
@@ -61,6 +62,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   /// so there is no drift and no background truncation to compensate for.
   late DateTime _deadline;
   DateTime? _breakDeadline;
+  DateTime? _sectionDeadline;
 
   /// When the user entered the current question — used to bank per-question
   /// time on leave/submit, which is accurate across backgrounding.
@@ -76,6 +78,13 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   int get _remainingSeconds {
     final diff = _deadline.difference(DateTime.now()).inSeconds;
+    return diff < 0 ? 0 : diff;
+  }
+
+  int get _sectionRemainingSeconds {
+    final d = _sectionDeadline;
+    if (d == null) return -1; // no per-section limit
+    final diff = d.difference(DateTime.now()).inSeconds;
     return diff < 0 ? 0 : diff;
   }
 
@@ -118,6 +127,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _deadline = DateTime.fromMillisecondsSinceEpoch(resume.deadlineEpochMs);
       _breakDeadline = resume.breakDeadlineEpochMs != null
           ? DateTime.fromMillisecondsSinceEpoch(resume.breakDeadlineEpochMs!)
+          : null;
+      _sectionDeadline = resume.sectionDeadlineEpochMs != null
+          ? DateTime.fromMillisecondsSinceEpoch(resume.sectionDeadlineEpochMs!)
           : null;
       _phase =
           resume.phase == 'break_' ? _SessionPhase.break_ : _SessionPhase.taking;
@@ -178,6 +190,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _skipEmptySections();
       _currentIndex = _questions.isEmpty ? 0 : _sectionStart[_currentSection];
     }
+    _initSectionDeadline();
 
     // 0.1: never start the ticker on an empty allocation — build() shows the
     // empty state and _onTick would otherwise index an empty list every second.
@@ -299,6 +312,15 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   // Timekeeping
   // ─────────────────────────────────────────────────────────────
 
+  void _initSectionDeadline() {
+    final sectionDuration = widget.config.sections[_currentSection].durationSeconds;
+    if (sectionDuration != null && sectionDuration > 0) {
+      _sectionDeadline = DateTime.now().add(Duration(seconds: sectionDuration));
+    } else {
+      _sectionDeadline = null;
+    }
+  }
+
   void _onTick(Timer timer) {
     if (!mounted || _submitted) return;
 
@@ -308,6 +330,11 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       } else {
         setState(() {}); // repaint break countdown
       }
+      return;
+    }
+
+    if (_sectionRemainingSeconds == 0) {
+      _advanceToSection(_currentSection + 1);
       return;
     }
 
@@ -437,6 +464,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _breakDeadline = null;
     });
     _questionEnteredAt = DateTime.now();
+    final sectionDuration = widget.config.sections[target].durationSeconds;
+    if (sectionDuration != null && sectionDuration > 0) {
+      _sectionDeadline = DateTime.now().add(Duration(seconds: sectionDuration));
+    } else {
+      _sectionDeadline = null;
+    }
     _saveCheckpoint();
   }
 
@@ -468,6 +501,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       phase: _phase == _SessionPhase.break_ ? 'break_' : 'taking',
       deadlineEpochMs: _deadline.millisecondsSinceEpoch,
       breakDeadlineEpochMs: _breakDeadline?.millisecondsSinceEpoch,
+      sectionDeadlineEpochMs: _sectionDeadline?.millisecondsSinceEpoch,
       startedAtEpochMs: _startedAt.millisecondsSinceEpoch,
       savedAtEpochMs: DateTime.now().millisecondsSinceEpoch,
     );
@@ -576,6 +610,19 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
           seed: _seed,
         );
     await _clearCheckpoint();
+
+    for (int i = 0; i < _questions.length; i++) {
+      final q = _questions[i];
+      final answer = _answers[i];
+      final isCorrect = answer != null && answer == q.correctAnswer;
+      if (!isCorrect) {
+        final dbInstance = ref.read(databaseProvider);
+        await dbInstance.addToErrorBook(db.ErrorBookCompanion.insert(
+          questionId: q.id,
+          addedAt: DateTime.now(),
+        ));
+      }
+    }
 
     if (!mounted) return;
     // Close the confirm dialog if the deadline fired while it was open.
@@ -726,6 +773,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             ? AppColors.warning
             : AppColors.primary;
 
+    final sectionRemaining = _sectionRemainingSeconds;
+    final sectionDuration = widget.config.sections[_currentSection].durationSeconds;
+
     return Container(
       color: AdaptiveColors.surface(context),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -735,21 +785,39 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Time Remaining',
+                sectionRemaining >= 0 ? 'Section Time' : 'Time Remaining',
                 style: Theme.of(
                   context,
                 ).textTheme.labelSmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
               ),
               Text(
-                _formatTime(remaining),
+                sectionRemaining >= 0
+                    ? _formatTime(sectionRemaining)
+                    : _formatTime(remaining),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: color,
+                  color: sectionRemaining >= 0 && sectionRemaining < 120
+                      ? AppColors.error
+                      : color,
                   fontWeight: FontWeight.bold,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
             ],
           ),
+          if (sectionRemaining >= 0 && sectionDuration != null && sectionDuration > 0) ...[
+            const SizedBox(height: 6),
+            LinearProgressIndicator(
+              value: sectionDuration <= 0
+                  ? 0.0
+                  : (sectionDuration - sectionRemaining) / sectionDuration,
+              minHeight: 4,
+              borderRadius: BorderRadius.circular(2),
+              backgroundColor: AdaptiveColors.divider(context),
+              valueColor: AlwaysStoppedAnimation(
+                sectionRemaining < 120 ? AppColors.error : AppColors.primary,
+              ),
+            ),
+          ],
           const SizedBox(height: 6),
           LinearProgressIndicator(
             value: progress.clamp(0.0, 1.0),

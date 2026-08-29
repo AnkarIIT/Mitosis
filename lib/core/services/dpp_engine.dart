@@ -5,6 +5,7 @@ import '../database/drift_database.dart' as db;
 import '../database/question_repository.dart';
 import '../models/question_model.dart';
 import '../services/question_history_service.dart';
+import '../services/mastery_service.dart';
 
 /// Configuration for a single Daily Practice Paper (DPP).
 class DppConfig {
@@ -137,9 +138,10 @@ class DppEngine {
   final db.AppDatabase _db;
   final QuestionRepository _questionRepo;
   final QuestionHistoryService _history;
+  final MasteryService _mastery;
   final Random _random;
 
-  DppEngine(this._db, this._questionRepo, this._history, {Random? random})
+  DppEngine(this._db, this._questionRepo, this._history, this._mastery, {Random? random})
       : _random = random ?? Random();
 
   /// Generates a DPP for today. If one already exists for the given config,
@@ -276,23 +278,8 @@ class DppEngine {
   }
 
   Future<Set<String>> _getWeakTopicIds(List<String> subjects) async {
-    final cards = await _db.getSpacedRepetitionCards();
-    final allQuestions = await _questionRepo.getAllQuestionsFromDb();
-    final questionByTopicId = <String, String>{};
-    for (final q in allQuestions) {
-      if (subjects.contains(q.subject)) {
-        questionByTopicId[q.id] = q.topicId;
-      }
-    }
-
-    final weak = <String>{};
-    for (final card in cards) {
-      final topicId = questionByTopicId[card.questionId];
-      if (topicId != null && card.box <= 2) {
-        weak.add(topicId);
-      }
-    }
-    return weak;
+    final weak = await _mastery.weakTopicIds(subjects);
+    return weak.toSet();
   }
 
   List<Question> _sample(List<Question> pool, int count, DppConfig config) {

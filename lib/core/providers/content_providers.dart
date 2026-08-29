@@ -11,6 +11,7 @@ import '../database/question_repository.dart';
 import '../services/content_sync_service.dart';
 import '../services/question_history_service.dart';
 import '../services/dpp_engine.dart';
+import '../services/mastery_service.dart';
 import 'core_providers.dart';
 import '../database/drift_database.dart' as db;
 
@@ -174,7 +175,8 @@ final dppEngineProvider = Provider<DppEngine>((ref) {
   final database = ref.watch(databaseProvider);
   final questionRepo = QuestionRepository(database);
   final history = QuestionHistoryService(database);
-  return DppEngine(database, questionRepo, history);
+  final mastery = MasteryService(database, questionRepo.getAllQuestionsFromDb());
+  return DppEngine(database, questionRepo, history, mastery);
 });
 
 final todayDppProvider = FutureProvider.family<DppResult?, String>((ref, subject) async {

@@ -7,6 +7,7 @@ import '../../core/database/drift_database.dart' as db;
 import '../../core/providers/core_providers.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/dpp_engine.dart';
+import '../../core/services/result_export_service.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:drift/drift.dart' hide Column;
 
@@ -168,8 +169,60 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
           maxMarks: Value(_questions.length * 4),
         ),
       );
+
+      for (int i = 0; i < _questions.length; i++) {
+        final q = _questions[i];
+        final answer = _attempt.answersByIndex[i];
+        final isCorrect = answer != null && answer == q.correctAnswer;
+        if (!isCorrect) {
+          await database.addToErrorBook(db.ErrorBookCompanion.insert(
+            questionId: q.id,
+            addedAt: DateTime.now(),
+          ));
+        }
+      }
     } catch (e) {
       debugPrint('❌ Error persisting DPP result: $e');
+    }
+  }
+
+  Future<void> _exportCsv() async {
+    try {
+      final path = await ResultExportService.exportDppResultToCsv(
+        _questions,
+        _attempt.answersByIndex,
+        widget.dppResult.set.subject,
+      );
+
+      if (!mounted) return;
+      if (path == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to export CSV.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('CSV exported to: $path'),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'OK',
+            onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Export failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -197,6 +250,12 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
         appBar: AppBar(
           title: Text('DPP - ${widget.dppResult.set.date}'),
           actions: [
+            if (_submitted)
+              IconButton(
+                icon: const Icon(Icons.download_rounded),
+                tooltip: 'Export CSV',
+                onPressed: () => _exportCsv(),
+              ),
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),

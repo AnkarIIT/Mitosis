@@ -16,6 +16,7 @@ class ExamSection {
   final String sourceSubject;
   final int presentedCount;
   final int gradedCount;
+  final int? durationSeconds;
 
   ExamSection({
     required this.index,
@@ -23,6 +24,7 @@ class ExamSection {
     required this.sourceSubject,
     required this.presentedCount,
     int? gradedCount,
+    this.durationSeconds,
   }) : gradedCount = gradedCount ?? presentedCount;
 
   bool get isOptional => gradedCount < presentedCount;
@@ -36,6 +38,7 @@ class ExamSection {
         'sourceSubject': sourceSubject,
         'presentedCount': presentedCount,
         'gradedCount': gradedCount,
+        'durationSeconds': durationSeconds,
       };
 
   factory ExamSection.fromJson(Map<String, dynamic> json) => ExamSection(
@@ -45,6 +48,7 @@ class ExamSection {
         presentedCount:
             (json['presentedCount'] ?? json['questionCount']) as int,
         gradedCount: json['gradedCount'] as int?,
+        durationSeconds: json['durationSeconds'] as int?,
       );
 }
 
@@ -119,7 +123,15 @@ class ExamConfig {
     bool sectionLock = false,
     bool breaksEnabled = false,
     int breakMinutes = 5,
+    int? physicsMinutes,
+    int? chemistryMinutes,
+    int? botanyMinutes,
+    int? zoologyMinutes,
   }) {
+    final physicsSec = physicsMinutes ?? (durationMinutes ~/ 4 * 60);
+    final chemistrySec = chemistryMinutes ?? (durationMinutes ~/ 4 * 60);
+    final botanySec = botanyMinutes ?? (durationMinutes ~/ 8 * 60);
+    final zoologySec = zoologyMinutes ?? (durationMinutes ~/ 8 * 60);
     return ExamConfig(
       mode: ExamMode.neet,
       testType: 'mock',
@@ -139,24 +151,28 @@ class ExamConfig {
           name: 'Physics',
           sourceSubject: 'Physics',
           presentedCount: physicsCount,
+          durationSeconds: physicsSec,
         ),
         ExamSection(
           index: 1,
           name: 'Chemistry',
           sourceSubject: 'Chemistry',
           presentedCount: chemistryCount,
+          durationSeconds: chemistrySec,
         ),
         ExamSection(
           index: 2,
           name: 'Botany',
           sourceSubject: 'Biology',
           presentedCount: botanyCount,
+          durationSeconds: botanySec,
         ),
         ExamSection(
           index: 3,
           name: 'Zoology',
           sourceSubject: 'Biology',
           presentedCount: zoologyCount,
+          durationSeconds: zoologySec,
         ),
       ],
     );

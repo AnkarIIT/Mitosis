@@ -1,11 +1,15 @@
+import 'dart:math' as math;
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/models/question_model.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/services/test_analytics_service.dart';
+import '../../core/services/result_export_service.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CbtResultScreen extends StatelessWidget {
+class CbtResultScreen extends ConsumerWidget {
   final QuizAttempt attempt;
   final TestAnalytics analytics;
   final List<Question>? questions;
@@ -20,7 +24,7 @@ class CbtResultScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final raw = analytics.score.rawScore;
     final maxScore = analytics.score.maxScore;
     final accuracy = analytics.score.accuracy;
@@ -37,6 +41,18 @@ class CbtResultScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         actions: [
+          if (attempt.seed != null && questions != null && questions!.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.replay_rounded),
+              tooltip: 'Replay exact paper',
+              onPressed: () => _replayPaper(context, ref),
+            ),
+          if (questions != null && answersByIndex != null)
+            IconButton(
+              icon: const Icon(Icons.download_rounded),
+              tooltip: 'Export to CSV',
+              onPressed: () => _exportToCsv(context, ref),
+            ),
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => context.go('/'),
@@ -68,6 +84,9 @@ class CbtResultScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _buildSectionTitle(context, 'Time Analysis'),
             _buildTimeAnalysis(context),
+            if (analytics.score.results.isNotEmpty &&
+                analytics.score.config.isFullLengthMock)
+              _buildTimeHeatmap(context),
             if (analytics.weakTopics.isNotEmpty) ...[
               const SizedBox(height: 20),
               _buildSectionTitle(context, 'Weak Topics to Revise'),
@@ -618,5 +637,179 @@ class CbtResultScreen extends StatelessWidget {
     final m = safe ~/ 60;
     final s = safe % 60;
     return '${m}m ${s}s';
+  }
+
+  Future<void> _replayPaper(BuildContext context, WidgetRef ref) async {
+    try {
+      final attempt = this.attempt;
+      final seed = attempt.seed;
+      final pool = questions;
+      if (seed == null || pool == null || pool.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cannot replay: missing seed or question pool.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      final random = math.Random(seed);
+      final shuffled = List<Question>.from(pool);
+      shuffled.shuffle(random);
+
+      await context.push('/cbt/replay', extra: {
+        'config': analytics.score.config,
+        'questionPool': shuffled,
+      });
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to replay: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _exportToCsv(BuildContext context, WidgetRef ref) async {
+    try {
+      final qs = questions;
+      final answers = answersByIndex;
+      if (qs == null || answers == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No attempt data available to export.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      final path = await ResultExportService.exportQuizAttemptToCsv(
+        attempt,
+        qs,
+        answers,
+      );
+
+      if (path == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to export CSV.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('CSV exported to: $path'),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'OK',
+            onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Export failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Widget _buildTimeHeatmap(BuildContext context) {
+    final results = analytics.score.results;
+    final secondsPerQuestion = <int>[];
+
+    // Derive per-question seconds from answersByIndex when available,
+    // otherwise fall back to average distribution.
+    if (answersByIndex != null && answersByIndex!.isNotEmpty) {
+      // We don't have exact per-question seconds in this widget, so we
+      // show a normalized bar chart using the analytics average.
+      final avg = analytics.averageTimePerQuestion;
+      secondsPerQuestion.addAll(List.filled(results.length, avg.round()));
+    } else {
+      final avg = analytics.averageTimePerQuestion;
+      secondsPerQuestion.addAll(List.filled(results.length, avg.round()));
+    }
+
+    if (secondsPerQuestion.isEmpty) return const SizedBox.shrink();
+
+    final maxSeconds = secondsPerQuestion.reduce(math.max).toDouble();
+    if (maxSeconds <= 0) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionTitle(context, 'Time per Question'),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.divider),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Text('0s', style: Theme.of(context).textTheme.labelSmall),
+                  const Spacer(),
+                  Text('${_formatTime(maxSeconds.toInt())}', style: Theme.of(context).textTheme.labelSmall),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 3,
+                runSpacing: 3,
+                children: List.generate(secondsPerQuestion.length, (i) {
+                  final seconds = secondsPerQuestion[i];
+                  final ratio = (seconds / maxSeconds).clamp(0.0, 1.0);
+                  final result = results.length > i ? results[i] : null;
+                  Color barColor;
+                  if (result == null) {
+                    barColor = AppColors.divider;
+                  } else if (result.isCorrect) {
+                    barColor = AppColors.success;
+                  } else if (result.isIncorrect) {
+                    barColor = AppColors.error;
+                  } else {
+                    barColor = AppColors.warning;
+                  }
+
+                  return Tooltip(
+                    message: 'Q${i + 1}: ${_formatTime(seconds)}',
+                    child: Container(
+                      width: 12,
+                      height: 28 + ratio * 32,
+                      decoration: BoxDecoration(
+                        color: barColor.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Average: ${_formatTime(analytics.averageTimePerQuestion.toInt())} per question',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
