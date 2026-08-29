@@ -21,6 +21,10 @@ class QuizAttempts extends Table {
   /// Used to avoid repeating the same questions in later quizzes/mocks.
   TextColumn get questionIds => text().nullable()();
 
+  /// Seed used to shuffle questions for this attempt so the order can be
+  /// reproduced later for review or debugging.
+  IntColumn get seed => integer().nullable()();
+
   DateTimeColumn get updatedAt =>
       dateTime().nullable().clientDefault(() => DateTime.now())();
 }

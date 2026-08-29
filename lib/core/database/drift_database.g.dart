@@ -1224,6 +1224,15 @@ class $QuizAttemptsTable extends QuizAttempts
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _seedMeta = const VerificationMeta('seed');
+  @override
+  late final GeneratedColumn<int> seed = GeneratedColumn<int>(
+    'seed',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -1252,6 +1261,7 @@ class $QuizAttemptsTable extends QuizAttempts
     rawScore,
     maxMarks,
     questionIds,
+    seed,
     updatedAt,
   ];
   @override
@@ -1382,6 +1392,12 @@ class $QuizAttemptsTable extends QuizAttempts
         ),
       );
     }
+    if (data.containsKey('seed')) {
+      context.handle(
+        _seedMeta,
+        seed.isAcceptableOrUnknown(data['seed']!, _seedMeta),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -1453,6 +1469,10 @@ class $QuizAttemptsTable extends QuizAttempts
         DriftSqlType.string,
         data['${effectivePrefix}question_ids'],
       ),
+      seed: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}seed'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -1484,6 +1504,10 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
   /// Ordered IDs of the questions presented in this attempt, JSON-encoded.
   /// Used to avoid repeating the same questions in later quizzes/mocks.
   final String? questionIds;
+
+  /// Seed used to shuffle questions for this attempt so the order can be
+  /// reproduced later for review or debugging.
+  final int? seed;
   final DateTime? updatedAt;
   const QuizAttempt({
     required this.id,
@@ -1500,6 +1524,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     this.rawScore,
     this.maxMarks,
     this.questionIds,
+    this.seed,
     this.updatedAt,
   });
   @override
@@ -1526,6 +1551,9 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     }
     if (!nullToAbsent || questionIds != null) {
       map['question_ids'] = Variable<String>(questionIds);
+    }
+    if (!nullToAbsent || seed != null) {
+      map['seed'] = Variable<int>(seed);
     }
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -1557,6 +1585,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       questionIds: questionIds == null && nullToAbsent
           ? const Value.absent()
           : Value(questionIds),
+      seed: seed == null && nullToAbsent ? const Value.absent() : Value(seed),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -1583,6 +1612,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       rawScore: serializer.fromJson<int?>(json['rawScore']),
       maxMarks: serializer.fromJson<int?>(json['maxMarks']),
       questionIds: serializer.fromJson<String?>(json['questionIds']),
+      seed: serializer.fromJson<int?>(json['seed']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
   }
@@ -1604,6 +1634,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       'rawScore': serializer.toJson<int?>(rawScore),
       'maxMarks': serializer.toJson<int?>(maxMarks),
       'questionIds': serializer.toJson<String?>(questionIds),
+      'seed': serializer.toJson<int?>(seed),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
   }
@@ -1623,6 +1654,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     Value<int?> rawScore = const Value.absent(),
     Value<int?> maxMarks = const Value.absent(),
     Value<String?> questionIds = const Value.absent(),
+    Value<int?> seed = const Value.absent(),
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => QuizAttempt(
     id: id ?? this.id,
@@ -1641,6 +1673,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     rawScore: rawScore.present ? rawScore.value : this.rawScore,
     maxMarks: maxMarks.present ? maxMarks.value : this.maxMarks,
     questionIds: questionIds.present ? questionIds.value : this.questionIds,
+    seed: seed.present ? seed.value : this.seed,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
   QuizAttempt copyWithCompanion(QuizAttemptsCompanion data) {
@@ -1673,6 +1706,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
       questionIds: data.questionIds.present
           ? data.questionIds.value
           : this.questionIds,
+      seed: data.seed.present ? data.seed.value : this.seed,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1694,6 +1728,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
           ..write('rawScore: $rawScore, ')
           ..write('maxMarks: $maxMarks, ')
           ..write('questionIds: $questionIds, ')
+          ..write('seed: $seed, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -1715,6 +1750,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
     rawScore,
     maxMarks,
     questionIds,
+    seed,
     updatedAt,
   );
   @override
@@ -1735,6 +1771,7 @@ class QuizAttempt extends DataClass implements Insertable<QuizAttempt> {
           other.rawScore == this.rawScore &&
           other.maxMarks == this.maxMarks &&
           other.questionIds == this.questionIds &&
+          other.seed == this.seed &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -1753,6 +1790,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
   final Value<int?> rawScore;
   final Value<int?> maxMarks;
   final Value<String?> questionIds;
+  final Value<int?> seed;
   final Value<DateTime?> updatedAt;
   const QuizAttemptsCompanion({
     this.id = const Value.absent(),
@@ -1769,6 +1807,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     this.rawScore = const Value.absent(),
     this.maxMarks = const Value.absent(),
     this.questionIds = const Value.absent(),
+    this.seed = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   QuizAttemptsCompanion.insert({
@@ -1786,6 +1825,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     this.rawScore = const Value.absent(),
     this.maxMarks = const Value.absent(),
     this.questionIds = const Value.absent(),
+    this.seed = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : topicId = Value(topicId),
        subject = Value(subject),
@@ -1809,6 +1849,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     Expression<int>? rawScore,
     Expression<int>? maxMarks,
     Expression<String>? questionIds,
+    Expression<int>? seed,
     Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
@@ -1826,6 +1867,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
       if (rawScore != null) 'raw_score': rawScore,
       if (maxMarks != null) 'max_marks': maxMarks,
       if (questionIds != null) 'question_ids': questionIds,
+      if (seed != null) 'seed': seed,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
@@ -1845,6 +1887,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     Value<int?>? rawScore,
     Value<int?>? maxMarks,
     Value<String?>? questionIds,
+    Value<int?>? seed,
     Value<DateTime?>? updatedAt,
   }) {
     return QuizAttemptsCompanion(
@@ -1862,6 +1905,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
       rawScore: rawScore ?? this.rawScore,
       maxMarks: maxMarks ?? this.maxMarks,
       questionIds: questionIds ?? this.questionIds,
+      seed: seed ?? this.seed,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -1911,6 +1955,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
     if (questionIds.present) {
       map['question_ids'] = Variable<String>(questionIds.value);
     }
+    if (seed.present) {
+      map['seed'] = Variable<int>(seed.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -1934,6 +1981,7 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
           ..write('rawScore: $rawScore, ')
           ..write('maxMarks: $maxMarks, ')
           ..write('questionIds: $questionIds, ')
+          ..write('seed: $seed, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -7420,6 +7468,17 @@ class $DppSetsTable extends DppSets with TableInfo<$DppSetsTable, DppSet> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _durationMinutesMeta = const VerificationMeta(
+    'durationMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> durationMinutes = GeneratedColumn<int>(
+    'duration_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _correctCountMeta = const VerificationMeta(
     'correctCount',
   );
@@ -7515,6 +7574,7 @@ class $DppSetsTable extends DppSets with TableInfo<$DppSetsTable, DppSet> {
     chapterId,
     topicId,
     totalQuestions,
+    durationMinutes,
     correctCount,
     incorrectCount,
     unattemptedCount,
@@ -7576,6 +7636,15 @@ class $DppSetsTable extends DppSets with TableInfo<$DppSetsTable, DppSet> {
       );
     } else if (isInserting) {
       context.missing(_totalQuestionsMeta);
+    }
+    if (data.containsKey('duration_minutes')) {
+      context.handle(
+        _durationMinutesMeta,
+        durationMinutes.isAcceptableOrUnknown(
+          data['duration_minutes']!,
+          _durationMinutesMeta,
+        ),
+      );
     }
     if (data.containsKey('correct_count')) {
       context.handle(
@@ -7667,6 +7736,10 @@ class $DppSetsTable extends DppSets with TableInfo<$DppSetsTable, DppSet> {
         DriftSqlType.int,
         data['${effectivePrefix}total_questions'],
       )!,
+      durationMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_minutes'],
+      ),
       correctCount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}correct_count'],
@@ -7711,6 +7784,7 @@ class DppSet extends DataClass implements Insertable<DppSet> {
   final String? chapterId;
   final String? topicId;
   final int totalQuestions;
+  final int? durationMinutes;
   final int correctCount;
   final int incorrectCount;
   final int unattemptedCount;
@@ -7725,6 +7799,7 @@ class DppSet extends DataClass implements Insertable<DppSet> {
     this.chapterId,
     this.topicId,
     required this.totalQuestions,
+    this.durationMinutes,
     required this.correctCount,
     required this.incorrectCount,
     required this.unattemptedCount,
@@ -7746,6 +7821,9 @@ class DppSet extends DataClass implements Insertable<DppSet> {
       map['topic_id'] = Variable<String>(topicId);
     }
     map['total_questions'] = Variable<int>(totalQuestions);
+    if (!nullToAbsent || durationMinutes != null) {
+      map['duration_minutes'] = Variable<int>(durationMinutes);
+    }
     map['correct_count'] = Variable<int>(correctCount);
     map['incorrect_count'] = Variable<int>(incorrectCount);
     map['unattempted_count'] = Variable<int>(unattemptedCount);
@@ -7772,6 +7850,9 @@ class DppSet extends DataClass implements Insertable<DppSet> {
           ? const Value.absent()
           : Value(topicId),
       totalQuestions: Value(totalQuestions),
+      durationMinutes: durationMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(durationMinutes),
       correctCount: Value(correctCount),
       incorrectCount: Value(incorrectCount),
       unattemptedCount: Value(unattemptedCount),
@@ -7798,6 +7879,7 @@ class DppSet extends DataClass implements Insertable<DppSet> {
       chapterId: serializer.fromJson<String?>(json['chapterId']),
       topicId: serializer.fromJson<String?>(json['topicId']),
       totalQuestions: serializer.fromJson<int>(json['totalQuestions']),
+      durationMinutes: serializer.fromJson<int?>(json['durationMinutes']),
       correctCount: serializer.fromJson<int>(json['correctCount']),
       incorrectCount: serializer.fromJson<int>(json['incorrectCount']),
       unattemptedCount: serializer.fromJson<int>(json['unattemptedCount']),
@@ -7817,6 +7899,7 @@ class DppSet extends DataClass implements Insertable<DppSet> {
       'chapterId': serializer.toJson<String?>(chapterId),
       'topicId': serializer.toJson<String?>(topicId),
       'totalQuestions': serializer.toJson<int>(totalQuestions),
+      'durationMinutes': serializer.toJson<int?>(durationMinutes),
       'correctCount': serializer.toJson<int>(correctCount),
       'incorrectCount': serializer.toJson<int>(incorrectCount),
       'unattemptedCount': serializer.toJson<int>(unattemptedCount),
@@ -7834,6 +7917,7 @@ class DppSet extends DataClass implements Insertable<DppSet> {
     Value<String?> chapterId = const Value.absent(),
     Value<String?> topicId = const Value.absent(),
     int? totalQuestions,
+    Value<int?> durationMinutes = const Value.absent(),
     int? correctCount,
     int? incorrectCount,
     int? unattemptedCount,
@@ -7848,6 +7932,9 @@ class DppSet extends DataClass implements Insertable<DppSet> {
     chapterId: chapterId.present ? chapterId.value : this.chapterId,
     topicId: topicId.present ? topicId.value : this.topicId,
     totalQuestions: totalQuestions ?? this.totalQuestions,
+    durationMinutes: durationMinutes.present
+        ? durationMinutes.value
+        : this.durationMinutes,
     correctCount: correctCount ?? this.correctCount,
     incorrectCount: incorrectCount ?? this.incorrectCount,
     unattemptedCount: unattemptedCount ?? this.unattemptedCount,
@@ -7866,6 +7953,9 @@ class DppSet extends DataClass implements Insertable<DppSet> {
       totalQuestions: data.totalQuestions.present
           ? data.totalQuestions.value
           : this.totalQuestions,
+      durationMinutes: data.durationMinutes.present
+          ? data.durationMinutes.value
+          : this.durationMinutes,
       correctCount: data.correctCount.present
           ? data.correctCount.value
           : this.correctCount,
@@ -7895,6 +7985,7 @@ class DppSet extends DataClass implements Insertable<DppSet> {
           ..write('chapterId: $chapterId, ')
           ..write('topicId: $topicId, ')
           ..write('totalQuestions: $totalQuestions, ')
+          ..write('durationMinutes: $durationMinutes, ')
           ..write('correctCount: $correctCount, ')
           ..write('incorrectCount: $incorrectCount, ')
           ..write('unattemptedCount: $unattemptedCount, ')
@@ -7914,6 +8005,7 @@ class DppSet extends DataClass implements Insertable<DppSet> {
     chapterId,
     topicId,
     totalQuestions,
+    durationMinutes,
     correctCount,
     incorrectCount,
     unattemptedCount,
@@ -7932,6 +8024,7 @@ class DppSet extends DataClass implements Insertable<DppSet> {
           other.chapterId == this.chapterId &&
           other.topicId == this.topicId &&
           other.totalQuestions == this.totalQuestions &&
+          other.durationMinutes == this.durationMinutes &&
           other.correctCount == this.correctCount &&
           other.incorrectCount == this.incorrectCount &&
           other.unattemptedCount == this.unattemptedCount &&
@@ -7948,6 +8041,7 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
   final Value<String?> chapterId;
   final Value<String?> topicId;
   final Value<int> totalQuestions;
+  final Value<int?> durationMinutes;
   final Value<int> correctCount;
   final Value<int> incorrectCount;
   final Value<int> unattemptedCount;
@@ -7962,6 +8056,7 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
     this.chapterId = const Value.absent(),
     this.topicId = const Value.absent(),
     this.totalQuestions = const Value.absent(),
+    this.durationMinutes = const Value.absent(),
     this.correctCount = const Value.absent(),
     this.incorrectCount = const Value.absent(),
     this.unattemptedCount = const Value.absent(),
@@ -7977,6 +8072,7 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
     this.chapterId = const Value.absent(),
     this.topicId = const Value.absent(),
     required int totalQuestions,
+    this.durationMinutes = const Value.absent(),
     this.correctCount = const Value.absent(),
     this.incorrectCount = const Value.absent(),
     this.unattemptedCount = const Value.absent(),
@@ -7994,6 +8090,7 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
     Expression<String>? chapterId,
     Expression<String>? topicId,
     Expression<int>? totalQuestions,
+    Expression<int>? durationMinutes,
     Expression<int>? correctCount,
     Expression<int>? incorrectCount,
     Expression<int>? unattemptedCount,
@@ -8009,6 +8106,7 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
       if (chapterId != null) 'chapter_id': chapterId,
       if (topicId != null) 'topic_id': topicId,
       if (totalQuestions != null) 'total_questions': totalQuestions,
+      if (durationMinutes != null) 'duration_minutes': durationMinutes,
       if (correctCount != null) 'correct_count': correctCount,
       if (incorrectCount != null) 'incorrect_count': incorrectCount,
       if (unattemptedCount != null) 'unattempted_count': unattemptedCount,
@@ -8026,6 +8124,7 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
     Value<String?>? chapterId,
     Value<String?>? topicId,
     Value<int>? totalQuestions,
+    Value<int?>? durationMinutes,
     Value<int>? correctCount,
     Value<int>? incorrectCount,
     Value<int>? unattemptedCount,
@@ -8041,6 +8140,7 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
       chapterId: chapterId ?? this.chapterId,
       topicId: topicId ?? this.topicId,
       totalQuestions: totalQuestions ?? this.totalQuestions,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
       correctCount: correctCount ?? this.correctCount,
       incorrectCount: incorrectCount ?? this.incorrectCount,
       unattemptedCount: unattemptedCount ?? this.unattemptedCount,
@@ -8071,6 +8171,9 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
     }
     if (totalQuestions.present) {
       map['total_questions'] = Variable<int>(totalQuestions.value);
+    }
+    if (durationMinutes.present) {
+      map['duration_minutes'] = Variable<int>(durationMinutes.value);
     }
     if (correctCount.present) {
       map['correct_count'] = Variable<int>(correctCount.value);
@@ -8105,6 +8208,7 @@ class DppSetsCompanion extends UpdateCompanion<DppSet> {
           ..write('chapterId: $chapterId, ')
           ..write('topicId: $topicId, ')
           ..write('totalQuestions: $totalQuestions, ')
+          ..write('durationMinutes: $durationMinutes, ')
           ..write('correctCount: $correctCount, ')
           ..write('incorrectCount: $incorrectCount, ')
           ..write('unattemptedCount: $unattemptedCount, ')
@@ -9452,6 +9556,7 @@ typedef $$QuizAttemptsTableCreateCompanionBuilder =
       Value<int?> rawScore,
       Value<int?> maxMarks,
       Value<String?> questionIds,
+      Value<int?> seed,
       Value<DateTime?> updatedAt,
     });
 typedef $$QuizAttemptsTableUpdateCompanionBuilder =
@@ -9470,6 +9575,7 @@ typedef $$QuizAttemptsTableUpdateCompanionBuilder =
       Value<int?> rawScore,
       Value<int?> maxMarks,
       Value<String?> questionIds,
+      Value<int?> seed,
       Value<DateTime?> updatedAt,
     });
 
@@ -9549,6 +9655,11 @@ class $$QuizAttemptsTableFilterComposer
 
   ColumnFilters<String> get questionIds => $composableBuilder(
     column: $table.questionIds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get seed => $composableBuilder(
+    column: $table.seed,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -9637,6 +9748,11 @@ class $$QuizAttemptsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get seed => $composableBuilder(
+    column: $table.seed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -9708,6 +9824,9 @@ class $$QuizAttemptsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get seed =>
+      $composableBuilder(column: $table.seed, builder: (column) => column);
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -9757,6 +9876,7 @@ class $$QuizAttemptsTableTableManager
                 Value<int?> rawScore = const Value.absent(),
                 Value<int?> maxMarks = const Value.absent(),
                 Value<String?> questionIds = const Value.absent(),
+                Value<int?> seed = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => QuizAttemptsCompanion(
                 id: id,
@@ -9773,6 +9893,7 @@ class $$QuizAttemptsTableTableManager
                 rawScore: rawScore,
                 maxMarks: maxMarks,
                 questionIds: questionIds,
+                seed: seed,
                 updatedAt: updatedAt,
               ),
           createCompanionCallback:
@@ -9791,6 +9912,7 @@ class $$QuizAttemptsTableTableManager
                 Value<int?> rawScore = const Value.absent(),
                 Value<int?> maxMarks = const Value.absent(),
                 Value<String?> questionIds = const Value.absent(),
+                Value<int?> seed = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => QuizAttemptsCompanion.insert(
                 id: id,
@@ -9807,6 +9929,7 @@ class $$QuizAttemptsTableTableManager
                 rawScore: rawScore,
                 maxMarks: maxMarks,
                 questionIds: questionIds,
+                seed: seed,
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
@@ -12546,6 +12669,7 @@ typedef $$DppSetsTableCreateCompanionBuilder =
       Value<String?> chapterId,
       Value<String?> topicId,
       required int totalQuestions,
+      Value<int?> durationMinutes,
       Value<int> correctCount,
       Value<int> incorrectCount,
       Value<int> unattemptedCount,
@@ -12562,6 +12686,7 @@ typedef $$DppSetsTableUpdateCompanionBuilder =
       Value<String?> chapterId,
       Value<String?> topicId,
       Value<int> totalQuestions,
+      Value<int?> durationMinutes,
       Value<int> correctCount,
       Value<int> incorrectCount,
       Value<int> unattemptedCount,
@@ -12607,6 +12732,11 @@ class $$DppSetsTableFilterComposer
 
   ColumnFilters<int> get totalQuestions => $composableBuilder(
     column: $table.totalQuestions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12685,6 +12815,11 @@ class $$DppSetsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get correctCount => $composableBuilder(
     column: $table.correctCount,
     builder: (column) => ColumnOrderings(column),
@@ -12747,6 +12882,11 @@ class $$DppSetsTableAnnotationComposer
 
   GeneratedColumn<int> get totalQuestions => $composableBuilder(
     column: $table.totalQuestions,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
     builder: (column) => column,
   );
 
@@ -12816,6 +12956,7 @@ class $$DppSetsTableTableManager
                 Value<String?> chapterId = const Value.absent(),
                 Value<String?> topicId = const Value.absent(),
                 Value<int> totalQuestions = const Value.absent(),
+                Value<int?> durationMinutes = const Value.absent(),
                 Value<int> correctCount = const Value.absent(),
                 Value<int> incorrectCount = const Value.absent(),
                 Value<int> unattemptedCount = const Value.absent(),
@@ -12830,6 +12971,7 @@ class $$DppSetsTableTableManager
                 chapterId: chapterId,
                 topicId: topicId,
                 totalQuestions: totalQuestions,
+                durationMinutes: durationMinutes,
                 correctCount: correctCount,
                 incorrectCount: incorrectCount,
                 unattemptedCount: unattemptedCount,
@@ -12846,6 +12988,7 @@ class $$DppSetsTableTableManager
                 Value<String?> chapterId = const Value.absent(),
                 Value<String?> topicId = const Value.absent(),
                 required int totalQuestions,
+                Value<int?> durationMinutes = const Value.absent(),
                 Value<int> correctCount = const Value.absent(),
                 Value<int> incorrectCount = const Value.absent(),
                 Value<int> unattemptedCount = const Value.absent(),
@@ -12860,6 +13003,7 @@ class $$DppSetsTableTableManager
                 chapterId: chapterId,
                 topicId: topicId,
                 totalQuestions: totalQuestions,
+                durationMinutes: durationMinutes,
                 correctCount: correctCount,
                 incorrectCount: incorrectCount,
                 unattemptedCount: unattemptedCount,

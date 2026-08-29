@@ -7,6 +7,7 @@ class DppSets extends Table {
   TextColumn get chapterId => text().nullable()();
   TextColumn get topicId => text().nullable()();
   IntColumn get totalQuestions => integer()();
+  IntColumn get durationMinutes => integer().nullable()();
   IntColumn get correctCount => integer().withDefault(const Constant(0))();
   IntColumn get incorrectCount => integer().withDefault(const Constant(0))();
   IntColumn get unattemptedCount => integer().withDefault(const Constant(0))();

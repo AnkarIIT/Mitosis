@@ -54,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 23;
+  int get schemaVersion => 25;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -252,6 +252,18 @@ class AppDatabase extends _$AppDatabase {
         // Daily Practice Paper tables.
         await m.createTable(dppSets);
         await m.createTable(dppQuestions);
+      }
+      if (from < 24) {
+        // Persist the shuffle seed for each attempt so the question order
+        // can be reproduced in review and diagnostics.
+        await _addColumnSafely(
+            m, quizAttempts, (quizAttempts as dynamic).seed);
+      }
+      if (from < 25) {
+        // DPP-specific duration so DPP sets are not forced into the 180-minute
+        // NEET mock timer.
+        await _addColumnSafely(
+            m, dppSets, (dppSets as dynamic).durationMinutes);
       }
     },
     beforeOpen: (details) async {
