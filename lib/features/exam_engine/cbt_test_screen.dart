@@ -43,6 +43,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   static const Color _cMarked = Color(0xFF7E57C2); // purple
 
   late final String _attemptId;
+  late final int _seed;
   late final DateTime _startedAt;
   late final List<List<Question>> _sectionQuestions;
   late final List<Question> _questions;
@@ -101,8 +102,17 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     final resume = widget.resumeFrom;
     final rebuilt = resume != null ? _rebuildSections(resume) : null;
 
+    // Check if we're replaying from a route with a seed
+    final routeExtra = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final replaySeed = routeExtra?['seed'] as int?;
+    final replayConfig = routeExtra?['config'] as ExamConfig?;
+    final replayQuestionPool = routeExtra?['questionPool'] as List<Question>?;
+
+    final bool isReplay = replaySeed != null;
+
     if (resume != null && rebuilt != null) {
       _attemptId = resume.attemptId;
+      _seed = resume.attemptId.hashCode;
       _startedAt = DateTime.fromMillisecondsSinceEpoch(resume.startedAtEpochMs);
       _sectionQuestions = rebuilt;
       _deadline = DateTime.fromMillisecondsSinceEpoch(resume.deadlineEpochMs);
@@ -117,12 +127,31 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       }
       _flagged.addAll(resume.flagged);
       _visited.addAll(resume.visited);
+    } else if (isReplay) {
+      final seed = replaySeed;
+      _attemptId = 'cbt_replay_${DateTime.now().millisecondsSinceEpoch}';
+      _seed = seed;
+      _startedAt = DateTime.now();
+      final pool = replayQuestionPool ?? widget.questionPool;
+      final config = replayConfig ?? widget.config;
+      _sectionQuestions = ExamEngineService.allocateQuestions(
+        pool,
+        config,
+        seed: _seed,
+        excludedIds: _excludedIds,
+      );
+      _deadline = DateTime.now()
+          .add(Duration(seconds: config.totalDurationSeconds));
+      // Use the replay seed for the allocation
+      _seed = seed;
     } else {
       _attemptId = 'cbt_${DateTime.now().millisecondsSinceEpoch}';
+      _seed = DateTime.now().millisecondsSinceEpoch;
       _startedAt = DateTime.now();
       _sectionQuestions = ExamEngineService.allocateQuestions(
         widget.questionPool,
         widget.config,
+        seed: _seed,
         excludedIds: _excludedIds,
       );
       _deadline = DateTime.now()
@@ -537,12 +566,14 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       ),
       rawScore: score.rawScore,
       maxMarks: score.maxScore,
+      seed: _seed,
     );
 
     await ref.read(userProgressProvider.notifier).recordQuizAttempt(
           attempt,
           questions: _questions,
           answersByIndex: _answers,
+          seed: _seed,
         );
     await _clearCheckpoint();
 
@@ -555,6 +586,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     context.go('/cbt/result', extra: {
       'attempt': attempt,
       'analytics': analytics,
+      'questions': _questions,
+      'answersByIndex': _answers,
     });
   }
 

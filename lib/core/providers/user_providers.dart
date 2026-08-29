@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' show Random;
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,6 +97,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
               subject: a.subject,
               rawScore: a.rawScore,
               maxMarks: a.maxMarks,
+              seed: a.seed,
             ),
           )
           .toList();
@@ -139,10 +141,16 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     }
   }
 
+  int _generateSeed() {
+    final random = Random();
+    return random.nextInt(0x7FFFFFFF);
+  }
+
   Future<void> recordQuizAttempt(
     QuizAttempt attempt, {
     List<Question>? questions,
     Map<int, String?>? answersByIndex,
+    int? seed,
   }) async {
     state = state.copyWith(quizAttempts: [...state.quizAttempts, attempt]);
 
@@ -176,6 +184,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
             questionIds: Value(
               jsonEncode(sourceQuestions.map((q) => q.id).toList()),
             ),
+            seed: seed != null ? Value(seed) : Value(_generateSeed()),
           ),
         );
 

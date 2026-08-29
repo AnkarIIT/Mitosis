@@ -86,6 +86,9 @@ class QuizAttempt {
   final int? rawScore;
   final int? maxMarks;
 
+  /// Seed used to shuffle questions for this attempt.
+  final int? seed;
+
   QuizAttempt({
     required this.id,
     required this.topicId,
@@ -100,6 +103,7 @@ class QuizAttempt {
     required this.selectedAnswers,
     this.rawScore,
     this.maxMarks,
+    this.seed,
   });
 
   /// NEET score. Uses the persisted raw marks when available; otherwise falls
