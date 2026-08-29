@@ -148,6 +148,57 @@ class QuizNotifier extends StateNotifier<QuizState> {
       timeSpentPerQuestion: newTimeSpent,
       visitedQuestions: visited,
     );
+
+    _maybeAdaptDifficulty();
+  }
+
+  void _maybeAdaptDifficulty() {
+    if (state.questions.length < 4) return;
+
+    // Compute current consecutive streak from the tail of answered questions.
+    int streak = 0;
+    bool? lastCorrect;
+    for (int i = state.currentIndex; i >= 0; i--) {
+      if (!state.answerResults.containsKey(i)) break;
+      final correct = state.answerResults[i]!;
+      if (lastCorrect == null) {
+        lastCorrect = correct;
+        streak = 1;
+      } else if (correct == lastCorrect) {
+        streak += 1;
+      } else {
+        break;
+      }
+    }
+
+    if (streak < 3) return;
+
+    final biasHarder = lastCorrect == true;
+    final remaining = <int>[];
+    for (int i = state.currentIndex + 1; i < state.questions.length; i++) {
+      if (!state.answerResults.containsKey(i)) remaining.add(i);
+    }
+    if (remaining.isEmpty) return;
+
+    final difficultyOrder = {'easy': 0, 'medium': 1, 'hard': 2};
+    remaining.sort((a, b) {
+      final qA = state.questions[a];
+      final qB = state.questions[b];
+      final dA = difficultyOrder[qA.difficulty.toLowerCase()] ?? 1;
+      final dB = difficultyOrder[qB.difficulty.toLowerCase()] ?? 1;
+      return biasHarder ? dB.compareTo(dA) : dA.compareTo(dB);
+    });
+
+    final reordered = List<Question>.from(state.questions);
+    final moved = <Question>[];
+    for (final idx in remaining) {
+      moved.add(reordered[idx]);
+    }
+    for (int i = 0; i < remaining.length; i++) {
+      reordered[remaining[i]] = moved[i];
+    }
+
+    state = state.copyWith(questions: reordered);
   }
 
   void nextQuestion() {
