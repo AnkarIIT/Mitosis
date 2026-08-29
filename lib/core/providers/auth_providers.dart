@@ -302,6 +302,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<bool> signInWithGoogle() async {
+    log('🔍 AuthProvider: signInWithGoogle called');
+    log('🔍 AuthProvider: googleSignInAvailable = ${AppConfig.googleSignInAvailable}');
+    log('🔍 AuthProvider: isCloudAuthConfigured = ${AppConfig.isCloudAuthConfigured}');
+    
     if (!AppConfig.googleSignInAvailable) {
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
@@ -312,6 +316,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     state = state.copyWith(status: AuthStatus.authenticating, error: null);
     final result = await _googleAuthService.signInWithGoogle();
+    log('🔍 AuthProvider: Google sign-in result: success=${result.success}, message=${result.message}');
     if (result.success) {
       state = state.copyWith(
         status: AuthStatus.authenticated,
