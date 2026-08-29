@@ -28,14 +28,24 @@ class GoogleAuthService {
     }
 
     try {
+      log('🔍 Google Sign-In: Starting...');
+      log('🔍 Google Server Client ID: ${AppConfig.googleServerClientId}');
+      log('🔍 Supabase URL: ${AppConfig.supabaseUrl}');
+      
       final GoogleSignInAccount? googleAccount = await _googleSignIn.signIn();
       if (googleAccount == null) {
+        log('🔍 Google Sign-In: Cancelled by user');
         return (success: false, message: 'Sign-in was cancelled', user: null);
       }
 
+      log('🔍 Google Sign-In: Got account: ${googleAccount.email}');
+      
       final GoogleSignInAuthentication googleAuth = await googleAccount.authentication;
       final String? idToken = googleAuth.idToken;
       final String? accessToken = googleAuth.accessToken;
+
+      log('🔍 Google Sign-In: ID Token: ${idToken != null ? 'present (${idToken.length} chars)' : 'NULL'}');
+      log('🔍 Google Sign-In: Access Token: ${accessToken != null ? 'present' : 'NULL'}');
 
       if (idToken == null) {
         return (success: false, message: 'Could not obtain ID token from Google', user: null);
@@ -77,13 +87,21 @@ class GoogleAuthService {
       if (e.code == GoogleSignIn.kSignInCanceledError) {
         return (success: false, message: 'Sign-in was cancelled.', user: null);
       }
-      return (success: false, message: 'Google sign-in failed. Please try again.', user: null);
+      if (e.message?.contains('12500') == true || e.code == 'sign_in_failed') {
+        return (
+          success: false,
+          message:
+              'Google sign-in failed with code 12500. This usually means the app signing certificate is not registered in Google Cloud/Firebase. Add this debug SHA-1 to your Android OAuth client: 49162e9ff8e0a2f61a7fd4b1ea1d37ca2c00e553',
+          user: null,
+        );
+      }
+      return (success: false, message: 'Google sign-in failed: ${e.code} - ${e.message}', user: null);
     } on supabase.AuthException catch (e) {
       log('Supabase auth error: ${e.statusCode ?? ''} - ${e.message}');
       return (success: false, message: _friendlySupabaseError(e.message), user: null);
     } catch (e) {
       log('Unexpected Google auth error: $e');
-      return (success: false, message: 'Something went wrong. Please try again.', user: null);
+      return (success: false, message: 'Something went wrong: $e', user: null);
     }
   }
 
