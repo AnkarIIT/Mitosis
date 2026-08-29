@@ -25,6 +25,7 @@ import '../../features/test_series/pdf_picker_screen.dart';
 import '../../features/exam_engine/cbt_test_screen.dart';
 import '../../features/exam_engine/cbt_result_screen.dart';
 import '../../core/services/exam_engine_service.dart';
+import '../../core/services/dpp_engine.dart';
 import '../../core/services/exam_checkpoint_service.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/models/question_model.dart';
@@ -40,6 +41,7 @@ import '../../features/settings/import_questions_screen.dart';
 import '../../features/pdf/ncert_pdf_screen.dart';
 import '../../features/bookmarks/bookmarks_dashboard.dart';
 import '../../features/dpp/dpp_screen.dart';
+import '../../features/dpp/dpp_attempt_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -269,6 +271,20 @@ GoRoute(
           return CbtResultScreen(
             attempt: args['attempt'] as QuizAttempt,
             analytics: args['analytics'] as TestAnalytics,
+            questions: args['questions'] as List<Question>?,
+            answersByIndex: args['answersByIndex'] as Map<int, String?>?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/cbt/replay',
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final config = extra['config'] as ExamConfig? ?? ExamConfig.neet();
+          final questionPool = extra['questionPool'] as List<Question>? ?? [];
+          return CbtTestScreen(
+            config: config,
+            questionPool: questionPool,
           );
         },
       ),
@@ -316,6 +332,23 @@ GoRoute(
         builder: (_, state) {
           final subject = state.pathParameters['subject'] ?? 'physics';
           return DppScreen(subject: subject);
+        },
+      ),
+      GoRoute(
+        path: '/dpp/attempt',
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final dppResult = extra['dppResult'] as DppResult?;
+          final durationMinutes = extra['durationMinutes'] as int? ?? 20;
+          if (dppResult == null) {
+            return const Scaffold(
+              body: Center(child: Text('No DPP data available')),
+            );
+          }
+          return DppAttemptScreen(
+            dppResult: dppResult,
+            durationMinutes: durationMinutes,
+          );
         },
       ),
     ],
