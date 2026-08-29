@@ -44,6 +44,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   String? _shortAnswerFeedback;
 
   bool _hasNavigatedToResults = false;
+  bool _showPalette = false;
 
   @override
   void initState() {
@@ -223,6 +224,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     final selectedAnswer = quizState.selectedAnswers[quizState.currentIndex];
     final bookmarks = ref.watch(bookmarksProvider);
     final isBookmarked = bookmarks.any((b) => b.questionId == currentQuestion.id);
+    final isFlagged = quizState.flaggedQuestions.contains(quizState.currentIndex);
 
     return Scaffold(
       backgroundColor: AdaptiveColors.surfaceWarm(context),
@@ -243,34 +245,40 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         },
         onHintPressed: () => _showHint(currentQuestion),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            QuizProgressBar(currentIndex: quizState.currentIndex, totalQuestions: quizState.questions.length),
-            const SizedBox(height: 8),
-            // Timer bar with pulse when time is low
-            _QuizTimerBar(elapsedSeconds: _elapsedSeconds),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
               children: [
-                QuizQuestionCounter(currentIndex: quizState.currentIndex, totalQuestions: quizState.questions.length),
-                QuizScoreIndicator(selectedAnswer: selectedAnswer, correctAnswer: currentQuestion.correctAnswer),
+                QuizProgressBar(currentIndex: quizState.currentIndex, totalQuestions: quizState.questions.length),
+                const SizedBox(height: 8),
+                // Timer bar with pulse when time is low
+                _QuizTimerBar(elapsedSeconds: _elapsedSeconds),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    QuizQuestionCounter(currentIndex: quizState.currentIndex, totalQuestions: quizState.questions.length),
+                    QuizScoreIndicator(selectedAnswer: selectedAnswer, correctAnswer: currentQuestion.correctAnswer),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                if (currentQuestion.type == 'shortAnswer')
+                  _buildShortAnswerInput(currentQuestion, isAnswered)
+                else
+                  QuestionCard(
+                    question: currentQuestion,
+                    isAnswered: isAnswered,
+                    selectedAnswer: selectedAnswer,
+                  ),
+                if (isAnswered) _buildExplanation(currentQuestion),
               ],
             ),
-            const SizedBox(height: 32),
-            if (currentQuestion.type == 'shortAnswer')
-              _buildShortAnswerInput(currentQuestion, isAnswered)
-            else
-              QuestionCard(
-                question: currentQuestion,
-                isAnswered: isAnswered,
-                selectedAnswer: selectedAnswer,
-              ),
-            if (isAnswered) _buildExplanation(currentQuestion),
-          ],
-        ),
+          ),
+          // Question palette overlay
+          if (_showPalette) _buildQuestionPalette(context, quizState),
+        ],
       ),
       floatingActionButton: ConfettiWidget(
         confettiController: _confettiController,
@@ -282,8 +290,11 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         totalQuestions: quizState.questions.length,
         isAnswered: isAnswered,
         isLastQuestion: quizState.currentIndex == quizState.questions.length - 1,
+        isFlagged: isFlagged,
         onPrevious: () => _navigateToQuestion(-1),
         onNext: () => _navigateToQuestion(1),
+        onFlagToggle: () => ref.read(quizProvider.notifier).toggleFlag(quizState.currentIndex),
+        onMarkForReviewAndNext: () => ref.read(quizProvider.notifier).markForReviewAndNext(),
         onSubmit: () {
           if (quizState.currentIndex < quizState.questions.length - 1) {
             _navigateToQuestion(1);
@@ -291,6 +302,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
             ref.read(quizProvider.notifier).completeQuiz();
           }
         },
+        onPaletteToggle: () => setState(() => _showPalette = !_showPalette),
       ),
     );
   }
@@ -338,6 +350,177 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildQuestionPalette(BuildContext context, QuizState quizState) {
+    final total = quizState.questions.length;
+    final answered = quizState.selectedAnswers.keys.toSet();
+    final flagged = quizState.flaggedQuestions;
+    final visited = quizState.visitedQuestions;
+
+    return Positioned.fill(
+      child: GestureDetector(
+        onTap: () => setState(() => _showPalette = false),
+        child: Container(
+          color: Colors.black.withValues(alpha: 0.3),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.7,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 12),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.divider,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Question Palette',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            onPressed: () => setState(() => _showPalette = false),
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          _paletteLegendDot(AppColors.success, 'Answered'),
+                          _paletteLegendDot(AppColors.error, 'Not Answered'),
+                          _paletteLegendDot(AppColors.warning, 'Flagged'),
+                          _paletteLegendDot(AppColors.primary, 'Current'),
+                          _paletteLegendDot(AdaptiveColors.divider(context), 'Not Visited'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: GridView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemCount: quizState.questions.length,
+                        itemBuilder: (context, index) {
+                          final isCurrent = index == quizState.currentIndex;
+                          final isAnswered = quizState.selectedAnswers.containsKey(index);
+                          final isFlagged = quizState.flaggedQuestions.contains(index);
+                          final isVisited = quizState.visitedQuestions.contains(index);
+
+                          Color bg;
+                          Color fg = Colors.white;
+                          if (isAnswered && isFlagged) {
+                            bg = AppColors.success;
+                          } else if (isAnswered) {
+                            bg = AppColors.success;
+                          } else if (isFlagged) {
+                            bg = AppColors.warning;
+                          } else if (isVisited) {
+                            bg = AppColors.error;
+                          } else {
+                            bg = AdaptiveColors.background(context);
+                            fg = AdaptiveColors.textPrimary(context);
+                          }
+
+                          return InkWell(
+                            onTap: () {
+                              setState(() => _showPalette = false);
+                              ref.read(quizProvider.notifier).goToQuestion(index);
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: bg,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isCurrent
+                                          ? AdaptiveColors.primary(context)
+                                          : AdaptiveColors.divider(context),
+                                      width: isCurrent ? 2.5 : 1,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: fg,
+                                    ),
+                                  ),
+                                ),
+                                if (isAnswered && isFlagged)
+                                  Positioned(
+                                    right: -4,
+                                    top: -4,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.warning,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 1),
+                                      ),
+                                      child: const Icon(Icons.flag, size: 10, color: Colors.white),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+Widget _paletteLegendDot(Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 4),
+        Text(label, style: TextStyle(fontSize: 11, color: AdaptiveColors.textSecondary(context))),
+      ],
     );
   }
 }
