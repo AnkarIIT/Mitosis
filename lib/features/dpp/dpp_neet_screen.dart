@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../core/providers/content_providers.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/models/subject_model.dart';
 
@@ -9,7 +11,7 @@ class DppNeetScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final subjects = ref.watch(subjectsProvider);
-    final primary = subjects.isNotEmpty ? subjects.first : const Subject(id: '', name: 'NEET', icon: '📝', chapters: const []);
+    final primary = subjects.isNotEmpty ? subjects.first : Subject(id: '', name: 'NEET', icon: '📝', chapters: const []);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,9 +44,9 @@ class DppNeetScreen extends ConsumerWidget {
                   final engine = ref.read(dppEngineProvider);
                   final config = DppConfig.neetPattern();
                   final result = await engine.generate(config, forceRefresh: true);
-                  if (!context.mounted) return;
-                  if (result != null && result.questions.isNotEmpty) {
-                    await context.push('/dpp/attempt', extra: {
+                  
+                  if (result.questions.isNotEmpty) {
+                    await GoRouter.of(context).push('/dpp/attempt', extra: {
                       'dppResult': result,
                       'durationMinutes': config.durationMinutes,
                       'config': config,
