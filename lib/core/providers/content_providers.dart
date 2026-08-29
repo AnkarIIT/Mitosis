@@ -178,5 +178,5 @@ final dppEngineProvider = Provider<DppEngine>((ref) {
 
 final todayDppProvider = FutureProvider.family<DppResult?, String>((ref, subject) async {
   final engine = ref.watch(dppEngineProvider);
-  return await engine.generate(DppConfig(subject: subject));
+  return await engine.generate(DppConfig.single(subject: subject));
 });

@@ -8,33 +8,126 @@ import '../services/question_history_service.dart';
 
 /// Configuration for a single Daily Practice Paper (DPP).
 class DppConfig {
-  final String subject;
+  /// Subjects to include. Use a list of 1–3 subjects for a mixed DPP, or a
+  /// single subject for a subject-specific drill.
+  final List<String> subjects;
   final String? chapterId;
   final String? topicId;
   final int totalQuestions;
+  final int durationMinutes;
   final int easyPercent;
   final int mediumPercent;
   final int hardPercent;
   final bool includeWeakTopics;
 
+  /// Subject weights for multi-subject DPP. Keys are subject names, values are
+  /// proportional weights (e.g., {'Physics': 45, 'Chemistry': 45, 'Biology': 90}).
+  /// If null, defaults to equal distribution across subjects.
+  final Map<String, int>? subjectWeights;
+
   const DppConfig({
-    required this.subject,
+    this.subjects = const ['Physics', 'Chemistry', 'Biology'],
     this.chapterId,
     this.topicId,
     this.totalQuestions = 20,
+    this.durationMinutes = 20,
     this.easyPercent = 30,
     this.mediumPercent = 50,
     this.hardPercent = 20,
     this.includeWeakTopics = true,
+    this.subjectWeights,
   });
+
+  /// Legacy single-subject constructor for backward compatibility.
+  factory DppConfig.single({
+    required String subject,
+    String? chapterId,
+    String? topicId,
+    int totalQuestions = 20,
+    int durationMinutes = 20,
+    bool includeWeakTopics = true,
+  }) {
+    return DppConfig(
+      subjects: [subject],
+      chapterId: chapterId,
+      topicId: topicId,
+      totalQuestions: totalQuestions,
+      durationMinutes: durationMinutes,
+      includeWeakTopics: includeWeakTopics,
+    );
+  }
+
+  /// NEET 2025 pattern multi-subject DPP factory.
+  /// Creates a balanced paper: Physics 45, Chemistry 45, Biology 90 (Botany 45 + Zoology 45).
+  factory DppConfig.neetPattern({
+    int totalQuestions = 180,
+    int durationMinutes = 180,
+    bool includeWeakTopics = true,
+  }) {
+    return DppConfig(
+      subjects: const ['Physics', 'Chemistry', 'Biology'],
+      totalQuestions: totalQuestions,
+      durationMinutes: durationMinutes,
+      includeWeakTopics: includeWeakTopics,
+      subjectWeights: const {
+        'Physics': 45,
+        'Chemistry': 45,
+        'Biology': 90,
+      },
+    );
+  }
+
+  /// Mixed subject DPP with custom weights.
+  factory DppConfig.mixed({
+    required List<String> subjects,
+    required Map<String, int> weights,
+    int totalQuestions = 60,
+    int durationMinutes = 60,
+    bool includeWeakTopics = true,
+  }) {
+    return DppConfig(
+      subjects: subjects,
+      totalQuestions: totalQuestions,
+      durationMinutes: durationMinutes,
+      includeWeakTopics: includeWeakTopics,
+      subjectWeights: weights,
+    );
+  }
+
+  int get subjectCount => subjects.length;
 }
 
 /// Result of a generated DPP set.
 class DppResult {
   final db.DppSet set;
   final List<Question> questions;
+  final Map<String, List<Question>> questionsBySubject;
 
-  DppResult({required this.set, required this.questions});
+  DppResult({
+    required this.set,
+    required this.questions,
+    required this.questionsBySubject,
+  });
+}
+
+/// Tracks the live state of an in-progress DPP attempt.
+class DppAttemptState {
+  final DppResult result;
+  final Map<int, String?> answersByIndex;
+  final Map<int, int> secondsPerQuestion;
+  final DateTime startedAt;
+  final int durationSeconds;
+  int get elapsedSeconds => DateTime.now().difference(startedAt).inSeconds;
+  int get remainingSeconds => durationSeconds - elapsedSeconds;
+
+  DppAttemptState({
+    required this.result,
+    required this.durationSeconds,
+    Map<int, String?>? answersByIndex,
+    Map<int, int>? secondsPerQuestion,
+  })  : answersByIndex = answersByIndex ?? {},
+        secondsPerQuestion = secondsPerQuestion ?? {},
+        startedAt = DateTime.now();
 }
 
 /// Generates Daily Practice Papers (DPP) by sampling from the local question
@@ -52,29 +145,32 @@ class DppEngine {
   /// Generates a DPP for today. If one already exists for the given config,
   /// returns the existing set (unless [forceRefresh] is true).
   Future<DppResult> generate(DppConfig config, {bool forceRefresh = false}) async {
-    final existing = await _db.getTodayDppSet(config.subject);
+    final primarySubject = config.subjects.first;
+    final existing = await _db.getTodayDppSet(primarySubject);
     if (existing != null && !forceRefresh) {
       final savedQuestions = await _db.getDppQuestions(existing.id);
       if (savedQuestions.isNotEmpty) {
+        final questions = savedQuestions
+            .map((q) => Question(
+                  id: q.questionId,
+                  subject: q.subject,
+                  chapter: q.chapter,
+                  topic: q.topic,
+                  topicId: q.topicId,
+                  questionText: q.questionText,
+                  options: _decodeOptions(q.options),
+                  correctAnswer: q.correctAnswer,
+                  explanation: q.explanation,
+                  year: q.year,
+                  difficulty: q.difficulty,
+                  tags: const [],
+                  type: 'MCQ',
+                ))
+            .toList();
         return DppResult(
           set: existing,
-          questions: savedQuestions
-              .map((q) => Question(
-                    id: q.questionId,
-                    subject: q.subject,
-                    chapter: q.chapter,
-                    topic: q.topic,
-                    topicId: q.topicId,
-                    questionText: q.questionText,
-                    options: _decodeOptions(q.options),
-                    correctAnswer: q.correctAnswer,
-                    explanation: q.explanation,
-                    year: q.year,
-                    difficulty: q.difficulty,
-                    tags: const [],
-                    type: 'MCQ',
-                  ))
-              .toList(),
+          questions: questions,
+          questionsBySubject: _groupBySubject(questions),
         );
       }
     }
@@ -88,8 +184,9 @@ class DppEngine {
     final dateStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
     final base = db.DppSetsCompanion.insert(
       date: dateStr,
-      subject: config.subject,
+      subject: primarySubject,
       totalQuestions: config.totalQuestions,
+      durationMinutes: Value(config.durationMinutes),
     );
     final companion = base.copyWith(
       chapterId: config.chapterId == null ? const Value.absent() : Value<String?>(config.chapterId!),
@@ -119,10 +216,11 @@ class DppEngine {
     final savedSet = db.DppSet(
       id: setId,
       date: dateStr,
-      subject: config.subject,
+      subject: primarySubject,
       chapterId: config.chapterId,
       topicId: config.topicId,
       totalQuestions: config.totalQuestions,
+      durationMinutes: config.durationMinutes,
       correctCount: 0,
       incorrectCount: 0,
       unattemptedCount: 0,
@@ -132,12 +230,16 @@ class DppEngine {
       updatedAt: DateTime.now(),
     );
 
-    return DppResult(set: savedSet, questions: selected);
+    return DppResult(
+      set: savedSet,
+      questions: selected,
+      questionsBySubject: _groupBySubject(selected),
+    );
   }
 
   Future<List<Question>> _buildPool(DppConfig config, Set<String> excludedIds) async {
     final all = await _questionRepo.getAllQuestionsFromDb();
-    var pool = all.where((q) => q.subject == config.subject).toList();
+    var pool = all.where((q) => config.subjects.contains(q.subject)).toList();
 
     // Exclude recently seen questions.
     if (excludedIds.isNotEmpty) {
@@ -147,12 +249,12 @@ class DppEngine {
     // If too few unseen questions remain, relax the exclusion to avoid
     // an empty pool.
     if (pool.length < config.totalQuestions ~/ 2) {
-      pool = all.where((q) => q.subject == config.subject).toList();
+      pool = all.where((q) => config.subjects.contains(q.subject)).toList();
     }
 
     // Bias toward weak topics when configured.
     if (config.includeWeakTopics) {
-      final weakTopicIds = await _getWeakTopicIds(config.subject);
+      final weakTopicIds = await _getWeakTopicIds(config.subjects);
       if (weakTopicIds.isNotEmpty) {
         final weak = pool.where((q) => weakTopicIds.contains(q.topicId)).toList();
         final others = pool.where((q) => !weakTopicIds.contains(q.topicId)).toList();
@@ -173,12 +275,12 @@ class DppEngine {
     return pool;
   }
 
-  Future<Set<String>> _getWeakTopicIds(String subject) async {
+  Future<Set<String>> _getWeakTopicIds(List<String> subjects) async {
     final cards = await _db.getSpacedRepetitionCards();
     final allQuestions = await _questionRepo.getAllQuestionsFromDb();
     final questionByTopicId = <String, String>{};
     for (final q in allQuestions) {
-      if (q.subject == subject) {
+      if (subjects.contains(q.subject)) {
         questionByTopicId[q.id] = q.topicId;
       }
     }
@@ -195,6 +297,13 @@ class DppEngine {
 
   List<Question> _sample(List<Question> pool, int count, DppConfig config) {
     if (pool.isEmpty) return [];
+
+    // If subject weights are specified, sample per subject
+    if (config.subjectWeights != null && config.subjectWeights!.isNotEmpty) {
+      return _sampleBySubject(pool, count, config);
+    }
+
+    // Otherwise, use difficulty-based sampling
     final shuffled = List<Question>.from(pool)..shuffle(_random);
     final easy = count * config.easyPercent ~/ 100;
     final medium = count * config.mediumPercent ~/ 100;
@@ -222,6 +331,86 @@ class DppEngine {
     }
 
     return picked.take(count).toList();
+  }
+
+  List<Question> _sampleBySubject(List<Question> pool, int totalCount, DppConfig config) {
+    final weights = config.subjectWeights!;
+    final picked = <Question>[];
+    final subjectPools = <String, List<Question>>{};
+
+    // Group pool by subject
+    for (final subject in config.subjects) {
+      subjectPools[subject] = pool.where((q) => q.subject == subject).toList();
+    }
+
+    // Calculate target count per subject based on weights
+    final totalWeight = weights.values.fold(0, (sum, w) => sum + w);
+    final targets = <String, int>{};
+    var allocated = 0;
+    for (int i = 0; i < config.subjects.length; i++) {
+      final subject = config.subjects[i];
+      final weight = weights[subject] ?? (totalWeight ~/ config.subjects.length);
+      int target;
+      if (i == config.subjects.length - 1) {
+        target = totalCount - allocated;
+      } else {
+        target = (totalCount * weight / totalWeight).round();
+      }
+      targets[subject] = target;
+      allocated += target;
+    }
+
+    // Sample per subject with difficulty balance
+    for (final subject in config.subjects) {
+      final target = targets[subject] ?? 0;
+      final subjectPool = subjectPools[subject] ?? [];
+
+      if (subjectPool.isEmpty) continue;
+
+      final shuffled = List<Question>.from(subjectPool)..shuffle(_random);
+      final easy = target * config.easyPercent ~/ 100;
+      final medium = target * config.mediumPercent ~/ 100;
+      final hard = target - easy - medium;
+
+      final buckets = <List<Question>>[
+        shuffled.where((q) => q.difficulty.toLowerCase() == 'easy').toList(),
+        shuffled.where((q) => q.difficulty.toLowerCase() == 'medium').toList(),
+        shuffled.where((q) => q.difficulty.toLowerCase() == 'hard').toList(),
+      ];
+
+      final targetsPerDiff = [easy, medium, hard];
+      for (int i = 0; i < 3; i++) {
+        final take = min(targetsPerDiff[i], buckets[i].length);
+        buckets[i].shuffle(_random);
+        picked.addAll(buckets[i].take(take));
+      }
+
+      // Backfill if short for this subject
+      if (picked.where((q) => q.subject == subject).length < target) {
+        final remaining = subjectPool.where((q) => !picked.contains(q)).toList();
+        remaining.shuffle(_random);
+        picked.addAll(remaining.take(target - picked.where((q) => q.subject == subject).length));
+      }
+    }
+
+    // If still short overall, backfill from all subjects
+    if (picked.length < totalCount) {
+      final remaining = pool.where((q) => !picked.contains(q)).toList();
+      remaining.shuffle(_random);
+      picked.addAll(remaining.take(totalCount - picked.length));
+    }
+
+    // Shuffle the final picked list to mix subjects
+    picked.shuffle(_random);
+    return picked.take(totalCount).toList();
+  }
+
+  static Map<String, List<Question>> _groupBySubject(List<Question> questions) {
+    final map = <String, List<Question>>{};
+    for (final q in questions) {
+      map.putIfAbsent(q.subject, () => []).add(q);
+    }
+    return map;
   }
 
   static List<String> _decodeOptions(String raw) {
