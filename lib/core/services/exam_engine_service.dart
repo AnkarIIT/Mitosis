@@ -434,9 +434,14 @@ class ExamEngineService {
       for (final q in remaining) {
         if (taken.length >= section.presentedCount) break;
         if (takenIds.contains(q.id)) continue;
-        if (section.sourceSubject.isNotEmpty &&
-            q.subject != section.sourceSubject) {
-          continue;
+        if (section.sourceSubject.isNotEmpty) {
+          final qSub = q.subject.toLowerCase();
+          final sSub = section.sourceSubject.toLowerCase();
+          final matches = qSub == sSub ||
+              (sSub == 'biology' && (qSub == 'botany' || qSub == 'zoology')) ||
+              (sSub == 'botany' && qSub == 'biology') ||
+              (sSub == 'zoology' && qSub == 'biology');
+          if (!matches) continue;
         }
         taken.add(q);
         takenIds.add(q.id);
