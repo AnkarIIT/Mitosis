@@ -528,14 +528,18 @@ Widget _paletteLegendDot(Color color, String label) {
 /// Timer bar that fills based on elapsed time and pulses red when < 30s remain.
 class _QuizTimerBar extends StatelessWidget {
   final int elapsedSeconds;
-  static const int _timeLimit = 1200; // 20 minutes default quiz timer
+  final int totalQuestions;
 
-  const _QuizTimerBar({required this.elapsedSeconds});
+  const _QuizTimerBar({
+    required this.elapsedSeconds,
+    this.totalQuestions = 10,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final remaining = (_timeLimit - elapsedSeconds).clamp(0, _timeLimit);
-    final fraction = elapsedSeconds / _timeLimit;
+    final timeLimit = totalQuestions * 60; // 1 min per question default
+    final remaining = (timeLimit - elapsedSeconds).clamp(0, timeLimit);
+    final fraction = elapsedSeconds / timeLimit;
     final isLow = remaining < 30;
     final color = isLow ? AppColors.error : SubjectColors.physics;
 

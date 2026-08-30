@@ -34,11 +34,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
   Timer? _timer;
   DateTime? _deadline;
   bool _submitted = false;
-
-  int get _currentQuestionIndex => _attempt.answersByIndex.keys.fold(
-      0,
-      (max, i) => i > max ? i : max,
-    );
+  int _currentQuestionIndex = 0;
 
   @override
   void initState() {
@@ -84,11 +80,35 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
     return idx < _questions.length ? _questions[idx] : _questions.last;
   }
 
-  void _selectAnswer(String answer) {
-    if (_attempt.answersByIndex.containsKey(_currentQuestionIndex)) return;
+  void _selectAnswer(String selectedValue) {
     setState(() {
-      _attempt.answersByIndex[_currentQuestionIndex] = answer;
+      _attempt.answersByIndex[_currentQuestionIndex] = selectedValue;
     });
+  }
+
+  static bool _checkAnswerCorrect(Question q, String? userVal) {
+    if (userVal == null || userVal.isEmpty) return false;
+    final cleanUser = userVal.trim().toLowerCase();
+    final cleanCorrect = q.correctAnswer.trim().toLowerCase();
+
+    if (cleanUser == cleanCorrect) return true;
+
+    // Check letter vs option text vs option index (0, 1, 2, 3 or A, B, C, D)
+    if (userVal.length == 1) {
+      final letterCode = userVal.toUpperCase().codeUnitAt(0);
+      if (letterCode >= 65 && letterCode <= 68) {
+        final idx = letterCode - 65;
+        // Check if correctAnswer is index string ('0', '1', '2', '3')
+        if (cleanCorrect == idx.toString()) return true;
+        // Check if correctAnswer matches option text at index
+        if (idx < q.options.length && q.options[idx].trim().toLowerCase() == cleanCorrect) {
+          return true;
+        }
+      }
+    }
+
+    // Check if userVal is option text matching correctAnswer
+    return false;
   }
 
   Future<void> _submitDpp({bool auto = false}) async {
@@ -100,7 +120,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
       final answer = _attempt.answersByIndex[i];
       if (answer == null || answer.isEmpty) {
         unattempted.add(i);
-      } else if (answer.trim() == _questions[i].correctAnswer.trim()) {
+      } else if (_checkAnswerCorrect(_questions[i], answer)) {
         correct.add(i);
       } else {
         incorrect.add(i);
@@ -330,7 +350,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: InkWell(
-                          onTap: isAnswered ? null : () => _selectAnswer(optionLetter),
+                          onTap: () => _selectAnswer(optionLetter),
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
                             padding: const EdgeInsets.all(14),
@@ -381,7 +401,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                 ),
               ),
             ),
-            // Bottom action bar
+            // Navigation & action bar
             Container(
               padding: EdgeInsets.only(
                 left: 16,
@@ -401,9 +421,18 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
               ),
               child: Row(
                 children: [
+                  OutlinedButton(
+                    onPressed: _currentQuestionIndex > 0
+                        ? () => setState(() => _currentQuestionIndex--)
+                        : null,
+                    child: const Text('Prev'),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: isAnswered ? _submitDpp : null,
+                      onPressed: _currentQuestionIndex < _questions.length - 1
+                          ? () => setState(() => _currentQuestionIndex++)
+                          : () => _submitDpp(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -412,7 +441,11 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(isAnswered ? 'Submit DPP' : 'Select an answer'),
+                      child: Text(
+                        _currentQuestionIndex < _questions.length - 1
+                            ? 'Next'
+                            : 'Submit DPP',
+                      ),
                     ),
                   ),
                 ],
