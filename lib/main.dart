@@ -138,6 +138,7 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   bool _needsBiometric = false;
   bool _splashDone = false;
+  DateTime? _lastUnlockTime;
 
   @override
   void initState() {
@@ -171,6 +172,17 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   Future<void> _checkBiometricLock() async {
     final bioService = ref.read(app_providers.biometricServiceProvider);
     final isEnabled = await bioService.isBiometricEnabled();
+
+    // Ignore spurious resume checks immediately after a successful unlock.
+    if (_lastUnlockTime != null) {
+      final elapsed = DateTime.now().difference(_lastUnlockTime!);
+      if (elapsed.inSeconds < 2) {
+        debugPrint('🔐 Biometric check skipped: cooldown ${elapsed.inSeconds}s');
+        return;
+      }
+      _lastUnlockTime = null;
+    }
+
     debugPrint('🔐 Biometric lock check: enabled=$isEnabled, needsBiometric=$_needsBiometric');
 
     if (isEnabled) {
@@ -204,7 +216,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       builder: (context, child) {
         if (_needsBiometric) {
           return _BiometricLockOverlay(
-            onUnlock: () => setState(() => _needsBiometric = false),
+            onUnlock: () {
+              _lastUnlockTime = DateTime.now();
+              if (mounted) {
+                setState(() => _needsBiometric = false);
+              }
+            },
           );
         }
         return child ?? const SizedBox.shrink();
