@@ -75,7 +75,7 @@ class AdaptiveColors {
 
 class AppTheme {
   static ThemeData get lightTheme {
-    final textTheme = GoogleFonts.interTextTheme().copyWith(
+    final textTheme = GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
       displayLarge: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.bold),
       displayMedium: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.bold),
       displaySmall: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.bold),
@@ -226,7 +226,7 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final textTheme = GoogleFonts.interTextTheme().copyWith(
+    final textTheme = GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
       displayLarge: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.bold),
       displayMedium: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.bold),
       displaySmall: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.bold),

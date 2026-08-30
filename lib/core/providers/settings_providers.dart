@@ -97,17 +97,39 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
     _loadTheme();
   }
   static const _themeKey = 'theme_mode';
+
   Future<void> _loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    final themeIndex = prefs.getInt(_themeKey);
-    if (themeIndex != null) {
-      state = ThemeMode.values[themeIndex];
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final themeIndex = prefs.getInt(_themeKey);
+      if (themeIndex != null &&
+          themeIndex >= 0 &&
+          themeIndex < ThemeMode.values.length) {
+        state = ThemeMode.values[themeIndex];
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading theme mode: $e');
     }
   }
+
   Future<void> toggleTheme(bool isDark) async {
     state = isDark ? ThemeMode.dark : ThemeMode.light;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_themeKey, state.index);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_themeKey, state.index);
+    } catch (e) {
+      debugPrint('❌ Error saving theme mode: $e');
+    }
+  }
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    state = mode;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_themeKey, state.index);
+    } catch (e) {
+      debugPrint('❌ Error saving theme mode: $e');
+    }
   }
 }
 

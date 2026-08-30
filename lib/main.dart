@@ -222,7 +222,7 @@ class _BrandedSplash extends StatelessWidget {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textDark,
+                color: AdaptiveColors.textPrimary(context),
                 letterSpacing: -0.5,
               ),
             ),
@@ -231,7 +231,7 @@ class _BrandedSplash extends StatelessWidget {
               'Your NEET prep companion',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSubtle,
+                color: AdaptiveColors.textSecondary(context),
               ),
             ),
             const SizedBox(height: 32),
@@ -291,13 +291,12 @@ class _BiometricLockOverlayState extends ConsumerState<_BiometricLockOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(app_providers.themeProvider);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: Theme.of(context).brightness == Brightness.dark
-          ? ThemeMode.dark
-          : ThemeMode.light,
+      themeMode: themeMode,
       home: Scaffold(
         body: Container(
           width: double.infinity,
