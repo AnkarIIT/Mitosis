@@ -121,6 +121,31 @@ class QuestionRepository {
     return _mapQuestions(data);
   }
 
+  /// Paginated fetch to prevent UI memory spikes when loading massive question sets.
+  Future<List<model.Question>> getQuestionsPaginated({
+    required int limit,
+    required int offset,
+    String? subject,
+    String? topicId,
+  }) async {
+    final query = db.select(db.questions)
+      ..where((tbl) {
+        Expression<bool> predicate = tbl.isActive.equals(true);
+        if (subject != null) {
+          predicate = predicate & tbl.subject.equals(subject);
+        }
+        if (topicId != null) {
+          predicate = predicate & tbl.topicId.equals(topicId);
+        }
+        return predicate;
+      })
+      ..orderBy([(tbl) => OrderingTerm.asc(tbl.id)])
+      ..limit(limit, offset: offset);
+
+    final data = await query.get();
+    return _mapQuestions(data);
+  }
+
   Future<List<model.Question>> getQuestionsBySubject(String subject) async {
     final data =
         await (db.select(db.questions)
