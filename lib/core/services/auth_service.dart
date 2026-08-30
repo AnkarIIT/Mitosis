@@ -264,4 +264,41 @@ class AuthService {
       return (success: false, message: 'Error: $e');
     }
   }
+
+  Future<({bool success, String message, db.User? user})> signInWithMicrosoft() async {
+    if (!_cloudAuthEnabled) {
+      return (success: false, message: 'Cloud auth is not configured', user: null);
+    }
+
+    try {
+      final client = _supabaseClient!;
+      final bool launched = await client.auth.signInWithOAuth(
+        supabase.OAuthProvider.azure,
+      );
+
+      if (!launched) {
+        return (success: false, message: 'Could not launch Microsoft authentication', user: null);
+      }
+
+      final session = client.auth.currentSession;
+      if (session != null) {
+        final email = session.user.email ?? 'user@microsoft.com';
+        final username = email.split('@').first;
+        final fullName = session.user.userMetadata?['full_name'] ??
+            session.user.userMetadata?['name'] ??
+            username;
+        await _upsertLocalUser(email: email, username: username, fullName: fullName);
+        final localUser = await _db.getUserByEmail(email);
+        return (success: true, message: 'Signed in with Microsoft', user: localUser);
+      }
+
+      return (
+        success: true,
+        message: 'Redirecting to Microsoft sign-in...',
+        user: null,
+      );
+    } catch (e) {
+      return (success: false, message: 'Microsoft sign-in error: $e', user: null);
+    }
+  }
 }

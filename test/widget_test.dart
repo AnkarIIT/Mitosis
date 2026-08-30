@@ -310,6 +310,9 @@ class _FakeAuthNotifier extends StateNotifier<AuthState>
   Future<bool> signInWithGoogle() async => false;
 
   @override
+  Future<bool> signInWithMicrosoft() async => false;
+
+  @override
   Future<({bool success, String message})> deleteAccount() async {
     return (success: true, message: 'deleted');
   }

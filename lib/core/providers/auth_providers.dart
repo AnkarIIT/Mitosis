@@ -164,6 +164,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return false;
   }
 
+  Future<bool> signInWithMicrosoft() async {
+    if (!AppConfig.isCloudAuthConfigured) {
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        error: 'Microsoft OAuth is not configured.',
+      );
+      return false;
+    }
+
+    state = state.copyWith(status: AuthStatus.authenticating, error: null);
+    final result = await _authService.signInWithMicrosoft();
+    if (result.success) {
+      if (result.user != null) {
+        state = state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.user,
+          isGuest: false,
+          error: null,
+        );
+        _ref.read(cloudSyncServiceProvider)?.syncAll();
+      }
+      return true;
+    }
+
+    state = state.copyWith(
+      status: AuthStatus.unauthenticated,
+      error: result.message,
+      isGuest: false,
+    );
+    return false;
+  }
+
   Future<bool> verifyOtp(String code) async {
     final email = state.pendingEmail ?? state.pendingPhone;
     if (email == null) return false;
