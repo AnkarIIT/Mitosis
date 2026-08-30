@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/models/question_model.dart';
 
 class ErrorBookScreen extends ConsumerWidget {
@@ -41,7 +42,7 @@ class ErrorBookScreen extends ConsumerWidget {
             'Your Error Book is Empty!',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+              color: AdaptiveColors.textPrimary(context),
             ),
           ),
           const SizedBox(height: 12),

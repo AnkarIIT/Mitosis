@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/providers/content_providers.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/services/dpp_engine.dart';
+import '../../core/theme/app_theme.dart';
 
 class DppScreen extends ConsumerStatefulWidget {
   final String subject;
@@ -378,7 +379,7 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                                         style: TextStyle(
                                           color: isCorrect
                                               ? Colors.white
-                                              : Colors.black87,
+                                              : AdaptiveColors.textPrimary(context),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 12,
                                         ),

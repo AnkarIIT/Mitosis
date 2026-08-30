@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 
 class TestResultScreen extends ConsumerWidget {
@@ -110,7 +111,7 @@ class TestResultScreen extends ConsumerWidget {
                     '${attempt.score}/${attempt.totalQuestions}',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color: AdaptiveColors.textPrimary(context),
                     ),
                   ),
                   Text(

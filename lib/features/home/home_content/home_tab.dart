@@ -1062,7 +1062,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               const SizedBox(width: 8),
               Text(
                 'Weak Topics',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textDark),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AdaptiveColors.textPrimary(context)),
               ),
             ],
           ),

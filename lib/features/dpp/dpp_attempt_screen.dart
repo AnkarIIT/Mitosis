@@ -9,6 +9,7 @@ import '../../core/models/question_model.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/services/result_export_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:drift/drift.dart' hide Column;
 
 class DppAttemptScreen extends ConsumerStatefulWidget {
@@ -380,7 +381,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                                     child: Text(
                                       optionLetter,
                                       style: TextStyle(
-                                        color: isSelected ? Colors.white : AppColors.textDark,
+                                        color: isSelected ? Colors.white : AdaptiveColors.textPrimary(context),
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                       ),
@@ -655,7 +656,7 @@ class _DppReviewSheet extends StatelessWidget {
                                             style: TextStyle(
                                               color: isCorrectOption || isUserChoice
                                                   ? Colors.white
-                                                  : AppColors.textDark,
+                                                  : AdaptiveColors.textPrimary(context),
                                               fontWeight: FontWeight.bold,
                                               fontSize: 11,
                                             ),

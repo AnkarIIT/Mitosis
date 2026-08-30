@@ -5,6 +5,7 @@ import '../../core/models/question_model.dart';
 import '../../core/services/paragraph_question_matcher.dart';
 import '../../core/services/pdf_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 class ParagraphQuestionPoolSheet extends ConsumerStatefulWidget {
   final List<Question> chapterQuestions;
@@ -119,17 +120,17 @@ class _ParagraphQuestionPoolSheetState
                     children: [
                       Text(
                         'Questions from Page ${widget.pageNumber}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textDark,
+                          color: AdaptiveColors.textPrimary(context),
                         ),
                       ),
                       Text(
                         'Tap a paragraph to filter questions from that section',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSubtle,
+                          color: AdaptiveColors.textSecondary(context),
                         ),
                       ),
                     ],
@@ -159,12 +160,12 @@ class _ParagraphQuestionPoolSheetState
                     ),
                   )
                 else if (_paragraphs.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
                       'No extractable text on this page (may be image-based).',
                       style: TextStyle(
-                        color: AppColors.textSubtle,
+                        color: AdaptiveColors.textSecondary(context),
                         fontSize: 12,
                       ),
                     ),
@@ -175,7 +176,7 @@ class _ParagraphQuestionPoolSheetState
                     child: Text(
                       'PARAGRAPHS ON THIS PAGE',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: AppColors.textSubtle,
+                        color: AdaptiveColors.textSecondary(context),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1,
                       ),
@@ -230,10 +231,10 @@ class _ParagraphQuestionPoolSheetState
                                   paragraph.text,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
                                     height: 1.35,
-                                    color: AppColors.textDark,
+                                    color: AdaptiveColors.textPrimary(context),
                                   ),
                                 ),
                               ),
@@ -252,7 +253,7 @@ class _ParagraphQuestionPoolSheetState
                         'QUESTIONS FROM THIS SECTION'
                         '${hasMatch ? ' (${visible.length} matched)' : ''}',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.textSubtle,
+                          color: AdaptiveColors.textSecondary(context),
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1,
                         ),
@@ -269,14 +270,14 @@ class _ParagraphQuestionPoolSheetState
                   ],
                 ),
                 if (_selectedIndex != null && _matched.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
                       'No strong keyword match for this paragraph — showing '
                       'all chapter questions.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSubtle,
+                        color: AdaptiveColors.textSecondary(context),
                       ),
                     ),
                   ),
@@ -339,10 +340,10 @@ class _ParagraphQuestionPoolSheetState
                       ),
                     ),
                     const Spacer(),
-                    const Icon(
+                    Icon(
                       Icons.chevron_right,
                       size: 16,
-                      color: AppColors.textSubtle,
+                      color: AdaptiveColors.textSecondary(context),
                     ),
                   ],
                 ),
@@ -351,19 +352,19 @@ class _ParagraphQuestionPoolSheetState
                   q.questionText,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13.5,
                     height: 1.35,
-                    color: AppColors.textDark,
+                    color: AdaptiveColors.textPrimary(context),
                   ),
                 ),
                 if (q.ncertReference != null) ...[
                   const SizedBox(height: 6),
                   Text(
                     '📖 ${q.ncertReference}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textSubtle,
+                      color: AdaptiveColors.textSecondary(context),
                     ),
                   ),
                 ],

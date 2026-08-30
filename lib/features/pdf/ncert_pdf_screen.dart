@@ -7,6 +7,7 @@ import '../../core/providers/providers.dart';
 import '../../core/services/ncert_book_catalog.dart';
 import '../../core/services/pdf_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'paragraph_question_pool.dart';
 
 class NcertPdfScreen extends ConsumerStatefulWidget {
@@ -122,10 +123,10 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
           children: [
             Text(
               _entry.chapterTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textDark,
+                color: AdaptiveColors.textPrimary(context),
               ),
             ),
             Text(
@@ -153,10 +154,10 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Text(
                   _entry.bookName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+                    color: AdaptiveColors.textPrimary(context),
                   ),
                 ),
               ),
@@ -197,21 +198,21 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
                               : FontWeight.normal,
                           color: isCurrent
                               ? AppColors.primary
-                              : AppColors.textDark,
+                              : AdaptiveColors.textPrimary(context),
                         ),
                       ),
                       trailing: isActiveChapter
                           ? Text(
                               _scanningChapter != null ? 'Scanning…' : 'Page $_currentPage',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textSubtle,
+                                color: AdaptiveColors.textSecondary(context),
                               ),
                             )
-                          : const Icon(
+                          : Icon(
                               Icons.chevron_right,
                               size: 18,
-                              color: AppColors.textSubtle,
+                              color: AdaptiveColors.textSecondary(context),
                             ),
                       onTap: () => _openChapter(entry),
                     );
@@ -258,17 +259,17 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
                         children: [
                           Text(
                             'NCERT-linked questions',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textDark,
+                              color: AdaptiveColors.textPrimary(context),
                             ),
                           ),
                           Text(
                             'Page $_currentPage • ${chapterQuestions.length} available',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textSubtle,
+                              color: AdaptiveColors.textSecondary(context),
                             ),
                           ),
                         ],

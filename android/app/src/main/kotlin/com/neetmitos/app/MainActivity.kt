@@ -1,4 +1,4 @@
-package com.neetmitosis.app
+package com.neetmitos.app
 
 import io.flutter.embedding.android.FlutterActivity
 

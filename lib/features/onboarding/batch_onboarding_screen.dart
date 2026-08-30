@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/user_preferences_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 /// Batch onboarding triage — a 3-step flow embedded in the onboarding
 /// PageView:
@@ -138,12 +139,12 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Which batch are you in?',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+              color: AdaptiveColors.textPrimary(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -221,10 +222,10 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
+                        color: AdaptiveColors.textPrimary(context),
                       ),
                     ),
                     Text(
@@ -254,12 +255,12 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'What year are you targeting?',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+              color: AdaptiveColors.textPrimary(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -281,7 +282,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                   labelStyle: TextStyle(
                     color: _targetYear == year
                         ? AppColors.primary
-                        : AppColors.textDark,
+                        : AdaptiveColors.textPrimary(context),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -306,12 +307,12 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'How much time can you commit daily?',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+              color: AdaptiveColors.textPrimary(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -351,10 +352,10 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                         Expanded(
                           child: Text(
                             _commitmentLabel(minutes),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textDark,
+                              color: AdaptiveColors.textPrimary(context),
                             ),
                           ),
                         ),

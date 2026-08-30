@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 /// Spaced-repetition review session over currently due cards.
 ///
@@ -117,8 +118,8 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                   children: [
                     Text(
                       'Card ${_index + 1} of ${_queue.length}',
-                      style: const TextStyle(
-                        color: AppColors.textSubtle,
+                      style: TextStyle(
+                        color: AdaptiveColors.textSecondary(context),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -160,8 +161,8 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                 children: [
                   Text(
                     '${question.subject} • ${question.chapter}',
-                    style: const TextStyle(
-                      color: AppColors.textSubtle,
+                    style: TextStyle(
+                      color: AdaptiveColors.textSecondary(context),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -171,7 +172,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                     question.questionText,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color: AdaptiveColors.textPrimary(context),
                       height: 1.4,
                     ),
                   ),
@@ -215,7 +216,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
 
       Color borderColor = AppColors.divider;
       Color bgColor = Colors.white;
-      Color textColor = AppColors.textDark;
+      Color textColor = AdaptiveColors.textPrimary(context);
 
       if (isSelected && !_answered) {
         borderColor = AppColors.primary;
@@ -366,18 +367,18 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
                   'Correct answer: ${question.correctAnswer}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
+                    color: AdaptiveColors.textPrimary(context),
                   ),
                 ),
               ),
             Text(
               explanation,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textDark,
+                color: AdaptiveColors.textPrimary(context),
                 height: 1.5,
               ),
             ),
@@ -416,9 +417,9 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
               const SizedBox(height: 8),
               Text(
                 '$correct of $total correct ($percent%)',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
-                  color: AppColors.textSubtle,
+                  color: AdaptiveColors.textSecondary(context),
                 ),
               ),
               const SizedBox(height: 32),
@@ -452,12 +453,12 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'No questions are due right now. Questions you miss during '
               'quizzes are scheduled here for review at growing intervals '
               '(1 → 3 → 7 → 21 days).',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSubtle, height: 1.5),
+              style: TextStyle(color: AdaptiveColors.textSecondary(context), height: 1.5),
             ),
           ],
         ),
