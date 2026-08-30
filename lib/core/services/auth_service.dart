@@ -11,9 +11,20 @@ class AuthService {
   final db.AppDatabase _db;
   final EmailService? _emailService;
   final FlutterSecureStorage _secureStorage;
+  final Map<String, DateTime> _lastAuthAttempts = {};
 
   AuthService(this._db, [this._emailService, FlutterSecureStorage? secureStorage])
       : _secureStorage = secureStorage ?? const FlutterSecureStorage();
+
+  bool _isRateLimited(String identifier, {int cooldownSeconds = 3}) {
+    final now = DateTime.now();
+    final last = _lastAuthAttempts[identifier];
+    if (last != null && now.difference(last).inSeconds < cooldownSeconds) {
+      return true;
+    }
+    _lastAuthAttempts[identifier] = now;
+    return false;
+  }
 
   supabase.SupabaseClient? get _supabaseClient =>
       AppConfig.enableCloudAuth && AppConfig.isCloudAuthConfigured
@@ -51,6 +62,10 @@ class AuthService {
   }
 
   Future<({bool success, String message})> sendOtp(String email) async {
+    if (_isRateLimited('otp_$email', cooldownSeconds: 10)) {
+      return (success: false, message: 'Please wait a few seconds before requesting another OTP');
+    }
+
     if (!_cloudAuthEnabled) {
       return (success: false, message: AppConfig.cloudAuthHelpText);
     }
@@ -101,6 +116,10 @@ class AuthService {
     required String password,
     String? fullName,
   }) async {
+    if (_isRateLimited('reg_$email', cooldownSeconds: 5)) {
+      return (success: false, message: 'Too many requests. Please try again shortly.', user: null);
+    }
+
     if (!_cloudAuthEnabled) return (success: false, message: 'Cloud auth disabled', user: null);
 
     try {
@@ -124,6 +143,10 @@ class AuthService {
     required String email,
     required String password,
   }) async {
+    if (_isRateLimited('login_$email', cooldownSeconds: 2)) {
+      return (success: false, message: 'Too many login attempts. Please wait.', user: null);
+    }
+
     if (!_cloudAuthEnabled) return (success: false, message: 'Cloud auth disabled', user: null);
 
     try {
@@ -190,8 +213,8 @@ class AuthService {
   }
 
   static const Duration _otpLifetime = Duration(minutes: 10);
-  static const String _secure2FACodeKey = 'pending_2fa_code';
-  static const String _secure2FAExpiryKey = 'pending_2fa_expiry';
+  static const String _secure2FACodeKey = 'neet_mitos_2fa_code';
+  static const String _secure2FAExpiryKey = 'neet_mitos_2fa_expiry';
 
   Future<({bool success, String message})> send2FAEmail(String email) async {
     final service = _emailService;

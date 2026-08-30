@@ -1,10 +1,18 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BiometricService {
   final LocalAuthentication _auth = LocalAuthentication();
-  static const String _biometricEnabledKey = 'biometric_enabled';
+  final FlutterSecureStorage _secureStorage;
+  static const String _biometricEnabledKey = 'neet_mitos_biometric_enabled';
+
+  BiometricService([FlutterSecureStorage? secureStorage])
+      : _secureStorage = secureStorage ??
+            const FlutterSecureStorage(
+              aOptions: AndroidOptions(encryptedSharedPreferences: true),
+              iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock_this_device),
+            );
 
   Future<bool> isBiometricAvailable() async {
     try {
@@ -45,12 +53,14 @@ class BiometricService {
   }
 
   Future<void> setBiometricEnabled(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_biometricEnabledKey, enabled);
+    await _secureStorage.write(
+      key: _biometricEnabledKey,
+      value: enabled.toString(),
+    );
   }
 
   Future<bool> isBiometricEnabled() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_biometricEnabledKey) ?? false;
+    final value = await _secureStorage.read(key: _biometricEnabledKey);
+    return value == 'true';
   }
 }

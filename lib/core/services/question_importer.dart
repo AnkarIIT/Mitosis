@@ -1,6 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 import '../models/question_model.dart';
+
+/// Top-level helper function for compute isolate execution.
+Set<String> _normalizeBatch(List<String> texts) {
+  return texts.map(QuestionImporter.normalizeText).toSet();
+}
 
 /// Result of a question import run.
 class QuestionImportResult {
@@ -61,6 +67,11 @@ class QuestionImporter {
   /// Canonicalizes a question text so duplicates can be detected.
   static String normalizeText(String text) =>
       text.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
+  /// Runs normalization in a background isolate using [compute] for large batches.
+  static Future<Set<String>> normalizeTextsInBackground(List<String> texts) async {
+    return await compute(_normalizeBatch, texts);
+  }
 
   /// Parses a JSON document into raw question rows.
   ///
