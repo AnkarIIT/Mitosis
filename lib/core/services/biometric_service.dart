@@ -15,6 +15,26 @@ class BiometricService {
               iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock_this_device),
             );
 
+  /// Returns true if the device has at least one biometric actually enrolled
+  /// (fingerprint, face, iris, etc.). This is distinct from merely supporting
+  /// biometric hardware — a device with only a PIN/pattern enrolled reports no
+  /// enrolled biometrics.
+  Future<bool> hasEnrolledBiometrics() async {
+    try {
+      final available = await _auth.getAvailableBiometrics();
+      final enrolled = available.isNotEmpty;
+      debugPrint('Enrolled biometrics: $available');
+      return enrolled;
+    } on PlatformException catch (e) {
+      debugPrint('Enrolled biometrics check failed: $e');
+      return false;
+    } on UnsupportedError {
+      // Older platforms may not expose getAvailableBiometrics; fall back to the
+      // capability check which is the best signal they provide.
+      return isBiometricAvailable();
+    }
+  }
+
   Future<bool> isBiometricAvailable() async {
     try {
       final bool canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
@@ -28,10 +48,13 @@ class BiometricService {
 
   Future<bool> authenticate() async {
     try {
-      // First check if biometric is actually available
-      final available = await isBiometricAvailable();
-      if (!available) {
-        debugPrint('Biometric not available, falling back to device credential');
+      // Only attempt biometric-only auth when a biometric is actually enrolled.
+      // Otherwise fall back straight to the device credential (PIN/pattern) so
+      // that enabling the lock never fails just because no fingerprint/face is
+      // configured.
+      final enrolled = await hasEnrolledBiometrics();
+      if (!enrolled) {
+        debugPrint('No enrolled biometrics, using device credential');
         return await authenticateWithDeviceCredential();
       }
 

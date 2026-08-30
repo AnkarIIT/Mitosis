@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
@@ -18,6 +19,11 @@ import 'core/constants/starter_flashcards.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Use locally-bundled Inter/Poppins fonts instead of downloading them from
+  // fonts.gstatic.com at runtime. This avoids network failures and guarantees
+  // consistent typography on every launch.
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   try {
     await dotenv.load(fileName: '.env');
