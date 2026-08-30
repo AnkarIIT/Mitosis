@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/config/app_config.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -155,27 +156,27 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 const SizedBox(height: 40),
                 Container(
                   padding: const EdgeInsets.all(28),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(28)),
+                  decoration: BoxDecoration(
+                    color: AdaptiveColors.surface(context),
+                    borderRadius: const BorderRadius.all(Radius.circular(28)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
+                      Text(
                         'Get Started',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textDark,
+                          color: AdaptiveColors.textPrimary(context),
                         ),
                       ),
                       const SizedBox(height: 6),
-                      const Text(
+                      Text(
                         'Sign in to sync your progress across devices.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: AppColors.textSubtle, fontSize: 13),
+                        style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 13),
                       ),
                       const SizedBox(height: 24),
                       if (showGoogleButton) ...[
@@ -370,8 +371,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         child: OutlinedButton(
                           onPressed: _handleGuestContinue,
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.textDark,
-                            side: BorderSide(color: AppColors.textSubtle.withValues(alpha: 0.3)),
+                            foregroundColor: AdaptiveColors.textPrimary(context),
+                            side: BorderSide(color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.3)),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),

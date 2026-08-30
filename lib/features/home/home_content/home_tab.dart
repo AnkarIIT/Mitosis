@@ -174,7 +174,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 17,
-              color: AppColors.textDark,
+              color: AdaptiveColors.textPrimary(context),
             ),
           ),
         ),
@@ -188,14 +188,14 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 17,
-                  color: AppColors.textDark,
+                  color: AdaptiveColors.textPrimary(context),
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 batchSubtitle,
                 style: TextStyle(
-                  color: AppColors.textSubtle,
+                  color: AdaptiveColors.textSecondary(context),
                   fontSize: 12,
                 ),
               ),
@@ -345,7 +345,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               child: Text(
                 _chipLabels[index],
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black87,
+                  color: isSelected
+                      ? Colors.white
+                      : AdaptiveColors.textPrimary(context),
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
@@ -369,7 +371,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+              color: AdaptiveColors.textPrimary(context),
             ),
           ),
         ),
@@ -516,7 +518,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: AppColors.textDark,
+        color: AdaptiveColors.textPrimary(context),
       ),
     ).animate().fade(delay: 240.ms, duration: 400.ms);
   }
@@ -530,7 +532,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 3)),
@@ -579,12 +581,12 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               children: [
                 Text(
                   'Daily Goal',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textDark),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AdaptiveColors.textPrimary(context)),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '$completed / $target questions solved',
-                  style: TextStyle(color: AppColors.textSubtle, fontSize: 12),
+                  style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12),
                 ),
                 const SizedBox(height: 8),
                 ClipRRect(
@@ -677,13 +679,13 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AdaptiveColors.surface(context),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Center(
           child: Text(
             'Start a quiz to see your progress here!',
-            style: TextStyle(color: AppColors.textSubtle, fontSize: 14),
+            style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 14),
           ),
         ),
       );
@@ -701,7 +703,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AdaptiveColors.surface(context),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
@@ -728,12 +730,12 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                   children: [
                     Text(
                       topicLabel,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textDark),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AdaptiveColors.textPrimary(context)),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       '${attempt.score}/${attempt.totalQuestions} correct • ${_formatTime(attempt.timeSpentSeconds)}',
-                      style: TextStyle(color: AppColors.textSubtle, fontSize: 11),
+                      style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 11),
                     ),
                     const SizedBox(height: 8),
                     ClipRRect(
@@ -757,7 +759,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               const SizedBox(width: 10),
               Text(
                 '${accuracy.toStringAsFixed(0)}%',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textDark),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AdaptiveColors.textPrimary(context)),
               ),
             ],
           ),
@@ -1049,7 +1051,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
       ),
@@ -1062,7 +1064,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               const SizedBox(width: 8),
               Text(
                 'Weak Topics',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textDark),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AdaptiveColors.textPrimary(context)),
               ),
             ],
           ),
