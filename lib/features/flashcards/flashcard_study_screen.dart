@@ -166,7 +166,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
         const SizedBox(height: 8),
         Text(
           'Reviewed: $_reviewed',
-          style: TextStyle(color: AppColors.textSubtle, fontSize: 12),
+          style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12),
         ),
 
         // Card area

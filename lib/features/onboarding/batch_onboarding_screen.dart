@@ -418,3 +418,4 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
     );
   }
 }
+

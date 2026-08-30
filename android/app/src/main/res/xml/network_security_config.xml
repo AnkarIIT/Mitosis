@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">supabase.co</domain>
+        <domain includeSubdomains="true">resend.com</domain>
+        <pin-set expiration="2026-12-31">
+            <!-- Supabase leaf (CN=supabase.co) -->
+            <pin algorithm="SHA-256">yyBDqvMo9Jc2CwnVJBDj8TE8u5xHielbUS/+h7VM2xs=</pin>
+            <!-- Google Trust Services WE1 intermediate (shared with Resend) -->
+            <pin algorithm="SHA-256">kIdp6NNEd8wsugYyyIYFsi1ylMCED3hZbSR8ZFsa/A4=</pin>
+            <!-- Google Trust Services Root R4 (backup) -->
+            <pin algorithm="SHA-256">mEflZT5enoR1FuXLgYYGqnVEoZvmf9c2bVBpiOjYQ0c=</pin>
+            <!-- Resend leaf (CN=api.resend.com) -->
+            <pin algorithm="SHA-256">/oyHzEcgLofQKkI4Ku2Ch3heJh8E62EkfUm3Jsz6X5s=</pin>
+        </pin-set>
+    </domain-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system"/>
+            <certificates src="user"/>
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

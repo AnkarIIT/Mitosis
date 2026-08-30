@@ -1,11 +1,11 @@
 import 'dart:math' as math;
-import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/models/question_model.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/services/result_export_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -73,7 +73,7 @@ class CbtResultScreen extends ConsumerWidget {
                 'Rough estimate — not an official NEET rank/percentile.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSubtle,
+                  color: AdaptiveColors.textSecondary(context),
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -155,7 +155,7 @@ class CbtResultScreen extends ConsumerWidget {
                     '$raw/$maxScore',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color: AdaptiveColors.textPrimary(context),
                     ),
                   ),
                   Text(
@@ -263,7 +263,7 @@ class CbtResultScreen extends ConsumerWidget {
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.bold,
-          color: AppColors.textDark,
+          color: AdaptiveColors.textPrimary(context),
         ),
       ),
     );
@@ -295,17 +295,17 @@ class CbtResultScreen extends ConsumerWidget {
                   children: [
                     Text(
                       subject.subject,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
+                        color: AdaptiveColors.textPrimary(context),
                       ),
                     ),
                     Text(
                       '${subject.correct}C • ${subject.incorrect}W • '
                       '${subject.unanswered}U',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSubtle,
+                        color: AdaptiveColors.textSecondary(context),
                       ),
                     ),
                   ],
@@ -436,18 +436,18 @@ class CbtResultScreen extends ConsumerWidget {
                     children: [
                       Text(
                         topic.topic,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
-                          color: AppColors.textDark,
+                          color: AdaptiveColors.textPrimary(context),
                         ),
                       ),
                       Text(
                         '${topic.chapter} • ${topic.attempted} attempted, '
                         '${topic.correct} correct (${topic.accuracy.toStringAsFixed(0)}%)',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSubtle,
+                          color: AdaptiveColors.textSecondary(context),
                         ),
                       ),
                     ],
@@ -563,7 +563,7 @@ class CbtResultScreen extends ConsumerWidget {
                                     style: TextStyle(
                                       color: isCorrectOption || isUserChoice
                                           ? Colors.white
-                                          : AppColors.textDark,
+                                          : AdaptiveColors.textPrimary(context),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 11,
                                     ),
@@ -813,3 +813,5 @@ class CbtResultScreen extends ConsumerWidget {
     );
   }
 }
+
+

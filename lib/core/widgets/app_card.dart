@@ -23,7 +23,7 @@ class AppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = backgroundColor ??
-        (isDark ? AppColors.surfaceDark : AppColors.cardLight);
+        (isDark ? AppColors.surfaceDark : AppColors.cardBg);
 
     final cardChild = Container(
       padding: padding ?? const EdgeInsets.all(16),

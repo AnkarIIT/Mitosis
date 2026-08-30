@@ -10,6 +10,7 @@ import '../../core/providers/providers.dart';
 import '../../core/services/explanation_seeder.dart';
 import '../../core/services/question_importer.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 
 enum _ImportSource { file, paste }
@@ -412,7 +413,7 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: color ?? AppColors.textDark,
+            color: color ?? AdaptiveColors.textPrimary(context),
           ),
         ),
         Text(label, style: const TextStyle(fontSize: 12)),
@@ -638,3 +639,5 @@ class _BundledImportChip extends ConsumerWidget {
     );
   }
 }
+
+

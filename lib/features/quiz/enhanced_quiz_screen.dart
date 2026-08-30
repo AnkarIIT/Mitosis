@@ -254,7 +254,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                 QuizProgressBar(currentIndex: quizState.currentIndex, totalQuestions: quizState.questions.length),
                 const SizedBox(height: 8),
                 // Timer bar with pulse when time is low
-                _QuizTimerBar(elapsedSeconds: _elapsedSeconds),
+                _QuizTimerBar(elapsedSeconds: _elapsedSeconds, totalQuestions: quizState.questions.length),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -354,11 +354,6 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   }
 
   Widget _buildQuestionPalette(BuildContext context, QuizState quizState) {
-    final total = quizState.questions.length;
-    final answered = quizState.selectedAnswers.keys.toSet();
-    final flagged = quizState.flaggedQuestions;
-    final visited = quizState.visitedQuestions;
-
     return Positioned.fill(
       child: GestureDetector(
         onTap: () => setState(() => _showPalette = false),

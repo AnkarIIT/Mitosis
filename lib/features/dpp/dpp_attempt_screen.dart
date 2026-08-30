@@ -251,7 +251,6 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
     final theme = Theme.of(context);
     final question = _currentQuestion;
     final selectedAnswer = _attempt.answersByIndex[_currentQuestionIndex];
-    final isAnswered = selectedAnswer != null;
     final remaining = _deadline!.difference(DateTime.now()).inSeconds;
     final progress = remaining <= 0 ? 1.0 : remaining / _durationSeconds;
     final timerColor = remaining < 60

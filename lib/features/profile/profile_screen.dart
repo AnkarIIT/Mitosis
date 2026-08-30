@@ -198,7 +198,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         'Aim high, work hard',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSubtle,
+                          color: AdaptiveColors.textSecondary(context),
                         ),
                       ),
                     ],
@@ -299,7 +299,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             icon: Icons.lock_outline,
             title: 'No achievements yet',
             description: 'Start solving questions to earn your first trophy.',
-            color: AppColors.divider,
+            color: AdaptiveColors.outline(context),
             locked: true,
           )
         else
@@ -465,7 +465,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         title: const Text('Settings', style: TextStyle(fontWeight: FontWeight.w600)),
         subtitle: const Text('Appearance, sync, AI preferences'),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: AdaptiveColors.textSecondary(context)),
         onTap: () => context.push('/settings'),
       ),
     );
@@ -530,7 +530,7 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
-                    color: locked ? AppColors.divider : AppColors.textDark,
+                    color: locked ? AdaptiveColors.outline(context) : AdaptiveColors.textPrimary(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -579,14 +579,14 @@ class _LockedAchievementChip extends StatelessWidget {
           Icon(
             Icons.lock_outline,
             size: 14,
-            color: AppColors.divider,
+            color: AdaptiveColors.outline(context),
           ),
           const SizedBox(width: 6),
           Text(
             achievement.title,
             style: TextStyle(
               fontSize: 12,
-              color: AppColors.divider,
+              color: AdaptiveColors.outline(context),
               fontWeight: FontWeight.w500,
             ),
           ),

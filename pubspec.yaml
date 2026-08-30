@@ -70,4 +70,3 @@ flutter:
     - assets/ml/
     - assets/ncert_books/
     - assets/questions/
-    - .env

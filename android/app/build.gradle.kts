@@ -18,7 +18,7 @@ if (hasKeystoreProperties) {
 }
 
 android {
-    namespace = "com.neetmitosis.app"
+    namespace = "com.neetmitos.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -33,7 +33,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.neetmitosis.app"
+        applicationId = "com.neetmitos.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

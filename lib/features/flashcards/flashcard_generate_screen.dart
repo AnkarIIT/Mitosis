@@ -198,7 +198,7 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
                     Text(
                       _status!,
                       style: TextStyle(
-                        color: _lastError != null ? AppColors.error : AppColors.textDark,
+                        color: _lastError != null ? AppColors.error : AdaptiveColors.textPrimary(context),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -290,7 +290,7 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textDark),
+      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AdaptiveColors.textPrimary(context)),
     );
   }
 

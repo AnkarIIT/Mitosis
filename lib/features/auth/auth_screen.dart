@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/config/app_config.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 enum AuthMode {
   passwordLogin,
@@ -251,20 +252,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text(
+                        Text(
                           'Welcome',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textDark,
+                            color: AdaptiveColors.textPrimary(context),
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           'Sign in or create an account to sync your progress.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: AppColors.textSubtle, fontSize: 13),
+                          style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 13),
                         ),
                         const SizedBox(height: 20),
 
@@ -434,9 +435,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             ),
                             child: Text(
                               AppConfig.cloudAuthHelpText,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.textSubtle,
+                                color: AdaptiveColors.textSecondary(context),
                               ),
                             ),
                           ),
@@ -461,9 +462,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 Expanded(
                                   child: Text(
                                     _friendlyAuthError(authState.error),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.textDark,
+                                      color: AdaptiveColors.textPrimary(context),
                                     ),
                                   ),
                                 ),
@@ -497,11 +498,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   child: Wrap(
                                     crossAxisAlignment: WrapCrossAlignment.center,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'I agree to the ',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: AppColors.textSubtle,
+                                          color: AdaptiveColors.textSecondary(context),
                                         ),
                                       ),
                                       TextButton(
@@ -520,11 +521,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                           ),
                                         ),
                                       ),
-                                      const Text(
+                                      Text(
                                         ' & ',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: AppColors.textSubtle,
+                                          color: AdaptiveColors.textSecondary(context),
                                         ),
                                       ),
                                       TextButton(
@@ -598,9 +599,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           child: OutlinedButton(
                             onPressed: _handleGuestContinue,
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.textDark,
+                              foregroundColor: AdaptiveColors.textPrimary(context),
                               side: BorderSide(
-                                color: AppColors.textSubtle.withValues(alpha: 0.3),
+                                color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.3),
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
@@ -709,10 +710,10 @@ class _GoogleSignInButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
-          foregroundColor: AppColors.textDark,
+          foregroundColor: AdaptiveColors.textPrimary(context),
           elevation: 0,
           side: BorderSide(
-            color: AppColors.textSubtle.withValues(alpha: 0.25),
+            color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.25),
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -871,16 +872,16 @@ class _DividerOr extends StatelessWidget {
           child: Divider(
             height: 1,
             thickness: 1,
-            color: AppColors.textSubtle.withValues(alpha: 0.2),
+            color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.2),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             'or continue with email',
             style: TextStyle(
               fontSize: 12,
-              color: AppColors.textSubtle,
+              color: AdaptiveColors.textSecondary(context),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -889,10 +890,11 @@ class _DividerOr extends StatelessWidget {
           child: Divider(
             height: 1,
             thickness: 1,
-            color: AppColors.textSubtle.withValues(alpha: 0.2),
+            color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.2),
           ),
         ),
       ],
     );
   }
 }
+

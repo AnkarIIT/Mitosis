@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -23,22 +25,7 @@ void main() async {
     debugPrint('⚠️ .env not loaded: $e');
   }
 
-  if (AppConfig.enableCloudAuth) {
-    try {
-      final url = AppConfig.supabaseUrl;
-      final key = AppConfig.supabaseAnonKey;
-      debugPrint('🔧 Supabase URL: $url');
-      debugPrint('🔧 Supabase key prefix: ${key.substring(0, key.length > 10 ? 10 : key.length)}...');
-      await supabase.Supabase.initialize(
-        url: url,
-        publishableKey: key,
-      );
-      debugPrint('✅ Supabase connected: ${AppConfig.supabaseUrl}');
-    } catch (e) {
-      debugPrint('❌ Supabase init failed: $e');
-    }
-  }
-
+  // Initialize notification service with timeout
   try {
     await NotificationService().init().timeout(
       const Duration(seconds: 5),
@@ -66,7 +53,35 @@ void main() async {
     ),
   );
 
+  // Defer Supabase initialization to background (non-blocking)
+  _initSupabaseBackground(container);
   _backgroundInit(container);
+}
+
+Future<void> _initSupabaseBackground(ProviderContainer container) async {
+  if (!AppConfig.enableCloudAuth) return;
+  
+  try {
+    final url = AppConfig.supabaseUrl;
+    final key = AppConfig.supabaseAnonKey;
+    debugPrint('🔧 Supabase URL: $url');
+    debugPrint('🔧 Supabase key prefix: ${key.substring(0, key.length > 10 ? 10 : key.length)}...');
+    await supabase.Supabase.initialize(
+      url: url,
+      publishableKey: key,
+    ).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        debugPrint('⚠️ Supabase init timeout - continuing offline');
+        throw TimeoutException('Supabase init timeout');
+      },
+    );
+    debugPrint('✅ Supabase connected: ${AppConfig.supabaseUrl}');
+  } on TimeoutException {
+    debugPrint('⚠️ Supabase init timeout - continuing offline');
+  } catch (e) {
+    debugPrint('❌ Supabase init failed: $e');
+  }
 }
 
 Future<void> _backgroundInit(ProviderContainer container) async {
@@ -150,10 +165,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   Future<void> _checkBiometricLock() async {
     final bioService = ref.read(app_providers.biometricServiceProvider);
     final isEnabled = await bioService.isBiometricEnabled();
+    debugPrint('🔐 Biometric lock check: enabled=$isEnabled, needsBiometric=$_needsBiometric');
 
     if (isEnabled && !_needsBiometric) {
       setState(() => _needsBiometric = true);
       final success = await bioService.authenticate();
+      debugPrint('🔐 Biometric auth result: $success');
       if (success && mounted) {
         setState(() => _needsBiometric = false);
       }
@@ -278,6 +295,7 @@ class _BiometricLockOverlayState extends ConsumerState<_BiometricLockOverlay> {
 
     final bioService = ref.read(app_providers.biometricServiceProvider);
     final success = await bioService.authenticate();
+    debugPrint('🔐 Overlay biometric auth result: $success');
 
     if (mounted) {
       setState(() => _authenticating = false);
@@ -419,6 +437,7 @@ class _BiometricLockOverlayState extends ConsumerState<_BiometricLockOverlay> {
 
     final bioService = ref.read(app_providers.biometricServiceProvider);
     final success = await bioService.authenticateWithDeviceCredential();
+    debugPrint('🔐 Overlay device credential auth result: $success');
 
     if (mounted) {
       setState(() => _authenticating = false);

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/question_model.dart';
 import '../../core/models/user_progress_model.dart';
@@ -99,6 +100,10 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
     // Exclude recently seen questions so each mock test feels fresh.
     final seen = ref.read(recentlySeenQuestionIdsProvider(null).future);
@@ -211,6 +216,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     WidgetsBinding.instance.removeObserver(this);
     _ticker?.cancel();
     _autosaveTimer?.cancel();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     super.dispose();
   }
 

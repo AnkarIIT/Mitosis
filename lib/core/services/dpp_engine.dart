@@ -59,21 +59,22 @@ class DppConfig {
   }
 
   /// NEET 2025 pattern multi-subject DPP factory.
-  /// Creates a balanced paper: Physics 45, Chemistry 45, Biology 90 (Botany 45 + Zoology 45).
+  /// Creates a balanced paper: Physics 45, Chemistry 45, Botany 45, Zoology 45.
   factory DppConfig.neetPattern({
     int totalQuestions = 180,
     int durationMinutes = 180,
     bool includeWeakTopics = true,
   }) {
     return DppConfig(
-      subjects: const ['Physics', 'Chemistry', 'Biology'],
+      subjects: const ['Physics', 'Chemistry', 'Botany', 'Zoology'],
       totalQuestions: totalQuestions,
       durationMinutes: durationMinutes,
       includeWeakTopics: includeWeakTopics,
       subjectWeights: const {
         'Physics': 45,
         'Chemistry': 45,
-        'Biology': 90,
+        'Botany': 45,
+        'Zoology': 45,
       },
     );
   }
@@ -143,6 +144,15 @@ class DppEngine {
 
   DppEngine(this._db, this._questionRepo, this._history, this._mastery, {Random? random})
       : _random = random ?? Random();
+
+  /// Normalizes difficulty string to standard values.
+  static String _normalizeDifficulty(String difficulty) {
+    final d = difficulty.trim().toLowerCase();
+    if (d == 'easy' || d == 'simple') return 'Easy';
+    if (d == 'medium' || d == 'moderate' || d == 'avg' || d == 'average') return 'Medium';
+    if (d == 'hard' || d == 'difficult' || d == 'tough') return 'Hard';
+    return 'Medium'; // default fallback
+  }
 
   /// Generates a DPP for today. If one already exists for the given config,
   /// returns the existing set (unless [forceRefresh] is true).
@@ -297,9 +307,9 @@ class DppEngine {
     final hard = count - easy - medium;
 
     final buckets = <List<Question>>[
-      shuffled.where((q) => q.difficulty.toLowerCase() == 'easy').toList(),
-      shuffled.where((q) => q.difficulty.toLowerCase() == 'medium').toList(),
-      shuffled.where((q) => q.difficulty.toLowerCase() == 'hard').toList(),
+      shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Easy').toList(),
+      shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Medium').toList(),
+      shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Hard').toList(),
     ];
 
     final picked = <Question>[];
@@ -324,10 +334,12 @@ class DppEngine {
     final weights = config.subjectWeights!;
     final picked = <Question>[];
     final subjectPools = <String, List<Question>>{};
+    final subjectPickedCount = <String, int>{};
 
     // Group pool by subject
     for (final subject in config.subjects) {
       subjectPools[subject] = pool.where((q) => q.subject == subject).toList();
+      subjectPickedCount[subject] = 0;
     }
 
     // Calculate target count per subject based on weights
@@ -360,23 +372,29 @@ class DppEngine {
       final hard = target - easy - medium;
 
       final buckets = <List<Question>>[
-        shuffled.where((q) => q.difficulty.toLowerCase() == 'easy').toList(),
-        shuffled.where((q) => q.difficulty.toLowerCase() == 'medium').toList(),
-        shuffled.where((q) => q.difficulty.toLowerCase() == 'hard').toList(),
+        shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Easy').toList(),
+        shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Medium').toList(),
+        shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Hard').toList(),
       ];
 
       final targetsPerDiff = [easy, medium, hard];
       for (int i = 0; i < 3; i++) {
         final take = min(targetsPerDiff[i], buckets[i].length);
         buckets[i].shuffle(_random);
-        picked.addAll(buckets[i].take(take));
+        final taken = buckets[i].take(take).toList();
+        picked.addAll(taken);
+        subjectPickedCount[subject] = (subjectPickedCount[subject] ?? 0) + taken.length;
       }
 
-      // Backfill if short for this subject
-      if (picked.where((q) => q.subject == subject).length < target) {
+      // Backfill if short for this subject - use tracked count instead of filtering entire picked list
+      final currentSubjectCount = subjectPickedCount[subject] ?? 0;
+      if (currentSubjectCount < target) {
         final remaining = subjectPool.where((q) => !picked.contains(q)).toList();
         remaining.shuffle(_random);
-        picked.addAll(remaining.take(target - picked.where((q) => q.subject == subject).length));
+        final needed = target - currentSubjectCount;
+        final taken = remaining.take(needed).toList();
+        picked.addAll(taken);
+        subjectPickedCount[subject] = currentSubjectCount + taken.length;
       }
     }
 

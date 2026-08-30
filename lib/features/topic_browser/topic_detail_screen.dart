@@ -399,21 +399,21 @@ onPressed: () {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Read the Actual NCERT Chapter',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
+                        color: AdaptiveColors.textPrimary(context),
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       '${entry.subject} • ${entry.classLevel} • '
                       'Chapter ${entry.chapterNumber}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSubtle,
+                        color: AdaptiveColors.textSecondary(context),
                       ),
                     ),
                     const SizedBox(height: 3),

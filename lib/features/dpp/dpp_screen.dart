@@ -44,7 +44,7 @@ class _DppScreenState extends ConsumerState<DppScreen> {
       final result = await engine.generate(config, forceRefresh: true);
       if (!mounted) return;
 
-      if (result != null && result.questions.isNotEmpty) {
+      if (result.questions.isNotEmpty) {
         setState(() => _currentResult = result);
         await _startDpp(result, config);
       } else {
@@ -486,3 +486,4 @@ class _DppScreenState extends ConsumerState<DppScreen> {
     );
   }
 }
+

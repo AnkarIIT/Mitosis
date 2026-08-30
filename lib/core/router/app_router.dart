@@ -11,7 +11,7 @@ import '../../features/auth/privacy_policy_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/home/home_shell_screen.dart';
 import '../../features/home/home_content/home_tab.dart';
-import '../../features/home/home_content/subjects_tab.dart';
+// import '../../features/home/home_content/subjects_tab.dart'; // Replaced with Flashcards
 import '../../features/home/home_content/review_tab.dart';
 import '../../features/home/home_content/progress_tab.dart';
 import '../../features/home/home_content/profile_tab.dart';
@@ -33,8 +33,9 @@ import '../../core/models/user_progress_model.dart';
 import '../../features/study_plan/study_plan_screen.dart';
 import '../../features/error_book/error_book_screen.dart';
 import '../../features/mark_booster/mark_booster_screen.dart';
-import '../../features/flashcards/flashcard_generate_screen.dart';
 import '../../features/flashcards/flashcard_study_screen.dart';
+import '../../features/flashcards/flashcard_generate_screen.dart';
+import '../../features/flashcards/flashcard_dashboard_screen.dart';
 import '../../features/chatbot/chatbot_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/settings/import_questions_screen.dart';
@@ -150,8 +151,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ]),
       StatefulShellBranch(routes: [
         GoRoute(
-            path: '/subjects',
-            builder: (_, _) => const SubjectsTab(),
+            path: '/flashcards',
+            builder: (_, _) => const FlashcardDashboardScreen(),
         ),
       ]),
       StatefulShellBranch(routes: [
