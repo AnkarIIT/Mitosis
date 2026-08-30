@@ -5,6 +5,8 @@ import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 
 
+import '../../core/services/biometric_service.dart';
+
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -20,7 +22,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _remindersEnabled = false;
   TimeOfDay _reminderTime = const TimeOfDay(hour: 20, minute: 0);
   bool _biometricEnabled = false;
-  bool _biometricAvailable = false;
+  BiometricStatus _biometricStatus = BiometricStatus.unavailable;
+  String? _biometricUnavailableReason;
 
   @override
   void initState() {
@@ -97,31 +100,77 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _loadBiometricSettings() async {
     final service = ref.read(biometricServiceProvider);
-    final available = await service.isBiometricAvailable();
+    final status = await service.getBiometricStatus();
     final enabled = await service.isBiometricEnabled();
-    setState(() {
-      _biometricAvailable = available;
-      _biometricEnabled = enabled;
-    });
+
+    String? reason;
+    switch (status) {
+      case BiometricStatus.available:
+        reason = null;
+        break;
+      case BiometricStatus.enrolledButUnavailable:
+        reason = 'No fingerprint or face enrolled. Add one in device Settings to enable app lock.';
+        break;
+      case BiometricStatus.unavailable:
+        reason = 'This device does not support biometric authentication.';
+        break;
+      case BiometricStatus.error:
+        reason = 'Could not check biometric availability. Please try again.';
+        break;
+    }
+
+    if (mounted) {
+      setState(() {
+        _biometricStatus = status;
+        _biometricUnavailableReason = reason;
+        _biometricEnabled = enabled;
+      });
+    }
   }
 
   Future<void> _toggleBiometric(bool value) async {
     final service = ref.read(biometricServiceProvider);
     if (value) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          icon: const Icon(Icons.fingerprint, size: 32, color: AppColors.primary),
+          title: const Text('Enable Biometric Lock?'),
+          content: const Text(
+            'You will need to authenticate with your fingerprint, face, or device PIN every time you open the app.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => context.pop(false),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () => context.pop(true),
+              child: const Text('ENABLE'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+
       final success = await service.authenticate();
       if (success) {
         await service.setBiometricEnabled(true);
-        setState(() => _biometricEnabled = true);
+        if (mounted) {
+          setState(() => _biometricEnabled = true);
+        }
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Biometric authentication failed. Lock not enabled.'),
+            content: Text('Authentication failed. Lock not enabled.'),
           ),
         );
       }
     } else {
       await service.setBiometricEnabled(false);
-      setState(() => _biometricEnabled = false);
+      if (mounted) {
+        setState(() => _biometricEnabled = false);
+      }
     }
   }
 
@@ -433,16 +482,23 @@ child: Text(
               },
               secondary: const Icon(Icons.dark_mode_outlined),
             ),
-            if (_biometricAvailable) ...[
-              const Divider(height: 1),
-              SwitchListTile(
-                title: const Text('Biometric Lock'),
-                subtitle: const Text('Unlock app with Fingerprint/FaceID'),
-                value: _biometricEnabled,
-                onChanged: _toggleBiometric,
-                secondary: const Icon(Icons.fingerprint),
+            const Divider(height: 1),
+            SwitchListTile(
+              title: const Text('Biometric Lock'),
+              subtitle: Text(
+                _biometricUnavailableReason ??
+                    'Unlock app with Fingerprint/FaceID',
               ),
-            ],
+              value: _biometricEnabled,
+              onChanged: _biometricStatus == BiometricStatus.available
+                  ? _toggleBiometric
+                  : null,
+              secondary: Icon(
+                _biometricStatus == BiometricStatus.available
+                    ? Icons.fingerprint
+                    : Icons.fingerprint_outlined,
+              ),
+            ),
           ]),
           const SizedBox(height: 24),
 

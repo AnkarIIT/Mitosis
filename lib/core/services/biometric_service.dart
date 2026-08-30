@@ -3,6 +3,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:flutter/services.dart';
 
+enum BiometricStatus {
+  available,
+  enrolledButUnavailable,
+  unavailable,
+  error,
+}
+
 class BiometricService {
   final LocalAuthentication _auth = LocalAuthentication();
   final FlutterSecureStorage _secureStorage;
@@ -46,12 +53,38 @@ class BiometricService {
     }
   }
 
+  /// Returns a detailed status so the UI can explain why biometric lock is
+  /// unavailable instead of silently hiding the option.
+  Future<BiometricStatus> getBiometricStatus() async {
+    try {
+      final bool canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
+      final bool deviceSupported = await _auth.isDeviceSupported();
+      
+      if (!canAuthenticateWithBiometrics && !deviceSupported) {
+        return BiometricStatus.unavailable;
+      }
+
+      final enrolled = await hasEnrolledBiometrics();
+      if (enrolled) {
+        return BiometricStatus.available;
+      }
+
+      // Hardware exists but no biometric is enrolled. On Android this often
+      // means only PIN/pattern is set up.
+      return BiometricStatus.enrolledButUnavailable;
+    } on PlatformException catch (e) {
+      debugPrint('Biometric status check failed: $e');
+      return BiometricStatus.error;
+    }
+  }
+
+  /// Authenticate with the strongest available local credential.
+  ///
+  /// 1. If biometrics are enrolled, try biometric first.
+  /// 2. On ANY failure/cancel of biometric prompt, fall back to device
+  ///    credential (PIN/pattern) so the user is never permanently locked out.
   Future<bool> authenticate() async {
     try {
-      // Only attempt biometric-only auth when a biometric is actually enrolled.
-      // Otherwise fall back straight to the device credential (PIN/pattern) so
-      // that enabling the lock never fails just because no fingerprint/face is
-      // configured.
       final enrolled = await hasEnrolledBiometrics();
       if (!enrolled) {
         debugPrint('No enrolled biometrics, using device credential');
@@ -68,7 +101,10 @@ class BiometricService {
       );
     } on PlatformException catch (e) {
       debugPrint('Biometric auth failed: $e');
-      // Fallback to device credential (PIN/pattern)
+      return await authenticateWithDeviceCredential();
+    } catch (e) {
+      // Cancelled or unknown error — still offer device credential fallback.
+      debugPrint('Biometric auth cancelled/failed: $e');
       return await authenticateWithDeviceCredential();
     }
   }

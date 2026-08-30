@@ -173,13 +173,10 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     final isEnabled = await bioService.isBiometricEnabled();
     debugPrint('🔐 Biometric lock check: enabled=$isEnabled, needsBiometric=$_needsBiometric');
 
-    if (isEnabled && !_needsBiometric) {
+    if (isEnabled) {
+      // Defer authentication to the lock overlay so the UI is not blocked
+      // and failures do not permanently lock the user out of the app.
       setState(() => _needsBiometric = true);
-      final success = await bioService.authenticate();
-      debugPrint('🔐 Biometric auth result: $success');
-      if (success && mounted) {
-        setState(() => _needsBiometric = false);
-      }
     }
   }
 
