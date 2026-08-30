@@ -23,21 +23,6 @@ void main() async {
     debugPrint('⚠️ .env not loaded: $e');
   }
 
-  if (AppConfig.enableCloudAuth) {
-    try {
-      final url = AppConfig.supabaseUrl;
-      final key = AppConfig.supabaseAnonKey;
-      debugPrint('🔧 Supabase URL: $url');
-      debugPrint('🔧 Supabase key prefix: ${key.substring(0, key.length > 10 ? 10 : key.length)}...');
-      await supabase.Supabase.initialize(
-        url: url,
-        publishableKey: key,
-      );
-      debugPrint('✅ Supabase connected: ${AppConfig.supabaseUrl}');
-    } catch (e) {
-      debugPrint('❌ Supabase init failed: $e');
-    }
-  }
 
   try {
     await NotificationService().init().timeout(
@@ -70,6 +55,26 @@ void main() async {
 }
 
 Future<void> _backgroundInit(ProviderContainer container) async {
+  if (AppConfig.enableCloudAuth) {
+    try {
+      final url = AppConfig.supabaseUrl;
+      final key = AppConfig.supabaseAnonKey;
+      await supabase.Supabase.initialize(
+        url: url,
+        publishableKey: key,
+      ).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          debugPrint('⚠️ Supabase init timed out');
+          return supabase.Supabase.instance;
+        },
+      );
+      debugPrint('✅ Supabase connected: ${AppConfig.supabaseUrl}');
+    } catch (e) {
+      debugPrint('❌ Supabase init failed: $e');
+    }
+  }
+
   try {
     final repository = container.read(questionRepositoryProvider);
     await repository.importBundledQuestions('assets/questions/neet_sample_10.json');
