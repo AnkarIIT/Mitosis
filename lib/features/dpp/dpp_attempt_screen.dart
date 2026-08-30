@@ -381,7 +381,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                                     child: Text(
                                       optionLetter,
                                       style: TextStyle(
-                                        color: isSelected ? Colors.white : AppColors.textDark,
+                                        color: isSelected ? Colors.white : AdaptiveColors.textPrimary(context),
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                       ),
@@ -656,7 +656,7 @@ class _DppReviewSheet extends StatelessWidget {
                                             style: TextStyle(
                                               color: isCorrectOption || isUserChoice
                                                   ? Colors.white
-                                                  : AppColors.textDark,
+                                                  : AdaptiveColors.textPrimary(context),
                                               fontWeight: FontWeight.bold,
                                               fontSize: 11,
                                             ),
