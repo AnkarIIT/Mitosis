@@ -181,25 +181,6 @@ class GeminiChatService {
     }
   }
 
-  Future<String> _chatDirect(
-    String text,
-    GenerativeModel Function() modelFactory, {
-    required String fallback,
-  }) {
-    if (!isConfigured) {
-      return Future.value(
-        'Error: Gemini API Key is not configured. Please add it in Settings.',
-      );
-    }
-    try {
-      return modelFactory()
-          .generateContent([Content.text(text)])
-          .then((response) => response.text ?? fallback);
-    } catch (e) {
-      debugPrint('❌ Direct Gemini call failed: $e');
-      return Future.value(fallback);
-    }
-  }
 
   Future<String> sendMultimodalMessage(String text, List<Part> parts) async {
     if (!isConfigured) {
