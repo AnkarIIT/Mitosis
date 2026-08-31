@@ -220,7 +220,9 @@ class TopicDetailScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            ...(resolvedTopic.keyPoints ?? _getDefaultKeyPoints(topic)).map((point) {
+            ...(resolvedTopic.keyPoints ?? _getDefaultKeyPoints(topic)).map((
+              point,
+            ) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
@@ -307,14 +309,16 @@ class TopicDetailScreen extends ConsumerWidget {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-onPressed: () {
-                    if (hasQuestions) {
-                      context.push('/quiz?topicId=${Uri.encodeComponent(resolvedTopic.id)}&topicName=${Uri.encodeComponent(resolvedTopic.name)}&subject=${Uri.encodeComponent(subjectName)}');
-                      return;
-                    }
+                onPressed: () {
+                  if (hasQuestions) {
+                    context.push(
+                      '/quiz?topicId=${Uri.encodeComponent(resolvedTopic.id)}&topicName=${Uri.encodeComponent(resolvedTopic.name)}&subject=${Uri.encodeComponent(subjectName)}',
+                    );
+                    return;
+                  }
 
-                    context.push('/test-series');
-                  },
+                  context.push('/test-series');
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -378,7 +382,9 @@ onPressed: () {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.25),
+            ),
           ),
           child: Row(
             children: [
@@ -762,7 +768,9 @@ class _InfoPill extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: AdaptiveColors.textPrimary(context).withValues(alpha: 0.7),
+                color: AdaptiveColors.textPrimary(
+                  context,
+                ).withValues(alpha: 0.7),
                 fontSize: 10,
               ),
             ),

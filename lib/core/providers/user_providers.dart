@@ -199,10 +199,12 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
           if (isCorrect) {
             await _db.removeFromErrorBook(q.id);
           } else {
-            await _db.addToErrorBook(db.ErrorBookCompanion.insert(
-              questionId: q.id,
-              addedAt: DateTime.now(),
-            ));
+            await _db.addToErrorBook(
+              db.ErrorBookCompanion.insert(
+                questionId: q.id,
+                addedAt: DateTime.now(),
+              ),
+            );
           }
           final nextCard = SpacedRepetitionService.review(
             questionId: q.id,
@@ -222,7 +224,9 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
       }
 
       _ref.invalidate(errorBookProvider);
-      _ref.read(dailyGoalProvider.notifier).incrementProgress(attempt.totalQuestions);
+      _ref
+          .read(dailyGoalProvider.notifier)
+          .incrementProgress(attempt.totalQuestions);
     } catch (e) {
       debugPrint('❌ Error saving quiz attempt: $e');
     }
@@ -246,7 +250,11 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     if (lastActivity == null) {
       newStreak = 1;
     } else {
-      final lastDate = DateTime(lastActivity.year, lastActivity.month, lastActivity.day);
+      final lastDate = DateTime(
+        lastActivity.year,
+        lastActivity.month,
+        lastActivity.day,
+      );
       final difference = today.difference(lastDate).inDays;
 
       if (difference == 1) {
@@ -256,10 +264,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
       }
     }
 
-    state = state.copyWith(
-      currentStreak: newStreak,
-      lastActivityDate: now,
-    );
+    state = state.copyWith(currentStreak: newStreak, lastActivityDate: now);
 
     try {
       final dbUsers = await _db.select(_db.users).get();
@@ -291,11 +296,10 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     }
 
     for (final entry in perTopic.entries) {
-      final timeSpent =
-          attempt.totalQuestions == 0
-              ? 0.0
-              : attempt.timeSpentSeconds *
-                    (entry.value.total / attempt.totalQuestions);
+      final timeSpent = attempt.totalQuestions == 0
+          ? 0.0
+          : attempt.timeSpentSeconds *
+                (entry.value.total / attempt.totalQuestions);
       await _applyTopicProgress(
         topicId: entry.key,
         correct: entry.value.correct,
@@ -319,8 +323,11 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     final newAttempted = prevAttempted + total;
     final newCorrect = prevCorrect + correct;
     final newTimeSpent =
-        ((existing?.averageTimeSeconds ?? 0) * prevAttempted) + timeSpentSeconds;
-    final accuracy = newAttempted == 0 ? 0.0 : (newCorrect / newAttempted) * 100;
+        ((existing?.averageTimeSeconds ?? 0) * prevAttempted) +
+        timeSpentSeconds;
+    final accuracy = newAttempted == 0
+        ? 0.0
+        : (newCorrect / newAttempted) * 100;
 
     final updatedProgress = TopicProgress(
       topicId: topicId,
@@ -372,7 +379,9 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
           topicId: topicId,
           questionsAttempted: Value(updated.questionsAttempted),
           questionsCorrect: Value(updated.questionsCorrect),
-          timeSpentSeconds: Value(((updated.averageTimeSeconds) * updated.questionsAttempted).toInt()),
+          timeSpentSeconds: Value(
+            ((updated.averageTimeSeconds) * updated.questionsAttempted).toInt(),
+          ),
           averageTimeSeconds: Value(updated.averageTimeSeconds),
           lastAttempted: DateTime.now(),
           isCompleted: Value(updated.isCompleted),
@@ -490,13 +499,13 @@ class DailyGoalNotifier extends StateNotifier<Map<String, dynamic>> {
   final Ref _ref;
 
   DailyGoalNotifier(this._db, this._ref)
-      : super({
-          'target': 50,
-          'completed': 0,
-          'percent': 0.0,
-          'date': DateTime.now(),
-          'status': 'pending',
-        }) {
+    : super({
+        'target': 50,
+        'completed': 0,
+        'percent': 0.0,
+        'date': DateTime.now(),
+        'status': 'pending',
+      }) {
     _loadTodayGoal();
   }
 

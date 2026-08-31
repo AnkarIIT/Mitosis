@@ -17,12 +17,18 @@ abstract class MLService {
     return fallbackSimilarity(text1, text2);
   }
 
-  Future<double> evaluateShortAnswer(String studentAnswer, String correctAnswer) async {
+  Future<double> evaluateShortAnswer(
+    String studentAnswer,
+    String correctAnswer,
+  ) async {
     // 1. Keyword match (40%)
     final kwScore = _calculateKeywordMatch(studentAnswer, correctAnswer);
 
     // 2. Semantic Similarity (60%)
-    final semanticScore = await calculateSemanticSimilarity(studentAnswer, correctAnswer);
+    final semanticScore = await calculateSemanticSimilarity(
+      studentAnswer,
+      correctAnswer,
+    );
 
     final finalScore = (kwScore * 0.4) + (semanticScore * 0.6);
     return finalScore;
@@ -40,8 +46,23 @@ abstract class MLService {
     final studentWords = student.toLowerCase().split(RegExp(r'\s+')).toSet();
     final correctWords = correct.toLowerCase().split(RegExp(r'\s+')).toSet();
 
-    final stopWords = {'the', 'is', 'at', 'which', 'on', 'and', 'a', 'an', 'to', 'of', 'in'};
-    final importantCorrectWords = correctWords.difference(stopWords).where((w) => w.length > 2).toSet();
+    final stopWords = {
+      'the',
+      'is',
+      'at',
+      'which',
+      'on',
+      'and',
+      'a',
+      'an',
+      'to',
+      'of',
+      'in',
+    };
+    final importantCorrectWords = correctWords
+        .difference(stopWords)
+        .where((w) => w.length > 2)
+        .toSet();
 
     if (importantCorrectWords.isEmpty) return 1.0;
 

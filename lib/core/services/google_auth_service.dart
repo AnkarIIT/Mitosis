@@ -12,26 +12,30 @@ class GoogleAuthService {
   final GoogleSignIn _googleSignIn;
 
   GoogleAuthService(this._db, [GoogleSignIn? googleSignIn])
-      : _googleSignIn = googleSignIn ??
-            GoogleSignIn(
-              serverClientId: AppConfig.googleServerClientId,
-            );
+    : _googleSignIn =
+          googleSignIn ??
+          GoogleSignIn(serverClientId: AppConfig.googleServerClientId);
 
   supabase.SupabaseClient? get _supabaseClient =>
       AppConfig.enableCloudAuth ? supabase.Supabase.instance.client : null;
 
   bool get _cloudAuthEnabled => _supabaseClient != null;
 
-  Future<({bool success, String message, db.User? user})> signInWithGoogle() async {
+  Future<({bool success, String message, db.User? user})>
+  signInWithGoogle() async {
     if (!_cloudAuthEnabled) {
-      return (success: false, message: 'Cloud auth is not configured', user: null);
+      return (
+        success: false,
+        message: 'Cloud auth is not configured',
+        user: null,
+      );
     }
 
     try {
       log('🔍 Google Sign-In: Starting...');
       log('🔍 Google Server Client ID: ${AppConfig.googleServerClientId}');
       log('🔍 Supabase URL: ${AppConfig.supabaseUrl}');
-      
+
       final GoogleSignInAccount? googleAccount = await _googleSignIn.signIn();
       if (googleAccount == null) {
         log('🔍 Google Sign-In: Cancelled by user');
@@ -39,16 +43,25 @@ class GoogleAuthService {
       }
 
       log('🔍 Google Sign-In: Got account: ${googleAccount.email}');
-      
-      final GoogleSignInAuthentication googleAuth = await googleAccount.authentication;
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleAccount.authentication;
       final String? idToken = googleAuth.idToken;
       final String? accessToken = googleAuth.accessToken;
 
-      log('🔍 Google Sign-In: ID Token: ${idToken != null ? 'present (${idToken.length} chars)' : 'NULL'}');
-      log('🔍 Google Sign-In: Access Token: ${accessToken != null ? 'present' : 'NULL'}');
+      log(
+        '🔍 Google Sign-In: ID Token: ${idToken != null ? 'present (${idToken.length} chars)' : 'NULL'}',
+      );
+      log(
+        '🔍 Google Sign-In: Access Token: ${accessToken != null ? 'present' : 'NULL'}',
+      );
 
       if (idToken == null) {
-        return (success: false, message: 'Could not obtain ID token from Google', user: null);
+        return (
+          success: false,
+          message: 'Could not obtain ID token from Google',
+          user: null,
+        );
       }
 
       final client = _supabaseClient!;
@@ -62,11 +75,16 @@ class GoogleAuthService {
 
       final supabaseUser = response.user;
       if (supabaseUser == null) {
-        return (success: false, message: 'Google authentication failed with Supabase', user: null);
+        return (
+          success: false,
+          message: 'Google authentication failed with Supabase',
+          user: null,
+        );
       }
 
       final email = supabaseUser.email ?? googleAccount.email;
-      final displayName = supabaseUser.userMetadata?['full_name'] ??
+      final displayName =
+          supabaseUser.userMetadata?['full_name'] ??
           supabaseUser.userMetadata?['name'] ??
           googleAccount.displayName ??
           email.split('@').first;
@@ -82,7 +100,11 @@ class GoogleAuthService {
     } on PlatformException catch (e) {
       log('Google auth platform error: ${e.code} - ${e.message}');
       if (e.code == GoogleSignIn.kNetworkError) {
-        return (success: false, message: 'Network error. Please check your connection.', user: null);
+        return (
+          success: false,
+          message: 'Network error. Please check your connection.',
+          user: null,
+        );
       }
       if (e.code == GoogleSignIn.kSignInCanceledError) {
         return (success: false, message: 'Sign-in was cancelled.', user: null);
@@ -95,10 +117,18 @@ class GoogleAuthService {
           user: null,
         );
       }
-      return (success: false, message: 'Google sign-in failed: ${e.code} - ${e.message}', user: null);
+      return (
+        success: false,
+        message: 'Google sign-in failed: ${e.code} - ${e.message}',
+        user: null,
+      );
     } on supabase.AuthException catch (e) {
       log('Supabase auth error: ${e.statusCode ?? ''} - ${e.message}');
-      return (success: false, message: _friendlySupabaseError(e.message), user: null);
+      return (
+        success: false,
+        message: _friendlySupabaseError(e.message),
+        user: null,
+      );
     } catch (e) {
       log('Unexpected Google auth error: $e');
       return (success: false, message: 'Something went wrong: $e', user: null);
@@ -124,7 +154,9 @@ class GoogleAuthService {
     final existing = await _db.getUserByEmail(email);
 
     if (existing != null) {
-      await (_db.update(_db.users)..where((t) => t.id.equals(existing.id))).write(
+      await (_db.update(
+        _db.users,
+      )..where((t) => t.id.equals(existing.id))).write(
         db.UsersCompanion(
           email: Value(email),
           username: Value(username),

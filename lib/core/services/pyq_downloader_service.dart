@@ -16,7 +16,8 @@ class PyqDownloaderService {
   final QuestionRepository _repository;
   final http.Client _client;
 
-  PyqDownloaderService(this._repository, {http.Client? client}) : _client = client ?? http.Client();
+  PyqDownloaderService(this._repository, {http.Client? client})
+    : _client = client ?? http.Client();
 
   /// Known public sources for NEET PYQs (JSON arrays of question objects).
   /// Each entry: (url, description).
@@ -55,7 +56,11 @@ class PyqDownloaderService {
     int inserted = 0;
     for (final (url, label) in sources) {
       try {
-        inserted += await _downloadSource(url, label, forceRefresh: forceRefresh);
+        inserted += await _downloadSource(
+          url,
+          label,
+          forceRefresh: forceRefresh,
+        );
       } catch (e) {
         // log and continue with next source
       }
@@ -63,7 +68,11 @@ class PyqDownloaderService {
     return inserted;
   }
 
-  Future<int> _downloadSource(String url, String label, {bool forceRefresh = false}) async {
+  Future<int> _downloadSource(
+    String url,
+    String label, {
+    bool forceRefresh = false,
+  }) async {
     final response = await _client.get(Uri.parse(url));
     if (response.statusCode != 200) {
       throw Exception('Failed to load $label: HTTP ${response.statusCode}');
@@ -86,7 +95,9 @@ class PyqDownloaderService {
 
     // Avoid duplicates: skip if question text already exists.
     final existingTexts = await _repository.getExistingQuestionTexts();
-    final toInsert = questions.where((q) => !existingTexts.contains(q.questionText)).toList();
+    final toInsert = questions
+        .where((q) => !existingTexts.contains(q.questionText))
+        .toList();
 
     if (toInsert.isEmpty) return 0;
 
@@ -95,18 +106,26 @@ class PyqDownloaderService {
   }
 
   Question? _parseQuestion(Map<String, dynamic> json, String sourceLabel) {
-    final text = (json['questionText'] ?? json['question'] ?? '').toString().trim();
+    final text = (json['questionText'] ?? json['question'] ?? '')
+        .toString()
+        .trim();
     if (text.isEmpty) return null;
 
     final options = _decodeStringList(json['options']);
-    final correctAnswer = (json['correctAnswer'] ?? json['answer'] ?? '').toString().trim();
+    final correctAnswer = (json['correctAnswer'] ?? json['answer'] ?? '')
+        .toString()
+        .trim();
     if (options.length < 2 || correctAnswer.isEmpty) return null;
 
     final subject = (json['subject'] ?? '').toString().trim();
     final chapter = (json['chapter'] ?? '').toString().trim();
     final topic = (json['topic'] ?? chapter).toString().trim();
-    final topicId = (json['topicId'] ?? json['topic_id'] ?? '').toString().trim();
-    final year = int.tryParse((json['year'] ?? json['examYear'] ?? '').toString());
+    final topicId = (json['topicId'] ?? json['topic_id'] ?? '')
+        .toString()
+        .trim();
+    final year = int.tryParse(
+      (json['year'] ?? json['examYear'] ?? '').toString(),
+    );
     final difficulty = (json['difficulty'] ?? 'Medium').toString().trim();
     final explanation = json['explanation']?.toString().trim();
     final ncertRef = json['ncertReference']?.toString().trim();
@@ -145,7 +164,10 @@ class PyqDownloaderService {
 
   static List<String> _decodeStringList(dynamic value) {
     if (value is List) {
-      return value.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+      return value
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
     }
     if (value is String) {
       final trimmed = value.trim();
@@ -153,12 +175,19 @@ class PyqDownloaderService {
       if (trimmed.startsWith('[')) {
         try {
           final decoded = jsonDecode(trimmed) as List;
-          return decoded.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+          return decoded
+              .map((e) => e.toString().trim())
+              .where((e) => e.isNotEmpty)
+              .toList();
         } on FormatException {
           // fall through
         }
       }
-      return trimmed.split('|||').where((e) => e.trim().isNotEmpty).map((e) => e.trim()).toList();
+      return trimmed
+          .split('|||')
+          .where((e) => e.trim().isNotEmpty)
+          .map((e) => e.trim())
+          .toList();
     }
     return [];
   }

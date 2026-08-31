@@ -41,7 +41,11 @@ class FlashcardDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, List<Flashcard> dueCards, List<Flashcard> allCards) {
+  Widget _buildContent(
+    BuildContext context,
+    List<Flashcard> dueCards,
+    List<Flashcard> allCards,
+  ) {
     final dueCount = dueCards.length;
     final totalCount = allCards.length;
 
@@ -114,9 +118,9 @@ class FlashcardDashboardScreen extends ConsumerWidget {
           // Quick Actions
           Text(
             'Quick Actions',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 12),
           Row(
@@ -127,7 +131,11 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      Icon(Icons.auto_awesome, size: 32, color: AppColors.primary),
+                      Icon(
+                        Icons.auto_awesome,
+                        size: 32,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(height: 8),
                       Text(
                         'Generate with AI',
@@ -151,7 +159,11 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      Icon(Icons.quiz_outlined, size: 32, color: AppColors.success),
+                      Icon(
+                        Icons.quiz_outlined,
+                        size: 32,
+                        color: AppColors.success,
+                      ),
                       const SizedBox(height: 8),
                       Text(
                         'Study Session',
@@ -177,9 +189,9 @@ class FlashcardDashboardScreen extends ConsumerWidget {
           if (allCards.isNotEmpty) ...[
             Text(
               'By Subject',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
             _buildSubjectBreakdown(context, allCards),
@@ -257,9 +269,9 @@ class _StatItem extends StatelessWidget {
         ),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textSubtle,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.textSubtle),
         ),
       ],
     );

@@ -117,7 +117,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     final rebuilt = resume != null ? _rebuildSections(resume) : null;
 
     // Check if we're replaying from a route with a seed
-    final routeExtra = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final routeExtra =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final replaySeed = routeExtra?['seed'] as int?;
     final replayConfig = routeExtra?['config'] as ExamConfig?;
     final replayQuestionPool = routeExtra?['questionPool'] as List<Question>?;
@@ -136,8 +137,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _sectionDeadline = resume.sectionDeadlineEpochMs != null
           ? DateTime.fromMillisecondsSinceEpoch(resume.sectionDeadlineEpochMs!)
           : null;
-      _phase =
-          resume.phase == 'break_' ? _SessionPhase.break_ : _SessionPhase.taking;
+      _phase = resume.phase == 'break_'
+          ? _SessionPhase.break_
+          : _SessionPhase.taking;
       for (final entry in resume.answersByIndex.entries) {
         final v = entry.value;
         if (v != null && v.isNotEmpty) _answers[entry.key] = v;
@@ -157,8 +159,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         seed: _seed,
         excludedIds: _excludedIds,
       );
-      _deadline = DateTime.now()
-          .add(Duration(seconds: config.totalDurationSeconds));
+      _deadline = DateTime.now().add(
+        Duration(seconds: config.totalDurationSeconds),
+      );
       // Use the replay seed for the allocation
       _seed = seed;
     } else {
@@ -171,8 +174,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         seed: _seed,
         excludedIds: _excludedIds,
       );
-      _deadline = DateTime.now()
-          .add(Duration(seconds: widget.config.totalDurationSeconds));
+      _deadline = DateTime.now().add(
+        Duration(seconds: widget.config.totalDurationSeconds),
+      );
     }
 
     _questions = ExamEngineService.flattenAllocated(_sectionQuestions);
@@ -205,8 +209,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _startTicker();
       _startAutosave();
       if (_phase == _SessionPhase.taking && _remainingSeconds <= 0) {
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _submitTest(auto: true));
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _submitTest(auto: true),
+        );
       }
     }
   }
@@ -283,8 +288,10 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   void _startAutosave() {
     if (!_checkpointable) return;
     _autosaveTimer?.cancel();
-    _autosaveTimer =
-        Timer.periodic(const Duration(seconds: 15), (_) => _saveCheckpoint());
+    _autosaveTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => _saveCheckpoint(),
+    );
     _saveCheckpoint(); // initial save so a resume card exists immediately
   }
 
@@ -324,7 +331,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   // ─────────────────────────────────────────────────────────────
 
   void _initSectionDeadline() {
-    final sectionDuration = widget.config.sections[_currentSection].durationSeconds;
+    final sectionDuration =
+        widget.config.sections[_currentSection].durationSeconds;
     if (sectionDuration != null && sectionDuration > 0) {
       _sectionDeadline = DateTime.now().add(Duration(seconds: sectionDuration));
     } else {
@@ -433,8 +441,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   void _previous() {
     // 1.5: respect the section lock — never step before the section's first
     // question when locked.
-    final lowerBound =
-        widget.config.sectionLock ? _sectionStart[_currentSection] : 0;
+    final lowerBound = widget.config.sectionLock
+        ? _sectionStart[_currentSection]
+        : 0;
     if (_currentIndex > lowerBound) {
       _goTo(_currentIndex - 1);
     }
@@ -447,8 +456,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _questionEnteredAt = null;
       setState(() {
         _phase = _SessionPhase.break_;
-        _breakDeadline = DateTime.now()
-            .add(Duration(seconds: widget.config.breakDurationSeconds));
+        _breakDeadline = DateTime.now().add(
+          Duration(seconds: widget.config.breakDurationSeconds),
+        );
       });
       _saveCheckpoint();
       return;
@@ -614,7 +624,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       seed: _seed,
     );
 
-    await ref.read(userProgressProvider.notifier).recordQuizAttempt(
+    await ref
+        .read(userProgressProvider.notifier)
+        .recordQuizAttempt(
           attempt,
           questions: _questions,
           answersByIndex: _answers,
@@ -628,10 +640,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       final isCorrect = answer != null && answer == q.correctAnswer;
       if (!isCorrect) {
         final dbInstance = ref.read(databaseProvider);
-        await dbInstance.addToErrorBook(db.ErrorBookCompanion.insert(
-          questionId: q.id,
-          addedAt: DateTime.now(),
-        ));
+        await dbInstance.addToErrorBook(
+          db.ErrorBookCompanion.insert(
+            questionId: q.id,
+            addedAt: DateTime.now(),
+          ),
+        );
       }
     }
 
@@ -641,12 +655,15 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       Navigator.of(context).pop();
       _confirmDialogOpen = false;
     }
-    context.go('/cbt/result', extra: {
-      'attempt': attempt,
-      'analytics': analytics,
-      'questions': _questions,
-      'answersByIndex': _answers,
-    });
+    context.go(
+      '/cbt/result',
+      extra: {
+        'attempt': attempt,
+        'analytics': analytics,
+        'questions': _questions,
+        'answersByIndex': _answers,
+      },
+    );
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -730,7 +747,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               Text(
                 widget.config.sectionLock
                     ? 'Section ${_currentSection + 1} of '
-                        '${_sectionQuestions.length} • ${_activeSection.name}'
+                          '${_sectionQuestions.length} • ${_activeSection.name}'
                     : _activeSection.name,
                 style: TextStyle(
                   color: AdaptiveColors.textSecondary(context),
@@ -781,11 +798,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     final color = remaining < 300
         ? AppColors.error
         : remaining < 600
-            ? AppColors.warning
-            : AppColors.primary;
+        ? AppColors.warning
+        : AppColors.primary;
 
     final sectionRemaining = _sectionRemainingSeconds;
-    final sectionDuration = widget.config.sections[_currentSection].durationSeconds;
+    final sectionDuration =
+        widget.config.sections[_currentSection].durationSeconds;
 
     return Container(
       color: AdaptiveColors.surface(context),
@@ -797,9 +815,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             children: [
               Text(
                 sectionRemaining >= 0 ? 'Section Time' : 'Time Remaining',
-                style: Theme.of(
-                  context,
-                ).textTheme.labelSmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AdaptiveColors.textSecondary(context),
+                ),
               ),
               Text(
                 sectionRemaining >= 0
@@ -815,7 +833,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               ),
             ],
           ),
-          if (sectionRemaining >= 0 && sectionDuration != null && sectionDuration > 0) ...[
+          if (sectionRemaining >= 0 &&
+              sectionDuration != null &&
+              sectionDuration > 0) ...[
             const SizedBox(height: 6),
             LinearProgressIndicator(
               value: sectionDuration <= 0
@@ -946,7 +966,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    final borderColor = isSelected ? AdaptiveColors.primary(context) : AdaptiveColors.divider(context);
+    final borderColor = isSelected
+        ? AdaptiveColors.primary(context)
+        : AdaptiveColors.divider(context);
     final bgColor = isSelected
         ? AdaptiveColors.primary(context).withValues(alpha: 0.08)
         : AdaptiveColors.surface(context);
@@ -975,7 +997,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
                       : AdaptiveColors.background(context),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? AdaptiveColors.primary(context) : AdaptiveColors.divider(context),
+                    color: isSelected
+                        ? AdaptiveColors.primary(context)
+                        : AdaptiveColors.divider(context),
                   ),
                 ),
                 child: Text(
@@ -1019,12 +1043,13 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         : 0;
     final visibleTo = widget.config.sectionLock
         ? _sectionStart[_currentSection] +
-            _sectionQuestions[_currentSection].length
+              _sectionQuestions[_currentSection].length
         : _questions.length;
 
     final hasAnswer = _answers.containsKey(_currentIndex);
-    final lowerBound =
-        widget.config.sectionLock ? _sectionStart[_currentSection] : 0;
+    final lowerBound = widget.config.sectionLock
+        ? _sectionStart[_currentSection]
+        : 0;
 
     return Container(
       color: AdaptiveColors.surface(context),
@@ -1101,7 +1126,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       );
     }
     if (widget.config.sectionLock && _isLastQuestionInSection) {
-      final isBreak = widget.config.breaksEnabled &&
+      final isBreak =
+          widget.config.breaksEnabled &&
           _currentSection == widget.config.breakAfterSectionIndex;
       return ElevatedButton(
         onPressed: _goToNextSection,
@@ -1233,11 +1259,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.coffee,
-              size: 64,
-              color: AppColors.primary,
-            ),
+            const Icon(Icons.coffee, size: 64, color: AppColors.primary),
             const SizedBox(height: 20),
             Text(
               'Break Time',
@@ -1267,9 +1289,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
             const SizedBox(height: 8),
             Text(
               'Next section starts automatically',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AdaptiveColors.textSecondary(context),
+              ),
             ),
             const SizedBox(height: 28),
             OutlinedButton.icon(

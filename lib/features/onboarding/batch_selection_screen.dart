@@ -52,7 +52,7 @@ class _BatchSelectionScreenState extends ConsumerState<BatchSelectionScreen> {
             ElevatedButton(
               onPressed: _continue,
               child: const Text('Continue to Goal Setting'),
-            )
+            ),
           ],
         ),
       ),
@@ -160,8 +160,7 @@ class GoalSettingScreen extends ConsumerStatefulWidget {
   const GoalSettingScreen({super.key});
 
   @override
-  ConsumerState<GoalSettingScreen> createState() =>
-      _GoalSettingScreenState();
+  ConsumerState<GoalSettingScreen> createState() => _GoalSettingScreenState();
 }
 
 class _GoalSettingScreenState extends ConsumerState<GoalSettingScreen> {
@@ -200,10 +199,7 @@ class _GoalSettingScreenState extends ConsumerState<GoalSettingScreen> {
                 setState(() => _targetScore = value.round());
               },
             ),
-            Text(
-              '$_targetScore / 720',
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text('$_targetScore / 720', style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 32),
             const Text(
               'Target Goal',
@@ -238,15 +234,19 @@ class _GoalSettingScreenState extends ConsumerState<GoalSettingScreen> {
                 final batch = ref.watch(batchServiceProvider);
                 if (batch != null) {
                   final updatedBatch = batch.copyWith(
-                    studyMode: _aimingForMedical ? StudyMode.coachingStudent : StudyMode.selfStudy,
+                    studyMode: _aimingForMedical
+                        ? StudyMode.coachingStudent
+                        : StudyMode.selfStudy,
                   );
-                  ref.read(batchServiceProvider.notifier).saveBatch(updatedBatch);
+                  ref
+                      .read(batchServiceProvider.notifier)
+                      .saveBatch(updatedBatch);
                 }
                 if (!mounted) return;
                 Navigator.of(context).pop();
               },
               child: const Text('Finish Onboarding'),
-            )
+            ),
           ],
         ),
       ),

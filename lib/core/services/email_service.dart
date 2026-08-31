@@ -33,8 +33,8 @@ class EmailService {
   final FlutterSecureStorage _secureStorage;
 
   EmailService({http.Client? client, FlutterSecureStorage? secureStorage})
-      : _client = client ?? http.Client(),
-        _secureStorage = secureStorage ?? const FlutterSecureStorage();
+    : _client = client ?? http.Client(),
+      _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   String? get apiKey => _apiKey;
   String? get senderEmail => _senderEmail;

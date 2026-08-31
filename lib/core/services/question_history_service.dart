@@ -29,10 +29,10 @@ class QuestionHistoryService {
   }
 
   /// Records the ordered list of question IDs for an attempt.
-  Future<void> recordAttemptQuestionIds(int attemptId, List<String> questionIds) async {
-    await _db.updateQuizAttemptQuestionIds(
-      attemptId,
-      jsonEncode(questionIds),
-    );
+  Future<void> recordAttemptQuestionIds(
+    int attemptId,
+    List<String> questionIds,
+  ) async {
+    await _db.updateQuizAttemptQuestionIds(attemptId, jsonEncode(questionIds));
   }
 }

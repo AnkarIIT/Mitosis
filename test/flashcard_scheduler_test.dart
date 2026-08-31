@@ -18,7 +18,10 @@ void main() {
     });
 
     test('three consecutive "good" reviews climb the ladder 1→3→7', () {
-      var r = FlashcardScheduler.review(rating: FlashcardRating.good, now: fixedNow);
+      var r = FlashcardScheduler.review(
+        rating: FlashcardRating.good,
+        now: fixedNow,
+      );
       r = FlashcardScheduler.review(
         rating: FlashcardRating.good,
         box: r.box,
@@ -133,9 +136,21 @@ void main() {
     });
 
     test('isDue returns true for past due dates', () {
-      expect(FlashcardScheduler.isDue(fixedNow.subtract(const Duration(days: 1)), now: fixedNow), true);
+      expect(
+        FlashcardScheduler.isDue(
+          fixedNow.subtract(const Duration(days: 1)),
+          now: fixedNow,
+        ),
+        true,
+      );
       expect(FlashcardScheduler.isDue(fixedNow, now: fixedNow), true);
-      expect(FlashcardScheduler.isDue(fixedNow.add(const Duration(days: 1)), now: fixedNow), false);
+      expect(
+        FlashcardScheduler.isDue(
+          fixedNow.add(const Duration(days: 1)),
+          now: fixedNow,
+        ),
+        false,
+      );
     });
   });
 }

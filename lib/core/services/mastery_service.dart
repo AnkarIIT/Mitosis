@@ -48,16 +48,18 @@ class MasteryService {
   }
 
   /// Returns topic IDs sorted by ascending mastery (weakest first).
-  Future<List<String>> weakTopicIds(List<String> subjects, {int limit = 20}) async {
+  Future<List<String>> weakTopicIds(
+    List<String> subjects, {
+    int limit = 20,
+  }) async {
     final mastery = await computeTopicMastery();
     final questions = await _bank;
-    final filtered = mastery.entries
-        .where((e) {
-          // Keep only topics whose questions belong to the requested subjects.
-          return questions
-              .any((q) => q.topicId == e.key && subjects.contains(q.subject));
-        })
-        .toList();
+    final filtered = mastery.entries.where((e) {
+      // Keep only topics whose questions belong to the requested subjects.
+      return questions.any(
+        (q) => q.topicId == e.key && subjects.contains(q.subject),
+      );
+    }).toList();
     filtered.sort((a, b) => a.value.compareTo(b.value));
     return filtered.take(limit).map((e) => e.key).toList();
   }

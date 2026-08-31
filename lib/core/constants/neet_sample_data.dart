@@ -49,7 +49,8 @@ final List<Question> biologyQuestions = [
     questionText: "Which of the following is the basic unit of classification?",
     options: ["Genus", "Species", "Kingdom", "Family"],
     correctAnswer: "Species",
-    explanation: "Species is defined as a group of similar organisms capable of interbreeding and producing fertile offspring. It is the basic unit of classification.",
+    explanation:
+        "Species is defined as a group of similar organisms capable of interbreeding and producing fertile offspring. It is the basic unit of classification.",
     ncertReference: "NCERT Class 11, Chapter 1, Page 10",
     year: 2023,
     difficulty: "Easy",
@@ -62,10 +63,12 @@ final List<Question> biologyQuestions = [
     chapter: "The Living World",
     topic: "Characteristics of Living Organisms",
     topicId: 'bio_ch1_t1',
-    questionText: "The ability of living organisms to undergo changes to suit their environment is called:",
+    questionText:
+        "The ability of living organisms to undergo changes to suit their environment is called:",
     options: ["Adaptation", "Evolution", "Mutation", "Variation"],
     correctAnswer: "Adaptation",
-    explanation: "Adaptation is the process by which organisms change to suit their environment, allowing better survival and reproduction.",
+    explanation:
+        "Adaptation is the process by which organisms change to suit their environment, allowing better survival and reproduction.",
     ncertReference: "NCERT Class 11, Chapter 1, Page 12",
     year: 2022,
     difficulty: "Easy",
@@ -79,9 +82,15 @@ final List<Question> biologyQuestions = [
     topic: "Diversity in Living Organisms",
     topicId: 'bio_ch1_t2',
     questionText: "Taxonomy is the science of:",
-    options: ["Classification of organisms", "Study of fossils", "Study of heredity", "Study of cells"],
+    options: [
+      "Classification of organisms",
+      "Study of fossils",
+      "Study of heredity",
+      "Study of cells",
+    ],
     correctAnswer: "Classification of organisms",
-    explanation: "Taxonomy is the branch of biology that deals with the classification and naming of organisms.",
+    explanation:
+        "Taxonomy is the branch of biology that deals with the classification and naming of organisms.",
     ncertReference: "NCERT Class 11, Chapter 1, Page 8",
     year: 2023,
     difficulty: "Easy",
@@ -95,9 +104,15 @@ final List<Question> biologyQuestions = [
     topic: "Monera",
     topicId: 'bio_ch2_t1',
     questionText: "Archaebacteria differ from eubacteria in:",
-    options: ["Cell membrane structure", "Mode of nutrition", "Cell shape", "Mode of reproduction"],
+    options: [
+      "Cell membrane structure",
+      "Mode of nutrition",
+      "Cell shape",
+      "Mode of reproduction",
+    ],
     correctAnswer: "Cell membrane structure",
-    explanation: "Archaebacteria have a different cell wall structure and cell membrane structure (branched lipid chain) that helps them survive in extreme conditions.",
+    explanation:
+        "Archaebacteria have a different cell wall structure and cell membrane structure (branched lipid chain) that helps them survive in extreme conditions.",
     ncertReference: "NCERT Class 11 Biology, Chapter 2",
     year: 2014,
     difficulty: "Medium",
@@ -126,10 +141,17 @@ final List<Question> biologyQuestions = [
     chapter: "Animal Kingdom",
     topic: "Phylum Chordata",
     topicId: 'bio_ch4_t1',
-    questionText: "Which of the following characteristics is not shared by birds and mammals?",
-    options: ["Viviparity", "Warm blooded nature", "Ossified endoskeleton", "Breathing using lungs"],
+    questionText:
+        "Which of the following characteristics is not shared by birds and mammals?",
+    options: [
+      "Viviparity",
+      "Warm blooded nature",
+      "Ossified endoskeleton",
+      "Breathing using lungs",
+    ],
     correctAnswer: "Viviparity",
-    explanation: "Most mammals are viviparous (give birth to live young), while all birds are oviparous (lay eggs).",
+    explanation:
+        "Most mammals are viviparous (give birth to live young), while all birds are oviparous (lay eggs).",
     ncertReference: "NCERT Class 11 Biology, Chapter 4",
     year: 2016,
     difficulty: "Medium",
@@ -142,10 +164,17 @@ final List<Question> biologyQuestions = [
     chapter: "Cell: The Unit of Life",
     topic: "Prokaryotic Cells",
     topicId: 'bio_ch8_t1',
-    questionText: "Which of the following is not a characteristic of prokaryotic cells?",
-    options: ["Mesosome", "Circular DNA", "Photosynthetic lamellae", "Membrane bound organelles"],
+    questionText:
+        "Which of the following is not a characteristic of prokaryotic cells?",
+    options: [
+      "Mesosome",
+      "Circular DNA",
+      "Photosynthetic lamellae",
+      "Membrane bound organelles",
+    ],
     correctAnswer: "Membrane bound organelles",
-    explanation: "Prokaryotic cells lack membrane-bound organelles like mitochondria, Golgi apparatus, etc.",
+    explanation:
+        "Prokaryotic cells lack membrane-bound organelles like mitochondria, Golgi apparatus, etc.",
     ncertReference: "NCERT Class 11 Biology, Chapter 8",
     year: 2021,
     difficulty: "Easy",
@@ -177,7 +206,8 @@ final List<Question> biologyQuestions = [
     questionText: "Crossing over takes place during which stage of meiosis?",
     options: ["Pachytene", "Zygotene", "Leptotene", "Diplotene"],
     correctAnswer: "Pachytene",
-    explanation: "Crossing over occurs between non-sister chromatids of homologous chromosomes during the pachytene stage of Prophase I.",
+    explanation:
+        "Crossing over occurs between non-sister chromatids of homologous chromosomes during the pachytene stage of Prophase I.",
     ncertReference: "NCERT Class 11 Biology, Chapter 10",
     year: 2020,
     difficulty: "Medium",
@@ -193,7 +223,8 @@ final List<Question> biologyQuestions = [
     questionText: "The primary electron acceptor in PS II is:",
     options: ["Pheophytin", "Plastoquinone", "Cytochrome", "ATP"],
     correctAnswer: "Pheophytin",
-    explanation: "In Photosystem II, the excited P680 transfers an electron to pheophytin.",
+    explanation:
+        "In Photosystem II, the excited P680 transfers an electron to pheophytin.",
     ncertReference: "NCERT Class 11 Biology, Chapter 13",
     year: 2018,
     difficulty: "Hard",
@@ -209,7 +240,8 @@ final List<Question> biologyQuestions = [
     questionText: "The end product of glycolysis is:",
     options: ["Pyruvic acid", "Acetyl CoA", "Citric acid", "Lactic acid"],
     correctAnswer: "Pyruvic acid",
-    explanation: "Glycolysis breaks down one molecule of glucose into two molecules of pyruvic acid.",
+    explanation:
+        "Glycolysis breaks down one molecule of glucose into two molecules of pyruvic acid.",
     ncertReference: "NCERT Class 11 Biology, Chapter 14",
     year: 2019,
     difficulty: "Easy",
@@ -225,7 +257,8 @@ final List<Question> biologyQuestions = [
     questionText: "The surge of which hormone triggers ovulation?",
     options: ["LH", "FSH", "Estrogen", "Progesterone"],
     correctAnswer: "LH",
-    explanation: "A rapid surge of Luteinizing Hormone (LH) induces the rupture of Graafian follicle and release of ovum.",
+    explanation:
+        "A rapid surge of Luteinizing Hormone (LH) induces the rupture of Graafian follicle and release of ovum.",
     ncertReference: "NCERT Class 12 Biology, Chapter 3",
     year: 2020,
     difficulty: "Medium",
@@ -238,10 +271,12 @@ final List<Question> biologyQuestions = [
     chapter: "Principles of Inheritance and Variation",
     topic: "Mendelian Inheritance",
     topicId: 'bio_ch5_12_t1',
-    questionText: "The phenotypic ratio of a dihybrid cross in F2 generation is:",
+    questionText:
+        "The phenotypic ratio of a dihybrid cross in F2 generation is:",
     options: ["9:3:3:1", "3:1", "1:2:1", "1:1:1:1"],
     correctAnswer: "9:3:3:1",
-    explanation: "Mendel's dihybrid cross resulted in a 9:3:3:1 ratio of phenotypes in the F2 generation.",
+    explanation:
+        "Mendel's dihybrid cross resulted in a 9:3:3:1 ratio of phenotypes in the F2 generation.",
     ncertReference: "NCERT Class 12 Biology, Chapter 5",
     year: 2021,
     difficulty: "Easy",
@@ -257,7 +292,8 @@ final List<Question> biologyQuestions = [
     questionText: "The pitch of DNA double helix is:",
     options: ["3.4 nm", "0.34 nm", "2 nm", "34 nm"],
     correctAnswer: "3.4 nm",
-    explanation: "The pitch of the B-DNA helix is 3.4 nm, with about 10 base pairs per turn.",
+    explanation:
+        "The pitch of the B-DNA helix is 3.4 nm, with about 10 base pairs per turn.",
     ncertReference: "NCERT Class 12 Biology, Chapter 6",
     year: 2022,
     difficulty: "Medium",
@@ -270,10 +306,17 @@ final List<Question> biologyQuestions = [
     chapter: "Evolution",
     topic: "Homologous Structures",
     topicId: 'bio_ch7_12_t1',
-    questionText: "Thorns of Bougainvillea and tendrils of Cucurbita are examples of:",
-    options: ["Homologous organs", "Analogous organs", "Vestigial organs", "Atavism"],
+    questionText:
+        "Thorns of Bougainvillea and tendrils of Cucurbita are examples of:",
+    options: [
+      "Homologous organs",
+      "Analogous organs",
+      "Vestigial organs",
+      "Atavism",
+    ],
     correctAnswer: "Homologous organs",
-    explanation: "They both represent axillary bud modifications, hence are homologous despite performing different functions.",
+    explanation:
+        "They both represent axillary bud modifications, hence are homologous despite performing different functions.",
     ncertReference: "NCERT Class 12 Biology, Chapter 7",
     year: 2017,
     difficulty: "Medium",
@@ -289,7 +332,8 @@ final List<Question> biologyQuestions = [
     questionText: "Which of the following is a primary lymphoid organ?",
     options: ["Bone marrow", "Spleen", "Peyer's patches", "Lymph nodes"],
     correctAnswer: "Bone marrow",
-    explanation: "Bone marrow and thymus are primary lymphoid organs where lymphocytes mature.",
+    explanation:
+        "Bone marrow and thymus are primary lymphoid organs where lymphocytes mature.",
     ncertReference: "NCERT Class 12 Biology, Chapter 8",
     year: 2023,
     difficulty: "Easy",
@@ -303,9 +347,15 @@ final List<Question> biologyQuestions = [
     topic: "Restriction Enzymes",
     topicId: 'bio_ch11_12_t1',
     questionText: "The 'molecular scissors' used in genetic engineering are:",
-    options: ["Restriction endonucleases", "Ligases", "Polymerases", "Helicases"],
+    options: [
+      "Restriction endonucleases",
+      "Ligases",
+      "Polymerases",
+      "Helicases",
+    ],
     correctAnswer: "Restriction endonucleases",
-    explanation: "Restriction enzymes cut DNA at specific palindromic sequences.",
+    explanation:
+        "Restriction enzymes cut DNA at specific palindromic sequences.",
     ncertReference: "NCERT Class 12 Biology, Chapter 11",
     year: 2019,
     difficulty: "Easy",
@@ -321,7 +371,8 @@ final List<Question> biologyQuestions = [
     questionText: "Which curve represents exponential growth?",
     options: ["J-shaped", "S-shaped", "Linear", "Bell-shaped"],
     correctAnswer: "J-shaped",
-    explanation: "Exponential growth occurs when resources are unlimited, resulting in a J-shaped curve.",
+    explanation:
+        "Exponential growth occurs when resources are unlimited, resulting in a J-shaped curve.",
     ncertReference: "NCERT Class 12 Biology, Chapter 13",
     year: 2020,
     difficulty: "Medium",
@@ -337,7 +388,8 @@ final List<Question> biologyQuestions = [
     questionText: "The 10% law of energy transfer was proposed by:",
     options: ["Lindeman", "Odum", "Tansley", "Reiter"],
     correctAnswer: "Lindeman",
-    explanation: "Raymond Lindeman proposed the 10% law, stating only 10% energy is transferred to the next trophic level.",
+    explanation:
+        "Raymond Lindeman proposed the 10% law, stating only 10% energy is transferred to the next trophic level.",
     ncertReference: "NCERT Class 12 Biology, Chapter 14",
     year: 2021,
     difficulty: "Easy",
@@ -350,10 +402,17 @@ final List<Question> biologyQuestions = [
     chapter: "Biodiversity and Conservation",
     topic: "In-situ Conservation",
     topicId: 'bio_ch15_12_t1',
-    questionText: "Which of the following is not an in-situ conservation method?",
-    options: ["Botanical gardens", "National parks", "Biosphere reserves", "Sacred groves"],
+    questionText:
+        "Which of the following is not an in-situ conservation method?",
+    options: [
+      "Botanical gardens",
+      "National parks",
+      "Biosphere reserves",
+      "Sacred groves",
+    ],
     correctAnswer: "Botanical gardens",
-    explanation: "Botanical gardens are ex-situ conservation methods where plants are grown outside their natural habitat.",
+    explanation:
+        "Botanical gardens are ex-situ conservation methods where plants are grown outside their natural habitat.",
     ncertReference: "NCERT Class 12 Biology, Chapter 15",
     year: 2022,
     difficulty: "Easy",
@@ -367,15 +426,18 @@ final List<Question> biologyQuestions = [
     topic: "Taxonomy",
     topicId: 'bio_ch1_t2',
     type: 'AR',
-    questionText: "Assertion (A): Hierarchical system of classification is useful. \nReason (R): It helps in easy identification and study of organisms.",
+    questionText:
+        "Assertion (A): Hierarchical system of classification is useful. \nReason (R): It helps in easy identification and study of organisms.",
     options: [
       "Both (A) and (R) are true and (R) is the correct explanation of (A).",
       "Both (A) and (R) are true but (R) is not the correct explanation of (A).",
       "(A) is true but (R) is false.",
-      "(A) is false but (R) is true."
+      "(A) is false but (R) is true.",
     ],
-    correctAnswer: "Both (A) and (R) are true and (R) is the correct explanation of (A).",
-    explanation: "Hierarchical classification organizes organisms into nested groups, which simplifies study and identification.",
+    correctAnswer:
+        "Both (A) and (R) are true and (R) is the correct explanation of (A).",
+    explanation:
+        "Hierarchical classification organizes organisms into nested groups, which simplifies study and identification.",
     ncertReference: "NCERT Class 11, Chapter 1",
     difficulty: "Medium",
     tags: ["NCERT", "AR"],
@@ -387,15 +449,17 @@ final List<Question> biologyQuestions = [
     topic: "Kingdom Monera",
     topicId: 'bio_ch2_t1',
     type: 'Statement',
-    questionText: "Statement I: Bacteria are the sole members of Kingdom Monera. \nStatement II: Bacteria exhibit the most extensive metabolic diversity.",
+    questionText:
+        "Statement I: Bacteria are the sole members of Kingdom Monera. \nStatement II: Bacteria exhibit the most extensive metabolic diversity.",
     options: [
       "Both Statement I and Statement II are correct.",
       "Both Statement I and Statement II are incorrect.",
       "Statement I is correct but Statement II is incorrect.",
-      "Statement I is incorrect but Statement II is correct."
+      "Statement I is incorrect but Statement II is correct.",
     ],
     correctAnswer: "Both Statement I and Statement II are correct.",
-    explanation: "Kingdom Monera consists entirely of bacteria, and as a group, they show a wide range of metabolic activities.",
+    explanation:
+        "Kingdom Monera consists entirely of bacteria, and as a group, they show a wide range of metabolic activities.",
     ncertReference: "NCERT Class 11, Chapter 2",
     difficulty: "Medium",
     tags: ["NCERT", "Statement"],
@@ -413,7 +477,8 @@ final List<Question> chemistryQuestions = [
     questionText: "The number of atoms in 0.1 mole of a triatomic gas is?",
     options: ["6.022×10²²", "1.806×10²³", "3.6×10²³", "1.8×10²²"],
     correctAnswer: "1.806×10²³",
-    explanation: "1 mole of any substance contains Avogadro's number (6.022×10²³) of particles. For a triatomic molecule with 0.1 mole: 0.1 × 3 × 6.022×10²³ = 1.806×10²³ atoms.",
+    explanation:
+        "1 mole of any substance contains Avogadro's number (6.022×10²³) of particles. For a triatomic molecule with 0.1 mole: 0.1 × 3 × 6.022×10²³ = 1.806×10²³ atoms.",
     ncertReference: "NCERT Class 11, Chapter 1, Page 12",
     year: 2024,
     difficulty: "Medium",
@@ -426,10 +491,12 @@ final List<Question> chemistryQuestions = [
     chapter: "Structure of Atom",
     topic: "Quantum Numbers",
     topicId: 'chem_ch2_t1',
-    questionText: "The total number of orbitals associated with third shell is:",
+    questionText:
+        "The total number of orbitals associated with third shell is:",
     options: ["9", "4", "16", "3"],
     correctAnswer: "9",
-    explanation: "Number of orbitals = n². For n=3, number of orbitals = 3² = 9 (one 3s, three 3p, five 3d).",
+    explanation:
+        "Number of orbitals = n². For n=3, number of orbitals = 3² = 9 (one 3s, three 3p, five 3d).",
     ncertReference: "NCERT Class 11 Chemistry, Chapter 2",
     year: 2021,
     difficulty: "Medium",
@@ -449,7 +516,8 @@ final List<Question> physicsQuestions = [
     questionText: "The dimensional formula for gravitational constant G is:",
     options: ["[M⁻¹L³T⁻²]", "[ML³T⁻²]", "[M⁻¹L²T⁻²]", "[ML²T⁻²]"],
     correctAnswer: "[M⁻¹L³T⁻²]",
-    explanation: "F = G m1m2 / r² => G = F r² / m1m2. Units: [MLT⁻²][L²] / [M²] = [M⁻¹L³T⁻²].",
+    explanation:
+        "F = G m1m2 / r² => G = F r² / m1m2. Units: [MLT⁻²][L²] / [M²] = [M⁻¹L³T⁻²].",
     ncertReference: "NCERT Class 11 Physics, Chapter 2",
     year: 2023,
     difficulty: "Medium",
@@ -462,7 +530,8 @@ final List<Question> physicsQuestions = [
     chapter: "Motion in a Straight Line",
     topic: "Kinematics",
     topicId: 'phys_ch3_t1',
-    questionText: "For a body falling freely under gravity, distance covered in time t is proportional to:",
+    questionText:
+        "For a body falling freely under gravity, distance covered in time t is proportional to:",
     options: ["t²", "t", "√t", "t³"],
     correctAnswer: "t²",
     explanation: "s = ut + ½gt². For free fall u=0, so s = ½gt² => s ∝ t².",
@@ -491,12 +560,13 @@ final List<Subject> subjects = [
         weight: 1,
         topics: [
           Topic(
-            id: 'bio_ch1_t1', 
-            name: 'Characteristics of Living Organisms', 
-            chapterId: 'bio_ch1', 
-            questionCount: 4, 
+            id: 'bio_ch1_t1',
+            name: 'Characteristics of Living Organisms',
+            chapterId: 'bio_ch1',
+            questionCount: 4,
             difficulty: 'Easy',
-            summary: 'The living world is rich in variety. Millions of plants and animals have been identified and described but a large number still remains unknown. Life is a unique, complex organization of molecules, expressing through chemical reactions which lead to growth, development, responsiveness, adaptation and reproduction.',
+            summary:
+                'The living world is rich in variety. Millions of plants and animals have been identified and described but a large number still remains unknown. Life is a unique, complex organization of molecules, expressing through chemical reactions which lead to growth, development, responsiveness, adaptation and reproduction.',
             keyPoints: [
               'Growth: Increase in mass and increase in number of individuals are twin characteristics of growth.',
               'Reproduction: In living organisms, reproduction is the production of progeny possessing features more or less similar to those of parents.',
@@ -505,12 +575,13 @@ final List<Subject> subjects = [
             ],
           ),
           Topic(
-            id: 'bio_ch1_t2', 
-            name: 'Diversity in Living Organisms', 
-            chapterId: 'bio_ch1', 
-            questionCount: 4, 
+            id: 'bio_ch1_t2',
+            name: 'Diversity in Living Organisms',
+            chapterId: 'bio_ch1',
+            questionCount: 4,
             difficulty: 'Medium',
-            summary: 'The number of species that are known and described range between 1.7-1.8 million. This refers to biodiversity or the number and types of organisms present on earth. Taxonomy is the study of principles and procedures of classification.',
+            summary:
+                'The number of species that are known and described range between 1.7-1.8 million. This refers to biodiversity or the number and types of organisms present on earth. Taxonomy is the study of principles and procedures of classification.',
             keyPoints: [
               'Binomial Nomenclature: Each name has two components – the Generic name and the specific epithet.',
               'Taxonomic Categories: Kingdom, Phylum/Division, Class, Order, Family, Genus and Species.',
@@ -541,7 +612,8 @@ final List<Subject> subjects = [
         id: 'bio_ch3',
         name: 'Plant Kingdom',
         subjectId: 'bio',
-        description: 'Classification of plants into algae, bryophytes, pteridophytes and gymnosperms',
+        description:
+            'Classification of plants into algae, bryophytes, pteridophytes and gymnosperms',
         classLevel: 'Class 11',
         weight: 2,
         topics: [
@@ -558,7 +630,8 @@ final List<Subject> subjects = [
         id: 'bio_ch4',
         name: 'Animal Kingdom',
         subjectId: 'bio',
-        description: 'Classification and features of non-chordate and chordate phyla',
+        description:
+            'Classification and features of non-chordate and chordate phyla',
         classLevel: 'Class 11',
         weight: 2,
         topics: [
@@ -818,20 +891,21 @@ final List<Subject> subjects = [
     description: 'The study of matter and its transformations',
     chapters: [
       Chapter(
-        id: 'chem_ch1', 
-        name: 'Basic Concepts', 
-        subjectId: 'chem', 
+        id: 'chem_ch1',
+        name: 'Basic Concepts',
+        subjectId: 'chem',
         description: 'Mole concept and stoichiometry',
-        classLevel: 'Class 11', 
-        weight: 2, 
+        classLevel: 'Class 11',
+        weight: 2,
         topics: [
           Topic(
-            id: 'chem_ch1_t1', 
-            name: 'Mole Concept', 
-            chapterId: 'chem_ch1', 
-            questionCount: 5, 
+            id: 'chem_ch1_t1',
+            name: 'Mole Concept',
+            chapterId: 'chem_ch1',
+            questionCount: 5,
             difficulty: 'Medium',
-            summary: 'One mole is the amount of a substance that contains as many particles or entities as there are atoms in exactly 12 g of the 12C isotope. The mass of one mole of a substance in grams is called its molar mass.',
+            summary:
+                'One mole is the amount of a substance that contains as many particles or entities as there are atoms in exactly 12 g of the 12C isotope. The mass of one mole of a substance in grams is called its molar mass.',
             keyPoints: [
               'Avogadro Number (NA): 6.022 × 10²³',
               'Molar Mass: Mass of 1 mole of substance in grams.',
@@ -867,20 +941,21 @@ final List<Subject> subjects = [
     description: 'The study of nature and its laws',
     chapters: [
       Chapter(
-        id: 'phys_ch2', 
-        name: 'Units & Measurements', 
-        subjectId: 'phys', 
+        id: 'phys_ch2',
+        name: 'Units & Measurements',
+        subjectId: 'phys',
         description: 'SI units, dimensions and significant figures',
-        classLevel: 'Class 11', 
-        weight: 1, 
+        classLevel: 'Class 11',
+        weight: 1,
         topics: [
           Topic(
-            id: 'phys_ch2_t1', 
-            name: 'Dimensions', 
-            chapterId: 'phys_ch2', 
-            questionCount: 5, 
+            id: 'phys_ch2_t1',
+            name: 'Dimensions',
+            chapterId: 'phys_ch2',
+            questionCount: 5,
             difficulty: 'Medium',
-            summary: 'The dimensions of a physical quantity are the powers to which the base quantities are raised to represent that quantity. Dimensional analysis is a tool to check the consistency of equations and to derive relations between physical quantities.',
+            summary:
+                'The dimensions of a physical quantity are the powers to which the base quantities are raised to represent that quantity. Dimensional analysis is a tool to check the consistency of equations and to derive relations between physical quantities.',
             keyPoints: [
               'Base Quantities: Length [L], Mass [M], Time [T], etc.',
               'Principle of Homogeneity: Dimensions of all terms in a physical equation must be the same.',

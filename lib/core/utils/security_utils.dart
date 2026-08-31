@@ -28,7 +28,12 @@ class SecurityUtils {
   /// generated every time.
   static String hashPassword(String password) {
     final saltBytes = _randomBytes(_saltLength);
-    final hashBytes = _pbkdf2HmacSha256(password, saltBytes, _iterations, _keyLength);
+    final hashBytes = _pbkdf2HmacSha256(
+      password,
+      saltBytes,
+      _iterations,
+      _keyLength,
+    );
     final salt = base64Url.encode(saltBytes);
     final hash = base64Url.encode(hashBytes);
     return '$_prefix:$_iterations:$salt:$hash';

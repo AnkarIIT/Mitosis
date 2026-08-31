@@ -75,12 +75,15 @@ class _ParagraphQuestionPoolSheetState
   }
 
   void _startQuiz(List<Question> questions, {String? source}) {
-    context.go('/quiz', extra: {
-      'questions': questions,
-      'topicName': source ?? 'NCERT Linked Questions',
-      'topicId': 'ncert_reader',
-      'subject': 'Mixed',
-    });
+    context.go(
+      '/quiz',
+      extra: {
+        'questions': questions,
+        'topicName': source ?? 'NCERT Linked Questions',
+        'topicId': 'ncert_reader',
+        'subject': 'Mixed',
+      },
+    );
   }
 
   @override
@@ -389,4 +392,3 @@ class _ParagraphQuestionPoolSheetState
     }
   }
 }
-

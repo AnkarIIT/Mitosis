@@ -13,10 +13,7 @@ import 'paragraph_question_pool.dart';
 class NcertPdfScreen extends ConsumerStatefulWidget {
   final String entryId;
 
-  const NcertPdfScreen({
-    super.key,
-    required this.entryId,
-  });
+  const NcertPdfScreen({super.key, required this.entryId});
 
   @override
   ConsumerState<NcertPdfScreen> createState() => _NcertPdfScreenState();
@@ -104,7 +101,9 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
       _jumpToChapterStart();
       return;
     }
-    context.go('/pdf?entryId=${Uri.encodeComponent(entry.chapterTitle.replaceAll(" ", "_").toLowerCase())}');
+    context.go(
+      '/pdf?entryId=${Uri.encodeComponent(entry.chapterTitle.replaceAll(" ", "_").toLowerCase())}',
+    );
   }
 
   @override
@@ -167,10 +166,8 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
                   itemCount: _bookChapters.length,
                   itemBuilder: (context, index) {
                     final entry = _bookChapters[index];
-                    final isCurrent =
-                        entry.assetPath == _entry.assetPath;
-                    final isActiveChapter =
-                        isCurrent && _loaded;
+                    final isCurrent = entry.assetPath == _entry.assetPath;
+                    final isActiveChapter = isCurrent && _loaded;
                     return ListTile(
                       dense: true,
                       leading: CircleAvatar(
@@ -203,7 +200,9 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
                       ),
                       trailing: isActiveChapter
                           ? Text(
-                              _scanningChapter != null ? 'Scanning…' : 'Page $_currentPage',
+                              _scanningChapter != null
+                                  ? 'Scanning…'
+                                  : 'Page $_currentPage',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: AdaptiveColors.textSecondary(context),
@@ -292,4 +291,3 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
     );
   }
 }
-

@@ -11,12 +11,12 @@ class DppNeetScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final subjects = ref.watch(subjectsProvider);
-    final primary = subjects.isNotEmpty ? subjects.first : Subject(id: '', name: 'NEET', icon: '📝', chapters: const []);
+    final primary = subjects.isNotEmpty
+        ? subjects.first
+        : Subject(id: '', name: 'NEET', icon: '📝', chapters: const []);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${primary.name} - NEET Pattern DPP'),
-      ),
+      appBar: AppBar(title: Text('${primary.name} - NEET Pattern DPP')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -43,18 +43,26 @@ class DppNeetScreen extends ConsumerWidget {
                 onPressed: () async {
                   final engine = ref.read(dppEngineProvider);
                   final config = DppConfig.neetPattern();
-                  final result = await engine.generate(config, forceRefresh: true);
-                  
+                  final result = await engine.generate(
+                    config,
+                    forceRefresh: true,
+                  );
+
                   if (result.questions.isNotEmpty) {
-                    await GoRouter.of(context).push('/dpp/attempt', extra: {
-                      'dppResult': result,
-                      'durationMinutes': config.durationMinutes,
-                      'config': config,
-                    });
+                    await GoRouter.of(context).push(
+                      '/dpp/attempt',
+                      extra: {
+                        'dppResult': result,
+                        'durationMinutes': config.durationMinutes,
+                        'config': config,
+                      },
+                    );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Not enough questions for NEET pattern. Please import more questions.'),
+                        content: Text(
+                          'Not enough questions for NEET pattern. Please import more questions.',
+                        ),
                         backgroundColor: Colors.orange,
                       ),
                     );

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 
-
 import '../../core/services/biometric_service.dart';
 
 import 'package:go_router/go_router.dart';
@@ -62,10 +61,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _reminderTime = picked;
       });
       if (_remindersEnabled) {
-        await ref.read(notificationServiceProvider).scheduleDailyReminder(
-          hour: picked.hour,
-          minute: picked.minute,
-        );
+        await ref
+            .read(notificationServiceProvider)
+            .scheduleDailyReminder(hour: picked.hour, minute: picked.minute);
       }
     }
   }
@@ -108,7 +106,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         reason = null;
         break;
       case BiometricStatus.enrolledButUnavailable:
-        reason = 'No fingerprint or face enrolled. Add one in device Settings to enable app lock.';
+        reason =
+            'No fingerprint or face enrolled. Add one in device Settings to enable app lock.';
         break;
       case BiometricStatus.unavailable:
         reason = 'This device does not support biometric authentication.';
@@ -133,7 +132,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          icon: const Icon(Icons.fingerprint, size: 32, color: AppColors.primary),
+          icon: const Icon(
+            Icons.fingerprint,
+            size: 32,
+            color: AppColors.primary,
+          ),
           title: const Text('Enable Biometric Lock?'),
           content: const Text(
             'You will need to authenticate with your fingerprint, face, or device PIN every time you open the app.',
@@ -305,13 +308,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           TextButton(
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
-              final res = await ref
-                  .read(authProvider.notifier)
-                  .deleteAccount();
+              final res = await ref.read(authProvider.notifier).deleteAccount();
               if (res.success) {
                 context.pop();
                 messenger.showSnackBar(
-                  const SnackBar(content: Text('Account deleted successfully.')),
+                  const SnackBar(
+                    content: Text('Account deleted successfully.'),
+                  ),
                 );
               } else {
                 context.pop();
@@ -331,18 +334,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _downloadPyqs() async {
     final messenger = ScaffoldMessenger.of(context);
     final downloader = ref.read(pyqDownloaderProvider);
-    
+
     messenger.showSnackBar(
       const SnackBar(
         content: Text('Downloading NEET PYQs... This may take a while.'),
         duration: Duration(seconds: 2),
       ),
     );
-    
+
     try {
       final count = await downloader.downloadAll();
       if (!mounted) return;
-      
+
       if (count > 0) {
         messenger.showSnackBar(
           SnackBar(
@@ -353,7 +356,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       } else {
         messenger.showSnackBar(
           const SnackBar(
-            content: Text('No new questions downloaded. Sources may be unavailable.'),
+            content: Text(
+              'No new questions downloaded. Sources may be unavailable.',
+            ),
             backgroundColor: Colors.orange,
           ),
         );
@@ -457,7 +462,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ListTile(
                 leading: const Icon(Icons.access_time),
                 title: const Text('Reminder Time'),
-trailing: Text(
+                trailing: Text(
                   _reminderTime.format(context),
                   style: TextStyle(
                     color: AdaptiveColors.primary(context),
@@ -479,7 +484,10 @@ trailing: Text(
                 children: [
                   Text(
                     'Enter your Gemini API Key to enable the AI Doubt Solver inside the app.',
-                    style: TextStyle(fontSize: 13, color: AdaptiveColors.textSecondary(context)),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AdaptiveColors.textSecondary(context),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -553,7 +561,9 @@ trailing: Text(
                 color: AppColors.primary,
               ),
               title: const Text('Download NEET PYQs'),
-              subtitle: const Text('Fetch previous year questions from configured sources'),
+              subtitle: const Text(
+                'Fetch previous year questions from configured sources',
+              ),
               onTap: _downloadPyqs,
             ),
             const Divider(height: 1),
@@ -580,7 +590,10 @@ trailing: Text(
             ],
             const Divider(height: 1),
             ListTile(
-              leading: Icon(Icons.logout, color: AdaptiveColors.textSecondary(context)),
+              leading: Icon(
+                Icons.logout,
+                color: AdaptiveColors.textSecondary(context),
+              ),
               title: const Text('Sign Out'),
               onTap: () {
                 ref.read(authProvider.notifier).logout();
@@ -638,7 +651,9 @@ trailing: Text(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AdaptiveColors.divider(context).withValues(alpha: 0.5)),
+        side: BorderSide(
+          color: AdaptiveColors.divider(context).withValues(alpha: 0.5),
+        ),
       ),
       child: Column(children: children),
     );

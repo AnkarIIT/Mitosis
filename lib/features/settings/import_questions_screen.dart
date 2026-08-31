@@ -78,9 +78,7 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
   }
 
   Future<void> _parse() async {
-    final raw = _source == _ImportSource.paste
-        ? _pasteController.text
-        : _raw;
+    final raw = _source == _ImportSource.paste ? _pasteController.text : _raw;
     final trimmed = raw.trim();
     if (trimmed.isEmpty) {
       setState(() => _formatError = 'No content to parse.');
@@ -132,9 +130,9 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isImporting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Import failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Import failed: $e')));
     }
   }
 
@@ -165,11 +163,18 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.auto_awesome, size: 20, color: AppColors.primary),
+                      Icon(
+                        Icons.auto_awesome,
+                        size: 20,
+                        color: AppColors.primary,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'One-Tap Import',
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
                       ),
                     ],
                   ),
@@ -432,7 +437,9 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
     if (missing.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('All questions already have explanations.')),
+          const SnackBar(
+            content: Text('All questions already have explanations.'),
+          ),
         );
       }
       return;
@@ -448,11 +455,17 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
     final seeder = ExplanationSeeder(
       getQuestions: () async => missing,
       updateExplanation: (id, text) async {
-        await ref.read(questionRepositoryProvider).updateQuestionExplanation(id, text);
+        await ref
+            .read(questionRepositoryProvider)
+            .updateQuestionExplanation(id, text);
       },
       proxy: ref.read(geminiProxyServiceProvider),
       onProgress: (completed, total) {
-        if (mounted) setState(() { _seedCompleted = completed; _seedTotal = total; });
+        if (mounted)
+          setState(() {
+            _seedCompleted = completed;
+            _seedTotal = total;
+          });
       },
     );
 
@@ -460,7 +473,10 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
     ref.invalidate(allQuestionsProvider);
 
     if (mounted) {
-      setState(() { _isSeeding = false; _seedResult = result; });
+      setState(() {
+        _isSeeding = false;
+        _seedResult = result;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -514,7 +530,9 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
                 Icon(
                   missingCount == 0 ? Icons.check_circle : Icons.info_outline,
                   size: 16,
-                  color: missingCount == 0 ? AppColors.success : AppColors.warning,
+                  color: missingCount == 0
+                      ? AppColors.success
+                      : AppColors.warning,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -533,7 +551,10 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
               const SizedBox(height: 6),
               Text(
                 'Generating explanation $_seedCompleted / $_seedTotal...',
-                style: const TextStyle(fontSize: 12, color: AppColors.textSubtle),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSubtle,
+                ),
               ),
             ],
             if (_seedResult != null && !_isSeeding) ...[
@@ -556,14 +577,19 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: (_isSeeding || missingCount == 0) ? null : _startSeeding,
+                onPressed: (_isSeeding || missingCount == 0)
+                    ? null
+                    : _startSeeding,
                 icon: _isSeeding
                     ? const SizedBox(
-                        width: 16, height: 16,
+                        width: 16,
+                        height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.auto_awesome),
-                label: Text(_isSeeding ? 'Generating...' : 'GENERATE EXPLANATIONS'),
+                label: Text(
+                  _isSeeding ? 'Generating...' : 'GENERATE EXPLANATIONS',
+                ),
               ),
             ),
           ],
@@ -639,5 +665,3 @@ class _BundledImportChip extends ConsumerWidget {
     );
   }
 }
-
-

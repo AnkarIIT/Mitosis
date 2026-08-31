@@ -11,7 +11,6 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import 'package:uuid/uuid.dart';
 
-
 class PdfPickerScreen extends ConsumerStatefulWidget {
   const PdfPickerScreen({super.key});
 
@@ -57,7 +56,8 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
       setState(() {
         _chapters = chapters;
         _isProcessing = false;
-        _status = "Found ${chapters.length} chapters. Ready to generate questions.";
+        _status =
+            "Found ${chapters.length} chapters. Ready to generate questions.";
       });
     } catch (e) {
       setState(() {
@@ -76,14 +76,17 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
     final gemini = ref.read(geminiServiceProvider);
     if (!gemini.isConfigured) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please configure Gemini API Key in Settings.")),
+        const SnackBar(
+          content: Text("Please configure Gemini API Key in Settings."),
+        ),
       );
       return;
     }
 
     setState(() {
       _isProcessing = true;
-      _status = "AI is generating questions for ${_chapters[index]['title']}...";
+      _status =
+          "AI is generating questions for ${_chapters[index]['title']}...";
     });
 
     try {
@@ -92,11 +95,14 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
       final generated = <Map<String, dynamic>>[];
       final seenQuestions = <String>{};
 
-      for (var i = 0;
-          i < chunks.length && generated.length < _maxQuestionsPerChapter;
-          i++) {
+      for (
+        var i = 0;
+        i < chunks.length && generated.length < _maxQuestionsPerChapter;
+        i++
+      ) {
         setState(() {
-          _status = "AI is generating questions for ${_chapters[index]['title']}..."
+          _status =
+              "AI is generating questions for ${_chapters[index]['title']}..."
               " (${i + 1}/${chunks.length})";
         });
 
@@ -148,7 +154,9 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
         _status = "Successfully generated ${generated.length} questions!";
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Generated ${generated.length} questions from NCERT!")),
+        SnackBar(
+          content: Text("Generated ${generated.length} questions from NCERT!"),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
@@ -208,11 +216,17 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                ),
               ),
               child: Column(
                 children: [
-                  const Icon(Icons.auto_awesome, size: 56, color: AppColors.primary),
+                  const Icon(
+                    Icons.auto_awesome,
+                    size: 56,
+                    color: AppColors.primary,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     _status,
@@ -235,8 +249,13 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                     ),
                 ],
@@ -250,7 +269,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                   Text(
                     "Extracted Chapters",
                     style: GoogleFonts.poppins(
-                      fontSize: 18, 
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AdaptiveColors.textPrimary(context),
                     ),
@@ -275,7 +294,9 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                       color: AdaptiveColors.surface(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: AdaptiveColors.divider(context)),
+                        side: BorderSide(
+                          color: AdaptiveColors.divider(context),
+                        ),
                       ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16),
@@ -285,12 +306,16 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                         ),
                         subtitle: Text(
                           "${(_chapters[index]['content']!.length / 1000).toStringAsFixed(1)}k characters of study material",
-                          style: TextStyle(color: AdaptiveColors.textSecondary(context)),
+                          style: TextStyle(
+                            color: AdaptiveColors.textSecondary(context),
+                          ),
                         ),
                         trailing: ElevatedButton(
                           onPressed: () => _generateQuestions(index),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                            backgroundColor: AppColors.primary.withValues(
+                              alpha: 0.1,
+                            ),
                             foregroundColor: AppColors.primary,
                             elevation: 0,
                           ),

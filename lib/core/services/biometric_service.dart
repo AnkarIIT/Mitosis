@@ -3,12 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:flutter/services.dart';
 
-enum BiometricStatus {
-  available,
-  enrolledButUnavailable,
-  unavailable,
-  error,
-}
+enum BiometricStatus { available, enrolledButUnavailable, unavailable, error }
 
 class BiometricService {
   final LocalAuthentication _auth = LocalAuthentication();
@@ -16,11 +11,14 @@ class BiometricService {
   static const String _biometricEnabledKey = 'neet_mitos_biometric_enabled';
 
   BiometricService([FlutterSecureStorage? secureStorage])
-      : _secureStorage = secureStorage ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(),
-              iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock_this_device),
-            );
+    : _secureStorage =
+          secureStorage ??
+          const FlutterSecureStorage(
+            aOptions: AndroidOptions(),
+            iOptions: IOSOptions(
+              accessibility: KeychainAccessibility.first_unlock_this_device,
+            ),
+          );
 
   /// Returns true if the device has at least one biometric actually enrolled
   /// (fingerprint, face, iris, etc.). This is distinct from merely supporting
@@ -45,7 +43,8 @@ class BiometricService {
   Future<bool> isBiometricAvailable() async {
     try {
       final bool canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
-      final bool canAuthenticate = canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
+      final bool canAuthenticate =
+          canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
       return canAuthenticate;
     } on PlatformException catch (e) {
       debugPrint('Biometric availability check failed: $e');
@@ -59,7 +58,7 @@ class BiometricService {
     try {
       final bool canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
       final bool deviceSupported = await _auth.isDeviceSupported();
-      
+
       if (!canAuthenticateWithBiometrics && !deviceSupported) {
         return BiometricStatus.unavailable;
       }

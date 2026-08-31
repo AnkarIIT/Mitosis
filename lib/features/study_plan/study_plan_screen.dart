@@ -250,7 +250,9 @@ class StudyPlanScreen extends ConsumerWidget {
           color: AdaptiveColors.textSecondary(context),
         ),
         onTap: () {
-          context.push('/topic/${topic.id}?subjectName=${Uri.encodeComponent('Review')}&chapterName=${Uri.encodeComponent('Smart Plan')}');
+          context.push(
+            '/topic/${topic.id}?subjectName=${Uri.encodeComponent('Review')}&chapterName=${Uri.encodeComponent('Smart Plan')}',
+          );
         },
       ),
     );

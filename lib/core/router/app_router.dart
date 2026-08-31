@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../providers/providers.dart';
 import '../../features/auth/auth_screen.dart';
 
-
 import '../../features/auth/terms_screen.dart';
 import '../../features/auth/privacy_policy_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
@@ -69,7 +68,6 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (isLoading) return '/loading';
 
-
       if (isAuthenticated) {
         final onboardingComplete = ref.read(onboardingCompleteProvider);
         if (!onboardingComplete) return '/onboarding';
@@ -102,10 +100,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 const SizedBox(height: 20),
                 const Text(
                   'NEET Mitos',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
                 const SizedBox(
@@ -122,51 +117,49 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/auth', builder: (_, _) => const AuthScreen()),
       GoRoute(path: '/terms', builder: (_, _) => const TermsScreen()),
       GoRoute(path: '/privacy', builder: (_, _) => const PrivacyPolicyScreen()),
-      GoRoute(
-          path: '/onboarding',
-          builder: (_, _) => const OnboardingScreen()),
+      GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
 
-  StatefulShellRoute.indexedStack(
-    builder: (_, _, shell) => HomeShellScreen(navigationShell: shell),
-    branches: [
-      StatefulShellBranch(routes: [
-        GoRoute(
-          path: '/',
-          builder: (_, _) => const HomeTab(),
-        ),
-      ]),
-      StatefulShellBranch(routes: [
-        GoRoute(
-            path: '/flashcards',
-            builder: (_, _) => const FlashcardDashboardScreen(),
-        ),
-      ]),
-      StatefulShellBranch(routes: [
-        GoRoute(
-            path: '/review',
-            builder: (_, _) => const ReviewTab(),
-        ),
-      ]),
-      StatefulShellBranch(routes: [
-        GoRoute(
-            path: '/progress',
-            builder: (_, _) => const ProgressTab(),
-        ),
-      ]),
-      StatefulShellBranch(routes: [
-        GoRoute(
-            path: '/profile',
-            builder: (_, _) => const ProfileTab(),
-        ),
-      ]),
-    ],
-  ),
+      StatefulShellRoute.indexedStack(
+        builder: (_, _, shell) => HomeShellScreen(navigationShell: shell),
+        branches: [
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/', builder: (_, _) => const HomeTab())],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/flashcards',
+                builder: (_, _) => const FlashcardDashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/review', builder: (_, _) => const ReviewTab()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/progress',
+                builder: (_, _) => const ProgressTab(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/profile', builder: (_, _) => const ProfileTab()),
+            ],
+          ),
+        ],
+      ),
 
       GoRoute(
         path: '/subjects/:subjectId',
         builder: (_, state) {
           final subjectId = state.pathParameters['subjectId']!;
-          final subjectName = state.uri.queryParameters['subjectName'] ?? subjectId;
+          final subjectName =
+              state.uri.queryParameters['subjectName'] ?? subjectId;
           return TopicBrowserScreen(
             subjectId: subjectId,
             subjectName: subjectName,
@@ -220,11 +213,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/test-series/paper',
         builder: (_, _) => const QuestionPaperSelector(),
       ),
+      GoRoute(path: '/pdf-picker', builder: (_, _) => const PdfPickerScreen()),
       GoRoute(
-        path: '/pdf-picker',
-        builder: (_, _) => const PdfPickerScreen(),
-      ),
-GoRoute(
         path: '/pdf',
         builder: (_, state) {
           final entryId = state.uri.queryParameters['entryId'] ?? '';
@@ -274,10 +264,7 @@ GoRoute(
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final config = extra['config'] as ExamConfig? ?? ExamConfig.neet();
           final questionPool = extra['questionPool'] as List<Question>? ?? [];
-          return CbtTestScreen(
-            config: config,
-            questionPool: questionPool,
-          );
+          return CbtTestScreen(config: config, questionPool: questionPool);
         },
       ),
       GoRoute(
@@ -288,10 +275,7 @@ GoRoute(
         path: '/flashcards/study',
         builder: (_, _) => const FlashcardStudyScreen(),
       ),
-      GoRoute(
-        path: '/error-book',
-        builder: (_, _) => const ErrorBookScreen(),
-      ),
+      GoRoute(path: '/error-book', builder: (_, _) => const ErrorBookScreen()),
       GoRoute(
         path: '/bookmarks',
         builder: (_, _) => const BookmarksDashboard(),
@@ -307,18 +291,12 @@ GoRoute(
           return ChatbotScreen(initialMessage: initialMessage);
         },
       ),
-      GoRoute(
-        path: '/settings',
-        builder: (_, _) => const SettingsScreen(),
-      ),
+      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(
         path: '/settings/import',
         builder: (_, _) => const ImportQuestionsScreen(),
       ),
-      GoRoute(
-        path: '/study-plan',
-        builder: (_, _) => const StudyPlanScreen(),
-      ),
+      GoRoute(path: '/study-plan', builder: (_, _) => const StudyPlanScreen()),
       GoRoute(
         path: '/dpp/neet',
         builder: (_, _) {

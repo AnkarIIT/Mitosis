@@ -53,46 +53,42 @@ class ExamCheckpoint {
   }
 
   Map<String, dynamic> toJson() => {
-        'attemptId': attemptId,
-        'config': configJson,
-        'sectionQuestionIds': sectionQuestionIds,
-        'answers': answersByIndex.map((k, v) => MapEntry(k.toString(), v)),
-        'flagged': flagged,
-        'visited': visited,
-        'currentIndex': currentIndex,
-        'currentSection': currentSection,
-        'phase': phase,
-        'deadlineEpochMs': deadlineEpochMs,
-        'breakDeadlineEpochMs': breakDeadlineEpochMs,
-        'sectionDeadlineEpochMs': sectionDeadlineEpochMs,
-        'startedAtEpochMs': startedAtEpochMs,
-        'savedAtEpochMs': savedAtEpochMs,
-      };
+    'attemptId': attemptId,
+    'config': configJson,
+    'sectionQuestionIds': sectionQuestionIds,
+    'answers': answersByIndex.map((k, v) => MapEntry(k.toString(), v)),
+    'flagged': flagged,
+    'visited': visited,
+    'currentIndex': currentIndex,
+    'currentSection': currentSection,
+    'phase': phase,
+    'deadlineEpochMs': deadlineEpochMs,
+    'breakDeadlineEpochMs': breakDeadlineEpochMs,
+    'sectionDeadlineEpochMs': sectionDeadlineEpochMs,
+    'startedAtEpochMs': startedAtEpochMs,
+    'savedAtEpochMs': savedAtEpochMs,
+  };
 
   factory ExamCheckpoint.fromJson(Map<String, dynamic> json) => ExamCheckpoint(
-        attemptId: json['attemptId'] as String,
-        configJson: (json['config'] as Map).cast<String, dynamic>(),
-        sectionQuestionIds: (json['sectionQuestionIds'] as List)
-            .map((s) => (s as List).map((e) => e as String).toList())
-            .toList(),
-        answersByIndex: (json['answers'] as Map).map(
-          (k, v) => MapEntry(int.parse(k as String), v as String?),
-        ),
-        flagged:
-            (json['flagged'] as List).map((e) => (e as num).toInt()).toList(),
-        visited:
-            (json['visited'] as List).map((e) => (e as num).toInt()).toList(),
-        currentIndex: (json['currentIndex'] as num).toInt(),
-        currentSection: (json['currentSection'] as num).toInt(),
-        phase: json['phase'] as String,
-        deadlineEpochMs: (json['deadlineEpochMs'] as num).toInt(),
-        breakDeadlineEpochMs:
-            (json['breakDeadlineEpochMs'] as num?)?.toInt(),
-        sectionDeadlineEpochMs:
-            (json['sectionDeadlineEpochMs'] as num?)?.toInt(),
-        startedAtEpochMs: (json['startedAtEpochMs'] as num).toInt(),
-        savedAtEpochMs: (json['savedAtEpochMs'] as num).toInt(),
-      );
+    attemptId: json['attemptId'] as String,
+    configJson: (json['config'] as Map).cast<String, dynamic>(),
+    sectionQuestionIds: (json['sectionQuestionIds'] as List)
+        .map((s) => (s as List).map((e) => e as String).toList())
+        .toList(),
+    answersByIndex: (json['answers'] as Map).map(
+      (k, v) => MapEntry(int.parse(k as String), v as String?),
+    ),
+    flagged: (json['flagged'] as List).map((e) => (e as num).toInt()).toList(),
+    visited: (json['visited'] as List).map((e) => (e as num).toInt()).toList(),
+    currentIndex: (json['currentIndex'] as num).toInt(),
+    currentSection: (json['currentSection'] as num).toInt(),
+    phase: json['phase'] as String,
+    deadlineEpochMs: (json['deadlineEpochMs'] as num).toInt(),
+    breakDeadlineEpochMs: (json['breakDeadlineEpochMs'] as num?)?.toInt(),
+    sectionDeadlineEpochMs: (json['sectionDeadlineEpochMs'] as num?)?.toInt(),
+    startedAtEpochMs: (json['startedAtEpochMs'] as num).toInt(),
+    savedAtEpochMs: (json['savedAtEpochMs'] as num).toInt(),
+  );
 }
 
 /// Persists the single active CBT checkpoint to [SharedPreferences].

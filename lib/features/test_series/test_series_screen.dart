@@ -91,7 +91,8 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
             _buildTestCard(
               context,
               title: 'Smart Question Paper Generator',
-              subtitle: '5 / 10 / 30 / 180 questions • Balanced 40-40-20 difficulty • Clean PYQs (no year marks)',
+              subtitle:
+                  '5 / 10 / 30 / 180 questions • Balanced 40-40-20 difficulty • Clean PYQs (no year marks)',
               icon: Icons.library_add,
               color: AppColors.primary,
               onTap: () {
@@ -235,22 +236,28 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
     }
 
     if (type == 'subject' && subjectName != null) {
-      context.push('/quiz', extra: {
-        'questions': questions,
-        'topicName': title,
-        'topicId': 'subject_${Uri.encodeComponent(subjectName)}',
-        'subject': subjectName,
-        'testType': 'subject',
-      });
+      context.push(
+        '/quiz',
+        extra: {
+          'questions': questions,
+          'topicName': title,
+          'topicId': 'subject_${Uri.encodeComponent(subjectName)}',
+          'subject': subjectName,
+          'testType': 'subject',
+        },
+      );
     } else {
-      context.push('/quiz', extra: {
-        'questions': questions,
-        'topicName': title,
-        'topicId': type == 'mock'
-            ? 'mock_test'
-            : (subjectName ?? 'custom_test'),
-        'subject': subjectName ?? 'Mixed',
-      });
+      context.push(
+        '/quiz',
+        extra: {
+          'questions': questions,
+          'topicName': title,
+          'topicId': type == 'mock'
+              ? 'mock_test'
+              : (subjectName ?? 'custom_test'),
+          'subject': subjectName ?? 'Mixed',
+        },
+      );
     }
   }
 
@@ -268,10 +275,10 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
       return;
     }
 
-    context.push('/cbt', extra: {
-      'config': ExamConfig.neet(),
-      'questionPool': pool,
-    });
+    context.push(
+      '/cbt',
+      extra: {'config': ExamConfig.neet(), 'questionPool': pool},
+    );
   }
 
   Widget _buildResumeCard(
@@ -282,8 +289,10 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
     final answered = cp.answersByIndex.values
         .where((v) => v != null && v.isNotEmpty)
         .length;
-    final total =
-        cp.sectionQuestionIds.fold<int>(0, (s, ids) => s + ids.length);
+    final total = cp.sectionQuestionIds.fold<int>(
+      0,
+      (s, ids) => s + ids.length,
+    );
     final remaining = cp.remainingSecondsAt(DateTime.now());
 
     return Container(
@@ -351,11 +360,14 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
     List<Question> allQuestions,
   ) {
     // Pass the FULL pool so the saved question IDs resolve on restore.
-    context.push('/cbt', extra: {
-      'config': cp.config,
-      'questionPool': allQuestions,
-      'resumeCheckpoint': cp,
-    });
+    context.push(
+      '/cbt',
+      extra: {
+        'config': cp.config,
+        'questionPool': allQuestions,
+        'resumeCheckpoint': cp,
+      },
+    );
   }
 
   Future<void> _discardCheckpoint() async {
@@ -382,8 +394,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) =>
-          _CbtPracticeSheet(allQuestions: allQuestions),
+      builder: (context) => _CbtPracticeSheet(allQuestions: allQuestions),
     );
   }
 
@@ -539,12 +550,15 @@ class _CustomTestBuilderSheetState
     final questions = filtered.take(_questionCount).toList();
 
     context.pop();
-    context.push('/quiz', extra: {
-      'questions': questions,
-      'topicName': 'Custom Practice',
-      'topicId': 'custom_builder',
-      'subject': 'Mixed',
-    });
+    context.push(
+      '/quiz',
+      extra: {
+        'questions': questions,
+        'topicName': 'Custom Practice',
+        'topicId': 'custom_builder',
+        'subject': 'Mixed',
+      },
+    );
   }
 }
 
@@ -606,8 +620,7 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
             max: 60,
             divisions: 11,
             label: '$_durationMinutes min',
-            onChanged: (val) =>
-                setState(() => _durationMinutes = val.toInt()),
+            onChanged: (val) => setState(() => _durationMinutes = val.toInt()),
           ),
           const SizedBox(height: 16),
           SizedBox(
@@ -638,10 +651,6 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
       durationMinutes: _durationMinutes,
     );
     context.pop();
-    context.push('/cbt', extra: {
-      'config': config,
-      'questionPool': pool,
-    });
+    context.push('/cbt', extra: {'config': config, 'questionPool': pool});
   }
 }
-

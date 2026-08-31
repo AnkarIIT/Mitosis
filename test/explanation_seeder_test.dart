@@ -11,8 +11,14 @@ Question _q(String id, {String? explanation}) {
     chapter: 'The Living World',
     topic: 'Taxonomy',
     topicId: 't_$id',
-    questionText: 'Which of the following is used for hierarchical classification?',
-    options: const ['A. Systematics', 'B. Cladistics', 'C. Numerical taxonomy', 'D. Phylogenetics'],
+    questionText:
+        'Which of the following is used for hierarchical classification?',
+    options: const [
+      'A. Systematics',
+      'B. Cladistics',
+      'C. Numerical taxonomy',
+      'D. Phylogenetics',
+    ],
     correctAnswer: 'B',
     explanation: explanation,
     difficulty: 'Medium',
@@ -51,8 +57,13 @@ void main() {
 
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
-        updateExplanation: (id, _) async { updatedIds.add(id); },
-        proxy: makeProxy({'source': 'gemini', 'response': 'Generated explanation text here.'}),
+        updateExplanation: (id, _) async {
+          updatedIds.add(id);
+        },
+        proxy: makeProxy({
+          'source': 'gemini',
+          'response': 'Generated explanation text here.',
+        }),
       );
 
       final result = await seeder.seedAll();
@@ -68,8 +79,13 @@ void main() {
 
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
-        updateExplanation: (id, _) async { updatedIds.add(id); },
-        proxy: makeProxy({'source': 'gemini', 'response': 'Fresh explanation text here.'}),
+        updateExplanation: (id, _) async {
+          updatedIds.add(id);
+        },
+        proxy: makeProxy({
+          'source': 'gemini',
+          'response': 'Fresh explanation text here.',
+        }),
       );
 
       final result = await seeder.seedAll(forceRefresh: true);
@@ -84,7 +100,9 @@ void main() {
 
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
-        updateExplanation: (_, _) async { updated = true; },
+        updateExplanation: (_, _) async {
+          updated = true;
+        },
         proxy: makeProxy({'source': 'gemini', 'response': 'Too short'}),
       );
 
@@ -101,7 +119,10 @@ void main() {
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
         updateExplanation: (_, _) async {},
-        proxy: makeProxy({'source': 'gemini', 'response': 'Error: something went wrong'}),
+        proxy: makeProxy({
+          'source': 'gemini',
+          'response': 'Error: something went wrong',
+        }),
       );
 
       final result = await seeder.seedAll();
@@ -116,10 +137,15 @@ void main() {
 
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
-        updateExplanation: (_, _) async { updated = true; },
+        updateExplanation: (_, _) async {
+          updated = true;
+        },
         proxy: makeProxySequence([
           {'source': 'gemini', 'response': 'Error: transient failure'},
-          {'source': 'gemini', 'response': 'Valid explanation generated here with enough text.'},
+          {
+            'source': 'gemini',
+            'response': 'Valid explanation generated here with enough text.',
+          },
         ]),
         maxRetries: 1,
       );
@@ -137,13 +163,18 @@ void main() {
 
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
-        updateExplanation: (id, _) async { updatedIds.add(id); },
+        updateExplanation: (id, _) async {
+          updatedIds.add(id);
+        },
         proxy: GeminiProxyService(
           configured: true,
           invoker: (name, {body}) async {
             callCount++;
             if (callCount == 1) {
-              return {'source': 'gemini', 'response': 'Valid explanation for question one.'};
+              return {
+                'source': 'gemini',
+                'response': 'Valid explanation for question one.',
+              };
             }
             throw const FunctionException(status: 429);
           },
@@ -165,7 +196,10 @@ void main() {
       final seeder = ExplanationSeeder(
         getQuestions: () async => questions,
         updateExplanation: (_, _) async {},
-        proxy: makeProxy({'source': 'cache', 'response': 'Cached explanation text here.'}),
+        proxy: makeProxy({
+          'source': 'cache',
+          'response': 'Cached explanation text here.',
+        }),
         delayBetweenRequests: Duration.zero,
         onProgress: (done, total) => progressLog.add((done, total)),
       );
@@ -187,7 +221,10 @@ void main() {
           updatedIds.add(id);
           if (id == '1') seeder.cancel();
         },
-        proxy: makeProxy({'source': 'gemini', 'response': 'Explanation text generated for question.'}),
+        proxy: makeProxy({
+          'source': 'gemini',
+          'response': 'Explanation text generated for question.',
+        }),
         delayBetweenRequests: Duration.zero,
       );
 

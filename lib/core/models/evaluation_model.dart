@@ -46,8 +46,12 @@ class Evaluation {
       keywordMatch: (map['keyword_match'] as num).toDouble(),
       isCorrect: map['is_correct'] == 1,
       feedback: map['feedback'] ?? '',
-      missingKeywords: List<String>.from(jsonDecode(map['missing_keywords'] ?? '[]')),
-      evaluatedAt: DateTime.parse(map['evaluated_at'] ?? DateTime.now().toIso8601String()),
+      missingKeywords: List<String>.from(
+        jsonDecode(map['missing_keywords'] ?? '[]'),
+      ),
+      evaluatedAt: DateTime.parse(
+        map['evaluated_at'] ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
 }

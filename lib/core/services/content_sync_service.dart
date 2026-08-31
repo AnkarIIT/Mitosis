@@ -91,8 +91,7 @@ class ContentSyncService {
         ),
       );
 
-      if (updatedAt != null &&
-          (latest == null || updatedAt.isAfter(latest))) {
+      if (updatedAt != null && (latest == null || updatedAt.isAfter(latest))) {
         latest = updatedAt;
       }
     }
@@ -112,10 +111,10 @@ class ContentSyncService {
   /// no longer returned as active by the server (removed or soft-disabled).
   Future<void> _reconcileActiveSet(SupabaseClient client) async {
     try {
-      final active = await client.from(_catalogTable).select('id').eq(
-        'is_active',
-        true,
-      );
+      final active = await client
+          .from(_catalogTable)
+          .select('id')
+          .eq('is_active', true);
       final activeLocalIds = active
           .map((r) => _remoteToLocalId(r['id'].toString()))
           .toSet();
@@ -123,11 +122,9 @@ class ContentSyncService {
 
       for (final localId in localRemoteIds) {
         if (!activeLocalIds.contains(localId)) {
-          await (_localDb.update(
-            _localDb.questions,
-          )..where((t) => t.id.equals(localId))).write(
-            db.QuestionsCompanion(isActive: Value(false)),
-          );
+          await (_localDb.update(_localDb.questions)
+                ..where((t) => t.id.equals(localId)))
+              .write(db.QuestionsCompanion(isActive: Value(false)));
         }
       }
     } catch (e) {

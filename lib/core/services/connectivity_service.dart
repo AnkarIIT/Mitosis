@@ -28,7 +28,9 @@ class ConnectivityService {
     _isOnline = await InternetConnectionChecker().hasConnection;
     _controller.add(_isOnline);
 
-    _statusSubscription = InternetConnectionChecker().onStatusChange.listen((status) {
+    _statusSubscription = InternetConnectionChecker().onStatusChange.listen((
+      status,
+    ) {
       _isOnline = status == InternetConnectionStatus.connected;
       _controller.add(_isOnline);
     });

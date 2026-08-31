@@ -129,9 +129,18 @@ void main() {
       expect(result.imported, 1);
       expect(result.rejected, 3);
       expect(result.errors, hasLength(3));
-      expect(result.errors.any((e) => e.contains('missing questionText')), isTrue);
-      expect(result.errors.any((e) => e.contains('missing correctAnswer')), isTrue);
-      expect(result.errors.any((e) => e.contains('at least 2 options')), isTrue);
+      expect(
+        result.errors.any((e) => e.contains('missing questionText')),
+        isTrue,
+      );
+      expect(
+        result.errors.any((e) => e.contains('missing correctAnswer')),
+        isTrue,
+      );
+      expect(
+        result.errors.any((e) => e.contains('at least 2 options')),
+        isTrue,
+      );
     });
 
     test('dedupes within a batch using normalized text', () {
@@ -187,18 +196,15 @@ void main() {
           'correctAnswer': 'A',
         },
       ];
-      final (questions, _) =
-          QuestionImporter(baseId: 'q_9').buildQuestions(rows);
+      final (questions, _) = QuestionImporter(
+        baseId: 'q_9',
+      ).buildQuestions(rows);
       expect(questions.map((q) => q.id).toList(), ['q_90', 'q_91', 'q_92']);
     });
 
     test('parses options stored as ||| separated string', () {
       final rows = [
-        {
-          'questionText': 'Q?',
-          'options': 'A|||B|||C',
-          'correctAnswer': 'A',
-        },
+        {'questionText': 'Q?', 'options': 'A|||B|||C', 'correctAnswer': 'A'},
       ];
       final (questions, _) = QuestionImporter().buildQuestions(rows);
       expect(questions.single.options, ['A', 'B', 'C']);

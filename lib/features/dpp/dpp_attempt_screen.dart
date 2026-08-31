@@ -102,7 +102,8 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
         // Check if correctAnswer is index string ('0', '1', '2', '3')
         if (cleanCorrect == idx.toString()) return true;
         // Check if correctAnswer matches option text at index
-        if (idx < q.options.length && q.options[idx].trim().toLowerCase() == cleanCorrect) {
+        if (idx < q.options.length &&
+            q.options[idx].trim().toLowerCase() == cleanCorrect) {
           return true;
         }
       }
@@ -161,10 +162,13 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
     try {
       final database = ref.read(databaseProvider);
       final set = widget.dppResult.set;
-      final timeSpent = _durationSeconds - _deadline!.difference(DateTime.now()).inSeconds;
+      final timeSpent =
+          _durationSeconds - _deadline!.difference(DateTime.now()).inSeconds;
       final safeTime = timeSpent > 0 ? timeSpent : _durationSeconds;
 
-      await (database.update(database.dppSets)..where((t) => t.id.equals(set.id))).write(
+      await (database.update(
+        database.dppSets,
+      )..where((t) => t.id.equals(set.id))).write(
         db.DppSetsCompanion(
           correctCount: Value(correctCount),
           incorrectCount: Value(incorrectCount),
@@ -185,7 +189,9 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
           totalQuestions: _questions.length,
           timeSpentSeconds: safeTime,
           attemptedAt: DateTime.now(),
-          selectedAnswers: jsonEncode(List<String>.filled(_questions.length, '')),
+          selectedAnswers: jsonEncode(
+            List<String>.filled(_questions.length, ''),
+          ),
           rawScore: Value(correctCount * 4 - incorrectCount),
           maxMarks: Value(_questions.length * 4),
         ),
@@ -196,10 +202,12 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
         final answer = _attempt.answersByIndex[i];
         final isCorrect = answer != null && answer == q.correctAnswer;
         if (!isCorrect) {
-          await database.addToErrorBook(db.ErrorBookCompanion.insert(
-            questionId: q.id,
-            addedAt: DateTime.now(),
-          ));
+          await database.addToErrorBook(
+            db.ErrorBookCompanion.insert(
+              questionId: q.id,
+              addedAt: DateTime.now(),
+            ),
+          );
         }
       }
     } catch (e) {
@@ -232,7 +240,8 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: 'OK',
-            onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+            onPressed: () =>
+                ScaffoldMessenger.of(context).hideCurrentSnackBar(),
           ),
         ),
       );
@@ -257,8 +266,8 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
     final timerColor = remaining < 60
         ? AppColors.error
         : remaining < 300
-            ? AppColors.warning
-            : AppColors.primary;
+        ? AppColors.warning
+        : AppColors.primary;
 
     return PopScope(
       canPop: false,
@@ -338,8 +347,9 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                     const SizedBox(height: 12),
                     Text(
                       question.questionText,
-                      style: theme.textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w600),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 20),
                     ...List.generate(question.options.length, (index) {
@@ -381,7 +391,11 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                                     child: Text(
                                       optionLetter,
                                       style: TextStyle(
-                                        color: isSelected ? Colors.white : AdaptiveColors.textPrimary(context),
+                                        color: isSelected
+                                            ? Colors.white
+                                            : AdaptiveColors.textPrimary(
+                                                context,
+                                              ),
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                       ),
@@ -469,9 +483,14 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Exit DPP?'),
-        content: const Text('Your progress will be lost if timer hasn\'t expired.'),
+        content: const Text(
+          'Your progress will be lost if timer hasn\'t expired.',
+        ),
         actions: [
-          TextButton(onPressed: () => context.pop(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () => context.go('/'),
             child: const Text('Exit'),
@@ -540,11 +559,17 @@ class _DppReviewSheet extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.warning.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: AppColors.warning.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.timer_off_rounded, color: AppColors.warning, size: 20),
+                        Icon(
+                          Icons.timer_off_rounded,
+                          color: AppColors.warning,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -569,9 +594,24 @@ class _DppReviewSheet extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildStat(context, 'Correct', '$correct', AppColors.success),
-                    _buildStat(context, 'Incorrect', '$incorrect', AppColors.error),
-                    _buildStat(context, 'Skipped', '$unattempted', AppColors.warning),
+                    _buildStat(
+                      context,
+                      'Correct',
+                      '$correct',
+                      AppColors.success,
+                    ),
+                    _buildStat(
+                      context,
+                      'Incorrect',
+                      '$incorrect',
+                      AppColors.error,
+                    ),
+                    _buildStat(
+                      context,
+                      'Skipped',
+                      '$unattempted',
+                      AppColors.warning,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -615,7 +655,9 @@ class _DppReviewSheet extends StatelessWidget {
                         child: Icon(
                           isCorrect
                               ? Icons.check_rounded
-                              : (isIncorrect ? Icons.close_rounded : Icons.remove_rounded),
+                              : (isIncorrect
+                                    ? Icons.close_rounded
+                                    : Icons.remove_rounded),
                           color: statusColor,
                           size: 18,
                         ),
@@ -635,10 +677,14 @@ class _DppReviewSheet extends StatelessWidget {
                               ...q.options.asMap().entries.map((entry) {
                                 final idx = entry.key;
                                 final option = entry.value;
-                                final isUserChoice = userAnswer == String.fromCharCode(65 + idx);
-                                final isCorrectOption = idx.toString() == q.correctAnswer;
+                                final isUserChoice =
+                                    userAnswer == String.fromCharCode(65 + idx);
+                                final isCorrectOption =
+                                    idx.toString() == q.correctAnswer;
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 3,
+                                  ),
                                   child: Row(
                                     children: [
                                       Container(
@@ -648,15 +694,21 @@ class _DppReviewSheet extends StatelessWidget {
                                           shape: BoxShape.circle,
                                           color: isCorrectOption
                                               ? AppColors.success
-                                              : (isUserChoice ? AppColors.error : AppColors.divider),
+                                              : (isUserChoice
+                                                    ? AppColors.error
+                                                    : AppColors.divider),
                                         ),
                                         child: Center(
                                           child: Text(
                                             String.fromCharCode(65 + idx),
                                             style: TextStyle(
-                                              color: isCorrectOption || isUserChoice
+                                              color:
+                                                  isCorrectOption ||
+                                                      isUserChoice
                                                   ? Colors.white
-                                                  : AdaptiveColors.textPrimary(context),
+                                                  : AdaptiveColors.textPrimary(
+                                                      context,
+                                                    ),
                                               fontWeight: FontWeight.bold,
                                               fontSize: 11,
                                             ),
@@ -669,7 +721,8 @@ class _DppReviewSheet extends StatelessWidget {
                                   ),
                                 );
                               }),
-                              if (q.explanation != null && q.explanation!.isNotEmpty) ...[
+                              if (q.explanation != null &&
+                                  q.explanation!.isNotEmpty) ...[
                                 const SizedBox(height: 10),
                                 const Divider(),
                                 Text(
@@ -710,10 +763,22 @@ class _DppReviewSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildStat(BuildContext context, String label, String value, Color color) {
+  Widget _buildStat(
+    BuildContext context,
+    String label,
+    String value,
+    Color color,
+  ) {
     return Column(
       children: [
-        Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
         Text(label, style: Theme.of(context).textTheme.bodySmall),
       ],
     );

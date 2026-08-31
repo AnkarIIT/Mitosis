@@ -32,7 +32,8 @@ class SpacedRepetitionService {
     DateTime? now,
   }) {
     final t = now ?? DateTime.now();
-    final base = card ??
+    final base =
+        card ??
         db.SpacedRepetitionData(
           questionId: questionId,
           box: 0,
@@ -57,10 +58,7 @@ class SpacedRepetitionService {
       }
       repetitions += 1;
       box = box < maxBox ? box + 1 : box;
-      easeFactor = (easeFactor + easeGain).clamp(
-        minEaseFactor,
-        maxEaseFactor,
-      );
+      easeFactor = (easeFactor + easeGain).clamp(minEaseFactor, maxEaseFactor);
     } else {
       interval = 1;
       repetitions = 0;

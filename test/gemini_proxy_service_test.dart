@@ -16,11 +16,7 @@ void main() {
       final service = _service((name, {body}) async {
         expect(name, 'gemini-proxy');
         expect(body, isA<Map>());
-        return {
-          'cached': true,
-          'source': 'cache',
-          'response': 'Cached answer',
-        };
+        return {'cached': true, 'source': 'cache', 'response': 'Cached answer'};
       });
 
       final result = await service.generate(prompt: 'Explain meiosis');
@@ -82,7 +78,10 @@ void main() {
 
     test('maps a 429 FunctionException to rateLimited', () async {
       final service = _service((name, {body}) async {
-        throw const FunctionException(status: 429, reasonPhrase: 'Too many requests');
+        throw const FunctionException(
+          status: 429,
+          reasonPhrase: 'Too many requests',
+        );
       });
 
       final result = await service.generate(prompt: 'hi');

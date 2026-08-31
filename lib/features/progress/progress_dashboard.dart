@@ -61,7 +61,7 @@ class ProgressDashboard extends ConsumerWidget {
                     Text(
                       'Overall Performance',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-color: AdaptiveColors.onPrimary(context),
+                        color: AdaptiveColors.onPrimary(context),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -80,8 +80,12 @@ color: AdaptiveColors.onPrimary(context),
                                 child: CircularProgressIndicator(
                                   value: (stats['accuracy'] as double) / 100,
                                   strokeWidth: 12,
-                                  backgroundColor: AdaptiveColors.secondary(context).withValues(alpha: 0.2),
-                                  valueColor: AlwaysStoppedAnimation(AdaptiveColors.secondary(context)),
+                                  backgroundColor: AdaptiveColors.secondary(
+                                    context,
+                                  ).withValues(alpha: 0.2),
+                                  valueColor: AlwaysStoppedAnimation(
+                                    AdaptiveColors.secondary(context),
+                                  ),
                                 ),
                               ),
                               Column(
@@ -89,16 +93,26 @@ color: AdaptiveColors.onPrimary(context),
                                 children: [
                                   Text(
                                     '${(stats['accuracy'] as double).toStringAsFixed(0)}%',
-                                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-color: AdaptiveColors.onPrimary(context),
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium
+                                        ?.copyWith(
+                                          color: AdaptiveColors.onPrimary(
+                                            context,
+                                          ),
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   Text(
                                     'Accuracy',
-                                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-color: AdaptiveColors.secondary(context),
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: AdaptiveColors.secondary(
+                                            context,
+                                          ),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -132,7 +146,11 @@ color: AdaptiveColors.secondary(context),
             const SizedBox(height: 24),
 
             // Rank Predictor Card
-            _buildRankPredictor(context, stats['accuracy'] as double, mockStats),
+            _buildRankPredictor(
+              context,
+              stats['accuracy'] as double,
+              mockStats,
+            ),
             const SizedBox(height: 32),
 
             // Recent Quizzes Chart
@@ -145,7 +163,7 @@ color: AdaptiveColors.secondary(context),
             const SizedBox(height: 16),
             Card(
               elevation: 0,
-color: AdaptiveColors.surface(context),
+              color: AdaptiveColors.surface(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(color: AdaptiveColors.divider(context)),
@@ -166,18 +184,24 @@ color: AdaptiveColors.surface(context),
                               bottomTitles: AxisTitles(
                                 sideTitles: SideTitles(
                                   showTitles: true,
-                                  getTitlesWidget: (double value, TitleMeta meta) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        'Q${value.toInt() + 1}',
-                                        style: TextStyle(
-                                          color: AdaptiveColors.textSecondary(context),
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                  getTitlesWidget:
+                                      (double value, TitleMeta meta) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 8.0,
+                                          ),
+                                          child: Text(
+                                            'Q${value.toInt() + 1}',
+                                            style: TextStyle(
+                                              color:
+                                                  AdaptiveColors.textSecondary(
+                                                    context,
+                                                  ),
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                 ),
                               ),
                               leftTitles: AxisTitles(
@@ -203,16 +227,25 @@ color: AdaptiveColors.surface(context),
                               },
                             ),
                             borderData: FlBorderData(show: false),
-                            barGroups: List.generate(recentActivity.length, (index) {
-                              final attempt = recentActivity[recentActivity.length - 1 - index];
+                            barGroups: List.generate(recentActivity.length, (
+                              index,
+                            ) {
+                              final attempt =
+                                  recentActivity[recentActivity.length -
+                                      1 -
+                                      index];
                               return BarChartGroupData(
                                 x: index,
                                 barRods: [
                                   BarChartRodData(
                                     toY: attempt.accuracy,
-                                    color: attempt.accuracy >= 70 ? AdaptiveColors.primary(context) : AdaptiveColors.secondary(context),
+                                    color: attempt.accuracy >= 70
+                                        ? AdaptiveColors.primary(context)
+                                        : AdaptiveColors.secondary(context),
                                     width: 16,
-                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(4),
+                                    ),
                                   ),
                                 ],
                               );
@@ -250,9 +283,11 @@ color: AdaptiveColors.surface(context),
                           side: const BorderSide(color: Colors.red, width: 0.5),
                         ),
                         child: InkWell(
-onTap: () {
-                              context.push('/topic/${topic.id}?subjectName=${Uri.encodeComponent(topic.id.startsWith('bio') ? 'Biology' : (topic.id.startsWith('chem') ? 'Chemistry' : 'Physics'))}&chapterName=${Uri.encodeComponent('Review Needed')}');
-                            },
+                          onTap: () {
+                            context.push(
+                              '/topic/${topic.id}?subjectName=${Uri.encodeComponent(topic.id.startsWith('bio') ? 'Biology' : (topic.id.startsWith('chem') ? 'Chemistry' : 'Physics'))}&chapterName=${Uri.encodeComponent('Review Needed')}',
+                            );
+                          },
                           borderRadius: BorderRadius.circular(12),
                           child: Padding(
                             padding: const EdgeInsets.all(12),
@@ -261,18 +296,27 @@ onTap: () {
                               children: [
                                 Text(
                                   topic.name,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 const Spacer(),
                                 Row(
                                   children: [
-                                    const Icon(Icons.warning, color: Colors.red, size: 14),
+                                    const Icon(
+                                      Icons.warning,
+                                      color: Colors.red,
+                                      size: 14,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Needs Practice',
-                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.red),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(color: Colors.red),
                                     ),
                                   ],
                                 ),
@@ -326,10 +370,12 @@ onTap: () {
                               ),
                               decoration: BoxDecoration(
                                 color: accuracy >= 70
-                                    ? AdaptiveColors.primary(context).withValues(alpha: 0.2)
-                                    : AdaptiveColors.secondary(context).withValues(
-                                        alpha: 0.2,
-                                      ),
+                                    ? AdaptiveColors.primary(
+                                        context,
+                                      ).withValues(alpha: 0.2)
+                                    : AdaptiveColors.secondary(
+                                        context,
+                                      ).withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -350,9 +396,9 @@ onTap: () {
                           child: LinearProgressIndicator(
                             value: totalQuestions == 0 ? 0 : accuracy / 100,
                             minHeight: 6,
-                            backgroundColor: AdaptiveColors.secondary(context).withValues(
-                              alpha: 0.2,
-                            ),
+                            backgroundColor: AdaptiveColors.secondary(
+                              context,
+                            ).withValues(alpha: 0.2),
                             valueColor: AlwaysStoppedAnimation(
                               accuracy >= 70
                                   ? AdaptiveColors.primary(context)
@@ -389,12 +435,12 @@ onTap: () {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-children: [
-                  Icon(
-                    Icons.lightbulb_outline,
-                    color: AdaptiveColors.primary(context),
-                  ),
-                  const SizedBox(width: 8),
+                    children: [
+                      Icon(
+                        Icons.lightbulb_outline,
+                        color: AdaptiveColors.primary(context),
+                      ),
+                      const SizedBox(width: 8),
                       Text(
                         'Study Tips',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -444,11 +490,17 @@ children: [
                   value: percent,
                   strokeWidth: 6,
                   backgroundColor: AdaptiveColors.divider(context),
-                  valueColor: AlwaysStoppedAnimation(percent >= 1.0 ? Colors.green : AdaptiveColors.primary(context)),
+                  valueColor: AlwaysStoppedAnimation(
+                    percent >= 1.0
+                        ? Colors.green
+                        : AdaptiveColors.primary(context),
+                  ),
                 ),
                 Icon(
                   percent >= 1.0 ? Icons.check : Icons.flag,
-                  color: percent >= 1.0 ? Colors.green : AdaptiveColors.primary(context),
+                  color: percent >= 1.0
+                      ? Colors.green
+                      : AdaptiveColors.primary(context),
                   size: 20,
                 ),
               ],
@@ -461,12 +513,16 @@ children: [
               children: [
                 Text(
                   'Daily Practice Goal',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '$completed / $target questions answered today',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AdaptiveColors.secondary(context)),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AdaptiveColors.secondary(context),
+                  ),
                 ),
               ],
             ),
@@ -476,12 +532,16 @@ children: [
     );
   }
 
-  Widget _buildRankPredictor(BuildContext context, double accuracy, Map<String, dynamic> mockStats) {
+  Widget _buildRankPredictor(
+    BuildContext context,
+    double accuracy,
+    Map<String, dynamic> mockStats,
+  ) {
     final bool hasMock = mockStats['hasMockTests'] as bool;
-    final int estimatedScore = hasMock 
-        ? mockStats['highestScore'] as int 
+    final int estimatedScore = hasMock
+        ? mockStats['highestScore'] as int
         : (accuracy / 100 * 720).toInt();
-    
+
     final predictedRank = RankPredictor.predictRank(estimatedScore);
     final percentile = RankPredictor.getPercentile(estimatedScore);
 
@@ -490,7 +550,9 @@ children: [
       decoration: BoxDecoration(
         color: AdaptiveColors.primary(context).withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AdaptiveColors.primary(context).withValues(alpha: 0.1)),
+        border: Border.all(
+          color: AdaptiveColors.primary(context).withValues(alpha: 0.1),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +562,11 @@ children: [
             children: [
               Row(
                 children: [
-                  Icon(Icons.analytics_outlined, color: AdaptiveColors.primary(context), size: 20),
+                  Icon(
+                    Icons.analytics_outlined,
+                    color: AdaptiveColors.primary(context),
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'NEET Rank Predictor',
@@ -513,14 +579,21 @@ children: [
               ),
               if (hasMock)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
                     'Based on Mocks',
-                    style: TextStyle(fontSize: 10, color: AppColors.success, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.success,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
             ],
@@ -538,7 +611,10 @@ children: [
                   ),
                   Text(
                     '$estimatedScore / 720',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                 ],
               ),
@@ -551,7 +627,11 @@ children: [
                   ),
                   Text(
                     '~${predictedRank.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.primary),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ],
               ),
@@ -563,12 +643,19 @@ children: [
             children: [
               Text(
                 'Current Percentile: $percentile',
-                style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: AdaptiveColors.secondary(context)),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  color: AdaptiveColors.secondary(context),
+                ),
               ),
               if (!hasMock)
                 Text(
                   '*Based on topic accuracy',
-                  style: TextStyle(fontSize: 10, color: AdaptiveColors.textSecondary(context)),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: AdaptiveColors.textSecondary(context),
+                  ),
                 ),
             ],
           ),
@@ -610,7 +697,10 @@ class _StatItem extends StatelessWidget {
         ),
         Text(
           label,
-          style: TextStyle(color: AdaptiveColors.secondary(context), fontSize: 12),
+          style: TextStyle(
+            color: AdaptiveColors.secondary(context),
+            fontSize: 12,
+          ),
         ),
       ],
     );

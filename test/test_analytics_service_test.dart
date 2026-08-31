@@ -26,10 +26,7 @@ Question _q(
 }
 
 /// Grade a flat practice attempt (single 'All Subjects' section).
-ExamScore _gradePractice(
-  List<Question> questions,
-  Map<int, String?> answers,
-) {
+ExamScore _gradePractice(List<Question> questions, Map<int, String?> answers) {
   final config = ExamConfig.practice(
     questionCount: questions.length,
     durationMinutes: 30,

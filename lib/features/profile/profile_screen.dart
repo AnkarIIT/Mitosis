@@ -106,8 +106,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               title: const Text('Logout'),
               content: const Text('Are you sure you want to logout?'),
               actions: [
-                TextButton(onPressed: () => context.pop(false), child: const Text('CANCEL')),
-                TextButton(onPressed: () => context.pop(true), child: const Text('LOGOUT')),
+                TextButton(
+                  onPressed: () => context.pop(false),
+                  child: const Text('CANCEL'),
+                ),
+                TextButton(
+                  onPressed: () => context.pop(true),
+                  child: const Text('LOGOUT'),
+                ),
               ],
             ),
           );
@@ -306,21 +312,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: earned
-                  .map((item) {
-                    final achievement = item['achievement'] as Achievement;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: _GitHubStyleAchievementTile(
-                        icon: achievement.icon,
-                        title: achievement.title,
-                        description: achievement.description,
-                        color: achievement.color,
-                        locked: false,
-                      ),
-                    );
-                  })
-                  .toList(),
+              children: earned.map((item) {
+                final achievement = item['achievement'] as Achievement;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: _GitHubStyleAchievementTile(
+                    icon: achievement.icon,
+                    title: achievement.title,
+                    description: achievement.description,
+                    color: achievement.color,
+                    locked: false,
+                  ),
+                );
+              }).toList(),
             ),
           ),
         if (locked.isNotEmpty) const SizedBox(height: 12),
@@ -328,13 +332,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: locked
-                .take(6)
-                .map((item) {
-                  final achievement = item['achievement'] as Achievement;
-                  return _LockedAchievementChip(achievement: achievement);
-                })
-                .toList(),
+            children: locked.take(6).map((item) {
+              final achievement = item['achievement'] as Achievement;
+              return _LockedAchievementChip(achievement: achievement);
+            }).toList(),
           ),
       ],
     );
@@ -461,11 +462,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(Icons.settings_rounded, color: AppColors.primary, size: 22),
+          child: Icon(
+            Icons.settings_rounded,
+            color: AppColors.primary,
+            size: 22,
+          ),
         ),
-        title: const Text('Settings', style: TextStyle(fontWeight: FontWeight.w600)),
+        title: const Text(
+          'Settings',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         subtitle: const Text('Appearance, sync, AI preferences'),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: AdaptiveColors.textSecondary(context)),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: AdaptiveColors.textSecondary(context),
+        ),
         onTap: () => context.push('/settings'),
       ),
     );
@@ -493,9 +505,7 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 180, maxWidth: 220),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: locked
-            ? AppColors.surface
-            : color.withValues(alpha: 0.08),
+        color: locked ? AppColors.surface : color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: locked
@@ -509,8 +519,9 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: (locked ? AppColors.divider : color)
-                  .withValues(alpha: locked ? 0.1 : 0.15),
+              color: (locked ? AppColors.divider : color).withValues(
+                alpha: locked ? 0.1 : 0.15,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -530,7 +541,9 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
-                    color: locked ? AdaptiveColors.outline(context) : AdaptiveColors.textPrimary(context),
+                    color: locked
+                        ? AdaptiveColors.outline(context)
+                        : AdaptiveColors.textPrimary(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -538,9 +551,7 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
                   description,
                   style: TextStyle(
                     fontSize: 12,
-                    color: locked
-                        ? AppColors.divider
-                        : AppColors.textSubtle,
+                    color: locked ? AppColors.divider : AppColors.textSubtle,
                     height: 1.3,
                   ),
                   maxLines: 2,
@@ -549,8 +560,7 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
               ],
             ),
           ),
-          if (!locked)
-            Icon(Icons.verified_rounded, color: color, size: 18),
+          if (!locked) Icon(Icons.verified_rounded, color: color, size: 18),
         ],
       ),
     );
@@ -569,9 +579,7 @@ class _LockedAchievementChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.divider.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: AppColors.divider.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -8,12 +8,8 @@ import 'package:neet_mitos/core/models/user_preferences_model.dart';
 import 'package:neet_mitos/core/providers/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Subject _subject(List<Chapter> chapters) => Subject(
-  id: 'bio',
-  name: 'Biology',
-  icon: '🧬',
-  chapters: chapters,
-);
+Subject _subject(List<Chapter> chapters) =>
+    Subject(id: 'bio', name: 'Biology', icon: '🧬', chapters: chapters);
 
 Chapter _chapter(String id, String? classLevel, List<Topic> topics) => Chapter(
   id: id,
@@ -23,12 +19,8 @@ Chapter _chapter(String id, String? classLevel, List<Topic> topics) => Chapter(
   topics: topics,
 );
 
-Topic _topic(String id, String chapterId) => Topic(
-  id: id,
-  name: id,
-  chapterId: chapterId,
-  questionCount: 10,
-);
+Topic _topic(String id, String chapterId) =>
+    Topic(id: id, name: id, chapterId: chapterId, questionCount: 10);
 
 void main() {
   group('UserPreferences batch filtering', () {
@@ -77,44 +69,54 @@ void main() {
       expect(filtered.length, 2);
     });
 
-    test('topics from chapters without a classLevel are excluded for 11/12',
-        () {
-      final tFree = _topic('tFree', 'cFree');
-      final subjectsWithFree = [
-        _subject([
-          _chapter('cFree', null, [tFree]),
-          _chapter('c11', 'Class 11', [t11]),
-        ]),
-      ];
-      final filtered = UserPreferences.filterTopicsByBatch(
-        [tFree, t11],
-        batch: 'Class 11',
-        subjects: subjectsWithFree,
-      );
-      expect(filtered, [t11]);
-    });
+    test(
+      'topics from chapters without a classLevel are excluded for 11/12',
+      () {
+        final tFree = _topic('tFree', 'cFree');
+        final subjectsWithFree = [
+          _subject([
+            _chapter('cFree', null, [tFree]),
+            _chapter('c11', 'Class 11', [t11]),
+          ]),
+        ];
+        final filtered = UserPreferences.filterTopicsByBatch(
+          [tFree, t11],
+          batch: 'Class 11',
+          subjects: subjectsWithFree,
+        );
+        expect(filtered, [t11]);
+      },
+    );
   });
 
   group('UserPreferences recommended daily target', () {
     test('defaults to 50 without a commitment', () {
       expect(const UserPreferences().recommendedDailyTarget, 50);
       expect(
-        const UserPreferences(dailyCommitmentMinutes: 60).recommendedDailyTarget,
+        const UserPreferences(
+          dailyCommitmentMinutes: 60,
+        ).recommendedDailyTarget,
         50,
       );
     });
 
     test('maps commitment bands to targets', () {
       expect(
-        const UserPreferences(dailyCommitmentMinutes: 30).recommendedDailyTarget,
+        const UserPreferences(
+          dailyCommitmentMinutes: 30,
+        ).recommendedDailyTarget,
         25,
       );
       expect(
-        const UserPreferences(dailyCommitmentMinutes: 90).recommendedDailyTarget,
+        const UserPreferences(
+          dailyCommitmentMinutes: 90,
+        ).recommendedDailyTarget,
         75,
       );
       expect(
-        const UserPreferences(dailyCommitmentMinutes: 120).recommendedDailyTarget,
+        const UserPreferences(
+          dailyCommitmentMinutes: 120,
+        ).recommendedDailyTarget,
         100,
       );
     });
@@ -163,7 +165,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       final container = ProviderContainer(
         overrides: [
-          databaseProvider.overrideWithValue(AppDatabase(NativeDatabase.memory())),
+          databaseProvider.overrideWithValue(
+            AppDatabase(NativeDatabase.memory()),
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -177,7 +181,10 @@ void main() {
 
       expect(container.read(userPreferencesProvider).batch, 'Dropper');
       expect(container.read(userPreferencesProvider).targetYear, 2028);
-      expect(container.read(userPreferencesProvider).dailyCommitmentMinutes, 90);
+      expect(
+        container.read(userPreferencesProvider).dailyCommitmentMinutes,
+        90,
+      );
       expect(container.read(userPreferencesProvider).isOnboarded, isTrue);
 
       final prefs = await SharedPreferences.getInstance();

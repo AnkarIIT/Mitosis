@@ -73,7 +73,8 @@ class QuizAttempt {
   final String topicId;
   final String subject;
   final String testType; // 'topic', 'chapter', 'subject', 'mock'
-  final Map<String, int>? subjectScores; // For mock tests: { 'Biology': 45, ... }
+  final Map<String, int>?
+  subjectScores; // For mock tests: { 'Biology': 45, ... }
   final int score; // Number of correct answers
   final int incorrectCount; // Number of incorrect answers
   final int totalQuestions;

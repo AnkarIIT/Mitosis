@@ -47,7 +47,8 @@ class SeederResult {
 }
 
 typedef GetQuestions = Future<List<Question>> Function();
-typedef UpdateExplanation = Future<void> Function(String questionId, String explanation);
+typedef UpdateExplanation =
+    Future<void> Function(String questionId, String explanation);
 
 class ExplanationSeeder {
   ExplanationSeeder({
@@ -205,10 +206,14 @@ class ExplanationSeeder {
       'Provide accurate, concise, NCERT-grounded explanations.';
 
   static String _buildPrompt(Question q) {
-    final optionsStr = q.options.asMap().entries.map((e) {
-      final letter = String.fromCharCode(65 + e.key);
-      return '$letter. ${e.value}';
-    }).join('\n');
+    final optionsStr = q.options
+        .asMap()
+        .entries
+        .map((e) {
+          final letter = String.fromCharCode(65 + e.key);
+          return '$letter. ${e.value}';
+        })
+        .join('\n');
 
     return '''
 You are generating an explanation for a NEET MCQ. Follow these rules exactly:

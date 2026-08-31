@@ -26,7 +26,7 @@ class GeminiChatService {
   final GeminiProxyService _proxy;
 
   GeminiChatService({GeminiProxyService? proxy})
-      : _proxy = proxy ?? GeminiProxyService();
+    : _proxy = proxy ?? GeminiProxyService();
 
   // ---------------------------------------------------------------------------
   // Lifecycle
@@ -216,10 +216,14 @@ Make it practical and achievable for a NEET student.''';
     }
   }
 
-  Future<List<Map<String, dynamic>>> generateQuestionsFromText(String textChunk, String subject) async {
+  Future<List<Map<String, dynamic>>> generateQuestionsFromText(
+    String textChunk,
+    String subject,
+  ) async {
     if (!isConfigured) return [];
 
-    final prompt = '''
+    final prompt =
+        '''
     Generate 5 high-yield NEET entrance exam questions based on the following text from an NCERT textbook.
     Text: "$textChunk"
     
@@ -241,13 +245,15 @@ Make it practical and achievable for a NEET student.''';
       final genModel = GenerativeModel(
         model: 'gemini-1.5-flash',
         apiKey: _apiKey!,
-        generationConfig: GenerationConfig(responseMimeType: 'application/json'),
+        generationConfig: GenerationConfig(
+          responseMimeType: 'application/json',
+        ),
         systemInstruction: Content.system(
           'You are an expert NEET question setter. Generate accurate, NCERT-based questions. '
           'For mcq, provide 4 distinct options. For shortAnswer, provide a model answer.',
         ),
       );
-      
+
       final response = await genModel.generateContent([Content.text(prompt)]);
       final jsonStr = response.text;
       if (jsonStr == null) return [];
@@ -310,7 +316,9 @@ Make it practical and achievable for a NEET student.''';
     final optionList = options is List
         ? options.whereType<String>().toList()
         : <String>[];
-    final type = raw['type'] is String ? (raw['type'] as String).toLowerCase() : 'mcq';
+    final type = raw['type'] is String
+        ? (raw['type'] as String).toLowerCase()
+        : 'mcq';
     final difficulty = raw['difficulty'] is String
         ? (raw['difficulty'] as String)
         : 'Medium';
@@ -322,8 +330,9 @@ Make it practical and achievable for a NEET student.''';
       'type': type,
       'difficulty': difficulty,
       'explanation': raw['explanation'] is String ? raw['explanation'] : '',
-      'ncertReference':
-          raw['ncertReference'] is String ? raw['ncertReference'] : '',
+      'ncertReference': raw['ncertReference'] is String
+          ? raw['ncertReference']
+          : '',
     };
   }
 }

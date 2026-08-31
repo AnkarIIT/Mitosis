@@ -69,8 +69,8 @@ class UserBatch {
     required this.dailyGoalHours,
     DateTime? startDate,
     DateTime? examDate,
-  })  : startDate = startDate ?? DateTime.now(),
-        examDate = examDate ?? DateTime.now().add(const Duration(days: 365));
+  }) : startDate = startDate ?? DateTime.now(),
+       examDate = examDate ?? DateTime.now().add(const Duration(days: 365));
 
   UserBatch copyWith({
     BatchType? type,
@@ -101,10 +101,12 @@ class UserBatch {
   factory UserBatch.fromJson(String json) {
     final map = jsonDecode(json);
     return UserBatch(
-      type: BatchType.values
-          .firstWhere((b) => b.toString().split('.').last == map['type']),
-      studyMode: StudyMode.values
-          .firstWhere((s) => s.toString().split('.').last == map['studyMode']),
+      type: BatchType.values.firstWhere(
+        (b) => b.toString().split('.').last == map['type'],
+      ),
+      studyMode: StudyMode.values.firstWhere(
+        (s) => s.toString().split('.').last == map['studyMode'],
+      ),
       dailyGoalHours: map['dailyGoalHours'] ?? 2,
       startDate: DateTime.parse(map['startDate']),
       examDate: DateTime.parse(map['examDate']),
@@ -112,11 +114,7 @@ class UserBatch {
   }
 }
 
-enum StudyMode {
-  selfStudy,
-  coachingStudent,
-  onlineCourse,
-}
+enum StudyMode { selfStudy, coachingStudent, onlineCourse }
 
 extension StudyModeExtension on StudyMode {
   String get label {

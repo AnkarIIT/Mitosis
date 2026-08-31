@@ -256,43 +256,46 @@ void main() {
       expect(cards.single.box, 1);
     });
 
-    test('getDueSpacedRepetition returns only due cards, soonest first', () async {
-      final now = DateTime(2026, 8, 17, 10);
-      await db.upsertSpacedRepetition(
-        SpacedRepetitionService.review(
-          questionId: '1',
-          card: null,
-          isCorrect: false,
-          now: now.subtract(const Duration(days: 2)),
-        ),
-      );
-      await db.upsertSpacedRepetition(
-        SpacedRepetitionService.review(
-          questionId: '2',
-          card: null,
-          isCorrect: false,
-          now: now.subtract(const Duration(days: 5)),
-        ),
-      );
-      await db.upsertSpacedRepetition(
-        SpacedRepetitionService.review(
-          questionId: '3',
-          card: null,
-          isCorrect: false,
-          now: now.subtract(const Duration(days: 1)),
-        ),
-      );
+    test(
+      'getDueSpacedRepetition returns only due cards, soonest first',
+      () async {
+        final now = DateTime(2026, 8, 17, 10);
+        await db.upsertSpacedRepetition(
+          SpacedRepetitionService.review(
+            questionId: '1',
+            card: null,
+            isCorrect: false,
+            now: now.subtract(const Duration(days: 2)),
+          ),
+        );
+        await db.upsertSpacedRepetition(
+          SpacedRepetitionService.review(
+            questionId: '2',
+            card: null,
+            isCorrect: false,
+            now: now.subtract(const Duration(days: 5)),
+          ),
+        );
+        await db.upsertSpacedRepetition(
+          SpacedRepetitionService.review(
+            questionId: '3',
+            card: null,
+            isCorrect: false,
+            now: now.subtract(const Duration(days: 1)),
+          ),
+        );
 
-      final due = await db.getDueSpacedRepetition(now);
-      expect(due.length, 3);
-      expect(due[0].questionId, '2'); // oldest due first
-      expect(due[2].questionId, '3');
+        final due = await db.getDueSpacedRepetition(now);
+        expect(due.length, 3);
+        expect(due[0].questionId, '2'); // oldest due first
+        expect(due[2].questionId, '3');
 
-      final noLongerDue = await db.getDueSpacedRepetition(
-        now.subtract(const Duration(days: 6)),
-      );
-      expect(noLongerDue, isEmpty);
-    });
+        final noLongerDue = await db.getDueSpacedRepetition(
+          now.subtract(const Duration(days: 6)),
+        );
+        expect(noLongerDue, isEmpty);
+      },
+    );
 
     test('removeSpacedRepetition deletes the card', () async {
       final now = DateTime(2026, 8, 17, 10);

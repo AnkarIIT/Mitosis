@@ -86,7 +86,7 @@ void main() {
           durationMinutes: 10,
         ).toJson(),
         sectionQuestionIds: const [
-          ['1']
+          ['1'],
         ],
         answersByIndex: const {},
         flagged: const [],

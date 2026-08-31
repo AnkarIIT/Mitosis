@@ -379,7 +379,9 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                                         style: TextStyle(
                                           color: isCorrect
                                               ? Colors.white
-                                              : AdaptiveColors.textPrimary(context),
+                                              : AdaptiveColors.textPrimary(
+                                                  context,
+                                                ),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 12,
                                         ),
@@ -487,4 +489,3 @@ class _DppScreenState extends ConsumerState<DppScreen> {
     );
   }
 }
-

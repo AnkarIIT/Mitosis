@@ -51,7 +51,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _stopwatch = Stopwatch()..start();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 1),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         if (widget.questions != null) {
@@ -65,7 +67,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   }
 
   Future<void> _loadQuestionsFromProvider() async {
-    final questions = await ref.read(questionsForTopicProvider(widget.topicId).future);
+    final questions = await ref.read(
+      questionsForTopicProvider(widget.topicId).future,
+    );
     if (mounted && questions.isNotEmpty) {
       ref.read(quizProvider.notifier).initializeQuiz(questions);
     }
@@ -112,10 +116,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
       return;
     }
 
-    final hint = await ref.read(geminiServiceProvider).getQuizHint(
-          question.questionText,
-          question.options.join(', '),
-        );
+    final hint = await ref
+        .read(geminiServiceProvider)
+        .getQuizHint(question.questionText, question.options.join(', '));
     _showHintDialog(hint);
   }
 
@@ -132,7 +135,10 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         ),
         content: SingleChildScrollView(child: Text(content)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Got it')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Got it'),
+          ),
         ],
       ),
     );
@@ -155,7 +161,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       topicId: widget.topicId,
       subject: widget.subject,
-      testType: widget.testType ?? (widget.topicId == 'mock_test' ? 'mock' : 'subject'),
+      testType:
+          widget.testType ??
+          (widget.topicId == 'mock_test' ? 'mock' : 'subject'),
       subjectScores: subjectScores,
       score: quizState.score,
       incorrectCount: quizState.incorrectCount,
@@ -173,7 +181,10 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     context.go('/quiz/result', extra: attempt);
   }
 
-  Future<void> _evaluateShortAnswer(String studentAnswer, String correctAnswer) async {
+  Future<void> _evaluateShortAnswer(
+    String studentAnswer,
+    String correctAnswer,
+  ) async {
     setState(() {
       _isEvaluatingShortAnswer = true;
       _shortAnswerScore = null;
@@ -181,7 +192,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     });
 
     try {
-      final score = await ref.read(mlServiceProvider).evaluateShortAnswer(studentAnswer, correctAnswer);
+      final score = await ref
+          .read(mlServiceProvider)
+          .evaluateShortAnswer(studentAnswer, correctAnswer);
       if (!mounted) return;
       setState(() {
         _shortAnswerScore = score * 100;
@@ -191,7 +204,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
             : "Review the key terms in NCERT to improve.";
       });
       final isCorrect = _shortAnswerScore! >= 65;
-      ref.read(quizProvider.notifier).selectAnswer(
+      ref
+          .read(quizProvider.notifier)
+          .selectAnswer(
             ref.read(quizProvider).currentIndex,
             studentAnswer,
             0,
@@ -220,11 +235,17 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     }
 
     final currentQuestion = quizState.questions[quizState.currentIndex];
-    final isAnswered = quizState.selectedAnswers.containsKey(quizState.currentIndex);
+    final isAnswered = quizState.selectedAnswers.containsKey(
+      quizState.currentIndex,
+    );
     final selectedAnswer = quizState.selectedAnswers[quizState.currentIndex];
     final bookmarks = ref.watch(bookmarksProvider);
-    final isBookmarked = bookmarks.any((b) => b.questionId == currentQuestion.id);
-    final isFlagged = quizState.flaggedQuestions.contains(quizState.currentIndex);
+    final isBookmarked = bookmarks.any(
+      (b) => b.questionId == currentQuestion.id,
+    );
+    final isFlagged = quizState.flaggedQuestions.contains(
+      quizState.currentIndex,
+    );
 
     return Scaffold(
       backgroundColor: AdaptiveColors.surfaceWarm(context),
@@ -237,7 +258,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         currentQuestion: currentQuestion,
         onClose: () => Navigator.maybePop(context),
         onBookmarkToggle: () {
-          ref.read(bookmarksProvider.notifier).toggleBookmark(
+          ref
+              .read(bookmarksProvider.notifier)
+              .toggleBookmark(
                 questionId: currentQuestion.id,
                 subject: currentQuestion.subject,
                 topicId: currentQuestion.topicId,
@@ -251,16 +274,28 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                QuizProgressBar(currentIndex: quizState.currentIndex, totalQuestions: quizState.questions.length),
+                QuizProgressBar(
+                  currentIndex: quizState.currentIndex,
+                  totalQuestions: quizState.questions.length,
+                ),
                 const SizedBox(height: 8),
                 // Timer bar with pulse when time is low
-                _QuizTimerBar(elapsedSeconds: _elapsedSeconds, totalQuestions: quizState.questions.length),
+                _QuizTimerBar(
+                  elapsedSeconds: _elapsedSeconds,
+                  totalQuestions: quizState.questions.length,
+                ),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    QuizQuestionCounter(currentIndex: quizState.currentIndex, totalQuestions: quizState.questions.length),
-                    QuizScoreIndicator(selectedAnswer: selectedAnswer, correctAnswer: currentQuestion.correctAnswer),
+                    QuizQuestionCounter(
+                      currentIndex: quizState.currentIndex,
+                      totalQuestions: quizState.questions.length,
+                    ),
+                    QuizScoreIndicator(
+                      selectedAnswer: selectedAnswer,
+                      correctAnswer: currentQuestion.correctAnswer,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -289,12 +324,15 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         currentIndex: quizState.currentIndex,
         totalQuestions: quizState.questions.length,
         isAnswered: isAnswered,
-        isLastQuestion: quizState.currentIndex == quizState.questions.length - 1,
+        isLastQuestion:
+            quizState.currentIndex == quizState.questions.length - 1,
         isFlagged: isFlagged,
         onPrevious: () => _navigateToQuestion(-1),
         onNext: () => _navigateToQuestion(1),
-        onFlagToggle: () => ref.read(quizProvider.notifier).toggleFlag(quizState.currentIndex),
-        onMarkForReviewAndNext: () => ref.read(quizProvider.notifier).markForReviewAndNext(),
+        onFlagToggle: () =>
+            ref.read(quizProvider.notifier).toggleFlag(quizState.currentIndex),
+        onMarkForReviewAndNext: () =>
+            ref.read(quizProvider.notifier).markForReviewAndNext(),
         onSubmit: () {
           if (quizState.currentIndex < quizState.questions.length - 1) {
             _navigateToQuestion(1);
@@ -324,11 +362,20 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         const SizedBox(height: 16),
         if (!isAnswered)
           ElevatedButton(
-            onPressed: _isEvaluatingShortAnswer ? null : () => _evaluateShortAnswer(_shortAnswerController.text, question.correctAnswer),
-            child: _isEvaluatingShortAnswer ? const CircularProgressIndicator() : const Text('SUBMIT FOR AI EVALUATION'),
+            onPressed: _isEvaluatingShortAnswer
+                ? null
+                : () => _evaluateShortAnswer(
+                    _shortAnswerController.text,
+                    question.correctAnswer,
+                  ),
+            child: _isEvaluatingShortAnswer
+                ? const CircularProgressIndicator()
+                : const Text('SUBMIT FOR AI EVALUATION'),
           ),
         if (isAnswered && _shortAnswerScore != null)
-          Text('AI Score: ${_shortAnswerScore!.toStringAsFixed(0)}% - $_shortAnswerFeedback'),
+          Text(
+            'AI Score: ${_shortAnswerScore!.toStringAsFixed(0)}% - $_shortAnswerFeedback',
+          ),
       ],
     );
   }
@@ -344,7 +391,10 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         ),
         child: Column(
           children: [
-            const Text('Explanation', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Explanation',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Text(question.explanation ?? 'No explanation available'),
           ],
@@ -367,7 +417,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                 height: MediaQuery.of(context).size.height * 0.7,
                 decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -387,10 +439,12 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                         children: [
                           Text(
                             'Question Palette',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           IconButton(
-                            onPressed: () => setState(() => _showPalette = false),
+                            onPressed: () =>
+                                setState(() => _showPalette = false),
                             icon: const Icon(Icons.close_rounded),
                           ),
                         ],
@@ -407,26 +461,38 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                           _paletteLegendDot(AppColors.error, 'Not Answered'),
                           _paletteLegendDot(AppColors.warning, 'Flagged'),
                           _paletteLegendDot(AppColors.primary, 'Current'),
-                          _paletteLegendDot(AdaptiveColors.divider(context), 'Not Visited'),
+                          _paletteLegendDot(
+                            AdaptiveColors.divider(context),
+                            'Not Visited',
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 8),
                     Expanded(
                       child: GridView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          childAspectRatio: 1,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
                         ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
+                              childAspectRatio: 1,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                            ),
                         itemCount: quizState.questions.length,
                         itemBuilder: (context, index) {
                           final isCurrent = index == quizState.currentIndex;
-                          final isAnswered = quizState.selectedAnswers.containsKey(index);
-                          final isFlagged = quizState.flaggedQuestions.contains(index);
-                          final isVisited = quizState.visitedQuestions.contains(index);
+                          final isAnswered = quizState.selectedAnswers
+                              .containsKey(index);
+                          final isFlagged = quizState.flaggedQuestions.contains(
+                            index,
+                          );
+                          final isVisited = quizState.visitedQuestions.contains(
+                            index,
+                          );
 
                           Color bg;
                           Color fg = Colors.white;
@@ -446,7 +512,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                           return InkWell(
                             onTap: () {
                               setState(() => _showPalette = false);
-                              ref.read(quizProvider.notifier).goToQuestion(index);
+                              ref
+                                  .read(quizProvider.notifier)
+                                  .goToQuestion(index);
                             },
                             borderRadius: BorderRadius.circular(12),
                             child: Stack(
@@ -482,9 +550,16 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                                       decoration: BoxDecoration(
                                         color: AppColors.warning,
                                         shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 1),
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 1,
+                                        ),
                                       ),
-                                      child: const Icon(Icons.flag, size: 10, color: Colors.white),
+                                      child: const Icon(
+                                        Icons.flag,
+                                        size: 10,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                               ],
@@ -504,7 +579,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     );
   }
 
-Widget _paletteLegendDot(Color color, String label) {
+  Widget _paletteLegendDot(Color color, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -514,7 +589,13 @@ Widget _paletteLegendDot(Color color, String label) {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 4),
-        Text(label, style: TextStyle(fontSize: 11, color: AdaptiveColors.textSecondary(context))),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: AdaptiveColors.textSecondary(context),
+          ),
+        ),
       ],
     );
   }
@@ -525,10 +606,7 @@ class _QuizTimerBar extends StatelessWidget {
   final int elapsedSeconds;
   final int totalQuestions;
 
-  const _QuizTimerBar({
-    required this.elapsedSeconds,
-    this.totalQuestions = 10,
-  });
+  const _QuizTimerBar({required this.elapsedSeconds, this.totalQuestions = 10});
 
   @override
   Widget build(BuildContext context) {
@@ -546,7 +624,10 @@ class _QuizTimerBar extends StatelessWidget {
           children: [
             Text(
               'Time',
-              style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 11),
+              style: TextStyle(
+                color: AdaptiveColors.textSecondary(context),
+                fontSize: 11,
+              ),
             ),
             Text(
               _formatTime(remaining),
@@ -560,14 +641,15 @@ class _QuizTimerBar extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         ClipRRect(
-          borderRadius: BorderRadius.circular(3),
-          child: LinearProgressIndicator(
-            value: fraction.clamp(0.0, 1.0),
-            minHeight: 4,
-            backgroundColor: color.withValues(alpha: 0.12),
-            valueColor: AlwaysStoppedAnimation(color),
-          ),
-        ).animate(onPlay: (c) => isLow ? c.repeat(reverse: true) : null)
+              borderRadius: BorderRadius.circular(3),
+              child: LinearProgressIndicator(
+                value: fraction.clamp(0.0, 1.0),
+                minHeight: 4,
+                backgroundColor: color.withValues(alpha: 0.12),
+                valueColor: AlwaysStoppedAnimation(color),
+              ),
+            )
+            .animate(onPlay: (c) => isLow ? c.repeat(reverse: true) : null)
             .scale(
               begin: const Offset(1, 1),
               end: const Offset(1, 1.8),

@@ -61,10 +61,12 @@ class SpacedReviewRecorder {
     if (isCorrect) {
       await dbInstance.removeFromErrorBook(questionId);
     } else {
-      await dbInstance.addToErrorBook(db.ErrorBookCompanion.insert(
-        questionId: questionId,
-        addedAt: DateTime.now(),
-      ));
+      await dbInstance.addToErrorBook(
+        db.ErrorBookCompanion.insert(
+          questionId: questionId,
+          addedAt: DateTime.now(),
+        ),
+      );
     }
     _ref.invalidate(spacedRepetitionCardsProvider);
     _ref.invalidate(dueCardsProvider);

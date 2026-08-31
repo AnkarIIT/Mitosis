@@ -21,16 +21,24 @@ class AuthService {
     String? fullName,
   }) async {
     final trimmedEmail = email.trim().toLowerCase();
-    final trimmedUsername =
-        (username ?? trimmedEmail.split('@').first).trim();
+    final trimmedUsername = (username ?? trimmedEmail.split('@').first).trim();
 
     if (trimmedEmail.isEmpty || password.length < 6) {
-      return (success: false, message: 'Enter a valid email and a password with at least 6 characters.', user: null);
+      return (
+        success: false,
+        message:
+            'Enter a valid email and a password with at least 6 characters.',
+        user: null,
+      );
     }
 
     final existing = await _db.getUserByEmail(trimmedEmail);
     if (existing != null) {
-      return (success: false, message: 'An account with this email already exists.', user: null);
+      return (
+        success: false,
+        message: 'An account with this email already exists.',
+        user: null,
+      );
     }
 
     final passwordHash = _hashPassword(password);
@@ -58,11 +66,20 @@ class AuthService {
 
     final user = await _db.getUserByEmail(trimmedEmail);
     if (user == null) {
-      return (success: false, message: 'No account found for this email.', user: null);
+      return (
+        success: false,
+        message: 'No account found for this email.',
+        user: null,
+      );
     }
 
     if (user.passwordHash == null || user.passwordHash!.isEmpty) {
-      return (success: false, message: 'This account was created with social sign-in. Use the original sign-in method or reset credentials.', user: null);
+      return (
+        success: false,
+        message:
+            'This account was created with social sign-in. Use the original sign-in method or reset credentials.',
+        user: null,
+      );
     }
 
     final hash = _hashPassword(password);
@@ -98,11 +115,17 @@ class AuthService {
     final user = await _db.getUserByEmail(trimmedEmail);
     if (user == null) {
       // Don't reveal whether email exists.
-      return (success: true, message: 'If an account exists, a reset code has been sent.');
+      return (
+        success: true,
+        message: 'If an account exists, a reset code has been sent.',
+      );
     }
 
     if (_emailService == null || !_emailService.isConfigured) {
-      return (success: false, message: 'Password reset email is not configured in Settings.');
+      return (
+        success: false,
+        message: 'Password reset email is not configured in Settings.',
+      );
     }
 
     final code = _generateNumericCode(6);
@@ -113,10 +136,14 @@ class AuthService {
         to: trimmedEmail,
         subject: 'Reset your NEET Mitos password',
         html: _buildResetEmailHtml(user.username, code),
-        text: 'Your NEET Mitos password reset code is: $code. It expires in 15 minutes.',
+        text:
+            'Your NEET Mitos password reset code is: $code. It expires in 15 minutes.',
       );
     } catch (e) {
-      return (success: false, message: 'Could not send reset email. Please try again later.');
+      return (
+        success: false,
+        message: 'Could not send reset email. Please try again later.',
+      );
     }
 
     await _db.updateUserPasswordReset(user.id, code, expiry);
@@ -138,7 +165,11 @@ class AuthService {
     if (reset == null ||
         reset.code != code ||
         reset.expiresAt.isBefore(DateTime.now())) {
-      return (success: false, message: 'Invalid or expired reset code.', user: null);
+      return (
+        success: false,
+        message: 'Invalid or expired reset code.',
+        user: null,
+      );
     }
 
     final passwordHash = _hashPassword(newPassword);

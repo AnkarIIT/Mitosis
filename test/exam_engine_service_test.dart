@@ -71,8 +71,12 @@ void main() {
       final config = ExamConfig.neet();
       expect(config.mode, ExamMode.neet);
       expect(config.sections.length, 4);
-      expect(config.sections.map((s) => s.name).toList(),
-          ['Physics', 'Chemistry', 'Botany', 'Zoology']);
+      expect(config.sections.map((s) => s.name).toList(), [
+        'Physics',
+        'Chemistry',
+        'Botany',
+        'Zoology',
+      ]);
       expect(config.totalDurationSeconds, 180 * 60);
       expect(config.marksPerCorrect, 4);
       expect(config.marksPerWrong, -1);
@@ -124,8 +128,13 @@ void main() {
     test('drops uneven / mis-keyed questions', () {
       final good = _q('g', 'Physics', 'p');
       final badCorrect = _q('b', 'Physics', 'p', correct: 'Not An Option');
-      final tooFewOptions =
-          _q('f', 'Physics', 'p', correct: 'A', options: ['A']);
+      final tooFewOptions = _q(
+        'f',
+        'Physics',
+        'p',
+        correct: 'A',
+        options: ['A'],
+      );
       final emptyText = Question(
         id: 'e',
         subject: 'Physics',
@@ -139,9 +148,12 @@ void main() {
         tags: const [],
         type: 'mcq',
       );
-      final clean = ExamEngineService.validatePool(
-        [good, badCorrect, tooFewOptions, emptyText],
-      );
+      final clean = ExamEngineService.validatePool([
+        good,
+        badCorrect,
+        tooFewOptions,
+        emptyText,
+      ]);
       expect(clean.map((q) => q.id).toList(), ['g']);
     });
 
@@ -174,8 +186,11 @@ void main() {
         botanyCount: 2,
         zoologyCount: 2,
       );
-      final sections =
-          ExamEngineService.allocateQuestions(_pool(), config, seed: 3);
+      final sections = ExamEngineService.allocateQuestions(
+        _pool(),
+        config,
+        seed: 3,
+      );
       expect(sections[0].length, 2);
       expect(sections[1].length, 2);
       expect(sections[2].length, 2);
@@ -191,8 +206,11 @@ void main() {
 
     test('handles shortfall gracefully', () {
       final config = ExamConfig.neet(); // asks for 45 per section
-      final sections =
-          ExamEngineService.allocateQuestions(_pool(), config, seed: 4);
+      final sections = ExamEngineService.allocateQuestions(
+        _pool(),
+        config,
+        seed: 4,
+      );
       expect(sections[0].length, 3);
       expect(sections[1].length, 3);
       expect(sections[2].length, 3);

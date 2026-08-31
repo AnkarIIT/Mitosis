@@ -54,26 +54,30 @@ final flashcardsFromDbProvider = FutureProvider<List<Flashcard>>((ref) async {
   final db = ref.watch(databaseProvider);
   final rows = await db.getAllFlashcards();
   if (rows.isEmpty) return sampleFlashcards;
-  return rows.map((r) => Flashcard(
-    id: r.id,
-    front: r.front,
-    back: r.back,
-    subject: r.subject,
-    topicId: r.topicId,
-    imageUrl: r.imageUrl,
-    chapterId: r.chapterId,
-    ncertReference: r.ncertReference,
-    sourcePage: r.sourcePage,
-    difficulty: r.difficulty,
-    isGenerated: r.isGenerated,
-    box: r.box,
-    easeFactor: r.easeFactor,
-    intervalDays: r.intervalDays,
-    repetitions: r.repetitions,
-    lapses: r.lapses,
-    dueAt: r.dueAt,
-    lastReviewedAt: r.lastReviewedAt,
-  )).toList();
+  return rows
+      .map(
+        (r) => Flashcard(
+          id: r.id,
+          front: r.front,
+          back: r.back,
+          subject: r.subject,
+          topicId: r.topicId,
+          imageUrl: r.imageUrl,
+          chapterId: r.chapterId,
+          ncertReference: r.ncertReference,
+          sourcePage: r.sourcePage,
+          difficulty: r.difficulty,
+          isGenerated: r.isGenerated,
+          box: r.box,
+          easeFactor: r.easeFactor,
+          intervalDays: r.intervalDays,
+          repetitions: r.repetitions,
+          lapses: r.lapses,
+          dueAt: r.dueAt,
+          lastReviewedAt: r.lastReviewedAt,
+        ),
+      )
+      .toList();
 });
 
 final flashcardsProvider = Provider<List<Flashcard>>((ref) {
@@ -83,26 +87,30 @@ final flashcardsProvider = Provider<List<Flashcard>>((ref) {
 final dueFlashcardsProvider = FutureProvider<List<Flashcard>>((ref) async {
   final db = ref.watch(databaseProvider);
   final rows = await db.getDueFlashcards(DateTime.now());
-  return rows.map((r) => Flashcard(
-    id: r.id,
-    front: r.front,
-    back: r.back,
-    subject: r.subject,
-    topicId: r.topicId,
-    imageUrl: r.imageUrl,
-    chapterId: r.chapterId,
-    ncertReference: r.ncertReference,
-    sourcePage: r.sourcePage,
-    difficulty: r.difficulty,
-    isGenerated: r.isGenerated,
-    box: r.box,
-    easeFactor: r.easeFactor,
-    intervalDays: r.intervalDays,
-    repetitions: r.repetitions,
-    lapses: r.lapses,
-    dueAt: r.dueAt,
-    lastReviewedAt: r.lastReviewedAt,
-  )).toList();
+  return rows
+      .map(
+        (r) => Flashcard(
+          id: r.id,
+          front: r.front,
+          back: r.back,
+          subject: r.subject,
+          topicId: r.topicId,
+          imageUrl: r.imageUrl,
+          chapterId: r.chapterId,
+          ncertReference: r.ncertReference,
+          sourcePage: r.sourcePage,
+          difficulty: r.difficulty,
+          isGenerated: r.isGenerated,
+          box: r.box,
+          easeFactor: r.easeFactor,
+          intervalDays: r.intervalDays,
+          repetitions: r.repetitions,
+          lapses: r.lapses,
+          dueAt: r.dueAt,
+          lastReviewedAt: r.lastReviewedAt,
+        ),
+      )
+      .toList();
 });
 
 final flashcardsForSubjectProvider = Provider.family<List<Flashcard>, String>((
@@ -114,11 +122,12 @@ final flashcardsForSubjectProvider = Provider.family<List<Flashcard>, String>((
 });
 
 // ============= QUESTIONS =============
-final recentlySeenQuestionIdsProvider = FutureProvider.family<Set<String>, String?>((ref, subject) async {
-  final database = ref.watch(databaseProvider);
-  final history = QuestionHistoryService(database);
-  return history.getRecentSeenQuestionIds(subject: subject);
-});
+final recentlySeenQuestionIdsProvider =
+    FutureProvider.family<Set<String>, String?>((ref, subject) async {
+      final database = ref.watch(databaseProvider);
+      final history = QuestionHistoryService(database);
+      return history.getRecentSeenQuestionIds(subject: subject);
+    });
 
 final allQuestionsProvider = FutureProvider<List<Question>>((ref) async {
   final repository = ref.watch(questionRepositoryProvider);
@@ -128,32 +137,32 @@ final allQuestionsProvider = FutureProvider<List<Question>>((ref) async {
   return all.where((q) => !seen.contains(q.id)).toList();
 });
 
-final questionsForTopicProvider = FutureProvider.family<List<Question>, String>((
-  ref,
-  topicId,
-) async {
-  final repository = ref.watch(questionRepositoryProvider);
-  final all = await repository.getQuestionsByTopicId(topicId);
-  final seen = await ref.watch(recentlySeenQuestionIdsProvider(null).future);
-  final unseen = seen.isEmpty ? all : all.where((q) => !seen.contains(q.id)).toList();
-  // Sample to avoid exhausting the full topic pool in one quiz.
-  final max = unseen.length > 20 ? 20 : unseen.length;
-  final random = Random(DateTime.now().millisecondsSinceEpoch);
-  unseen.shuffle(random);
-  return unseen.take(max).toList();
-});
+final questionsForTopicProvider = FutureProvider.family<List<Question>, String>(
+  (ref, topicId) async {
+    final repository = ref.watch(questionRepositoryProvider);
+    final all = await repository.getQuestionsByTopicId(topicId);
+    final seen = await ref.watch(recentlySeenQuestionIdsProvider(null).future);
+    final unseen = seen.isEmpty
+        ? all
+        : all.where((q) => !seen.contains(q.id)).toList();
+    // Sample to avoid exhausting the full topic pool in one quiz.
+    final max = unseen.length > 20 ? 20 : unseen.length;
+    final random = Random(DateTime.now().millisecondsSinceEpoch);
+    unseen.shuffle(random);
+    return unseen.take(max).toList();
+  },
+);
 
-final questionsForSubjectProvider = FutureProvider.family<List<Question>, String>((
-  ref,
-  subject,
-) async {
-  final allQuestions = await ref.watch(allQuestionsProvider.future);
-  return allQuestions.where((q) => q.subject == subject).toList();
-});
+final questionsForSubjectProvider =
+    FutureProvider.family<List<Question>, String>((ref, subject) async {
+      final allQuestions = await ref.watch(allQuestionsProvider.future);
+      return allQuestions.where((q) => q.subject == subject).toList();
+    });
 
 // ============= CONTENT CATALOG SYNC =============
 final contentSyncServiceProvider = Provider<ContentSyncService?>((ref) {
-  if (!AppConfig.enableCloudAuth || !AppConfig.isCloudAuthConfigured) return null;
+  if (!AppConfig.enableCloudAuth || !AppConfig.isCloudAuthConfigured)
+    return null;
   try {
     final database = ref.watch(databaseProvider);
     return ContentSyncService(database, supabase.Supabase.instance.client);
@@ -175,11 +184,17 @@ final dppEngineProvider = Provider<DppEngine>((ref) {
   final database = ref.watch(databaseProvider);
   final questionRepo = QuestionRepository(database);
   final history = QuestionHistoryService(database);
-  final mastery = MasteryService(database, questionRepo.getAllQuestionsFromDb());
+  final mastery = MasteryService(
+    database,
+    questionRepo.getAllQuestionsFromDb(),
+  );
   return DppEngine(database, questionRepo, history, mastery);
 });
 
-final todayDppProvider = FutureProvider.family<DppResult?, String>((ref, subject) async {
+final todayDppProvider = FutureProvider.family<DppResult?, String>((
+  ref,
+  subject,
+) async {
   final engine = ref.watch(dppEngineProvider);
   return await engine.generate(DppConfig.single(subject: subject));
 });
@@ -191,7 +206,9 @@ final dppStreakProvider = FutureProvider<int>((ref) async {
   return await _computeDppStreak(database);
 });
 
-final dppWeeklyAccuracyProvider = FutureProvider<Map<DateTime, double>>((ref) async {
+final dppWeeklyAccuracyProvider = FutureProvider<Map<DateTime, double>>((
+  ref,
+) async {
   final database = ref.watch(databaseProvider);
   return await _computeWeeklyAccuracy(database);
 });
@@ -214,7 +231,8 @@ Future<int> _computeDppStreak(db.AppDatabase database) async {
         int.parse(parts[2]),
       );
       final existing = byDate[d];
-      if (existing == null || (s as dynamic).updatedAt.isAfter((existing as dynamic).updatedAt)) {
+      if (existing == null ||
+          (s as dynamic).updatedAt.isAfter((existing as dynamic).updatedAt)) {
         byDate[d] = s;
       }
     }
@@ -241,15 +259,24 @@ Future<int> _computeDppStreak(db.AppDatabase database) async {
   }
 }
 
-Future<Map<DateTime, double>> _computeWeeklyAccuracy(db.AppDatabase database) async {
+Future<Map<DateTime, double>> _computeWeeklyAccuracy(
+  db.AppDatabase database,
+) async {
   try {
     final now = DateTime.now();
     final result = <DateTime, double>{};
 
     for (int i = 6; i >= 0; i--) {
-      final day = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
-      final dateStr = '${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}';
-      final sets = await (database.select(database.dppSets)..where((t) => t.date.equals(dateStr))).get();
+      final day = DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).subtract(Duration(days: i));
+      final dateStr =
+          '${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}';
+      final sets = await (database.select(
+        database.dppSets,
+      )..where((t) => t.date.equals(dateStr))).get();
 
       if (sets.isEmpty) {
         result[DateTime(day.year, day.month, day.day)] = 0.0;
@@ -264,7 +291,9 @@ Future<Map<DateTime, double>> _computeWeeklyAccuracy(db.AppDatabase database) as
         totalQuestions += (s as dynamic).totalQuestions as int;
       }
 
-      final accuracy = totalQuestions == 0 ? 0.0 : (totalCorrect / totalQuestions) * 100;
+      final accuracy = totalQuestions == 0
+          ? 0.0
+          : (totalCorrect / totalQuestions) * 100;
       result[DateTime(day.year, day.month, day.day)] = accuracy;
     }
 

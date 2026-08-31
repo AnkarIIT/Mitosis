@@ -36,7 +36,11 @@ class ErrorBookScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle_outline, size: 80, color: AppColors.success.withValues(alpha: 0.5)),
+          Icon(
+            Icons.check_circle_outline,
+            size: 80,
+            color: AppColors.success.withValues(alpha: 0.5),
+          ),
           const SizedBox(height: 20),
           Text(
             'Your Error Book is Empty!',
@@ -59,7 +63,11 @@ class ErrorBookScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuestionList(BuildContext context, List<Question> questions, WidgetRef ref) {
+  Widget _buildQuestionList(
+    BuildContext context,
+    List<Question> questions,
+    WidgetRef ref,
+  ) {
     return Column(
       children: [
         Container(
@@ -77,7 +85,9 @@ class ErrorBookScreen extends ConsumerWidget {
               Expanded(
                 child: Text(
                   'Review and re-test your mistakes. Once you answer correctly in a re-test, they can be removed.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.primary),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.primary),
                 ),
               ),
             ],
@@ -105,7 +115,9 @@ class ErrorBookScreen extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ),
@@ -114,7 +126,11 @@ class ErrorBookScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuestionCard(BuildContext context, Question question, WidgetRef ref) {
+  Widget _buildQuestionCard(
+    BuildContext context,
+    Question question,
+    WidgetRef ref,
+  ) {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
@@ -139,13 +155,28 @@ class ErrorBookScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Correct Answer:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                const Text(
+                  'Correct Answer:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
                 const SizedBox(height: 4),
-                Text(question.correctAnswer, style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.w500)),
+                Text(
+                  question.correctAnswer,
+                  style: const TextStyle(
+                    color: AppColors.success,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 12),
-                const Text('Explanation:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                const Text(
+                  'Explanation:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
                 const SizedBox(height: 4),
-                Text(question.explanation ?? 'No explanation available', style: const TextStyle(fontSize: 13)),
+                Text(
+                  question.explanation ?? 'No explanation available',
+                  style: const TextStyle(fontSize: 13),
+                ),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -171,12 +202,14 @@ class ErrorBookScreen extends ConsumerWidget {
   }
 
   void _startReTest(BuildContext context, List<Question> questions) {
-    context.push('/quiz', extra: {
-      'questions': questions,
-      'topicName': 'Error Book Re-test',
-      'topicId': 'error_retest',
-      'subject': 'Mixed',
-    });
+    context.push(
+      '/quiz',
+      extra: {
+        'questions': questions,
+        'topicName': 'Error Book Re-test',
+        'topicId': 'error_retest',
+        'subject': 'Mixed',
+      },
+    );
   }
 }
-

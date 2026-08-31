@@ -41,10 +41,9 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
       _answered = true;
       _results[question.id] = isCorrect;
     });
-    await ref.read(spacedReviewRecorderProvider).recordAnswer(
-      questionId: question.id,
-      isCorrect: isCorrect,
-    );
+    await ref
+        .read(spacedReviewRecorderProvider)
+        .recordAnswer(questionId: question.id, isCorrect: isCorrect);
   }
 
   void _next() {
@@ -71,9 +70,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
     final dueAsync = ref.watch(dueCardsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Review Session'),
-      ),
+      appBar: AppBar(title: const Text('Review Session')),
       body: dueAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Failed to load review: $e')),
@@ -137,7 +134,9 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          _results[question.id] == true ? 'Correct' : 'Incorrect',
+                          _results[question.id] == true
+                              ? 'Correct'
+                              : 'Incorrect',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -195,9 +194,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                 child: FilledButton(
                   onPressed: _next,
                   child: Text(
-                    _index + 1 >= _queue.length
-                        ? 'Finish Review'
-                        : 'Next Card',
+                    _index + 1 >= _queue.length ? 'Finish Review' : 'Next Card',
                   ),
                 ),
               ),
@@ -238,16 +235,17 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: _answered
-                ? null
-                : () => _submitAnswer(question, option),
+            onTap: _answered ? null : () => _submitAnswer(question, option),
             borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
+                border: Border.all(
+                  color: borderColor,
+                  width: isSelected ? 2 : 1,
+                ),
               ),
               child: Row(
                 children: [
@@ -276,7 +274,9 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                       style: TextStyle(
                         color: textColor,
                         fontSize: 16,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -330,8 +330,9 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: (isCorrect ? AppColors.success : AppColors.primary)
-              .withValues(alpha: 0.08),
+          color: (isCorrect ? AppColors.success : AppColors.primary).withValues(
+            alpha: 0.08,
+          ),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: (isCorrect ? AppColors.success : AppColors.primary)
@@ -401,9 +402,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                percent >= 80
-                    ? Icons.emoji_events
-                    : Icons.refresh,
+                percent >= 80 ? Icons.emoji_events : Icons.refresh,
                 size: 64,
                 color: percent >= 80 ? AppColors.warning : AppColors.primary,
               ),
@@ -448,9 +447,9 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
             const SizedBox(height: 16),
             Text(
               'All caught up!',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
@@ -458,7 +457,10 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
               'quizzes are scheduled here for review at growing intervals '
               '(1 → 3 → 7 → 21 days).',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AdaptiveColors.textSecondary(context), height: 1.5),
+              style: TextStyle(
+                color: AdaptiveColors.textSecondary(context),
+                height: 1.5,
+              ),
             ),
           ],
         ),
@@ -466,4 +468,3 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
     );
   }
 }
-

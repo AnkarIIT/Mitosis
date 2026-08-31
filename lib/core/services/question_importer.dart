@@ -47,8 +47,8 @@ class QuestionImportResult {
 /// as `option1`, `option2`, ... columns, or as one column using `|||`).
 class QuestionImporter {
   QuestionImporter({Set<String>? existingTexts, String? baseId})
-      : _existingTexts = existingTexts ?? const {},
-        _baseId = baseId ?? 'imp_${DateTime.now().microsecondsSinceEpoch}';
+    : _existingTexts = existingTexts ?? const {},
+      _baseId = baseId ?? 'imp_${DateTime.now().microsecondsSinceEpoch}';
 
   final Set<String> _existingTexts;
   final String _baseId;
@@ -69,7 +69,9 @@ class QuestionImporter {
       text.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
   /// Runs normalization in a background isolate using [compute] for large batches.
-  static Future<Set<String>> normalizeTextsInBackground(List<String> texts) async {
+  static Future<Set<String>> normalizeTextsInBackground(
+    List<String> texts,
+  ) async {
     return await compute(_normalizeBatch, texts);
   }
 
@@ -180,7 +182,8 @@ class QuestionImporter {
         continue;
       }
 
-      final correctAnswer = normalized['correctAnswer']?.toString().trim() ?? '';
+      final correctAnswer =
+          normalized['correctAnswer']?.toString().trim() ?? '';
       if (correctAnswer.isEmpty) {
         errors.add('Row $rowNumber: missing correctAnswer.');
         continue;
@@ -248,10 +251,13 @@ class QuestionImporter {
     }
 
     pick(['questionText', 'question', 'text', 'q'], 'questionText');
-    pick(
-      ['correctAnswer', 'correct_answer', 'answer', 'correct', 'answerKey'],
+    pick([
       'correctAnswer',
-    );
+      'correct_answer',
+      'answer',
+      'correct',
+      'answerKey',
+    ], 'correctAnswer');
     pick(['options'], 'options');
     pick(['subject'], 'subject');
     pick(['chapter'], 'chapter');
@@ -266,14 +272,13 @@ class QuestionImporter {
     pick(['imageUrl', 'image_url'], 'imageUrl');
 
     // Multi-column options (option1..optionN).
-    final optionCols = row.keys
-        .where((k) => RegExp(r'^option\d+$').hasMatch(k))
-        .toList()
-      ..sort((a, b) {
-        final na = int.parse(a.replaceAll(RegExp(r'\D'), ''));
-        final nb = int.parse(b.replaceAll(RegExp(r'\D'), ''));
-        return na.compareTo(nb);
-      });
+    final optionCols =
+        row.keys.where((k) => RegExp(r'^option\d+$').hasMatch(k)).toList()
+          ..sort((a, b) {
+            final na = int.parse(a.replaceAll(RegExp(r'\D'), ''));
+            final nb = int.parse(b.replaceAll(RegExp(r'\D'), ''));
+            return na.compareTo(nb);
+          });
     if (optionCols.isNotEmpty) {
       out['optionColumns'] = optionCols
           .map((k) => row[k]?.toString().trim() ?? '')
@@ -319,16 +324,16 @@ class QuestionImporter {
 
     final chapter = row['chapter']?.toString().trim() ?? '';
     final topic = row['topic']?.toString().trim() ?? '';
-    final base = (chapter + topic).isEmpty
-        ? 'imported'
-        : '$chapter-$topic';
+    final base = (chapter + topic).isEmpty ? 'imported' : '$chapter-$topic';
     return base.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_');
   }
 
   int? _parseYear(dynamic value) {
     if (value == null) return null;
     final text = value.toString().trim();
-    final parsed = int.tryParse(RegExp(r'\d{4}').firstMatch(text)?.group(0) ?? '');
+    final parsed = int.tryParse(
+      RegExp(r'\d{4}').firstMatch(text)?.group(0) ?? '',
+    );
     return parsed;
   }
 

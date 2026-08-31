@@ -46,7 +46,9 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
     _flipAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _flipController, curve: Curves.easeInOut),
     );
-    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 2),
+    );
   }
 
   @override
@@ -111,10 +113,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
     final dueAsync = ref.watch(dueFlashcardsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flashcard Review'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Flashcard Review'), elevation: 0),
       body: dueAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -148,9 +147,12 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                   child: LinearProgressIndicator(
                     value: (_currentIndex + 1) / _queue.length,
                     minHeight: 6,
-                    backgroundColor: AdaptiveColors.surfaceContainerHighest(context),
-                    valueColor:
-                        AlwaysStoppedAnimation(AdaptiveColors.primary(context)),
+                    backgroundColor: AdaptiveColors.surfaceContainerHighest(
+                      context,
+                    ),
+                    valueColor: AlwaysStoppedAnimation(
+                      AdaptiveColors.primary(context),
+                    ),
                   ),
                 ),
               ),
@@ -158,7 +160,9 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
               Text(
                 '${_currentIndex + 1}/${_queue.length}',
                 style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 14),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -166,7 +170,10 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
         const SizedBox(height: 8),
         Text(
           'Reviewed: $_reviewed',
-          style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12),
+          style: TextStyle(
+            color: AdaptiveColors.textSecondary(context),
+            fontSize: 12,
+          ),
         ),
 
         // Card area
@@ -209,11 +216,14 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
             child: Row(
               children: [
                 _buildRatingButton(
-                  label: 'Again',
-                  icon: Icons.close_rounded,
-                  color: AppColors.error,
-                  onTap: () => _rate(FlashcardRating.again),
-                ).animate().fadeIn(delay: 0.ms, duration: AppDuration.fast).scale(
+                      label: 'Again',
+                      icon: Icons.close_rounded,
+                      color: AppColors.error,
+                      onTap: () => _rate(FlashcardRating.again),
+                    )
+                    .animate()
+                    .fadeIn(delay: 0.ms, duration: AppDuration.fast)
+                    .scale(
                       begin: const Offset(0.8, 0.8),
                       end: const Offset(1, 1),
                       curve: Curves.elasticOut,
@@ -221,11 +231,14 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     ),
                 const SizedBox(width: 8),
                 _buildRatingButton(
-                  label: 'Hard',
-                  icon: Icons.sentiment_dissatisfied_rounded,
-                  color: AppColors.warning,
-                  onTap: () => _rate(FlashcardRating.hard),
-                ).animate().fadeIn(delay: 60.ms, duration: AppDuration.fast).scale(
+                      label: 'Hard',
+                      icon: Icons.sentiment_dissatisfied_rounded,
+                      color: AppColors.warning,
+                      onTap: () => _rate(FlashcardRating.hard),
+                    )
+                    .animate()
+                    .fadeIn(delay: 60.ms, duration: AppDuration.fast)
+                    .scale(
                       begin: const Offset(0.8, 0.8),
                       end: const Offset(1, 1),
                       curve: Curves.elasticOut,
@@ -233,11 +246,14 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     ),
                 const SizedBox(width: 8),
                 _buildRatingButton(
-                  label: 'Good',
-                  icon: Icons.sentiment_satisfied_rounded,
-                  color: AdaptiveColors.primary(context),
-                  onTap: () => _rate(FlashcardRating.good),
-                ).animate().fadeIn(delay: 120.ms, duration: AppDuration.fast).scale(
+                      label: 'Good',
+                      icon: Icons.sentiment_satisfied_rounded,
+                      color: AdaptiveColors.primary(context),
+                      onTap: () => _rate(FlashcardRating.good),
+                    )
+                    .animate()
+                    .fadeIn(delay: 120.ms, duration: AppDuration.fast)
+                    .scale(
                       begin: const Offset(0.8, 0.8),
                       end: const Offset(1, 1),
                       curve: Curves.elasticOut,
@@ -245,11 +261,14 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     ),
                 const SizedBox(width: 8),
                 _buildRatingButton(
-                  label: 'Easy',
-                  icon: Icons.sentiment_very_satisfied_rounded,
-                  color: AppColors.success,
-                  onTap: () => _rate(FlashcardRating.easy),
-                ).animate().fadeIn(delay: 180.ms, duration: AppDuration.fast).scale(
+                      label: 'Easy',
+                      icon: Icons.sentiment_very_satisfied_rounded,
+                      color: AppColors.success,
+                      onTap: () => _rate(FlashcardRating.easy),
+                    )
+                    .animate()
+                    .fadeIn(delay: 180.ms, duration: AppDuration.fast)
+                    .scale(
                       begin: const Offset(0.8, 0.8),
                       end: const Offset(1, 1),
                       curve: Curves.elasticOut,
@@ -265,7 +284,10 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
             padding: const EdgeInsets.only(bottom: 32),
             child: Text(
               'Tap to flip',
-              style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 13),
+              style: TextStyle(
+                color: AdaptiveColors.textSecondary(context),
+                fontSize: 13,
+              ),
             ),
           ),
       ],
@@ -281,7 +303,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
             colors: [
-AdaptiveColors.primary(context),
+              AdaptiveColors.primary(context),
               AdaptiveColors.primary(context).withValues(alpha: 0.8),
             ],
             begin: Alignment.topLeft,
@@ -315,16 +337,17 @@ AdaptiveColors.primary(context),
             const Spacer(),
             if (card.difficulty.isNotEmpty)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   card.difficulty,
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 11),
+                  style: const TextStyle(color: Colors.white70, fontSize: 11),
                 ),
               ).animate().fadeIn(delay: 200.ms, duration: AppDuration.normal),
           ],
@@ -345,7 +368,9 @@ AdaptiveColors.primary(context),
           borderRadius: BorderRadius.circular(24),
           color: Theme.of(context).cardColor,
           border: Border.all(
-              color: AdaptiveColors.primary(context).withValues(alpha: 0.2), width: 2),
+            color: AdaptiveColors.primary(context).withValues(alpha: 0.2),
+            width: 2,
+          ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -366,7 +391,10 @@ AdaptiveColors.primary(context),
                   card.back,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w600, height: 1.4),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                  ),
                 ).animate().fadeIn(delay: 150.ms, duration: AppDuration.normal),
               ),
             ),
@@ -375,23 +403,30 @@ AdaptiveColors.primary(context),
               GestureDetector(
                 onTap: () => _openNcertReference(card),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: AdaptiveColors.primary(context).withValues(alpha: 0.08),
+                    color: AdaptiveColors.primary(
+                      context,
+                    ).withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.book_outlined,
-                          size: 14, color: AdaptiveColors.primary(context)),
+                      Icon(
+                        Icons.book_outlined,
+                        size: 14,
+                        color: AdaptiveColors.primary(context),
+                      ),
                       const SizedBox(width: 6),
                       Flexible(
                         child: Text(
                           card.ncertReference,
                           style: TextStyle(
-color: AdaptiveColors.primary(context),
+                            color: AdaptiveColors.primary(context),
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                           ),
@@ -450,8 +485,11 @@ color: AdaptiveColors.primary(context),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_circle_outline_rounded,
-              size: 72, color: AppColors.success),
+          Icon(
+            Icons.check_circle_outline_rounded,
+            size: 72,
+            color: AppColors.success,
+          ),
           const SizedBox(height: 20),
           const Text(
             'All caught up!',
@@ -460,12 +498,18 @@ color: AdaptiveColors.primary(context),
           const SizedBox(height: 8),
           Text(
             'No flashcards due for review right now.',
-            style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 14),
+            style: TextStyle(
+              color: AdaptiveColors.textSecondary(context),
+              fontSize: 14,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'Generated cards will appear here when due.',
-style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12),
+            style: TextStyle(
+              color: AdaptiveColors.textSecondary(context),
+              fontSize: 12,
+            ),
           ),
           const SizedBox(height: 28),
           FilledButton.icon(
@@ -490,13 +534,19 @@ style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.celebration_rounded,
-                  size: 72, color: AdaptiveColors.primary(context)),
+              Icon(
+                Icons.celebration_rounded,
+                size: 72,
+                color: AdaptiveColors.primary(context),
+              ),
               const SizedBox(height: 20),
               Text(
-                'Session Complete!',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ).animate().fadeIn(duration: AppDuration.slow).scale(
+                    'Session Complete!',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  )
+                  .animate()
+                  .fadeIn(duration: AppDuration.slow)
+                  .scale(
                     begin: const Offset(0.8, 0.8),
                     end: const Offset(1, 1),
                     curve: Curves.elasticOut,
@@ -505,14 +555,20 @@ style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12),
               const SizedBox(height: 8),
               Text(
                 'You reviewed $_reviewed card${_reviewed == 1 ? '' : 's'}',
-                style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 14),
+                style: TextStyle(
+                  color: AdaptiveColors.textSecondary(context),
+                  fontSize: 14,
+                ),
               ).animate().fadeIn(delay: 100.ms, duration: AppDuration.normal),
               const SizedBox(height: 28),
               FilledButton.icon(
-                onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back_rounded),
-                label: const Text('BACK TO FLASHCARDS'),
-              ).animate().fadeIn(delay: 200.ms, duration: AppDuration.normal).slideY(begin: 0.2, end: 0),
+                    onPressed: () => context.pop(),
+                    icon: const Icon(Icons.arrow_back_rounded),
+                    label: const Text('BACK TO FLASHCARDS'),
+                  )
+                  .animate()
+                  .fadeIn(delay: 200.ms, duration: AppDuration.normal)
+                  .slideY(begin: 0.2, end: 0),
             ],
           ),
         ),
@@ -539,12 +595,18 @@ style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12),
   }
 
   void _openNcertReference(Flashcard card) {
-    final ref = card.ncertReference.isEmpty ? 'NCERT reference' : card.ncertReference;
+    final ref = card.ncertReference.isEmpty
+        ? 'NCERT reference'
+        : card.ncertReference;
     final pageHint = card.sourcePage > 0 ? '\nPage ${card.sourcePage}' : '';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: Icon(Icons.book_outlined, color: AdaptiveColors.primary(context), size: 32),
+        icon: Icon(
+          Icons.book_outlined,
+          color: AdaptiveColors.primary(context),
+          size: 32,
+        ),
         title: const Text('NCERT Reference'),
         content: Text('$ref$pageHint'),
         actions: [

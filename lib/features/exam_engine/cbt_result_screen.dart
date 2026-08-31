@@ -41,7 +41,9 @@ class CbtResultScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         actions: [
-          if (attempt.seed != null && questions != null && questions!.isNotEmpty)
+          if (attempt.seed != null &&
+              questions != null &&
+              questions!.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.replay_rounded),
               tooltip: 'Replay exact paper',
@@ -163,9 +165,9 @@ class CbtResultScreen extends ConsumerWidget {
                     '${analytics.score.config.marksPerWrong} • '
                     '${analytics.score.correct} correct • '
                     '${analytics.score.incorrect} wrong',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: AppColors.textSubtle),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSubtle,
+                    ),
                   ),
                 ],
               ),
@@ -400,10 +402,7 @@ class CbtResultScreen extends ConsumerWidget {
             ).textTheme.labelSmall?.copyWith(color: AppColors.textSubtle),
           ),
           const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -490,11 +489,26 @@ class CbtResultScreen extends ConsumerWidget {
       children: [
         Row(
           children: [
-            _buildReviewChip(context, 'Correct', correct.length, AppColors.success),
+            _buildReviewChip(
+              context,
+              'Correct',
+              correct.length,
+              AppColors.success,
+            ),
             const SizedBox(width: 8),
-            _buildReviewChip(context, 'Incorrect', incorrect.length, AppColors.error),
+            _buildReviewChip(
+              context,
+              'Incorrect',
+              incorrect.length,
+              AppColors.error,
+            ),
             const SizedBox(width: 8),
-            _buildReviewChip(context, 'Skipped', unattempted.length, AppColors.warning),
+            _buildReviewChip(
+              context,
+              'Skipped',
+              unattempted.length,
+              AppColors.warning,
+            ),
           ],
         ),
         const SizedBox(height: 12),
@@ -542,8 +556,10 @@ class CbtResultScreen extends ConsumerWidget {
                       ...q.options.asMap().entries.map((entry) {
                         final idx = entry.key;
                         final option = entry.value;
-                        final isUserChoice = userAnswer == String.fromCharCode(65 + idx);
-                        final isCorrectOption = idx.toString() == q.correctAnswer;
+                        final isUserChoice =
+                            userAnswer == String.fromCharCode(65 + idx);
+                        final isCorrectOption =
+                            idx.toString() == q.correctAnswer;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 3),
                           child: Row(
@@ -555,7 +571,9 @@ class CbtResultScreen extends ConsumerWidget {
                                   shape: BoxShape.circle,
                                   color: isCorrectOption
                                       ? AppColors.success
-                                      : (isUserChoice ? AppColors.error : AppColors.divider),
+                                      : (isUserChoice
+                                            ? AppColors.error
+                                            : AppColors.divider),
                                 ),
                                 child: Center(
                                   child: Text(
@@ -576,7 +594,8 @@ class CbtResultScreen extends ConsumerWidget {
                           ),
                         );
                       }),
-                      if (q.explanation != null && q.explanation!.isNotEmpty) ...[
+                      if (q.explanation != null &&
+                          q.explanation!.isNotEmpty) ...[
                         const SizedBox(height: 10),
                         const Divider(),
                         Text(
@@ -600,7 +619,12 @@ class CbtResultScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildReviewChip(BuildContext context, String label, int count, Color color) {
+  Widget _buildReviewChip(
+    BuildContext context,
+    String label,
+    int count,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -615,7 +639,11 @@ class CbtResultScreen extends ConsumerWidget {
           const SizedBox(width: 6),
           Text(
             '$label $count',
-            style: TextStyle(fontWeight: FontWeight.w600, color: color, fontSize: 12),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: color,
+              fontSize: 12,
+            ),
           ),
         ],
       ),
@@ -658,10 +686,10 @@ class CbtResultScreen extends ConsumerWidget {
       final shuffled = List<Question>.from(pool);
       shuffled.shuffle(random);
 
-      await context.push('/cbt/replay', extra: {
-        'config': analytics.score.config,
-        'questionPool': shuffled,
-      });
+      await context.push(
+        '/cbt/replay',
+        extra: {'config': analytics.score.config, 'questionPool': shuffled},
+      );
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -710,7 +738,8 @@ class CbtResultScreen extends ConsumerWidget {
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: 'OK',
-            onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+            onPressed: () =>
+                ScaffoldMessenger.of(context).hideCurrentSnackBar(),
           ),
         ),
       );
@@ -765,7 +794,10 @@ class CbtResultScreen extends ConsumerWidget {
                 children: [
                   Text('0s', style: Theme.of(context).textTheme.labelSmall),
                   const Spacer(),
-                  Text('${_formatTime(maxSeconds.toInt())}', style: Theme.of(context).textTheme.labelSmall),
+                  Text(
+                    '${_formatTime(maxSeconds.toInt())}',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -813,5 +845,3 @@ class CbtResultScreen extends ConsumerWidget {
     );
   }
 }
-
-

@@ -22,19 +22,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final List<OnboardingPage> _pages = [
     OnboardingPage(
       title: 'Master NEET Concepts',
-      description: 'Comprehensive coverage of Biology, Chemistry, and Physics based strictly on NCERT.',
+      description:
+          'Comprehensive coverage of Biology, Chemistry, and Physics based strictly on NCERT.',
       icon: Icons.auto_stories,
       color: AppColors.primary,
     ),
     OnboardingPage(
       title: 'AI-Powered Doubt Solving',
-      description: 'Stuck on a question? Take a photo or type it in, and our AI Tutor will guide you to the answer.',
+      description:
+          'Stuck on a question? Take a photo or type it in, and our AI Tutor will guide you to the answer.',
       icon: Icons.psychology,
       color: Colors.purple,
     ),
     OnboardingPage(
       title: 'Track Your Progress',
-      description: 'Identify your weak spots with smart analytics and focus on what matters most.',
+      description:
+          'Identify your weak spots with smart analytics and focus on what matters most.',
       icon: Icons.analytics,
       color: Colors.blue,
     ),
@@ -90,7 +93,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               curve: Curves.easeInOut,
                             );
                           },
-                          child: const Text('SKIP', style: TextStyle(color: AppColors.secondary)),
+                          child: const Text(
+                            'SKIP',
+                            style: TextStyle(color: AppColors.secondary),
+                          ),
                         )
                       else
                         const SizedBox(width: 60),
@@ -103,7 +109,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             width: _currentPage == index ? 24 : 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: _currentPage == index ? AppColors.primary : AppColors.divider,
+                              color: _currentPage == index
+                                  ? AppColors.primary
+                                  : AppColors.divider,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -112,7 +120,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
                       if (_currentPage < _pages.length)
                         IconButton(
-                          icon: const Icon(Icons.arrow_forward, color: AppColors.primary),
+                          icon: const Icon(
+                            Icons.arrow_forward,
+                            color: AppColors.primary,
+                          ),
                           onPressed: () {
                             _pageController.nextPage(
                               duration: const Duration(milliseconds: 300),
@@ -160,7 +171,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.settings_suggest, size: 80, color: AppColors.primary),
+          const Icon(
+            Icons.settings_suggest,
+            size: 80,
+            color: AppColors.primary,
+          ),
           const SizedBox(height: 24),
           const Text(
             'Final Setup',
@@ -193,7 +208,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             },
             child: const Text(
               'How to get a free key?',
-              style: TextStyle(color: AppColors.primary, fontSize: 12, decoration: TextDecoration.underline),
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 12,
+                decoration: TextDecoration.underline,
+              ),
             ),
           ),
           const SizedBox(height: 40),
@@ -215,11 +234,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     if (key.isNotEmpty) {
       await ref.read(geminiServiceProvider).saveApiKey(key);
     }
-    
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
     ref.read(onboardingCompleteProvider.notifier).state = true;
-    
+
     if (!mounted) return;
     context.go('/');
   }

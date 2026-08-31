@@ -92,9 +92,6 @@ class Question {
     } on FormatException {
       // Fall through to the deprecated '|||' separator format.
     }
-    return raw
-        .split('|||')
-        .where((e) => e.isNotEmpty)
-        .toList();
+    return raw.split('|||').where((e) => e.isNotEmpty).toList();
   }
 }

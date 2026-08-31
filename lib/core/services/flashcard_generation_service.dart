@@ -77,7 +77,8 @@ class FlashcardGenerationService {
 
     if (_proxy == null || !_proxy.isConfigured) {
       yield FlashcardGenerationProgress(
-        status: 'AI flashcard generation requires cloud sync. Please enable it in Settings.',
+        status:
+            'AI flashcard generation requires cloud sync. Please enable it in Settings.',
         currentStep: 'ai',
         lastError: 'ai_unavailable',
       );
@@ -87,7 +88,8 @@ class FlashcardGenerationService {
     final proxy = _proxy;
 
     // 1. Resolve asset path.
-    final assetPath = assetPathOverride ??
+    final assetPath =
+        assetPathOverride ??
         _resolveAssetPath(subject, chapterNumber, classLevel);
     if (assetPath == null) {
       yield FlashcardGenerationProgress(
@@ -140,7 +142,8 @@ class FlashcardGenerationService {
 
     if (!proxy.isConfigured) {
       yield FlashcardGenerationProgress(
-        status: 'AI flashcard generation requires cloud sync. Please enable it in Settings.',
+        status:
+            'AI flashcard generation requires cloud sync. Please enable it in Settings.',
         currentStep: 'ai',
         lastError: 'ai_unavailable',
       );
@@ -191,7 +194,9 @@ class FlashcardGenerationService {
       }
 
       if (i + batchSize < total && delayBetweenBatchesMs > 0) {
-        await Future<void>.delayed(Duration(milliseconds: delayBetweenBatchesMs));
+        await Future<void>.delayed(
+          Duration(milliseconds: delayBetweenBatchesMs),
+        );
       }
     }
 
@@ -236,7 +241,8 @@ class FlashcardGenerationService {
 
     final cards = <GeneratedFlashcard>[];
 
-    final assetPath = assetPathOverride ??
+    final assetPath =
+        assetPathOverride ??
         _resolveAssetPath(subject, chapterNumber, classLevel);
     if (assetPath == null) return cards;
 
@@ -270,7 +276,9 @@ class FlashcardGenerationService {
       }
 
       if (i + batchSize < chunks.length && delayBetweenBatchesMs > 0) {
-        await Future<void>.delayed(Duration(milliseconds: delayBetweenBatchesMs));
+        await Future<void>.delayed(
+          Duration(milliseconds: delayBetweenBatchesMs),
+        );
       }
     }
 
@@ -288,13 +296,17 @@ class FlashcardGenerationService {
   // Helpers
   // ─────────────────────────────────────────────────────────────
 
-  String? _resolveAssetPath(String subject, int chapterNumber, String classLevel) {
+  String? _resolveAssetPath(
+    String subject,
+    int chapterNumber,
+    String classLevel,
+  ) {
     final prefix = classLevel.toLowerCase().contains('12') ? 'le' : 'ke';
     final subjectPrefix = subject.toLowerCase().startsWith('bio')
         ? 'bo'
         : subject.toLowerCase().startsWith('chem')
-            ? 'ch'
-            : 'ph';
+        ? 'ch'
+        : 'ph';
     final padded = chapterNumber.toString().padLeft(3, '0');
     final fileName = '$prefix$subjectPrefix$padded.pdf';
 
@@ -307,16 +319,19 @@ class FlashcardGenerationService {
     final folder = subject.toLowerCase();
     final book = subject.toLowerCase().startsWith('bio')
         ? (classLevel.toLowerCase().contains('12')
-            ? 'Biology_Class_12'
-            : 'Biology_Class_11')
+              ? 'Biology_Class_12'
+              : 'Biology_Class_11')
         : (classLevel.toLowerCase().contains('12')
-            ? '${subject}_Class_12_Part_1'
-            : '${subject}_Class_11_Part_1');
+              ? '${subject}_Class_12_Part_1'
+              : '${subject}_Class_11_Part_1');
 
     return 'assets/ncert_books/$folder/$book/$fileName';
   }
 
-  List<String> _chunkParagraphs(List<PdfParagraph> paragraphs, int targetCount) {
+  List<String> _chunkParagraphs(
+    List<PdfParagraph> paragraphs,
+    int targetCount,
+  ) {
     if (paragraphs.isEmpty) return const [];
 
     final shuffled = List<PdfParagraph>.from(paragraphs)..shuffle(Random());
@@ -388,7 +403,8 @@ OUTPUT FORMAT (strict JSON array, no markdown):
       final back = item['back']?.toString().trim();
       final source = item['source']?.toString().trim() ?? '';
 
-      if (front == null || front.isEmpty || back == null || back.isEmpty) continue;
+      if (front == null || front.isEmpty || back == null || back.isEmpty)
+        continue;
 
       final page = _extractPageNumber(source);
 
@@ -413,7 +429,10 @@ OUTPUT FORMAT (strict JSON array, no markdown):
 
   Object _decodeJsonLoose(String input) {
     // Remove control characters that can break jsonDecode.
-    final cleaned = input.replaceAll(RegExp(r'[\x00-\x08\x0b\x0c\x0e-\x1f]'), '');
+    final cleaned = input.replaceAll(
+      RegExp(r'[\x00-\x08\x0b\x0c\x0e-\x1f]'),
+      '',
+    );
     return jsonDecode(cleaned);
   }
 

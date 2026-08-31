@@ -47,10 +47,7 @@ void main() {
     await tester.tap(find.text('NEXT'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('How much time can you commit daily?'),
-      findsOneWidget,
-    );
+    expect(find.text('How much time can you commit daily?'), findsOneWidget);
     await tester.ensureVisible(find.textContaining('1 hour'));
     await tester.tap(find.textContaining('1 hour'));
     await tester.pumpAndSettle();
@@ -87,10 +84,7 @@ void main() {
     await _pumpBatchPage(tester, onDone: () {});
 
     final nextButton = tester.widget<FilledButton>(
-      find.ancestor(
-        of: find.text('NEXT'),
-        matching: find.byType(FilledButton),
-      ),
+      find.ancestor(of: find.text('NEXT'), matching: find.byType(FilledButton)),
     );
     expect(nextButton.onPressed, isNull);
 
@@ -99,10 +93,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final enabledNext = tester.widget<FilledButton>(
-      find.ancestor(
-        of: find.text('NEXT'),
-        matching: find.byType(FilledButton),
-      ),
+      find.ancestor(of: find.text('NEXT'), matching: find.byType(FilledButton)),
     );
     expect(enabledNext.onPressed, isNotNull);
   });

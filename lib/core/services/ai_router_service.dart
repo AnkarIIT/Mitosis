@@ -22,27 +22,27 @@ class AiResponse {
   });
 
   factory AiResponse.error(String message) {
-    return AiResponse(
-      text: message,
-      source: AiSource.error,
-      confidence: 0.0,
-    );
+    return AiResponse(text: message, source: AiSource.error, confidence: 0.0);
   }
 }
 
 class AiRouterService {
   final GeminiProxyService _geminiProxy;
 
-  AiRouterService()
-      : _geminiProxy = GeminiProxyService();
+  AiRouterService() : _geminiProxy = GeminiProxyService();
 
   double _calculateConfidence(AiSource source, {double ragScore = 0.0}) {
     switch (source) {
-      case AiSource.rag: return ragScore.clamp(0.0, 1.0);
-      case AiSource.groq: return 0.85;
-      case AiSource.gemini: return 0.90;
-      case AiSource.onDevice: return 0.70;
-      default: return 0.0;
+      case AiSource.rag:
+        return ragScore.clamp(0.0, 1.0);
+      case AiSource.groq:
+        return 0.85;
+      case AiSource.gemini:
+        return 0.90;
+      case AiSource.onDevice:
+        return 0.70;
+      default:
+        return 0.0;
     }
   }
 

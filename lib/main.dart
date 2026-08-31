@@ -52,12 +52,7 @@ void main() async {
     debugPrint('❌ Onboarding preload failed: $e');
   }
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const MyApp(),
-    ),
-  );
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 
   // Defer Supabase initialization to background (non-blocking)
   _initSupabaseBackground(container);
@@ -66,16 +61,15 @@ void main() async {
 
 Future<void> _initSupabaseBackground(ProviderContainer container) async {
   if (!AppConfig.enableCloudAuth) return;
-  
+
   try {
     final url = AppConfig.supabaseUrl;
     final key = AppConfig.supabaseAnonKey;
     debugPrint('🔧 Supabase URL: $url');
-    debugPrint('🔧 Supabase key prefix: ${key.substring(0, key.length > 10 ? 10 : key.length)}...');
-    await supabase.Supabase.initialize(
-      url: url,
-      publishableKey: key,
-    ).timeout(
+    debugPrint(
+      '🔧 Supabase key prefix: ${key.substring(0, key.length > 10 ? 10 : key.length)}...',
+    );
+    await supabase.Supabase.initialize(url: url, publishableKey: key).timeout(
       const Duration(seconds: 5),
       onTimeout: () {
         debugPrint('⚠️ Supabase init timeout - continuing offline');
@@ -93,7 +87,9 @@ Future<void> _initSupabaseBackground(ProviderContainer container) async {
 Future<void> _backgroundInit(ProviderContainer container) async {
   try {
     final repository = container.read(questionRepositoryProvider);
-    await repository.importBundledQuestions('assets/questions/neet_sample_10.json');
+    await repository.importBundledQuestions(
+      'assets/questions/neet_sample_10.json',
+    );
     await repository.insertSampleQuestions();
 
     // Seed starter flashcard deck if empty.
@@ -177,13 +173,17 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (_lastUnlockTime != null) {
       final elapsed = DateTime.now().difference(_lastUnlockTime!);
       if (elapsed.inSeconds < 2) {
-        debugPrint('🔐 Biometric check skipped: cooldown ${elapsed.inSeconds}s');
+        debugPrint(
+          '🔐 Biometric check skipped: cooldown ${elapsed.inSeconds}s',
+        );
         return;
       }
       _lastUnlockTime = null;
     }
 
-    debugPrint('🔐 Biometric lock check: enabled=$isEnabled, needsBiometric=$_needsBiometric');
+    debugPrint(
+      '🔐 Biometric lock check: enabled=$isEnabled, needsBiometric=$_needsBiometric',
+    );
 
     if (isEnabled) {
       // Defer authentication to the lock overlay so the UI is not blocked

@@ -5,14 +5,63 @@ import '../models/question_model.dart';
 /// text and a question's topic/chapter/question text.
 class ParagraphQuestionMatcher {
   static const Set<String> _stopwords = {
-    'that', 'this', 'these', 'those', 'there', 'their', 'which',
-    'where', 'while', 'through', 'between', 'within', 'without',
-    'because', 'before', 'after', 'about', 'above', 'below', 'under',
-    'over', 'again', 'further', 'then', 'once', 'here', 'when',
-    'each', 'other', 'more', 'most', 'some', 'such', 'both', 'also',
-    'very', 'just', 'only', 'from', 'into', 'with', 'them', 'than',
-    'have', 'been', 'being', 'were', 'will', 'would', 'could',
-    'should', 'shall', 'does', 'doing', 'made', 'make', 'same',
+    'that',
+    'this',
+    'these',
+    'those',
+    'there',
+    'their',
+    'which',
+    'where',
+    'while',
+    'through',
+    'between',
+    'within',
+    'without',
+    'because',
+    'before',
+    'after',
+    'about',
+    'above',
+    'below',
+    'under',
+    'over',
+    'again',
+    'further',
+    'then',
+    'once',
+    'here',
+    'when',
+    'each',
+    'other',
+    'more',
+    'most',
+    'some',
+    'such',
+    'both',
+    'also',
+    'very',
+    'just',
+    'only',
+    'from',
+    'into',
+    'with',
+    'them',
+    'than',
+    'have',
+    'been',
+    'being',
+    'were',
+    'will',
+    'would',
+    'could',
+    'should',
+    'shall',
+    'does',
+    'doing',
+    'made',
+    'make',
+    'same',
   };
 
   /// Splits a text into significant tokens (length >= 4, stopwords removed,
@@ -25,10 +74,12 @@ class ParagraphQuestionMatcher {
         .trim();
     return normalized
         .split(' ')
-        .where((t) =>
-            t.length >= 4 &&
-            !_stopwords.contains(t) &&
-            !RegExp(r'^\d+$').hasMatch(t))
+        .where(
+          (t) =>
+              t.length >= 4 &&
+              !_stopwords.contains(t) &&
+              !RegExp(r'^\d+$').hasMatch(t),
+        )
         .toSet()
         .toList();
   }

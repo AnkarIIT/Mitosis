@@ -112,11 +112,11 @@ class QuestionRepository {
   }
 
   Future<List<model.Question>> getAllQuestionsFromDb() async {
-    final data = await (db.select(
-      db.questions,
-    )
-      ..where((tbl) => tbl.isActive.equals(true))
-      ..orderBy([(tbl) => OrderingTerm.asc(tbl.id)])).get();
+    final data =
+        await (db.select(db.questions)
+              ..where((tbl) => tbl.isActive.equals(true))
+              ..orderBy([(tbl) => OrderingTerm.asc(tbl.id)]))
+            .get();
 
     return _mapQuestions(data);
   }
@@ -173,9 +173,9 @@ class QuestionRepository {
   }
 
   Future<model.Question?> getQuestionById(String id) async {
-    final row = await (db.select(db.questions)
-          ..where((tbl) => tbl.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (db.select(
+      db.questions,
+    )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
     if (row == null) return null;
     return model.Question.fromMap({
       'id': row.id,
@@ -196,7 +196,10 @@ class QuestionRepository {
     });
   }
 
-  Future<void> updateQuestionExplanation(String questionId, String explanation) async {
+  Future<void> updateQuestionExplanation(
+    String questionId,
+    String explanation,
+  ) async {
     await (db.update(db.questions)..where((tbl) => tbl.id.equals(questionId)))
         .write(QuestionsCompanion(explanation: Value<String>(explanation)));
   }
@@ -243,26 +246,28 @@ class QuestionRepository {
 
   /// Inserts a single question. Duplicate ids are overwritten.
   Future<void> insertQuestion(model.Question question) async {
-    await db.into(db.questions).insert(
-      QuestionsCompanion(
-        id: Value<String>(question.id),
-        subject: Value<String>(question.subject),
-        chapter: Value<String>(question.chapter),
-        topic: Value<String>(question.topic),
-        topicId: Value<String>(question.topicId),
-        questionText: Value<String>(question.questionText),
-        options: Value<String>(question.options.join('|||')),
-        correctAnswer: Value<String>(question.correctAnswer),
-        explanation: Value<String?>(question.explanation),
-        ncertReference: Value<String?>(question.ncertReference),
-        year: Value<int?>(question.year),
-        difficulty: Value<String>(question.difficulty),
-        tags: Value<String>(question.tags.join('|||')),
-        imageUrl: Value<String?>(question.imageUrl),
-        type: Value<String>(question.type),
-      ),
-      mode: InsertMode.insertOrReplace,
-    );
+    await db
+        .into(db.questions)
+        .insert(
+          QuestionsCompanion(
+            id: Value<String>(question.id),
+            subject: Value<String>(question.subject),
+            chapter: Value<String>(question.chapter),
+            topic: Value<String>(question.topic),
+            topicId: Value<String>(question.topicId),
+            questionText: Value<String>(question.questionText),
+            options: Value<String>(question.options.join('|||')),
+            correctAnswer: Value<String>(question.correctAnswer),
+            explanation: Value<String?>(question.explanation),
+            ncertReference: Value<String?>(question.ncertReference),
+            year: Value<int?>(question.year),
+            difficulty: Value<String>(question.difficulty),
+            tags: Value<String>(question.tags.join('|||')),
+            imageUrl: Value<String?>(question.imageUrl),
+            type: Value<String>(question.type),
+          ),
+          mode: InsertMode.insertOrReplace,
+        );
   }
 
   List<model.Question> _mapQuestions(List<dynamic> rows) {

@@ -42,11 +42,13 @@ class QuestionCard extends ConsumerWidget {
               isAnswered: isAnswered,
               selectedAnswer: selectedAnswer,
               onTap: () {
-                ref.read(quizProvider.notifier).selectAnswer(
-                  ref.read(quizProvider).currentIndex,
-                  option,
-                  0,
-                );
+                ref
+                    .read(quizProvider.notifier)
+                    .selectAnswer(
+                      ref.read(quizProvider).currentIndex,
+                      option,
+                      0,
+                    );
               },
             );
           }),

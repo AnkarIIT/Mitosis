@@ -2,10 +2,10 @@ import 'question_model.dart';
 
 // Question Paper Standards
 enum PaperStandard {
-  mini,      // 5 questions (quick practice)
-  chapter,   // 10 questions (chapter test)
-  standard,  // 30 questions (mock NEET level)
-  full,      // 180 questions (full NEET exam)
+  mini, // 5 questions (quick practice)
+  chapter, // 10 questions (chapter test)
+  standard, // 30 questions (mock NEET level)
+  full, // 180 questions (full NEET exam)
 }
 
 class PaperConfig {
@@ -55,8 +55,7 @@ class PaperConfig {
   };
 
   static PaperConfig getConfig(PaperStandard standard) {
-    return configs[standard] ??
-        configs[PaperStandard.standard]!;
+    return configs[standard] ?? configs[PaperStandard.standard]!;
   }
 }
 

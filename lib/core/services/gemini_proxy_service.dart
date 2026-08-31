@@ -45,14 +45,16 @@ Future<dynamic> _defaultInvoker(String name, {Object? body}) async {
     throw Exception('AI proxy is disabled');
   }
   try {
-    final res = await Supabase.instance.client.functions.invoke(name, body: body);
+    final res = await Supabase.instance.client.functions.invoke(
+      name,
+      body: body,
+    );
     return res.data;
   } on Exception catch (e) {
     debugPrint('Supabase not initialized or function failed: $e');
     rethrow;
   }
 }
-
 
 /// Client for the `gemini-proxy` Supabase Edge Function.
 ///
@@ -64,38 +66,54 @@ Future<dynamic> _defaultInvoker(String name, {Object? body}) async {
 /// the caller, which owns the database handle.
 class GeminiProxyService {
   GeminiProxyService({GeminiInvoker? invoker, bool? configured})
-      : _invoker = invoker ?? _defaultInvoker,
-        _configured = configured;
+    : _invoker = invoker ?? _defaultInvoker,
+      _configured = configured;
 
   final GeminiInvoker _invoker;
   final bool? _configured;
 
-  bool get isConfigured => _configured ?? (AppConfig.enableAiProxy && AppConfig.isCloudAuthConfigured);
+  bool get isConfigured =>
+      _configured ??
+      (AppConfig.enableAiProxy && AppConfig.isCloudAuthConfigured);
 
   /// Build a context-aware system prompt for the AI tutor.
   String _buildSystemPrompt(ChatContext context) {
     final buffer = StringBuffer();
-    buffer.write('You are an expert NEET tutor for a ${context.userBatch} student. ');
+    buffer.write(
+      'You are an expert NEET tutor for a ${context.userBatch} student. ',
+    );
     buffer.write('They are currently studying ${context.currentChapter}. ');
 
     if (context.weakTopics.isNotEmpty) {
       buffer.write('Their weak topics are: ${context.weakTopics.join(', ')}. ');
-      buffer.write('Prioritize explaining these with extra examples and memory tricks. ');
+      buffer.write(
+        'Prioritize explaining these with extra examples and memory tricks. ',
+      );
     }
 
     buffer.write('They have ${context.daysToExam} days until NEET 2026. ');
-    buffer.write('Accuracy: ${(context.accuracy * 100).toInt()}% (${context.questionsSolved} questions solved). ');
+    buffer.write(
+      'Accuracy: ${(context.accuracy * 100).toInt()}% (${context.questionsSolved} questions solved). ',
+    );
 
     if (context.studyMode == StudyMode.coachingStudent) {
-      buffer.write('Assume they have coaching notes — reference NCERT first, then coaching material. ');
+      buffer.write(
+        'Assume they have coaching notes — reference NCERT first, then coaching material. ',
+      );
     } else {
-      buffer.write('They are self-studying — make explanations self-contained with NCERT references. ');
+      buffer.write(
+        'They are self-studying — make explanations self-contained with NCERT references. ',
+      );
     }
 
-    buffer.write('Use simple Hindi-English mix if the question is in Hinglish. ');
+    buffer.write(
+      'Use simple Hindi-English mix if the question is in Hinglish. ',
+    );
     buffer.write('For Biology: use mnemonics and diagrams descriptions. ');
     buffer.write('For Physics: show step-by-step formulas with units. ');
-    buffer.write('For Chemistry: show reaction mechanisms for organic, periodic trends for inorganic. ');
+    buffer.write(
+      'For Chemistry: show reaction mechanisms for organic, periodic trends for inorganic. ',
+    );
 
     return buffer.toString();
   }

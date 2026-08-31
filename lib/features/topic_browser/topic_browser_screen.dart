@@ -89,7 +89,9 @@ class TopicBrowserScreen extends ConsumerWidget {
                               '${chapter.topics.length} topics',
                               style: Theme.of(context).textTheme.labelSmall
                                   ?.copyWith(
-                                    color: AdaptiveColors.textSecondary(context),
+                                    color: AdaptiveColors.textSecondary(
+                                      context,
+                                    ),
                                   ),
                             ),
                           ],
@@ -126,7 +128,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                   padding: const EdgeInsets.only(bottom: 12),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                       color: AdaptiveColors.background(context),
+                                      color: AdaptiveColors.background(context),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color: AppColors.primary.withValues(
@@ -138,7 +140,9 @@ class TopicBrowserScreen extends ConsumerWidget {
                                       color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
-                                          context.push('/topic/${topic.id}?subjectName=${Uri.encodeComponent(subjectName)}&chapterName=${Uri.encodeComponent(chapter.name)}');
+                                          context.push(
+                                            '/topic/${topic.id}?subjectName=${Uri.encodeComponent(subjectName)}&chapterName=${Uri.encodeComponent(chapter.name)}',
+                                          );
                                         },
                                         borderRadius: BorderRadius.circular(12),
                                         child: Padding(
@@ -175,12 +179,14 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                       : Text(
                                                           topicQuestions.length
                                                               .toString(),
-                                                           style: TextStyle(
-                                                             fontSize: 14,
-                                                             fontWeight:
-                                                                 FontWeight.bold,
-                                                             color:
-                                                                 AdaptiveColors.textPrimary(context),
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                AdaptiveColors.textPrimary(
+                                                                  context,
+                                                                ),
                                                           ),
                                                         ),
                                                 ),
@@ -197,11 +203,13 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .bodyMedium
-                                                           ?.copyWith(
-                                                             fontWeight:
-                                                                 FontWeight.w600,
-                                                             color:
-                                                                 AdaptiveColors.textPrimary(context),
+                                                          ?.copyWith(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color:
+                                                                AdaptiveColors.textPrimary(
+                                                                  context,
+                                                                ),
                                                           ),
                                                       maxLines: 1,
                                                       overflow:
@@ -214,8 +222,10 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                           Icons
                                                               .help_outline_rounded,
                                                           size: 12,
-                                                             color:
-                                                                AdaptiveColors.textPrimary(context),
+                                                          color:
+                                                              AdaptiveColors.textPrimary(
+                                                                context,
+                                                              ),
                                                         ),
                                                         const SizedBox(
                                                           width: 4,
@@ -226,8 +236,10 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                               .textTheme
                                                               .labelSmall
                                                               ?.copyWith(
-                                                             color:
-                                                                AdaptiveColors.textPrimary(context),
+                                                                color:
+                                                                    AdaptiveColors.textPrimary(
+                                                                      context,
+                                                                    ),
                                                               ),
                                                         ),
                                                       ],

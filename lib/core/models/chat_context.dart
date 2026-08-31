@@ -1,8 +1,4 @@
-enum StudyMode {
-  selfStudy,
-  coachingStudent,
-  onlineCourse,
-}
+enum StudyMode { selfStudy, coachingStudent, onlineCourse }
 
 class ChatContext {
   final String userBatch;

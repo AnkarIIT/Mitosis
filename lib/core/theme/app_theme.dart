@@ -35,8 +35,7 @@ class AdaptiveColors {
   static Color textTertiary(BuildContext context) =>
       Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
 
-  static Color divider(BuildContext context) =>
-      Theme.of(context).dividerColor;
+  static Color divider(BuildContext context) => Theme.of(context).dividerColor;
 
   static Color primary(BuildContext context) =>
       Theme.of(context).colorScheme.primary;
@@ -55,13 +54,13 @@ class AdaptiveColors {
 
   static Color warning(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFFFBBF24)
-          : AppColors.warning;
+      ? const Color(0xFFFBBF24)
+      : AppColors.warning;
 
   static Color success(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF34D399)
-          : AppColors.success;
+      ? const Color(0xFF34D399)
+      : AppColors.success;
 
   static Color surfaceContainerHighest(BuildContext context) =>
       Theme.of(context).colorScheme.surfaceContainerHighest;
@@ -75,23 +74,60 @@ class AdaptiveColors {
 
 class AppTheme {
   static ThemeData get lightTheme {
-    final textTheme = GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
-      displayLarge: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.bold),
-      displayMedium: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.bold),
-      displaySmall: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.bold),
-      headlineLarge: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.bold),
-      headlineMedium: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.bold),
-      headlineSmall: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.w600),
-      titleLarge: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.w600),
-      titleMedium: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.w500),
-      titleSmall: GoogleFonts.inter(color: AppColors.textDark, fontWeight: FontWeight.w500),
-      bodyLarge: GoogleFonts.inter(color: AppColors.textDark),
-      bodyMedium: GoogleFonts.inter(color: AppColors.textDark),
-      bodySmall: GoogleFonts.inter(color: AppColors.textSubtle),
-      labelLarge: GoogleFonts.inter(color: AppColors.textSubtle, fontWeight: FontWeight.w500),
-      labelMedium: GoogleFonts.inter(color: AppColors.textSubtle, fontWeight: FontWeight.w500),
-      labelSmall: GoogleFonts.inter(color: AppColors.textSubtle, fontWeight: FontWeight.w500),
-    );
+    final textTheme = GoogleFonts.interTextTheme(ThemeData.light().textTheme)
+        .copyWith(
+          displayLarge: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.bold,
+          ),
+          displayMedium: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.bold,
+          ),
+          displaySmall: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.bold,
+          ),
+          headlineLarge: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.bold,
+          ),
+          headlineMedium: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.bold,
+          ),
+          headlineSmall: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.w600,
+          ),
+          titleLarge: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.w600,
+          ),
+          titleMedium: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.w500,
+          ),
+          titleSmall: GoogleFonts.inter(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.w500,
+          ),
+          bodyLarge: GoogleFonts.inter(color: AppColors.textDark),
+          bodyMedium: GoogleFonts.inter(color: AppColors.textDark),
+          bodySmall: GoogleFonts.inter(color: AppColors.textSubtle),
+          labelLarge: GoogleFonts.inter(
+            color: AppColors.textSubtle,
+            fontWeight: FontWeight.w500,
+          ),
+          labelMedium: GoogleFonts.inter(
+            color: AppColors.textSubtle,
+            fontWeight: FontWeight.w500,
+          ),
+          labelSmall: GoogleFonts.inter(
+            color: AppColors.textSubtle,
+            fontWeight: FontWeight.w500,
+          ),
+        );
 
     return ThemeData(
       useMaterial3: true,
@@ -199,7 +235,10 @@ class AppTheme {
         selectedColor: AppColors.primary.withValues(alpha: 0.15),
         side: const BorderSide(color: AppColors.divider),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+        labelStyle: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
       dialogTheme: DialogThemeData(
@@ -226,23 +265,60 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final textTheme = GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
-      displayLarge: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.bold),
-      displayMedium: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.bold),
-      displaySmall: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.bold),
-      headlineLarge: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.bold),
-      headlineMedium: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.bold),
-      headlineSmall: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.w600),
-      titleLarge: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.w600),
-      titleMedium: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.w500),
-      titleSmall: GoogleFonts.inter(color: AppColors.textLight, fontWeight: FontWeight.w500),
-      bodyLarge: GoogleFonts.inter(color: AppColors.textLight),
-      bodyMedium: GoogleFonts.inter(color: AppColors.textLight),
-      bodySmall: GoogleFonts.inter(color: AppColors.textSubtleDark),
-      labelLarge: GoogleFonts.inter(color: AppColors.textSubtleDark, fontWeight: FontWeight.w500),
-      labelMedium: GoogleFonts.inter(color: AppColors.textSubtleDark, fontWeight: FontWeight.w500),
-      labelSmall: GoogleFonts.inter(color: AppColors.textSubtleDark, fontWeight: FontWeight.w500),
-    );
+    final textTheme = GoogleFonts.interTextTheme(ThemeData.dark().textTheme)
+        .copyWith(
+          displayLarge: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.bold,
+          ),
+          displayMedium: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.bold,
+          ),
+          displaySmall: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.bold,
+          ),
+          headlineLarge: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.bold,
+          ),
+          headlineMedium: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.bold,
+          ),
+          headlineSmall: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.w600,
+          ),
+          titleLarge: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.w600,
+          ),
+          titleMedium: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.w500,
+          ),
+          titleSmall: GoogleFonts.inter(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.w500,
+          ),
+          bodyLarge: GoogleFonts.inter(color: AppColors.textLight),
+          bodyMedium: GoogleFonts.inter(color: AppColors.textLight),
+          bodySmall: GoogleFonts.inter(color: AppColors.textSubtleDark),
+          labelLarge: GoogleFonts.inter(
+            color: AppColors.textSubtleDark,
+            fontWeight: FontWeight.w500,
+          ),
+          labelMedium: GoogleFonts.inter(
+            color: AppColors.textSubtleDark,
+            fontWeight: FontWeight.w500,
+          ),
+          labelSmall: GoogleFonts.inter(
+            color: AppColors.textSubtleDark,
+            fontWeight: FontWeight.w500,
+          ),
+        );
 
     const ColorScheme darkScheme = ColorScheme(
       brightness: Brightness.dark,
@@ -375,7 +451,11 @@ class AppTheme {
         selectedColor: AppColors.primary.withValues(alpha: 0.2),
         side: const BorderSide(color: AppColors.dividerDark),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textLight),
+        labelStyle: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textLight,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
       dialogTheme: DialogThemeData(
@@ -392,7 +472,10 @@ class AppTheme {
         backgroundColor: AppColors.surfaceDark,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        contentTextStyle: GoogleFonts.inter(fontSize: 14, color: AppColors.textLight),
+        contentTextStyle: GoogleFonts.inter(
+          fontSize: 14,
+          color: AppColors.textLight,
+        ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppColors.cardBgDark,

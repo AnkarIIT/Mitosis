@@ -66,13 +66,12 @@ class AchievementService {
   }
 
   /// Return all achievements with their earned/locked state.
-  static List<Map<String, dynamic>> achievementBoard(UserProgressState progress) {
+  static List<Map<String, dynamic>> achievementBoard(
+    UserProgressState progress,
+  ) {
     final earned = evaluateEarned(progress).map((a) => a.id).toSet();
     return Achievement.all.map((a) {
-      return {
-        'achievement': a,
-        'earned': earned.contains(a.id),
-      };
+      return {'achievement': a, 'earned': earned.contains(a.id)};
     }).toList();
   }
 }

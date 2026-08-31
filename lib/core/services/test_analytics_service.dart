@@ -101,7 +101,8 @@ class TestAnalyticsService {
       final r = score.results[i];
       final key = _groupKey(score, i);
       byGroupTime.putIfAbsent(key, () => []).add(normalized[i]);
-      final entry = subjects[key] ??
+      final entry =
+          subjects[key] ??
           SubjectAnalytics(
             subject: key,
             correct: 0,
@@ -137,8 +138,9 @@ class TestAnalyticsService {
 
     // Rank estimate is only defensible for a full-length mock.
     final showRank = score.config.isFullLengthMock;
-    final percentile =
-        showRank ? estimatePercentile(score.rawScore, score.maxScore) : 0.0;
+    final percentile = showRank
+        ? estimatePercentile(score.rawScore, score.maxScore)
+        : 0.0;
     final air = showRank ? estimateAir(percentile) : 0;
 
     return TestAnalytics(
@@ -165,9 +167,7 @@ class TestAnalyticsService {
   }
 
   static double estimatePercentile(int rawScore, int maxScore) {
-    final equivalent = maxScore <= 0
-        ? 0.0
-        : (rawScore / maxScore) * 720;
+    final equivalent = maxScore <= 0 ? 0.0 : (rawScore / maxScore) * 720;
     final clamped = equivalent.clamp(0.0, 720.0).toDouble();
 
     if (_percentileAnchors.isEmpty) return 0;

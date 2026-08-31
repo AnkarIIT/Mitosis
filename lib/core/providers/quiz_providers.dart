@@ -99,7 +99,10 @@ class QuizNotifier extends StateNotifier<QuizState> {
         type: q.type,
       );
     }).toList();
-    state = QuizState(questions: randomizedQuestions, seed: seed ?? random.nextInt(1 << 30));
+    state = QuizState(
+      questions: randomizedQuestions,
+      seed: seed ?? random.nextInt(1 << 30),
+    );
   }
 
   void selectAnswer(
@@ -151,7 +154,8 @@ class QuizNotifier extends StateNotifier<QuizState> {
 
   void nextQuestion() {
     if (state.currentIndex < state.questions.length - 1) {
-      final visited = Set<int>.from(state.visitedQuestions)..add(state.currentIndex + 1);
+      final visited = Set<int>.from(state.visitedQuestions)
+        ..add(state.currentIndex + 1);
       state = state.copyWith(
         currentIndex: state.currentIndex + 1,
         visitedQuestions: visited,
@@ -170,10 +174,7 @@ class QuizNotifier extends StateNotifier<QuizState> {
   void goToQuestion(int index) {
     if (index >= 0 && index < state.questions.length) {
       final visited = Set<int>.from(state.visitedQuestions)..add(index);
-      state = state.copyWith(
-        currentIndex: index,
-        visitedQuestions: visited,
-      );
+      state = state.copyWith(currentIndex: index, visitedQuestions: visited);
     }
   }
 
@@ -272,7 +273,9 @@ final errorBookProvider = FutureProvider<List<Question>>((ref) async {
   for (var entry in entries) {
     if (!entry.isResolved) {
       try {
-        final question = allQuestions.firstWhere((q) => q.id == entry.questionId);
+        final question = allQuestions.firstWhere(
+          (q) => q.id == entry.questionId,
+        );
         errorQuestions.add(question);
       } catch (e) {
         debugPrint('⚠️ Question ${entry.questionId} not found for Error Book');

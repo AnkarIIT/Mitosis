@@ -42,11 +42,7 @@ void main() {
     testWidgets('renders welcome text and sign-in controls', (tester) async {
       SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: AuthScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: AuthScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -58,11 +54,7 @@ void main() {
     testWidgets('switches fields when changing auth mode tabs', (tester) async {
       SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: AuthScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: AuthScreen())),
       );
       await tester.pumpAndSettle();
 

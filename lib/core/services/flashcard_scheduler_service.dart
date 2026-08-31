@@ -93,9 +93,10 @@ class FlashcardScheduler {
         if (reps < FlashcardSchedulerService.ladder.length) {
           interval = FlashcardSchedulerService.ladder[reps];
         } else {
-          interval = (interval * ef)
-              .round()
-              .clamp(1, FlashcardSchedulerService.maxIntervalDays);
+          interval = (interval * ef).round().clamp(
+            1,
+            FlashcardSchedulerService.maxIntervalDays,
+          );
         }
         reps += 1;
         b = b < FlashcardSchedulerService.maxBox ? b + 1 : b;
@@ -107,12 +108,16 @@ class FlashcardScheduler {
       case FlashcardRating.easy:
         if (reps < FlashcardSchedulerService.ladder.length) {
           // Easy skips one step ahead on the ladder.
-          final ladderIdx = (reps + 1).clamp(0, FlashcardSchedulerService.ladder.length - 1);
+          final ladderIdx = (reps + 1).clamp(
+            0,
+            FlashcardSchedulerService.ladder.length - 1,
+          );
           interval = FlashcardSchedulerService.ladder[ladderIdx];
         } else {
-          interval = (interval * ef * 1.2)
-              .round()
-              .clamp(1, FlashcardSchedulerService.maxIntervalDays);
+          interval = (interval * ef * 1.2).round().clamp(
+            1,
+            FlashcardSchedulerService.maxIntervalDays,
+          );
         }
         reps += 1;
         b = b < FlashcardSchedulerService.maxBox ? b + 1 : b;

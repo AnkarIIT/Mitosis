@@ -44,11 +44,7 @@ class MitosSectionHeader extends StatelessWidget {
   final String title;
   final Widget? trailing;
 
-  const MitosSectionHeader({
-    super.key,
-    required this.title,
-    this.trailing,
-  });
+  const MitosSectionHeader({super.key, required this.title, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -106,8 +102,13 @@ class MitosSubjectChip extends StatelessWidget {
         fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
         color: selected ? color : AdaptiveColors.textSecondary(context),
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
     );
   }
 }
@@ -141,7 +142,9 @@ class MitosActionButton extends StatelessWidget {
             backgroundColor: color,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
           ),
         ),
       );
@@ -155,7 +158,9 @@ class MitosActionButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: color.withValues(alpha: 0.5)),
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
         ),
       ),
     );
@@ -190,7 +195,10 @@ class MitosEmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             Text(
               title,
-              style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600),
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -233,8 +241,12 @@ class MitosProgressBar extends StatelessWidget {
         height: height,
         child: LinearProgressIndicator(
           value: progress.clamp(0.0, 1.0),
-          backgroundColor: AdaptiveColors.outlineVariant(context).withValues(alpha: 0.3),
-          valueColor: AlwaysStoppedAnimation(color ?? AdaptiveColors.primary(context)),
+          backgroundColor: AdaptiveColors.outlineVariant(
+            context,
+          ).withValues(alpha: 0.3),
+          valueColor: AlwaysStoppedAnimation(
+            color ?? AdaptiveColors.primary(context),
+          ),
         ),
       ),
     );

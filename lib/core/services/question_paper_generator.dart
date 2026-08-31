@@ -25,11 +25,12 @@ class QuestionPaperGenerator {
 
       // Validate / cap question count (tolerant for small sample datasets)
       final targetCount = config.questionCount;
-      final actualCount = allPYQs.length < targetCount ? allPYQs.length : targetCount;
+      final actualCount = allPYQs.length < targetCount
+          ? allPYQs.length
+          : targetCount;
 
       // Select random questions without repetition (balanced difficulty)
-      final selectedQuestions =
-          _selectRandomQuestions(allPYQs, actualCount);
+      final selectedQuestions = _selectRandomQuestions(allPYQs, actualCount);
 
       // Shuffle questions
       selectedQuestions.shuffle(_random);
@@ -42,8 +43,16 @@ class QuestionPaperGenerator {
       // Create question paper (with actual count)
       final paper = QuestionPaper(
         id: _generatePaperId(),
-        title: _generateTitle(selectedSubjects, standard, actualCount != targetCount),
-        description: _generateDescription(selectedSubjects, standard, actualCount),
+        title: _generateTitle(
+          selectedSubjects,
+          standard,
+          actualCount != targetCount,
+        ),
+        description: _generateDescription(
+          selectedSubjects,
+          standard,
+          actualCount,
+        ),
         subjects: selectedSubjects,
         questions: processedQuestions,
         standard: standard,
@@ -61,12 +70,17 @@ class QuestionPaperGenerator {
   }
 
   /// Get all questions for selected subjects (optionally from a provided pool)
-  List<Question> _getPYQsForSubjects(List<String> subjects, [List<Question>? pool]) {
+  List<Question> _getPYQsForSubjects(
+    List<String> subjects, [
+    List<Question>? pool,
+  ]) {
     final source = pool ?? getAllQuestions();
     final allQuestions = <Question>[];
 
     for (var subject in subjects) {
-      final subjectQuestions = source.where((q) => q.subject == subject).toList();
+      final subjectQuestions = source
+          .where((q) => q.subject == subject)
+          .toList();
       allQuestions.addAll(subjectQuestions);
     }
 
@@ -133,8 +147,7 @@ class QuestionPaperGenerator {
     List<Question> source,
     int count,
   ) {
-    final available =
-        source.where((q) => !usedIds.contains(q.id)).toList();
+    final available = source.where((q) => !usedIds.contains(q.id)).toList();
 
     for (int i = 0; i < count && available.isNotEmpty; i++) {
       final question = available[_random.nextInt(available.length)];
@@ -178,7 +191,11 @@ class QuestionPaperGenerator {
   }
 
   /// Generate title (notes if capped due to data limits)
-  String _generateTitle(List<String> subjects, PaperStandard standard, [bool capped = false]) {
+  String _generateTitle(
+    List<String> subjects,
+    PaperStandard standard, [
+    bool capped = false,
+  ]) {
     final config = PaperConfig.getConfig(standard);
     final subjectsStr = subjects.join(' + ');
     final base = '$subjectsStr - ${config.displayName}';
@@ -186,7 +203,11 @@ class QuestionPaperGenerator {
   }
 
   /// Generate description
-  String _generateDescription(List<String> subjects, PaperStandard standard, int actualCount) {
+  String _generateDescription(
+    List<String> subjects,
+    PaperStandard standard,
+    int actualCount,
+  ) {
     final config = PaperConfig.getConfig(standard);
     final distribution = _getDistributionText(subjects.length);
     final base = '${config.description} | $distribution';

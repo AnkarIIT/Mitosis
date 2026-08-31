@@ -33,23 +33,22 @@ class ExamSection {
   int get questionCount => presentedCount;
 
   Map<String, dynamic> toJson() => {
-        'index': index,
-        'name': name,
-        'sourceSubject': sourceSubject,
-        'presentedCount': presentedCount,
-        'gradedCount': gradedCount,
-        'durationSeconds': durationSeconds,
-      };
+    'index': index,
+    'name': name,
+    'sourceSubject': sourceSubject,
+    'presentedCount': presentedCount,
+    'gradedCount': gradedCount,
+    'durationSeconds': durationSeconds,
+  };
 
   factory ExamSection.fromJson(Map<String, dynamic> json) => ExamSection(
-        index: json['index'] as int,
-        name: json['name'] as String,
-        sourceSubject: json['sourceSubject'] as String? ?? '',
-        presentedCount:
-            (json['presentedCount'] ?? json['questionCount']) as int,
-        gradedCount: json['gradedCount'] as int?,
-        durationSeconds: json['durationSeconds'] as int?,
-      );
+    index: json['index'] as int,
+    name: json['name'] as String,
+    sourceSubject: json['sourceSubject'] as String? ?? '',
+    presentedCount: (json['presentedCount'] ?? json['questionCount']) as int,
+    gradedCount: json['gradedCount'] as int?,
+    durationSeconds: json['durationSeconds'] as int?,
+  );
 }
 
 class ExamConfig {
@@ -191,19 +190,20 @@ class ExamConfig {
     bool breaksEnabled = false,
     int breakMinutes = 5,
   }) {
-    ExamSection compulsory(int index, String name, String source) => ExamSection(
+    ExamSection compulsory(int index, String name, String source) =>
+        ExamSection(
           index: index,
           name: name,
           sourceSubject: source,
           presentedCount: sectionACount,
         );
     ExamSection optional(int index, String name, String source) => ExamSection(
-          index: index,
-          name: name,
-          sourceSubject: source,
-          presentedCount: sectionBPresented,
-          gradedCount: sectionBGraded,
-        );
+      index: index,
+      name: name,
+      sourceSubject: source,
+      presentedCount: sectionBPresented,
+      gradedCount: sectionBGraded,
+    );
 
     return ExamConfig(
       mode: ExamMode.neet,
@@ -262,41 +262,41 @@ class ExamConfig {
   }
 
   Map<String, dynamic> toJson() => {
-        'mode': mode.name,
-        'testType': testType,
-        'topicId': topicId,
-        'subjectLabel': subjectLabel,
-        'totalDurationSeconds': totalDurationSeconds,
-        'sectionLock': sectionLock,
-        'breaksEnabled': breaksEnabled,
-        'breakDurationSeconds': breakDurationSeconds,
-        'breakAfterSectionIndex': breakAfterSectionIndex,
-        'marksPerCorrect': marksPerCorrect,
-        'marksPerWrong': marksPerWrong,
-        'isFullLengthMock': isFullLengthMock,
-        'sections': sections.map((s) => s.toJson()).toList(),
-      };
+    'mode': mode.name,
+    'testType': testType,
+    'topicId': topicId,
+    'subjectLabel': subjectLabel,
+    'totalDurationSeconds': totalDurationSeconds,
+    'sectionLock': sectionLock,
+    'breaksEnabled': breaksEnabled,
+    'breakDurationSeconds': breakDurationSeconds,
+    'breakAfterSectionIndex': breakAfterSectionIndex,
+    'marksPerCorrect': marksPerCorrect,
+    'marksPerWrong': marksPerWrong,
+    'isFullLengthMock': isFullLengthMock,
+    'sections': sections.map((s) => s.toJson()).toList(),
+  };
 
   factory ExamConfig.fromJson(Map<String, dynamic> json) => ExamConfig(
-        mode: ExamMode.values.firstWhere(
-          (m) => m.name == json['mode'],
-          orElse: () => ExamMode.practice,
-        ),
-        testType: json['testType'] as String,
-        topicId: json['topicId'] as String,
-        subjectLabel: json['subjectLabel'] as String,
-        totalDurationSeconds: json['totalDurationSeconds'] as int,
-        sectionLock: json['sectionLock'] as bool,
-        breaksEnabled: json['breaksEnabled'] as bool,
-        breakDurationSeconds: json['breakDurationSeconds'] as int,
-        breakAfterSectionIndex: json['breakAfterSectionIndex'] as int,
-        marksPerCorrect: json['marksPerCorrect'] as int,
-        marksPerWrong: json['marksPerWrong'] as int,
-        isFullLengthMock: json['isFullLengthMock'] as bool? ?? false,
-        sections: (json['sections'] as List)
-            .map((s) => ExamSection.fromJson((s as Map).cast<String, dynamic>()))
-            .toList(),
-      );
+    mode: ExamMode.values.firstWhere(
+      (m) => m.name == json['mode'],
+      orElse: () => ExamMode.practice,
+    ),
+    testType: json['testType'] as String,
+    topicId: json['topicId'] as String,
+    subjectLabel: json['subjectLabel'] as String,
+    totalDurationSeconds: json['totalDurationSeconds'] as int,
+    sectionLock: json['sectionLock'] as bool,
+    breaksEnabled: json['breaksEnabled'] as bool,
+    breakDurationSeconds: json['breakDurationSeconds'] as int,
+    breakAfterSectionIndex: json['breakAfterSectionIndex'] as int,
+    marksPerCorrect: json['marksPerCorrect'] as int,
+    marksPerWrong: json['marksPerWrong'] as int,
+    isFullLengthMock: json['isFullLengthMock'] as bool? ?? false,
+    sections: (json['sections'] as List)
+        .map((s) => ExamSection.fromJson((s as Map).cast<String, dynamic>()))
+        .toList(),
+  );
 }
 
 class QuestionResult {
@@ -421,11 +421,15 @@ class ExamEngineService {
     int? seed,
     Set<String>? excludedIds,
   }) {
-    var remaining = pool.where((q) => excludedIds == null || !excludedIds.contains(q.id)).toList();
+    var remaining = pool
+        .where((q) => excludedIds == null || !excludedIds.contains(q.id))
+        .toList();
     if (remaining.isEmpty) remaining = List<Question>.from(pool);
     remaining.shuffle(Random(seed ?? DateTime.now().millisecondsSinceEpoch));
-    final allocated =
-        List.generate(config.sections.length, (_) => <Question>[]);
+    final allocated = List.generate(
+      config.sections.length,
+      (_) => <Question>[],
+    );
     final takenIds = <String>{};
 
     for (int s = 0; s < config.sections.length; s++) {
@@ -437,7 +441,8 @@ class ExamEngineService {
         if (section.sourceSubject.isNotEmpty) {
           final qSub = q.subject.toLowerCase();
           final sSub = section.sourceSubject.toLowerCase();
-          final matches = qSub == sSub ||
+          final matches =
+              qSub == sSub ||
               (sSub == 'biology' && (qSub == 'botany' || qSub == 'zoology')) ||
               (sSub == 'botany' && qSub == 'biology') ||
               (sSub == 'zoology' && qSub == 'biology');
@@ -451,8 +456,9 @@ class ExamEngineService {
     return allocated;
   }
 
-  static List<Question> flattenAllocated(List<List<Question>> sections) =>
-      [for (final section in sections) ...section];
+  static List<Question> flattenAllocated(List<List<Question>> sections) => [
+    for (final section in sections) ...section,
+  ];
 
   /// Grades an attempt against the *actual* allocation so section boundaries
   /// and optional N-of-M caps are respected.
@@ -475,8 +481,9 @@ class ExamEngineService {
 
     for (int s = 0; s < sectionQuestions.length; s++) {
       final secQs = sectionQuestions[s];
-      final gradedCount =
-          s < config.sections.length ? config.sections[s].gradedCount : secQs.length;
+      final gradedCount = s < config.sections.length
+          ? config.sections[s].gradedCount
+          : secQs.length;
       final cap = gradedCount < secQs.length ? gradedCount : secQs.length;
       maxScore += cap * config.marksPerCorrect;
 

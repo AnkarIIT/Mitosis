@@ -7,7 +7,11 @@ import 'package:neet_mitos/core/models/subject_model.dart';
 import 'package:neet_mitos/core/models/user_progress_model.dart';
 import 'package:neet_mitos/core/services/mark_booster_service.dart';
 
-Question _makeQuestion(String id, {String topicId = 'weak_topic', String? type}) {
+Question _makeQuestion(
+  String id, {
+  String topicId = 'weak_topic',
+  String? type,
+}) {
   return Question(
     id: id,
     subject: 'Biology',
@@ -136,10 +140,10 @@ void main() {
 
   test('resolveErrorBookEntry maps stored id back to a question', () {
     final q = _makeQuestion('7');
-    final resolved = MarkBoosterService.resolveErrorBookEntry(
-      '7',
-      [_makeQuestion('1'), q],
-    );
+    final resolved = MarkBoosterService.resolveErrorBookEntry('7', [
+      _makeQuestion('1'),
+      q,
+    ]);
     expect(resolved?.id, '7');
   });
 
@@ -184,10 +188,7 @@ void main() {
     });
 
     test('isTopicMastered requires threshold and attempts', () {
-      expect(
-        MarkBoosterService.isTopicMastered(5, 70),
-        isTrue,
-      );
+      expect(MarkBoosterService.isTopicMastered(5, 70), isTrue);
       expect(
         MarkBoosterService.isTopicMastered(4, 70),
         isFalse,
@@ -236,7 +237,10 @@ void main() {
         10,
         (i) => makeAttempt('$i', 'booster', DateTime(2026, 1, 1 + i)),
       );
-      final sessions = MarkBoosterService.extractBoosterSessions(attempts, limit: 3);
+      final sessions = MarkBoosterService.extractBoosterSessions(
+        attempts,
+        limit: 3,
+      );
       expect(sessions, hasLength(3));
     });
   });

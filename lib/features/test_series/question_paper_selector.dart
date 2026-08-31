@@ -23,10 +23,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Question Paper'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Create Question Paper'), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -44,26 +41,28 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
                 Wrap(
                   spacing: 8,
                   children: subjects
-                      .map((subject) => FilterChip(
-                            label: Text(subject),
-                            selected: selectedSubjects.contains(subject),
-                            onSelected: (selected) {
-                              setState(() {
-                                if (selected) {
-                                  selectedSubjects.add(subject);
-                                } else {
-                                  selectedSubjects.remove(subject);
-                                }
-                              });
-                            },
-                            selectedColor: AppColors.primary,
-                            backgroundColor: AppColors.surfaceWarm,
-                            labelStyle: TextStyle(
-                              color: selectedSubjects.contains(subject)
-                                  ? Colors.white
-                                  : AppColors.textSubtle,
-                            ),
-                          ))
+                      .map(
+                        (subject) => FilterChip(
+                          label: Text(subject),
+                          selected: selectedSubjects.contains(subject),
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                selectedSubjects.add(subject);
+                              } else {
+                                selectedSubjects.remove(subject);
+                              }
+                            });
+                          },
+                          selectedColor: AppColors.primary,
+                          backgroundColor: AppColors.surfaceWarm,
+                          labelStyle: TextStyle(
+                            color: selectedSubjects.contains(subject)
+                                ? Colors.white
+                                : AppColors.textSubtle,
+                          ),
+                        ),
+                      )
                       .toList(),
                 ),
               ],
@@ -118,9 +117,9 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
                     ? null
                     : _generatePaper,
                 icon: const Icon(Icons.flash_on),
-                label: Text(_isGenerating
-                    ? 'Generating...'
-                    : 'Generate Question Paper'),
+                label: Text(
+                  _isGenerating ? 'Generating...' : 'Generate Question Paper',
+                ),
               ),
             ),
           ],
@@ -136,10 +135,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text(title, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 12),
         ...children,
       ],
@@ -172,7 +168,9 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
             child: Row(
               children: [
                 Icon(
-                  isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                  isSelected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
                   color: isSelected ? AppColors.primary : AppColors.textSubtle,
                 ),
                 const SizedBox(width: 12),
@@ -182,18 +180,16 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
                     children: [
                       Text(
                         config.displayName,
-                        style:
-                            Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         config.description,
-                        style:
-                            Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: AppColors.textSubtle,
-                                ),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.textSubtle,
+                        ),
                       ),
                     ],
                   ),
@@ -212,10 +208,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -281,10 +274,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
       if (!mounted) return;
       context.pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) {
@@ -302,17 +292,14 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              paper.title,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
+            Text(paper.title, style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 12),
             _buildStatRow('Total Questions', '${paper.totalQuestions}'),
-            _buildStatRow('Time Limit', '${paper.timeLimit?.inMinutes ?? 0} mins'),
             _buildStatRow(
-              'Subjects',
-              paper.subjects.join(', '),
+              'Time Limit',
+              '${paper.timeLimit?.inMinutes ?? 0} mins',
             ),
+            _buildStatRow('Subjects', paper.subjects.join(', ')),
             const SizedBox(height: 8),
             Text(
               'Subject Distribution:',
@@ -344,10 +331,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('Edit'),
-          ),
+          TextButton(onPressed: () => context.pop(), child: const Text('Edit')),
           ElevatedButton(
             onPressed: () {
               context.pop();
@@ -370,9 +354,9 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
           Text(
             value,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
           ),
         ],
       ),
@@ -381,12 +365,14 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
 
   void _startQuiz(QuestionPaper paper) {
     final sub = paper.subjects.length == 1 ? paper.subjects.first : 'Mixed';
-    context.push('/quiz', extra: {
-      'questions': paper.questions,
-      'topicName': paper.title,
-      'topicId': 'mock_test',
-      'subject': sub,
-    });
+    context.push(
+      '/quiz',
+      extra: {
+        'questions': paper.questions,
+        'topicName': paper.title,
+        'topicId': 'mock_test',
+        'subject': sub,
+      },
+    );
   }
 }
-

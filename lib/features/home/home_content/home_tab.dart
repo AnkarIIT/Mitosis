@@ -19,7 +19,8 @@ class HomeTab extends ConsumerStatefulWidget {
   ConsumerState<HomeTab> createState() => _HomeTabState();
 }
 
-class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin {
+class _HomeTabState extends ConsumerState<HomeTab>
+    with TickerProviderStateMixin {
   int _selectedChip = 0;
   bool _initialized = false;
   late AnimationController _progressAnimController;
@@ -38,7 +39,10 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
       final dailyGoal = ref.read(dailyGoalProvider);
       final progress = (dailyGoal['percent'] as double).clamp(0.0, 1.0);
       _progressAnim = Tween<double>(begin: 0.0, end: progress).animate(
-        CurvedAnimation(parent: _progressAnimController, curve: Curves.easeOutCubic),
+        CurvedAnimation(
+          parent: _progressAnimController,
+          curve: Curves.easeOutCubic,
+        ),
       );
       _progressAnimController.forward();
     });
@@ -50,17 +54,31 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
     super.dispose();
   }
 
-  static const _chipLabels = ['All', 'Botany', 'Zoology', 'Physics', 'Chemistry', 'Error Book'];
+  static const _chipLabels = [
+    'All',
+    'Botany',
+    'Zoology',
+    'Physics',
+    'Chemistry',
+    'Error Book',
+  ];
 
   String? _chipSubjectFilter(int index) {
     switch (index) {
-      case 0: return null;
-      case 1: return 'biology';
-      case 2: return 'biology';
-      case 3: return 'phys';
-      case 4: return 'chem';
-      case 5: return null;
-      default: return null;
+      case 0:
+        return null;
+      case 1:
+        return 'biology';
+      case 2:
+        return 'biology';
+      case 3:
+        return 'phys';
+      case 4:
+        return 'chem';
+      case 5:
+        return null;
+      default:
+        return null;
     }
   }
 
@@ -68,7 +86,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     final subjects = ref.watch(subjectsProvider);
     final stats = ref.watch(overallStatsProvider);
-    final streak = ref.watch(userProgressProvider.select((s) => s.currentStreak));
+    final streak = ref.watch(
+      userProgressProvider.select((s) => s.currentStreak),
+    );
     final dailyGoal = ref.watch(dailyGoalProvider);
     final recentActivity = ref.watch(recentActivityProvider);
     final weakTopics = ref.watch(weakTopicsProvider);
@@ -78,7 +98,16 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
     return Scaffold(
       backgroundColor: AdaptiveColors.background(context),
       body: _initialized
-          ? _buildHomeBody(context, subjects, stats, streak, dailyGoal, recentActivity, weakTopics, dueCount)
+          ? _buildHomeBody(
+              context,
+              subjects,
+              stats,
+              streak,
+              dailyGoal,
+              recentActivity,
+              weakTopics,
+              dueCount,
+            )
           : _buildShimmerSkeleton(context),
     );
   }
@@ -97,9 +126,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
     int dueCount,
   ) {
     final totalMCQs = subjects.fold<int>(0, (sum, s) {
-      return sum + s.chapters.fold<int>(0, (cSum, ch) {
-        return cSum + ch.topics.fold<int>(0, (tSum, t) => tSum + t.questionCount);
-      });
+      return sum +
+          s.chapters.fold<int>(0, (cSum, ch) {
+            return cSum +
+                ch.topics.fold<int>(0, (tSum, t) => tSum + t.questionCount);
+          });
     });
 
     final chipFilter = _chipSubjectFilter(_selectedChip);
@@ -154,7 +185,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   // ────────────────────────────────────────────────────────────
   // PROFILE ROW
   // ────────────────────────────────────────────────────────────
-  Widget _buildProfileRow(BuildContext context, int streak, Map<String, dynamic> stats) {
+  Widget _buildProfileRow(
+    BuildContext context,
+    int streak,
+    Map<String, dynamic> stats,
+  ) {
     final accuracy = (stats['accuracy'] as double);
     final authState = ref.watch(authProvider);
     final user = authState.user;
@@ -217,7 +252,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.local_fire_department, size: 14, color: Colors.orange),
+                const Icon(
+                  Icons.local_fire_department,
+                  size: 14,
+                  color: Colors.orange,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '$streak',
@@ -238,7 +277,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
           decoration: BoxDecoration(
             color: SubjectColors.physics.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: SubjectColors.physics.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: SubjectColors.physics.withValues(alpha: 0.3),
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -259,10 +300,17 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
         const SizedBox(width: 6),
         // Notifications
         IconButton(
-          icon: Icon(Icons.notifications_none_rounded, color: AdaptiveColors.textSecondary(context), size: 24),
+          icon: Icon(
+            Icons.notifications_none_rounded,
+            color: AdaptiveColors.textSecondary(context),
+            size: 24,
+          ),
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('No new notifications'), duration: Duration(seconds: 1)),
+              const SnackBar(
+                content: Text('No new notifications'),
+                duration: Duration(seconds: 1),
+              ),
             );
           },
           padding: EdgeInsets.zero,
@@ -277,10 +325,8 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   // ────────────────────────────────────────────────────────────
   Widget _buildSearchBar(BuildContext context) {
     return GestureDetector(
-      onTap: () => showSearch(
-        context: context,
-        delegate: _NeetSearchDelegate(ref),
-      ),
+      onTap: () =>
+          showSearch(context: context, delegate: _NeetSearchDelegate(ref)),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         decoration: BoxDecoration(
@@ -296,15 +342,26 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
         ),
         child: Row(
           children: [
-            Icon(Icons.search, color: AdaptiveColors.textSecondary(context), size: 22),
+            Icon(
+              Icons.search,
+              color: AdaptiveColors.textSecondary(context),
+              size: 22,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 'Search NCERT chapters, PYQs…',
-                style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 14),
+                style: TextStyle(
+                  color: AdaptiveColors.textSecondary(context),
+                  fontSize: 14,
+                ),
               ),
             ),
-            Icon(Icons.tune_rounded, color: AdaptiveColors.textSecondary(context), size: 20),
+            Icon(
+              Icons.tune_rounded,
+              color: AdaptiveColors.textSecondary(context),
+              size: 20,
+            ),
           ],
         ),
       ),
@@ -336,16 +393,26 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : AdaptiveColors.surface(context),
+                color: isSelected
+                    ? AppColors.primary
+                    : AdaptiveColors.surface(context),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: isSelected
-                    ? [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6, offset: const Offset(0, 2))]
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
                     : [],
               ),
               child: Text(
                 _chipLabels[index],
                 style: TextStyle(
-                  color: isSelected ? Colors.white : AdaptiveColors.textPrimary(context),
+                  color: isSelected
+                      ? Colors.white
+                      : AdaptiveColors.textPrimary(context),
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
@@ -362,33 +429,40 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   // ────────────────────────────────────────────────────────────
   Widget _buildFeaturedSubjectsHeader() {
     return Row(
-      children: [
-        Expanded(
-          child: Text(
-            'Featured Subjects',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AdaptiveColors.textPrimary(context),
+          children: [
+            Expanded(
+              child: Text(
+                'Featured Subjects',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AdaptiveColors.textPrimary(context),
+                ),
+              ),
             ),
-          ),
-        ),
-        GestureDetector(
-          onTap: () => setState(() => _selectedChip = 0),
-          child: Text(
-            'See all',
-            style: TextStyle(
-              color: SubjectColors.physics,
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
+            GestureDetector(
+              onTap: () => setState(() => _selectedChip = 0),
+              child: Text(
+                'See all',
+                style: TextStyle(
+                  color: SubjectColors.physics,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
-    ).animate().fade(delay: 180.ms, duration: 400.ms).slideX(begin: -0.06, end: 0);
+          ],
+        )
+        .animate()
+        .fade(delay: 180.ms, duration: 400.ms)
+        .slideX(begin: -0.06, end: 0);
   }
 
-  Widget _buildFeaturedCards(BuildContext context, List<Subject> subjects, int totalMCQs) {
+  Widget _buildFeaturedCards(
+    BuildContext context,
+    List<Subject> subjects,
+    int totalMCQs,
+  ) {
     final screenHeight = MediaQuery.of(context).size.height;
     final cardHeight = screenHeight < 600 ? 150.0 : 175.0;
 
@@ -401,23 +475,29 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
           final subject = subjects[index];
           final chapterCount = subject.chapters.length;
           final mcqCount = subject.chapters.fold<int>(0, (sum, ch) {
-            return sum + ch.topics.fold<int>(0, (tSum, t) => tSum + t.questionCount);
+            return sum +
+                ch.topics.fold<int>(0, (tSum, t) => tSum + t.questionCount);
           });
 
           final subjectStats = ref.watch(subjectStatsProvider(subject.name));
           final accuracy = subjectStats['accuracy'] as double;
 
           return _buildSubjectCard(
-            context,
-            subject: subject,
-            chapterCount: chapterCount,
-            mcqCount: mcqCount,
-            accuracy: accuracy,
-          ).animate(delay: (200 + index * 80).ms).fade(duration: 450.ms).scale(
+                context,
+                subject: subject,
+                chapterCount: chapterCount,
+                mcqCount: mcqCount,
+                accuracy: accuracy,
+              )
+              .animate(delay: (200 + index * 80).ms)
+              .fade(duration: 450.ms)
+              .scale(
                 begin: const Offset(0.94, 0.94),
                 end: const Offset(1, 1),
                 curve: Curves.easeOutBack,
-              ).then().scale(
+              )
+              .then()
+              .scale(
                 begin: const Offset(1.03, 1.03),
                 end: const Offset(1, 1),
                 duration: AppDuration.normal,
@@ -437,7 +517,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   }) {
     final color = _getSubjectAccent(subject.id);
     return GestureDetector(
-      onTap: () => context.push('/subjects/${subject.id}?subjectName=${Uri.encodeComponent(subject.name)}'),
+      onTap: () => context.push(
+        '/subjects/${subject.id}?subjectName=${Uri.encodeComponent(subject.name)}',
+      ),
       child: Container(
         width: 155,
         margin: const EdgeInsets.only(right: 14),
@@ -450,7 +532,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 5)),
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
           ],
         ),
         child: Column(
@@ -469,15 +555,27 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(_getSubjectIcon(subject.id), color: Colors.white, size: 26),
-                Icon(Icons.bookmark_border_rounded, color: Colors.white70, size: 18),
+                Icon(
+                  _getSubjectIcon(subject.id),
+                  color: Colors.white,
+                  size: 26,
+                ),
+                Icon(
+                  Icons.bookmark_border_rounded,
+                  color: Colors.white70,
+                  size: 18,
+                ),
               ],
             ),
             const Spacer(),
             Expanded(
               child: Text(
                 subject.name,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -522,7 +620,10 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   }
 
   // Daily Goal Card
-  Widget _buildDailyGoalCard(BuildContext context, Map<String, dynamic> dailyGoal) {
+  Widget _buildDailyGoalCard(
+    BuildContext context,
+    Map<String, dynamic> dailyGoal,
+  ) {
     final completed = dailyGoal['completed'] as int;
     final target = dailyGoal['target'] as int;
     final progress = (dailyGoal['percent'] as double).clamp(0.0, 1.0);
@@ -533,7 +634,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 3)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
         ],
       ),
       child: Row(
@@ -554,7 +659,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                       strokeWidth: 5,
                       backgroundColor: AdaptiveColors.surface(context),
                       valueColor: AlwaysStoppedAnimation(
-                        animValue >= 1.0 ? AppColors.success : SubjectColors.physics,
+                        animValue >= 1.0
+                            ? AppColors.success
+                            : SubjectColors.physics,
                       ),
                     ),
                     Center(
@@ -563,7 +670,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
-                          color: animValue >= 1.0 ? AppColors.success : SubjectColors.physics,
+                          color: animValue >= 1.0
+                              ? AppColors.success
+                              : SubjectColors.physics,
                         ),
                       ),
                     ),
@@ -579,12 +688,19 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               children: [
                 Text(
                   'Daily Goal',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AdaptiveColors.textPrimary(context)),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: AdaptiveColors.textPrimary(context),
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '$completed / $target questions solved',
-                  style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12),
+                  style: TextStyle(
+                    color: AdaptiveColors.textSecondary(context),
+                    fontSize: 12,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 ClipRRect(
@@ -594,7 +710,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                     minHeight: 6,
                     backgroundColor: AdaptiveColors.surface(context),
                     valueColor: AlwaysStoppedAnimation(
-                      progress >= 1.0 ? AppColors.success : SubjectColors.physics,
+                      progress >= 1.0
+                          ? AppColors.success
+                          : SubjectColors.physics,
                     ),
                   ),
                 ),
@@ -607,10 +725,16 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   }
 
   // Continue Studying CTA
-  Widget _buildContinueStudyingCard(BuildContext context, List recentActivity, List<Subject> subjects) {
+  Widget _buildContinueStudyingCard(
+    BuildContext context,
+    List recentActivity,
+    List<Subject> subjects,
+  ) {
     final hasActivity = recentActivity.isNotEmpty;
     final lastAttempt = hasActivity ? recentActivity.first : null;
-    final topicLabel = hasActivity ? _resolveTopicLabel(lastAttempt, subjects) : null;
+    final topicLabel = hasActivity
+        ? _resolveTopicLabel(lastAttempt, subjects)
+        : null;
 
     return GestureDetector(
       onTap: () {
@@ -658,13 +782,19 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    hasActivity ? 'Pick up where you left off — $topicLabel' : 'Open Study Plan to begin your NEET prep',
+                    hasActivity
+                        ? 'Pick up where you left off — $topicLabel'
+                        : 'Open Study Plan to begin your NEET prep',
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white60, size: 16),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white60,
+              size: 16,
+            ),
           ],
         ),
       ),
@@ -672,7 +802,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   }
 
   // Ongoing Revision Cards from recent activity
-  Widget _buildOngoingRevisionCards(BuildContext context, List recentActivity, List<Subject> subjects) {
+  Widget _buildOngoingRevisionCards(
+    BuildContext context,
+    List recentActivity,
+    List<Subject> subjects,
+  ) {
     if (recentActivity.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(20),
@@ -683,7 +817,10 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
         child: Center(
           child: Text(
             'Start a quiz to see your progress here!',
-            style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 14),
+            style: TextStyle(
+              color: AdaptiveColors.textSecondary(context),
+              fontSize: 14,
+            ),
           ),
         ),
       );
@@ -692,7 +829,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
     return Column(
       children: recentActivity.take(3).map((attempt) {
         final topicLabel = _resolveTopicLabel(attempt, subjects);
-        final subjectColor = _getSubjectAccent(attempt.subject.toLowerCase().replaceAll('y', '').trim());
+        final subjectColor = _getSubjectAccent(
+          attempt.subject.toLowerCase().replaceAll('y', '').trim(),
+        );
         final accuracy = attempt.totalQuestions > 0
             ? ((attempt.score / attempt.totalQuestions) * 100)
             : 0.0;
@@ -704,7 +843,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
             ],
           ),
           child: Row(
@@ -716,7 +859,9 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  _getSubjectIcon(attempt.subject.toLowerCase().replaceAll('y', '').trim()),
+                  _getSubjectIcon(
+                    attempt.subject.toLowerCase().replaceAll('y', '').trim(),
+                  ),
                   color: subjectColor,
                   size: 20,
                 ),
@@ -728,12 +873,19 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                   children: [
                     Text(
                       topicLabel,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AdaptiveColors.textPrimary(context)),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: AdaptiveColors.textPrimary(context),
+                      ),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       '${attempt.score}/${attempt.totalQuestions} correct • ${_formatTime(attempt.timeSpentSeconds)}',
-                      style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 11),
+                      style: TextStyle(
+                        color: AdaptiveColors.textSecondary(context),
+                        fontSize: 11,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     ClipRRect(
@@ -746,8 +898,8 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                           accuracy >= 70
                               ? AppColors.success
                               : accuracy >= 40
-                                  ? AppColors.warning
-                                  : AppColors.error,
+                              ? AppColors.warning
+                              : AppColors.error,
                         ),
                       ),
                     ),
@@ -757,7 +909,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
               const SizedBox(width: 10),
               Text(
                 '${accuracy.toStringAsFixed(0)}%',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AdaptiveColors.textPrimary(context)),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: AdaptiveColors.textPrimary(context),
+                ),
               ),
             ],
           ),
@@ -770,7 +926,8 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
   Widget _buildCbtMockTestCard(BuildContext context, List<Subject> subjects) {
     // Subtitle derived from ExamConfig so it can't drift from the real pattern.
     final neet = ExamConfig.neet();
-    final subtitle = '${neet.totalQuestionSlots} questions • '
+    final subtitle =
+        '${neet.totalQuestionSlots} questions • '
         '${neet.totalDurationSeconds ~/ 60} minutes • '
         '+${neet.marksPerCorrect}/${neet.marksPerWrong}/0 marking';
     return GestureDetector(
@@ -785,10 +942,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
           );
           return;
         }
-        context.push('/cbt', extra: {
-          'config': neet,
-          'questionPool': pool,
-        });
+        context.push('/cbt', extra: {'config': neet, 'questionPool': pool});
       },
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -811,11 +965,7 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                 color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.quiz_rounded,
-                color: Colors.white,
-                size: 24,
-              ),
+              child: Icon(Icons.quiz_rounded, color: Colors.white, size: 24),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -838,7 +988,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white60, size: 16),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white60,
+              size: 16,
+            ),
           ],
         ),
       ),
@@ -853,8 +1007,10 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
     final answered = cp.answersByIndex.values
         .where((v) => v != null && v.isNotEmpty)
         .length;
-    final total =
-        cp.sectionQuestionIds.fold<int>(0, (s, ids) => s + ids.length);
+    final total = cp.sectionQuestionIds.fold<int>(
+      0,
+      (s, ids) => s + ids.length,
+    );
     final remaining = cp.remainingSecondsAt(DateTime.now());
 
     return Padding(
@@ -862,13 +1018,15 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
       child: GestureDetector(
         onTap: () {
           // Full pool so saved question IDs resolve on restore.
-          final allQuestions =
-              ref.read(allQuestionsProvider).valueOrNull ?? [];
-          context.push('/cbt', extra: {
-            'config': cp.config,
-            'questionPool': allQuestions,
-            'resumeCheckpoint': cp,
-          });
+          final allQuestions = ref.read(allQuestionsProvider).valueOrNull ?? [];
+          context.push(
+            '/cbt',
+            extra: {
+              'config': cp.config,
+              'questionPool': allQuestions,
+              'resumeCheckpoint': cp,
+            },
+          );
         },
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -891,8 +1049,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.history_toggle_off,
-                    color: Colors.white, size: 24),
+                child: const Icon(
+                  Icons.history_toggle_off,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -910,7 +1071,10 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                     const SizedBox(height: 3),
                     Text(
                       '$answered/$total answered • ${_fmtRemaining(remaining)} left',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -966,7 +1130,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                 children: [
                   const Text(
                     'Spaced Repetition Due',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                   ),
                   const SizedBox(height: 3),
                   Text(
@@ -976,7 +1144,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white60, size: 16),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white60,
+              size: 16,
+            ),
           ],
         ),
       ),
@@ -1014,7 +1186,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                 color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.edit_note_rounded, color: Colors.white, size: 22),
+              child: const Icon(
+                Icons.edit_note_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -1037,7 +1213,11 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white60, size: 16),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white60,
+              size: 16,
+            ),
           ],
         ),
       ),
@@ -1058,11 +1238,19 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
         children: [
           Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
+              Icon(
+                Icons.warning_amber_rounded,
+                color: AppColors.warning,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Weak Topics',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AdaptiveColors.textPrimary(context)),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: AdaptiveColors.textPrimary(context),
+                ),
               ),
             ],
           ),
@@ -1072,15 +1260,24 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
             runSpacing: 8,
             children: weakTopics.take(4).map((topic) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.warning.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: AppColors.warning.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Text(
                   topic.name,
-                  style: TextStyle(color: AppColors.warning, fontSize: 12, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: AppColors.warning,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               );
             }).toList(),
@@ -1112,20 +1309,54 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(height: 14, width: 120, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(7))),
+                        Container(
+                          height: 14,
+                          width: 120,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                        ),
                         const SizedBox(height: 6),
-                        Container(height: 10, width: 80, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5))),
+                        Container(
+                          height: 10,
+                          width: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  Container(width: 48, height: 28, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14))),
+                  Container(
+                    width: 48,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                   const SizedBox(width: 8),
-                  Container(width: 48, height: 28, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14))),
+                  Container(
+                    width: 48,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
               // Search bar skeleton
-              Container(height: 46, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30))),
+              Container(
+                height: 46,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
               const SizedBox(height: 16),
               // Chip row skeleton
               SizedBox(
@@ -1134,12 +1365,26 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                   scrollDirection: Axis.horizontal,
                   itemCount: 4,
                   separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (_, __) => Container(width: 70, height: 34, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20))),
+                  itemBuilder: (_, __) => Container(
+                    width: 70,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
               // Featured subjects header skeleton
-              Container(height: 18, width: 160, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(9))),
+              Container(
+                height: 18,
+                width: 160,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(9),
+                ),
+              ),
               const SizedBox(height: 14),
               // Featured cards skeleton
               SizedBox(
@@ -1150,29 +1395,63 @@ class _HomeTabState extends ConsumerState<HomeTab> with TickerProviderStateMixin
                   separatorBuilder: (_, __) => const SizedBox(width: 14),
                   itemBuilder: (_, __) => Container(
                     width: 155,
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 28),
               // Ongoing header skeleton
-              Container(height: 18, width: 140, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(9))),
+              Container(
+                height: 18,
+                width: 140,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(9),
+                ),
+              ),
               const SizedBox(height: 14),
               // Daily goal card skeleton
               Container(
                 padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Row(
                   children: [
-                    Container(width: 56, height: 56, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200)),
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.shade200,
+                      ),
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(height: 14, width: 100, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(7))),
+                          Container(
+                            height: 14,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                          ),
                           const SizedBox(height: 8),
-                          Container(height: 6, width: double.infinity, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3))),
+                          Container(
+                            height: 6,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1263,10 +1542,7 @@ class _NeetSearchDelegate extends SearchDelegate<String?> {
   List<Widget>? buildActions(BuildContext context) {
     return [
       if (query.isNotEmpty)
-        IconButton(
-          icon: const Icon(Icons.clear),
-          onPressed: () => query = '',
-        ),
+        IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
     ];
   }
 
@@ -1301,11 +1577,9 @@ class _NeetSearchDelegate extends SearchDelegate<String?> {
               topic.name.toLowerCase().contains(q) ||
               chapter.name.toLowerCase().contains(q) ||
               subject.name.toLowerCase().contains(q)) {
-            results.add(_SearchResult(
-              topic: topic,
-              subject: subject,
-              chapter: chapter,
-            ));
+            results.add(
+              _SearchResult(topic: topic, subject: subject, chapter: chapter),
+            );
           }
         }
       }
@@ -1316,11 +1590,20 @@ class _NeetSearchDelegate extends SearchDelegate<String?> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off_rounded, size: 64, color: Colors.grey.shade300),
+            Icon(
+              Icons.search_off_rounded,
+              size: 64,
+              color: Colors.grey.shade300,
+            ),
             const SizedBox(height: 16),
             Text(
-              q.isEmpty ? 'Type to search chapters & topics' : 'No results for "$query"',
-              style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 15),
+              q.isEmpty
+                  ? 'Type to search chapters & topics'
+                  : 'No results for "$query"',
+              style: TextStyle(
+                color: AdaptiveColors.textSecondary(context),
+                fontSize: 15,
+              ),
             ),
           ],
         ),
@@ -1337,17 +1620,36 @@ class _NeetSearchDelegate extends SearchDelegate<String?> {
         return ListTile(
           leading: CircleAvatar(
             backgroundColor: color.withValues(alpha: 0.12),
-            child: Icon(_getSubjectIconData(r.subject.id), color: color, size: 20),
+            child: Icon(
+              _getSubjectIconData(r.subject.id),
+              color: color,
+              size: 20,
+            ),
           ),
-          title: Text(r.topic.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-          subtitle: Text('${r.chapter.name} • ${r.subject.name}', style: TextStyle(color: AdaptiveColors.textSecondary(context), fontSize: 12)),
+          title: Text(
+            r.topic.name,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            '${r.chapter.name} • ${r.subject.name}',
+            style: TextStyle(
+              color: AdaptiveColors.textSecondary(context),
+              fontSize: 12,
+            ),
+          ),
           trailing: Text(
             '${r.topic.questionCount} Q',
-            style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
           ),
           onTap: () {
             close(context, null);
-            context.push('/topic/${r.topic.id}?subjectName=${Uri.encodeComponent(r.subject.name)}&chapterName=${Uri.encodeComponent(r.chapter.name)}');
+            context.push(
+              '/topic/${r.topic.id}?subjectName=${Uri.encodeComponent(r.subject.name)}&chapterName=${Uri.encodeComponent(r.chapter.name)}',
+            );
           },
         );
       },
@@ -1392,5 +1694,9 @@ class _SearchResult {
   final Subject subject;
   final Chapter chapter;
 
-  _SearchResult({required this.topic, required this.subject, required this.chapter});
+  _SearchResult({
+    required this.topic,
+    required this.subject,
+    required this.chapter,
+  });
 }

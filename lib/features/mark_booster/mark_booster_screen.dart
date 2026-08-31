@@ -41,13 +41,16 @@ class _MarkBoosterScreenState extends ConsumerState<MarkBoosterScreen> {
       return;
     }
 
-    context.push('/quiz', extra: {
-      'questions': drill,
-      'topicName': 'Mark Booster Drill',
-      'topicId': 'mark_booster',
-      'subject': 'Mixed',
-      'testType': 'booster',
-    });
+    context.push(
+      '/quiz',
+      extra: {
+        'questions': drill,
+        'topicName': 'Mark Booster Drill',
+        'topicId': 'mark_booster',
+        'subject': 'Mixed',
+        'testType': 'booster',
+      },
+    );
   }
 
   @override
@@ -56,14 +59,10 @@ class _MarkBoosterScreenState extends ConsumerState<MarkBoosterScreen> {
 
     return Scaffold(
       backgroundColor: AdaptiveColors.background(context),
-      appBar: AppBar(
-        title: const Text('Mark Booster'),
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: const Text('Mark Booster'), centerTitle: false),
       body: diagnosisAsync.when(
         data: (diagnosis) => _buildBody(context, diagnosis),
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -103,18 +102,18 @@ class _MarkBoosterScreenState extends ConsumerState<MarkBoosterScreen> {
           const SizedBox(height: 20),
           _SectionHeader(
             title: 'Mastered',
-            subtitle:
-                'Topics you have driven to 60%+ accuracy',
+            subtitle: 'Topics you have driven to 60%+ accuracy',
             icon: Icons.emoji_events_outlined,
           ),
           const SizedBox(height: 8),
-          ...diagnosis.masteredTopics.map((m) => _MasteredTopicRow(mastered: m)),
+          ...diagnosis.masteredTopics.map(
+            (m) => _MasteredTopicRow(mastered: m),
+          ),
         ],
         const SizedBox(height: 16),
         _SectionHeader(
           title: 'Focus Topics',
-          subtitle:
-              'Sub-topics where your accuracy is below 60%',
+          subtitle: 'Sub-topics where your accuracy is below 60%',
           icon: Icons.flag_circle_outlined,
         ),
         const SizedBox(height: 8),
@@ -125,9 +124,7 @@ class _MarkBoosterScreenState extends ConsumerState<MarkBoosterScreen> {
                 'No weak topics yet. Keep practising and they will appear here.',
           )
         else
-          ...diagnosis.weakTopics.map(
-            (w) => _WeakTopicCard(weakness: w),
-          ),
+          ...diagnosis.weakTopics.map((w) => _WeakTopicCard(weakness: w)),
         if (diagnosis.typeWeaknesses.isNotEmpty) ...[
           const SizedBox(height: 20),
           _SectionHeader(
@@ -246,7 +243,10 @@ class _HeroCard extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Drill size',
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.8),
+              fontSize: 12,
+            ),
           ),
           const SizedBox(height: 8),
           Row(
@@ -307,9 +307,7 @@ class _SizeChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: selected ? Colors.white : Colors.white54,
-          ),
+          border: Border.all(color: selected ? Colors.white : Colors.white54),
         ),
         child: Text(
           '$size',
@@ -334,8 +332,8 @@ class _WeakTopicCard extends StatelessWidget {
     final color = accuracy < 30
         ? AppColors.error
         : accuracy < 45
-            ? AppColors.warning
-            : AppColors.success;
+        ? AppColors.warning
+        : AppColors.success;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -399,8 +397,11 @@ class _WeakTopicCard extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.history, size: 14,
-                  color: AdaptiveColors.textSecondary(context)),
+              Icon(
+                Icons.history,
+                size: 14,
+                color: AdaptiveColors.textSecondary(context),
+              ),
               const SizedBox(width: 4),
               Text(
                 '${weakness.questionsAttempted} attempted',
@@ -410,8 +411,11 @@ class _WeakTopicCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              Icon(Icons.library_books_outlined, size: 14,
-                  color: AdaptiveColors.textSecondary(context)),
+              Icon(
+                Icons.library_books_outlined,
+                size: 14,
+                color: AdaptiveColors.textSecondary(context),
+              ),
               const SizedBox(width: 4),
               Text(
                 '${weakness.questionsAvailable} in bank',
@@ -460,7 +464,10 @@ class _MasteredTopicRow extends StatelessWidget {
                 ),
                 Text(
                   '${mastered.chapterName} · ${mastered.subjectName}',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSubtle),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSubtle,
+                  ),
                 ),
               ],
             ),
@@ -486,14 +493,25 @@ class _SessionCard extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final now = DateTime.now();
-    final isToday = date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
-    final hour = date.hour == 0 ? 12 : (date.hour > 12 ? date.hour - 12 : date.hour);
+    final isToday =
+        date.year == now.year && date.month == now.month && date.day == now.day;
+    final hour = date.hour == 0
+        ? 12
+        : (date.hour > 12 ? date.hour - 12 : date.hour);
     final minute = date.minute.toString().padLeft(2, '0');
     final period = date.hour >= 12 ? 'PM' : 'AM';
     final time = '$hour:$minute $period';
@@ -507,8 +525,8 @@ class _SessionCard extends StatelessWidget {
     final color = accuracy >= 60
         ? AppColors.success
         : accuracy >= 30
-            ? AppColors.warning
-            : AppColors.error;
+        ? AppColors.warning
+        : AppColors.error;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),

@@ -41,11 +41,7 @@ void main() {
 
   group('ParagraphQuestionMatcher.score', () {
     test('counts shared significant tokens', () {
-      final q = _q(
-        '1',
-        'Algae',
-        'Which pigment is found in red algae?',
-      );
+      final q = _q('1', 'Algae', 'Which pigment is found in red algae?');
       final score = ParagraphQuestionMatcher.score(
         'Algae are the simplest chlorophyll bearing autotrophic plants found '
         'in aquatic habitats',

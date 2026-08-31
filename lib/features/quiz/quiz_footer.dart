@@ -77,12 +77,16 @@ class QuizFooter extends ConsumerWidget {
                     isFlagged ? 'Unmark' : 'Flag',
                     style: TextStyle(
                       color: isFlagged ? Colors.orange : null,
-                      fontWeight: isFlagged ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: isFlagged
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
-                      color: isFlagged ? Colors.orange : AdaptiveColors.divider(context),
+                      color: isFlagged
+                          ? Colors.orange
+                          : AdaptiveColors.divider(context),
                     ),
                   ),
                 ),
@@ -115,9 +119,7 @@ class QuizFooter extends ConsumerWidget {
                           }
                         }
                       : null,
-                  child: Text(
-                    isLastQuestion ? 'Submit Quiz' : 'Next',
-                  ),
+                  child: Text(isLastQuestion ? 'Submit Quiz' : 'Next'),
                 ),
               ),
             ],

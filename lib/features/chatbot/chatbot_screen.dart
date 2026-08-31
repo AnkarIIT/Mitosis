@@ -47,7 +47,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
   void initState() {
     super.initState();
     _loadChatHistory();
-    
+
     if (widget.initialMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _sendMessage(widget.initialMessage!);
@@ -58,25 +58,28 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
   Future<void> _loadChatHistory() async {
     final db = ref.read(databaseProvider);
     final history = await db.getAllChats();
-    
+
     if (!mounted) return;
 
     setState(() {
       if (history.isEmpty) {
         _messages.add(
           ChatMessage(
-            text: "Hello! I'm your AI Doubt Solver. You can ask me any NEET-related questions, or tap the camera icon to upload a photo of a question you're stuck on!",
+            text:
+                "Hello! I'm your AI Doubt Solver. You can ask me any NEET-related questions, or tap the camera icon to upload a photo of a question you're stuck on!",
             isUser: false,
             timestamp: DateTime.now(),
           ),
         );
       } else {
         _messages.addAll(
-          history.map((c) => ChatMessage(
-            text: c.message,
-            isUser: c.isUser,
-            timestamp: c.timestamp,
-          )),
+          history.map(
+            (c) => ChatMessage(
+              text: c.message,
+              isUser: c.isUser,
+              timestamp: c.timestamp,
+            ),
+          ),
         );
       }
     });
@@ -99,10 +102,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     }
 
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-      source: source,
-      imageQuality: 80,
-    );
+    final pickedFile = await picker.pickImage(source: source, imageQuality: 80);
 
     if (pickedFile != null) {
       final compressedPath = await _compressImage(pickedFile.path);
@@ -116,8 +116,9 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
   Future<String?> _compressImage(String path) async {
     try {
       final tempDir = await path_provider.getTemporaryDirectory();
-      final targetPath = '${tempDir.path}/temp_question_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      
+      final targetPath =
+          '${tempDir.path}/temp_question_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
       final result = await FlutterImageCompress.compressAndGetFile(
         path,
         targetPath,
@@ -160,7 +161,10 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
             ),
             const SizedBox(height: 20),
             ListTile(
-              leading: Icon(Icons.camera_alt, color: AdaptiveColors.primary(context)),
+              leading: Icon(
+                Icons.camera_alt,
+                color: AdaptiveColors.primary(context),
+              ),
               title: const Text('Take a Photo'),
               onTap: () {
                 context.pop();
@@ -168,7 +172,10 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library, color: AdaptiveColors.primary(context)),
+              leading: Icon(
+                Icons.photo_library,
+                color: AdaptiveColors.primary(context),
+              ),
               title: const Text('Choose from Gallery'),
               onTap: () {
                 context.pop();
@@ -209,11 +216,13 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     _scrollToBottom();
 
     // Persist user message
-    await db.insertChatMessage(ChatsCompanion.insert(
-      message: text,
-      isUser: true,
-      timestamp: userMessage.timestamp,
-    ));
+    await db.insertChatMessage(
+      ChatsCompanion.insert(
+        message: text,
+        isUser: true,
+        timestamp: userMessage.timestamp,
+      ),
+    );
 
     try {
       String responseText;
@@ -240,20 +249,23 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
       _scrollToBottom();
 
       // Persist AI response
-      await db.insertChatMessage(ChatsCompanion.insert(
-        message: responseText,
-        isUser: false,
-        timestamp: aiMessage.timestamp,
-      ));
-
+      await db.insertChatMessage(
+        ChatsCompanion.insert(
+          message: responseText,
+          isUser: false,
+          timestamp: aiMessage.timestamp,
+        ),
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _messages.add(ChatMessage(
-          text: "ERROR_MSG: $e",
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
+        _messages.add(
+          ChatMessage(
+            text: "ERROR_MSG: $e",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ),
+        );
         _isLoading = false;
       });
       _scrollToBottom();
@@ -314,15 +326,23 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Clear Chat?'),
-                  content: const Text('This will permanently delete your conversation history.'),
+                  content: const Text(
+                    'This will permanently delete your conversation history.',
+                  ),
                   actions: [
-                    TextButton(onPressed: () => context.pop(), child: const Text('Cancel')),
+                    TextButton(
+                      onPressed: () => context.pop(),
+                      child: const Text('Cancel'),
+                    ),
                     TextButton(
                       onPressed: () {
                         context.pop();
                         _clearChat();
                       },
-                      child: const Text('Clear', style: TextStyle(color: Colors.red)),
+                      child: const Text(
+                        'Clear',
+                        style: TextStyle(color: Colors.red),
+                      ),
                     ),
                   ],
                 ),
@@ -359,7 +379,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
-children: [
+                children: [
                   Text(
                     'AI is thinking',
                     style: TextStyle(
@@ -371,17 +391,15 @@ children: [
                   Row(
                     children: List.generate(3, (index) {
                       return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                        width: 6,
-                        height: 6,
-decoration: BoxDecoration(
-                  color: AdaptiveColors.primary(context),
-                  shape: BoxShape.circle,
-                ),
-                      )
-                          .animate(
-                            onPlay: (controller) => controller.repeat(),
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: AdaptiveColors.primary(context),
+                              shape: BoxShape.circle,
+                            ),
                           )
+                          .animate(onPlay: (controller) => controller.repeat())
                           .scaleXY(
                             begin: 0.5,
                             end: 1.2,
@@ -395,9 +413,9 @@ decoration: BoxDecoration(
                 ],
               ),
             ),
-          
+
           if (_messages.length <= 1) _buildSuggestedPrompts(),
-          
+
           _buildInputArea(),
         ],
       ),
@@ -406,7 +424,9 @@ decoration: BoxDecoration(
 
   Widget _buildMessageBubble(ChatMessage message) {
     final bool isError = message.text.startsWith("ERROR_MSG: ");
-    final String displayText = isError ? message.text.substring(11) : message.text;
+    final String displayText = isError
+        ? message.text.substring(11)
+        : message.text;
 
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -419,7 +439,9 @@ decoration: BoxDecoration(
         decoration: BoxDecoration(
           color: message.isUser
               ? AdaptiveColors.primary(context)
-              : (isError ? AppColors.errorLight : AdaptiveColors.secondary(context).withValues(alpha: 0.3)),
+              : (isError
+                    ? AppColors.errorLight
+                    : AdaptiveColors.secondary(context).withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(16).copyWith(
             bottomRight: message.isUser ? const Radius.circular(0) : null,
             bottomLeft: !message.isUser ? const Radius.circular(0) : null,
@@ -448,7 +470,9 @@ decoration: BoxDecoration(
                 p: TextStyle(
                   color: message.isUser
                       ? AdaptiveColors.onPrimary(context)
-                      : (isError ? AppColors.error : AdaptiveColors.textPrimary(context)),
+                      : (isError
+                            ? AppColors.error
+                            : AdaptiveColors.textPrimary(context)),
                 ),
               ),
             ),
@@ -488,10 +512,18 @@ decoration: BoxDecoration(
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ActionChip(
-                    avatar: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
+                    avatar: const Icon(
+                      Icons.camera_alt,
+                      size: 14,
+                      color: Colors.white,
+                    ),
                     label: const Text("UPLOAD QUESTION"),
-                    labelStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-backgroundColor: AdaptiveColors.primary(context),
+                    labelStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    backgroundColor: AdaptiveColors.primary(context),
                     onPressed: _showImagePickerOptions,
                   ),
                 ),
@@ -500,10 +532,21 @@ backgroundColor: AdaptiveColors.primary(context),
                     padding: const EdgeInsets.only(right: 8.0),
                     child: ActionChip(
                       label: Text(prompt),
-                      labelStyle: TextStyle(color: AdaptiveColors.onPrimary(context), fontSize: 12),
-                      backgroundColor: AdaptiveColors.primary(context).withValues(alpha: 0.1),
-                      side: BorderSide(color: AdaptiveColors.primary(context).withValues(alpha: 0.3)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      labelStyle: TextStyle(
+                        color: AdaptiveColors.onPrimary(context),
+                        fontSize: 12,
+                      ),
+                      backgroundColor: AdaptiveColors.primary(
+                        context,
+                      ).withValues(alpha: 0.1),
+                      side: BorderSide(
+                        color: AdaptiveColors.primary(
+                          context,
+                        ).withValues(alpha: 0.3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       onPressed: () => _sendMessage(prompt),
                     ),
                   );
@@ -555,7 +598,9 @@ backgroundColor: AdaptiveColors.primary(context),
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: AdaptiveColors.secondary(context).withValues(alpha: 0.3),
+                  fillColor: AdaptiveColors.secondary(
+                    context,
+                  ).withValues(alpha: 0.3),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
@@ -570,7 +615,10 @@ backgroundColor: AdaptiveColors.primary(context),
                   radius: 24,
                   backgroundColor: AdaptiveColors.primary(context),
                   child: IconButton(
-                    icon: Icon(Icons.send, color: AdaptiveColors.onPrimary(context)),
+                    icon: Icon(
+                      Icons.send,
+                      color: AdaptiveColors.onPrimary(context),
+                    ),
                     onPressed: () => _sendMessage(_messageController.text),
                   ),
                 )

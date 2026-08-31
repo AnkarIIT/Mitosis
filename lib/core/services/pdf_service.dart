@@ -17,7 +17,9 @@ class PdfService {
 
   static Future<String> extractText(File file) async {
     try {
-      final PdfDocument document = PdfDocument(inputBytes: await file.readAsBytes());
+      final PdfDocument document = PdfDocument(
+        inputBytes: await file.readAsBytes(),
+      );
       String text = PdfTextExtractor(document).extractText();
       document.dispose();
       return text;
@@ -32,10 +34,9 @@ class PdfService {
     final bytes = await _loadAssetBytes(assetPath);
     final PdfDocument document = PdfDocument(inputBytes: bytes);
     try {
-      return PdfTextExtractor(document).extractText(
-        startPageIndex: pageIndex,
-        endPageIndex: pageIndex,
-      );
+      return PdfTextExtractor(
+        document,
+      ).extractText(startPageIndex: pageIndex, endPageIndex: pageIndex);
     } finally {
       document.dispose();
     }
@@ -91,10 +92,7 @@ class PdfService {
       final extractor = PdfTextExtractor(document);
       final needle = _normalize(chapterTitle);
       for (int i = 0; i < document.pages.count; i++) {
-        final text = extractor.extractText(
-          startPageIndex: i,
-          endPageIndex: i,
-        );
+        final text = extractor.extractText(startPageIndex: i, endPageIndex: i);
         if (_normalize(text).contains(needle)) return i;
       }
     } catch (_) {
@@ -107,22 +105,24 @@ class PdfService {
 
   static List<Map<String, String>> splitByChapters(String fullText) {
     List<Map<String, String>> chapters = [];
-    final RegExp chapterRegex = RegExp(r'(Chapter\s+\d+[:\s]+[A-Za-z\s]+)', caseSensitive: false);
-    
+    final RegExp chapterRegex = RegExp(
+      r'(Chapter\s+\d+[:\s]+[A-Za-z\s]+)',
+      caseSensitive: false,
+    );
+
     final matches = chapterRegex.allMatches(fullText).toList();
-    
+
     if (matches.isEmpty) {
-      chapters.add({
-        'title': 'General Content',
-        'content': fullText,
-      });
+      chapters.add({'title': 'General Content', 'content': fullText});
       return chapters;
     }
 
     for (int i = 0; i < matches.length; i++) {
       int start = matches[i].start;
-      int end = (i + 1 < matches.length) ? matches[i + 1].start : fullText.length;
-      
+      int end = (i + 1 < matches.length)
+          ? matches[i + 1].start
+          : fullText.length;
+
       chapters.add({
         'title': matches[i].group(0) ?? 'Unknown Chapter',
         'content': fullText.substring(start, end).trim(),

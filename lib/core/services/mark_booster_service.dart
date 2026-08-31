@@ -3,6 +3,7 @@ import 'dart:math';
 import '../models/mark_booster_model.dart';
 import '../models/question_model.dart';
 import '../models/user_progress_model.dart';
+
 /// Builds personalized re-attempt drills from the Mark Booster diagnosis.
 ///
 /// Priority order:
@@ -44,8 +45,9 @@ class MarkBoosterService {
     }
 
     for (final weak in diagnosis.weakTopics) {
-      final pool = allQuestions.where((q) => q.topicId == weak.topic.id).toList()
-        ..shuffle(rng);
+      final pool =
+          allQuestions.where((q) => q.topicId == weak.topic.id).toList()
+            ..shuffle(rng);
       for (final q in pool.take(3)) {
         addQuestion(q);
       }
@@ -62,10 +64,9 @@ class MarkBoosterService {
     }
 
     if (selected.length < size) {
-      final extras = allQuestions
-          .where((q) => !selectedIds.contains(q.id))
-          .toList()
-        ..shuffle(rng);
+      final extras =
+          allQuestions.where((q) => !selectedIds.contains(q.id)).toList()
+            ..shuffle(rng);
       for (final q in extras) {
         if (selected.length >= size) break;
         selected.add(q);
@@ -112,9 +113,7 @@ class MarkBoosterService {
     List<QuizAttempt> attempts, {
     int limit = 8,
   }) {
-    final sessions = attempts
-        .where((a) => a.testType == 'booster')
-        .toList()
+    final sessions = attempts.where((a) => a.testType == 'booster').toList()
       ..sort((a, b) => b.attemptedAt.compareTo(a.attemptedAt));
     return sessions.take(limit).toList();
   }

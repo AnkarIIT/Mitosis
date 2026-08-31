@@ -21,7 +21,6 @@ class QuizHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return Column(
       children: [
         Text(
@@ -115,7 +114,9 @@ class QuizScoreIndicator extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isCorrect ? AppColors.success.withValues(alpha: 0.1) : AppColors.error.withValues(alpha: 0.1),
+        color: isCorrect
+            ? AppColors.success.withValues(alpha: 0.1)
+            : AppColors.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -160,7 +161,6 @@ class QuizAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -193,7 +193,9 @@ class QuizAppBar extends ConsumerWidget implements PreferredSizeWidget {
         IconButton(
           icon: Icon(
             isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-            color: isBookmarked ? AdaptiveColors.primary(context) : AdaptiveColors.textSecondary(context),
+            color: isBookmarked
+                ? AdaptiveColors.primary(context)
+                : AdaptiveColors.textSecondary(context),
           ),
           onPressed: onBookmarkToggle,
         ),
@@ -204,7 +206,10 @@ class QuizAppBar extends ConsumerWidget implements PreferredSizeWidget {
   Widget _buildHintButton(BuildContext context, Question question) {
     return IconButton(
       onPressed: onHintPressed,
-      icon: Icon(Icons.lightbulb_outline, color: AdaptiveColors.primary(context)),
+      icon: Icon(
+        Icons.lightbulb_outline,
+        color: AdaptiveColors.primary(context),
+      ),
       tooltip: 'Get a hint',
     );
   }
@@ -214,5 +219,4 @@ class QuizAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final secs = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
-
-  }
+}

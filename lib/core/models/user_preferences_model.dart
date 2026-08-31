@@ -85,7 +85,8 @@ class UserPreferences {
     return UserPreferences(
       batch: batch ?? this.batch,
       targetYear: targetYear ?? this.targetYear,
-      dailyCommitmentMinutes: dailyCommitmentMinutes ?? this.dailyCommitmentMinutes,
+      dailyCommitmentMinutes:
+          dailyCommitmentMinutes ?? this.dailyCommitmentMinutes,
       isOnboarded: isOnboarded ?? this.isOnboarded,
     );
   }

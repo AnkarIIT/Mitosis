@@ -9,7 +9,8 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   static const String _remindersEnabledKey = 'study_reminders_enabled';
   static const String _reminderTimeKey = 'study_reminder_time';
@@ -22,15 +23,16 @@ class NotificationService {
 
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     await _notificationsPlugin.initialize(
       initializationSettings,
@@ -45,16 +47,20 @@ class NotificationService {
 
   Future<bool> requestPermissions() async {
     if (kIsWeb) return false;
-    
+
     final bool? result = await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
-    
+
     return result ?? false;
   }
 
-  Future<void> scheduleDailyReminder({required int hour, required int minute}) async {
+  Future<void> scheduleDailyReminder({
+    required int hour,
+    required int minute,
+  }) async {
     await _notificationsPlugin.cancel(0); // Cancel existing reminder
 
     await _notificationsPlugin.zonedSchedule(
@@ -82,7 +88,7 @@ class NotificationService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_remindersEnabledKey, true);
     await prefs.setString(_reminderTimeKey, '$hour:$minute');
-    
+
     debugPrint('⏰ Daily reminder scheduled for $hour:$minute');
   }
 
@@ -95,8 +101,14 @@ class NotificationService {
 
   tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }

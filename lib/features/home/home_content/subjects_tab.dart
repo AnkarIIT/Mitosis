@@ -64,7 +64,9 @@ class SubjectsTab extends ConsumerWidget {
               itemCount: subjects.length,
               itemBuilder: (context, index) {
                 final subject = subjects[index];
-                final subjectStats = ref.watch(subjectStatsProvider(subject.name));
+                final subjectStats = ref.watch(
+                  subjectStatsProvider(subject.name),
+                );
                 final accuracy = subjectStats['accuracy'] as double;
                 final chapterCount = subject.chapters.length;
 
@@ -82,8 +84,12 @@ class SubjectsTab extends ConsumerWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            _getSubjectColor(subject.id).withValues(alpha: 0.95),
-                            _getSubjectColor(subject.id).withValues(alpha: 0.65),
+                            _getSubjectColor(
+                              subject.id,
+                            ).withValues(alpha: 0.95),
+                            _getSubjectColor(
+                              subject.id,
+                            ).withValues(alpha: 0.65),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -91,7 +97,9 @@ class SubjectsTab extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: _getSubjectColor(subject.id).withValues(alpha: 0.2),
+                            color: _getSubjectColor(
+                              subject.id,
+                            ).withValues(alpha: 0.2),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -116,10 +124,13 @@ class SubjectsTab extends ConsumerWidget {
                                     const SizedBox(height: 8),
                                     Text(
                                       subject.name,
-                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                        color: AppColors.textLight,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            color: AppColors.textLight,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -133,7 +144,9 @@ class SubjectsTab extends ConsumerWidget {
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.secondary.withValues(alpha: 0.3),
+                                      color: AppColors.secondary.withValues(
+                                        alpha: 0.3,
+                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(

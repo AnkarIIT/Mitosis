@@ -34,8 +34,9 @@ class WeakTopicDiagnosis {
     required this.questionsAvailable,
   });
 
-  double get accuracy =>
-      questionsAttempted == 0 ? 0 : (questionsCorrect / questionsAttempted) * 100;
+  double get accuracy => questionsAttempted == 0
+      ? 0
+      : (questionsCorrect / questionsAttempted) * 100;
 
   /// Progress (0.0–1.0) toward the mastery threshold.
   double get masteryProgress {

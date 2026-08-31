@@ -21,7 +21,8 @@ class BatchOnboardingPage extends ConsumerStatefulWidget {
   final VoidCallback onDone;
 
   @override
-  ConsumerState<BatchOnboardingPage> createState() => _BatchOnboardingPageState();
+  ConsumerState<BatchOnboardingPage> createState() =>
+      _BatchOnboardingPageState();
 }
 
 class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
@@ -49,11 +50,13 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
 
   Future<void> _save() async {
     setState(() => _saving = true);
-    await ref.read(userPreferencesProvider.notifier).save(
-      batch: _batch,
-      targetYear: _targetYear,
-      dailyCommitmentMinutes: _commitment,
-    );
+    await ref
+        .read(userPreferencesProvider.notifier)
+        .save(
+          batch: _batch,
+          targetYear: _targetYear,
+          dailyCommitmentMinutes: _commitment,
+        );
     if (!mounted) return;
     setState(() => _saving = false);
     widget.onDone();
@@ -99,9 +102,9 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
               child: Center(
                 child: Text(
                   labels[_step],
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -289,7 +292,8 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
               ),
               ChoiceChip(
                 label: const Text('Not sure yet'),
-                selected: _targetYear != null && !_yearOptions.contains(_targetYear),
+                selected:
+                    _targetYear != null && !_yearOptions.contains(_targetYear),
                 onSelected: (_) => setState(() => _targetYear = 0),
                 selectedColor: AppColors.primary.withValues(alpha: 0.15),
                 labelStyle: const TextStyle(fontWeight: FontWeight.w600),
@@ -346,7 +350,9 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                       children: [
                         Icon(
                           Icons.schedule,
-                          color: selected ? AppColors.primary : AppColors.secondary,
+                          color: selected
+                              ? AppColors.primary
+                              : AppColors.secondary,
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -365,10 +371,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                             color: AppColors.primary,
                           )
                         else
-                          Icon(
-                            Icons.circle_outlined,
-                            color: AppColors.divider,
-                          ),
+                          Icon(Icons.circle_outlined, color: AppColors.divider),
                       ],
                     ),
                   ),
@@ -383,15 +386,17 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
 
   String _commitmentLabel(int minutes) {
     if (minutes == 30) return '30 min — Light (${_targetLabel(minutes)} q/day)';
-    if (minutes == 60) return '1 hour — Standard (${_targetLabel(minutes)} q/day)';
-    if (minutes == 90) return '1.5 hours — Intense (${_targetLabel(minutes)} q/day)';
+    if (minutes == 60)
+      return '1 hour — Standard (${_targetLabel(minutes)} q/day)';
+    if (minutes == 90)
+      return '1.5 hours — Intense (${_targetLabel(minutes)} q/day)';
     return '2+ hours — Extreme (${_targetLabel(minutes)} q/day)';
   }
 
   String _targetLabel(int minutes) {
-    return UserPreferences(dailyCommitmentMinutes: minutes)
-        .recommendedDailyTarget
-        .toString();
+    return UserPreferences(
+      dailyCommitmentMinutes: minutes,
+    ).recommendedDailyTarget.toString();
   }
 
   Widget _buildFooter(BuildContext context) {
@@ -399,7 +404,10 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
       children: [
         TextButton(
           onPressed: _saving ? null : widget.onDone,
-          child: const Text('SKIP', style: TextStyle(color: AppColors.secondary)),
+          child: const Text(
+            'SKIP',
+            style: TextStyle(color: AppColors.secondary),
+          ),
         ),
         const Spacer(),
         FilledButton(
@@ -419,4 +427,3 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
     );
   }
 }
-

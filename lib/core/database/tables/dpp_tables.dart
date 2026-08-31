@@ -33,5 +33,6 @@ class DppQuestions extends Table {
   TextColumn get correctAnswer => text()();
   TextColumn get explanation => text().nullable()();
   IntColumn get year => integer().nullable()();
-  TextColumn get source => text().withDefault(const Constant('dpp'))(); // 'pyq' | 'dpp' | 'seeded'
+  TextColumn get source =>
+      text().withDefault(const Constant('dpp'))(); // 'pyq' | 'dpp' | 'seeded'
 }

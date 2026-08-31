@@ -8,7 +8,7 @@ import 'tokens.dart';
 class AppColors {
   // Primary Color - Teal/Dark Cyan
   static const Color primary = Color(0xFF216869);
-  
+
   // Secondary Color - Beige
   static const Color secondary = Color(0xFFDDDBCB);
 
@@ -22,7 +22,7 @@ class AppColors {
   static const Color backgroundDark = Color(0xFF0F1115);
   static const Color surfaceDark = Color(0xFF1A1D24);
   static const Color cardBgDark = Color(0xFF1A1D24);
-  
+
   // Text colors
   static const Color textDark = Color(0xFF1E293B);
   static const Color textLight = Color(0xFFF1F3F7);

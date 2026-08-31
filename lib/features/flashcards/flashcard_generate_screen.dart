@@ -19,10 +19,12 @@ class FlashcardGenerateScreen extends ConsumerStatefulWidget {
   const FlashcardGenerateScreen({super.key});
 
   @override
-  ConsumerState<FlashcardGenerateScreen> createState() => _FlashcardGenerateScreenState();
+  ConsumerState<FlashcardGenerateScreen> createState() =>
+      _FlashcardGenerateScreenState();
 }
 
-class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScreen> {
+class _FlashcardGenerateScreenState
+    extends ConsumerState<FlashcardGenerateScreen> {
   String? _selectedSubject;
   String? _selectedClassLevel;
   NcertBookEntry? _selectedChapter;
@@ -107,7 +109,9 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
                 .map(
                   (entry) => DropdownMenuItem(
                     value: entry,
-                    child: Text('Ch ${entry.chapterNumber}: ${entry.chapterTitle}'),
+                    child: Text(
+                      'Ch ${entry.chapterNumber}: ${entry.chapterTitle}',
+                    ),
                   ),
                 )
                 .toList(),
@@ -153,10 +157,15 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
                   ? const SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Icon(Icons.auto_awesome_rounded),
-              label: Text(_isGenerating ? 'Generating…' : 'GENERATE FLASHCARDS'),
+              label: Text(
+                _isGenerating ? 'Generating…' : 'GENERATE FLASHCARDS',
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -165,16 +174,19 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
             const SizedBox(height: 16),
             // Pulsing progress bar while generating
             ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(
-                value: (_processed != null && _total != null && _total! > 0)
-                    ? (_processed! / _total!).clamp(0.0, 1.0)
-                    : null,
-                minHeight: 6,
-                backgroundColor: AdaptiveColors.outlineVariant(context).withValues(alpha: 0.3),
-                valueColor: AlwaysStoppedAnimation(AppColors.success),
-              ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true))
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(
+                    value: (_processed != null && _total != null && _total! > 0)
+                        ? (_processed! / _total!).clamp(0.0, 1.0)
+                        : null,
+                    minHeight: 6,
+                    backgroundColor: AdaptiveColors.outlineVariant(
+                      context,
+                    ).withValues(alpha: 0.3),
+                    valueColor: AlwaysStoppedAnimation(AppColors.success),
+                  ),
+                )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
                 .scale(
                   begin: const Offset(1, 0.6),
                   end: const Offset(1, 1),
@@ -198,48 +210,64 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
                     Text(
                       _status!,
                       style: TextStyle(
-                        color: _lastError != null ? AppColors.error : AdaptiveColors.textPrimary(context),
+                        color: _lastError != null
+                            ? AppColors.error
+                            : AdaptiveColors.textPrimary(context),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    if (_processed != null && _total != null && _total! > 0) ...[
+                    if (_processed != null &&
+                        _total != null &&
+                        _total! > 0) ...[
                       const SizedBox(height: 10),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(6),
                         child: LinearProgressIndicator(
                           value: _processed! / _total!,
                           minHeight: 6,
-                          backgroundColor: AdaptiveColors.outlineVariant(context).withValues(alpha: 0.3),
+                          backgroundColor: AdaptiveColors.outlineVariant(
+                            context,
+                          ).withValues(alpha: 0.3),
                           valueColor: AlwaysStoppedAnimation(
-                            _lastError != null ? AppColors.error : AppColors.success,
+                            _lastError != null
+                                ? AppColors.error
+                                : AppColors.success,
                           ),
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         '${_processed!} / ${_total!}',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textSubtle),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSubtle,
+                        ),
                       ),
                     ],
                     if (_lastError != null) ...[
                       const SizedBox(height: 8),
                       Text(
                         'Error: $_lastError',
-                        style: const TextStyle(fontSize: 12, color: AppColors.error),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.error,
+                        ),
                       ),
                     ],
                     if (_generatedCards.isNotEmpty && _lastError == null) ...[
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Icon(Icons.check_circle, color: AppColors.success, size: 20)
-                              .animate()
-                              .scale(
-                                begin: Offset.zero,
-                                end: const Offset(1, 1),
-                                curve: Curves.elasticOut,
-                                duration: AppDuration.slow,
-                              ),
+                          Icon(
+                            Icons.check_circle,
+                            color: AppColors.success,
+                            size: 20,
+                          ).animate().scale(
+                            begin: Offset.zero,
+                            end: const Offset(1, 1),
+                            curve: Curves.elasticOut,
+                            duration: AppDuration.slow,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             'Done!',
@@ -266,7 +294,10 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
                 Expanded(
                   child: Text(
                     '${_generatedCards.length} cards ready',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 FilledButton.icon(
@@ -277,10 +308,17 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
               ],
             ),
             const SizedBox(height: 12),
-            ..._generatedCards.asMap().entries.map((entry) => _buildCardPreview(entry.value)
-                .animate(delay: (entry.key * 80).ms)
-                .fadeIn(duration: AppDuration.slow)
-                .slideY(begin: 0.15, end: 0, duration: AppDuration.slow, curve: Curves.easeOutCubic)),
+            ..._generatedCards.asMap().entries.map(
+              (entry) => _buildCardPreview(entry.value)
+                  .animate(delay: (entry.key * 80).ms)
+                  .fadeIn(duration: AppDuration.slow)
+                  .slideY(
+                    begin: 0.15,
+                    end: 0,
+                    duration: AppDuration.slow,
+                    curve: Curves.easeOutCubic,
+                  ),
+            ),
           ],
         ],
       ),
@@ -290,7 +328,11 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AdaptiveColors.textPrimary(context)),
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 15,
+        color: AdaptiveColors.textPrimary(context),
+      ),
     );
   }
 
@@ -305,13 +347,19 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        subtitle: Text(card.ncertReference, style: const TextStyle(fontSize: 12)),
+        subtitle: Text(
+          card.ncertReference,
+          style: const TextStyle(fontSize: 12),
+        ),
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(card.back, style: const TextStyle(fontSize: 14, height: 1.4)),
+              child: Text(
+                card.back,
+                style: const TextStyle(fontSize: 14, height: 1.4),
+              ),
             ),
           ),
         ],
@@ -324,14 +372,17 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
       child: Column(
-        children: List.generate(4, (index) => Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          height: 72,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+        children: List.generate(
+          4,
+          (index) => Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            height: 72,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
-        )),
+        ),
       ),
     );
   }
@@ -348,7 +399,8 @@ class _FlashcardGenerateScreenState extends ConsumerState<FlashcardGenerateScree
   }
 
   List<NcertBookEntry> _chaptersForSelection() {
-    if (_selectedSubject == null || _selectedClassLevel == null) return const [];
+    if (_selectedSubject == null || _selectedClassLevel == null)
+      return const [];
     return NcertBookCatalog.allEntries
         .where(
           (e) =>

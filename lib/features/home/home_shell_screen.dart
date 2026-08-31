@@ -26,10 +26,7 @@ class HomeShellScreen extends StatelessWidget {
           );
         },
         destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_filled),
-            label: 'Home',
-          ),
+          NavigationDestination(icon: Icon(Icons.home_filled), label: 'Home'),
           NavigationDestination(
             icon: Icon(Icons.style_rounded),
             label: 'Flashcards',
