@@ -6,6 +6,7 @@ import 'connection.dart'
 
 import 'tables/question_table.dart';
 import 'tables/quiz_attempts_table.dart';
+import 'tables/quiz_sessions_table.dart';
 import 'tables/topic_progress_table.dart';
 import 'tables/bookmarks_table.dart';
 import 'tables/chats_table.dart';
@@ -24,6 +25,7 @@ part 'drift_database.g.dart';
   tables: [
     Questions,
     QuizAttempts,
+    QuizSessions,
     TopicProgressEntries,
     Bookmarks,
     Chats,
@@ -54,7 +56,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 28;
+  int get schemaVersion => 29;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -315,6 +317,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 28) {
         // Cloud identity linkage: Supabase auth user id (email/password + Google).
         await _addColumnSafely(m, users, (users as dynamic).supabaseId);
+      }
+      if (from < 29) {
+        // Quiz sessions table for session persistence (save/resume in-progress quizzes)
+        await m.createTable(quizSessions);
       }
     },
     beforeOpen: (details) async {
@@ -764,6 +770,23 @@ class AppDatabase extends _$AppDatabase {
       batch.insertAll(dppQuestions, questions as Iterable<Insertable>);
     });
   }
+
+  // ============= QUIZ SESSIONS =============
+
+  Future<void> upsertQuizSession(QuizSessionsCompanion session) =>
+      into(quizSessions).insertOnConflictUpdate(session);
+
+  Future<QuizSession?> getQuizSession(String sessionId) =>
+      (select(quizSessions)..where((t) => t.sessionId.equals(sessionId))).getSingleOrNull();
+
+  Future<List<QuizSession>> getAllQuizSessions() =>
+      (select(quizSessions)..orderBy([(t) => OrderingTerm(expression: t.updatedAt, mode: OrderingMode.desc)])).get();
+
+  Future<void> deleteQuizSession(String sessionId) =>
+      (delete(quizSessions)..where((t) => t.sessionId.equals(sessionId))).go();
+
+  Future<void> deleteCompletedQuizSessions() =>
+      (delete(quizSessions)..where((t) => t.isCompleted.equals(true))).go();
 
   // ============= RESET DATA =============
 

@@ -5,10 +5,15 @@ import '../services/biometric_service.dart';
 import '../services/notification_service.dart';
 import '../models/batch_model.dart';
 import '../services/gemini_proxy_service.dart';
+import '../services/gemini_chat_service.dart';
 import '../services/google_auth_service.dart';
 import '../services/batch_service.dart';
 import '../services/exam_checkpoint_service.dart';
 import '../services/pyq_downloader_service.dart';
+import '../services/quiz_session_service.dart';
+import '../services/question_generation_service.dart';
+import '../services/dpp_streak_service.dart';
+import '../services/exam_blueprint_service.dart';
 import '../database/question_repository.dart';
 import '../services/auth_service.dart';
 import 'core_providers.dart';
@@ -59,4 +64,23 @@ final pyqDownloaderProvider = Provider<PyqDownloaderService>((ref) {
   final database = ref.watch(databaseProvider);
   final repo = QuestionRepository(database);
   return PyqDownloaderService(repo);
+});
+
+final quizSessionServiceProvider = Provider<QuizSessionService>((ref) {
+  final database = ref.watch(databaseProvider);
+  return QuizSessionService(database);
+});
+
+final questionGenerationServiceProvider = Provider<QuestionGenerationService?>((ref) {
+  final gemini = ref.watch(geminiServiceProvider);
+  return QuestionGenerationService(gemini);
+});
+
+final dppStreakServiceProvider = Provider<DppStreakService>((ref) {
+  final database = ref.watch(databaseProvider);
+  return DppStreakService(database);
+});
+
+final examBlueprintServiceProvider = Provider<ExamBlueprintService>((ref) {
+  return ExamBlueprintService();
 });

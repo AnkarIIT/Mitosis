@@ -1988,6 +1988,1237 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttempt> {
   }
 }
 
+class $QuizSessionsTable extends QuizSessions
+    with TableInfo<$QuizSessionsTable, QuizSession> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QuizSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _topicIdMeta = const VerificationMeta(
+    'topicId',
+  );
+  @override
+  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
+    'topic_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _subjectMeta = const VerificationMeta(
+    'subject',
+  );
+  @override
+  late final GeneratedColumn<String> subject = GeneratedColumn<String>(
+    'subject',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _testTypeMeta = const VerificationMeta(
+    'testType',
+  );
+  @override
+  late final GeneratedColumn<String> testType = GeneratedColumn<String>(
+    'test_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('topic'),
+  );
+  static const VerificationMeta _quizModeMeta = const VerificationMeta(
+    'quizMode',
+  );
+  @override
+  late final GeneratedColumn<String> quizMode = GeneratedColumn<String>(
+    'quiz_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('practice'),
+  );
+  static const VerificationMeta _timeLimitSecondsMeta = const VerificationMeta(
+    'timeLimitSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> timeLimitSeconds = GeneratedColumn<int>(
+    'time_limit_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _seedMeta = const VerificationMeta('seed');
+  @override
+  late final GeneratedColumn<int> seed = GeneratedColumn<int>(
+    'seed',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currentIndexMeta = const VerificationMeta(
+    'currentIndex',
+  );
+  @override
+  late final GeneratedColumn<int> currentIndex = GeneratedColumn<int>(
+    'current_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _selectedAnswersMeta = const VerificationMeta(
+    'selectedAnswers',
+  );
+  @override
+  late final GeneratedColumn<String> selectedAnswers = GeneratedColumn<String>(
+    'selected_answers',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _answerResultsMeta = const VerificationMeta(
+    'answerResults',
+  );
+  @override
+  late final GeneratedColumn<String> answerResults = GeneratedColumn<String>(
+    'answer_results',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timeSpentPerQuestionMeta =
+      const VerificationMeta('timeSpentPerQuestion');
+  @override
+  late final GeneratedColumn<String> timeSpentPerQuestion =
+      GeneratedColumn<String>(
+        'time_spent_per_question',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _flaggedQuestionsMeta = const VerificationMeta(
+    'flaggedQuestions',
+  );
+  @override
+  late final GeneratedColumn<String> flaggedQuestions = GeneratedColumn<String>(
+    'flagged_questions',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _visitedQuestionsMeta = const VerificationMeta(
+    'visitedQuestions',
+  );
+  @override
+  late final GeneratedColumn<String> visitedQuestions = GeneratedColumn<String>(
+    'visited_questions',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scoreMeta = const VerificationMeta('score');
+  @override
+  late final GeneratedColumn<int> score = GeneratedColumn<int>(
+    'score',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _incorrectCountMeta = const VerificationMeta(
+    'incorrectCount',
+  );
+  @override
+  late final GeneratedColumn<int> incorrectCount = GeneratedColumn<int>(
+    'incorrect_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _elapsedSecondsMeta = const VerificationMeta(
+    'elapsedSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> elapsedSeconds = GeneratedColumn<int>(
+    'elapsed_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isCompletedMeta = const VerificationMeta(
+    'isCompleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isCompleted = GeneratedColumn<bool>(
+    'is_completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _questionIdsMeta = const VerificationMeta(
+    'questionIds',
+  );
+  @override
+  late final GeneratedColumn<String> questionIds = GeneratedColumn<String>(
+    'question_ids',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _questionDataMeta = const VerificationMeta(
+    'questionData',
+  );
+  @override
+  late final GeneratedColumn<String> questionData = GeneratedColumn<String>(
+    'question_data',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    sessionId,
+    topicId,
+    subject,
+    testType,
+    quizMode,
+    timeLimitSeconds,
+    seed,
+    currentIndex,
+    selectedAnswers,
+    answerResults,
+    timeSpentPerQuestion,
+    flaggedQuestions,
+    visitedQuestions,
+    score,
+    incorrectCount,
+    elapsedSeconds,
+    isCompleted,
+    questionIds,
+    questionData,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'quiz_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<QuizSession> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('topic_id')) {
+      context.handle(
+        _topicIdMeta,
+        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_topicIdMeta);
+    }
+    if (data.containsKey('subject')) {
+      context.handle(
+        _subjectMeta,
+        subject.isAcceptableOrUnknown(data['subject']!, _subjectMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_subjectMeta);
+    }
+    if (data.containsKey('test_type')) {
+      context.handle(
+        _testTypeMeta,
+        testType.isAcceptableOrUnknown(data['test_type']!, _testTypeMeta),
+      );
+    }
+    if (data.containsKey('quiz_mode')) {
+      context.handle(
+        _quizModeMeta,
+        quizMode.isAcceptableOrUnknown(data['quiz_mode']!, _quizModeMeta),
+      );
+    }
+    if (data.containsKey('time_limit_seconds')) {
+      context.handle(
+        _timeLimitSecondsMeta,
+        timeLimitSeconds.isAcceptableOrUnknown(
+          data['time_limit_seconds']!,
+          _timeLimitSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('seed')) {
+      context.handle(
+        _seedMeta,
+        seed.isAcceptableOrUnknown(data['seed']!, _seedMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_seedMeta);
+    }
+    if (data.containsKey('current_index')) {
+      context.handle(
+        _currentIndexMeta,
+        currentIndex.isAcceptableOrUnknown(
+          data['current_index']!,
+          _currentIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_answers')) {
+      context.handle(
+        _selectedAnswersMeta,
+        selectedAnswers.isAcceptableOrUnknown(
+          data['selected_answers']!,
+          _selectedAnswersMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_selectedAnswersMeta);
+    }
+    if (data.containsKey('answer_results')) {
+      context.handle(
+        _answerResultsMeta,
+        answerResults.isAcceptableOrUnknown(
+          data['answer_results']!,
+          _answerResultsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_answerResultsMeta);
+    }
+    if (data.containsKey('time_spent_per_question')) {
+      context.handle(
+        _timeSpentPerQuestionMeta,
+        timeSpentPerQuestion.isAcceptableOrUnknown(
+          data['time_spent_per_question']!,
+          _timeSpentPerQuestionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_timeSpentPerQuestionMeta);
+    }
+    if (data.containsKey('flagged_questions')) {
+      context.handle(
+        _flaggedQuestionsMeta,
+        flaggedQuestions.isAcceptableOrUnknown(
+          data['flagged_questions']!,
+          _flaggedQuestionsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_flaggedQuestionsMeta);
+    }
+    if (data.containsKey('visited_questions')) {
+      context.handle(
+        _visitedQuestionsMeta,
+        visitedQuestions.isAcceptableOrUnknown(
+          data['visited_questions']!,
+          _visitedQuestionsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_visitedQuestionsMeta);
+    }
+    if (data.containsKey('score')) {
+      context.handle(
+        _scoreMeta,
+        score.isAcceptableOrUnknown(data['score']!, _scoreMeta),
+      );
+    }
+    if (data.containsKey('incorrect_count')) {
+      context.handle(
+        _incorrectCountMeta,
+        incorrectCount.isAcceptableOrUnknown(
+          data['incorrect_count']!,
+          _incorrectCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('elapsed_seconds')) {
+      context.handle(
+        _elapsedSecondsMeta,
+        elapsedSeconds.isAcceptableOrUnknown(
+          data['elapsed_seconds']!,
+          _elapsedSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_completed')) {
+      context.handle(
+        _isCompletedMeta,
+        isCompleted.isAcceptableOrUnknown(
+          data['is_completed']!,
+          _isCompletedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('question_ids')) {
+      context.handle(
+        _questionIdsMeta,
+        questionIds.isAcceptableOrUnknown(
+          data['question_ids']!,
+          _questionIdsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_questionIdsMeta);
+    }
+    if (data.containsKey('question_data')) {
+      context.handle(
+        _questionDataMeta,
+        questionData.isAcceptableOrUnknown(
+          data['question_data']!,
+          _questionDataMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sessionId};
+  @override
+  QuizSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QuizSession(
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      topicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic_id'],
+      )!,
+      subject: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject'],
+      )!,
+      testType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}test_type'],
+      )!,
+      quizMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}quiz_mode'],
+      )!,
+      timeLimitSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}time_limit_seconds'],
+      )!,
+      seed: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}seed'],
+      )!,
+      currentIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_index'],
+      )!,
+      selectedAnswers: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_answers'],
+      )!,
+      answerResults: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}answer_results'],
+      )!,
+      timeSpentPerQuestion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}time_spent_per_question'],
+      )!,
+      flaggedQuestions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}flagged_questions'],
+      )!,
+      visitedQuestions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}visited_questions'],
+      )!,
+      score: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}score'],
+      )!,
+      incorrectCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}incorrect_count'],
+      )!,
+      elapsedSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}elapsed_seconds'],
+      )!,
+      isCompleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_completed'],
+      )!,
+      questionIds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_ids'],
+      )!,
+      questionData: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_data'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $QuizSessionsTable createAlias(String alias) {
+    return $QuizSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class QuizSession extends DataClass implements Insertable<QuizSession> {
+  /// Unique session ID (UUID-like string)
+  final String sessionId;
+
+  /// Topic ID this quiz is for
+  final String topicId;
+
+  /// Subject name
+  final String subject;
+
+  /// Test type: 'topic', 'mock', 'practice', 'revision', 'speed'
+  final String testType;
+
+  /// Quiz mode: 'practice', 'exam', 'revision', 'speed'
+  final String quizMode;
+
+  /// Total time limit in seconds (0 = no limit)
+  final int timeLimitSeconds;
+
+  /// Seed used for question randomization
+  final int seed;
+
+  /// Current question index
+  final int currentIndex;
+
+  /// Selected answers as JSON map: {questionIndex: answer}
+  final String selectedAnswers;
+
+  /// Answer results as JSON map: {questionIndex: true/false}
+  final String answerResults;
+
+  /// Time spent per question as JSON map: {questionIndex: seconds}
+  final String timeSpentPerQuestion;
+
+  /// Flagged question indices as JSON array
+  final String flaggedQuestions;
+
+  /// Visited question indices as JSON array
+  final String visitedQuestions;
+
+  /// Current score
+  final int score;
+
+  /// Incorrect count
+  final int incorrectCount;
+
+  /// Elapsed time in seconds
+  final int elapsedSeconds;
+
+  /// Whether quiz is completed
+  final bool isCompleted;
+
+  /// Question IDs in order as JSON array
+  final String questionIds;
+
+  /// Question data (full questions) as JSON array for offline restore
+  final String? questionData;
+
+  /// Created timestamp
+  final DateTime createdAt;
+
+  /// Last updated timestamp
+  final DateTime? updatedAt;
+  const QuizSession({
+    required this.sessionId,
+    required this.topicId,
+    required this.subject,
+    required this.testType,
+    required this.quizMode,
+    required this.timeLimitSeconds,
+    required this.seed,
+    required this.currentIndex,
+    required this.selectedAnswers,
+    required this.answerResults,
+    required this.timeSpentPerQuestion,
+    required this.flaggedQuestions,
+    required this.visitedQuestions,
+    required this.score,
+    required this.incorrectCount,
+    required this.elapsedSeconds,
+    required this.isCompleted,
+    required this.questionIds,
+    this.questionData,
+    required this.createdAt,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['session_id'] = Variable<String>(sessionId);
+    map['topic_id'] = Variable<String>(topicId);
+    map['subject'] = Variable<String>(subject);
+    map['test_type'] = Variable<String>(testType);
+    map['quiz_mode'] = Variable<String>(quizMode);
+    map['time_limit_seconds'] = Variable<int>(timeLimitSeconds);
+    map['seed'] = Variable<int>(seed);
+    map['current_index'] = Variable<int>(currentIndex);
+    map['selected_answers'] = Variable<String>(selectedAnswers);
+    map['answer_results'] = Variable<String>(answerResults);
+    map['time_spent_per_question'] = Variable<String>(timeSpentPerQuestion);
+    map['flagged_questions'] = Variable<String>(flaggedQuestions);
+    map['visited_questions'] = Variable<String>(visitedQuestions);
+    map['score'] = Variable<int>(score);
+    map['incorrect_count'] = Variable<int>(incorrectCount);
+    map['elapsed_seconds'] = Variable<int>(elapsedSeconds);
+    map['is_completed'] = Variable<bool>(isCompleted);
+    map['question_ids'] = Variable<String>(questionIds);
+    if (!nullToAbsent || questionData != null) {
+      map['question_data'] = Variable<String>(questionData);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  QuizSessionsCompanion toCompanion(bool nullToAbsent) {
+    return QuizSessionsCompanion(
+      sessionId: Value(sessionId),
+      topicId: Value(topicId),
+      subject: Value(subject),
+      testType: Value(testType),
+      quizMode: Value(quizMode),
+      timeLimitSeconds: Value(timeLimitSeconds),
+      seed: Value(seed),
+      currentIndex: Value(currentIndex),
+      selectedAnswers: Value(selectedAnswers),
+      answerResults: Value(answerResults),
+      timeSpentPerQuestion: Value(timeSpentPerQuestion),
+      flaggedQuestions: Value(flaggedQuestions),
+      visitedQuestions: Value(visitedQuestions),
+      score: Value(score),
+      incorrectCount: Value(incorrectCount),
+      elapsedSeconds: Value(elapsedSeconds),
+      isCompleted: Value(isCompleted),
+      questionIds: Value(questionIds),
+      questionData: questionData == null && nullToAbsent
+          ? const Value.absent()
+          : Value(questionData),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory QuizSession.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QuizSession(
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      topicId: serializer.fromJson<String>(json['topicId']),
+      subject: serializer.fromJson<String>(json['subject']),
+      testType: serializer.fromJson<String>(json['testType']),
+      quizMode: serializer.fromJson<String>(json['quizMode']),
+      timeLimitSeconds: serializer.fromJson<int>(json['timeLimitSeconds']),
+      seed: serializer.fromJson<int>(json['seed']),
+      currentIndex: serializer.fromJson<int>(json['currentIndex']),
+      selectedAnswers: serializer.fromJson<String>(json['selectedAnswers']),
+      answerResults: serializer.fromJson<String>(json['answerResults']),
+      timeSpentPerQuestion: serializer.fromJson<String>(
+        json['timeSpentPerQuestion'],
+      ),
+      flaggedQuestions: serializer.fromJson<String>(json['flaggedQuestions']),
+      visitedQuestions: serializer.fromJson<String>(json['visitedQuestions']),
+      score: serializer.fromJson<int>(json['score']),
+      incorrectCount: serializer.fromJson<int>(json['incorrectCount']),
+      elapsedSeconds: serializer.fromJson<int>(json['elapsedSeconds']),
+      isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+      questionIds: serializer.fromJson<String>(json['questionIds']),
+      questionData: serializer.fromJson<String?>(json['questionData']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sessionId': serializer.toJson<String>(sessionId),
+      'topicId': serializer.toJson<String>(topicId),
+      'subject': serializer.toJson<String>(subject),
+      'testType': serializer.toJson<String>(testType),
+      'quizMode': serializer.toJson<String>(quizMode),
+      'timeLimitSeconds': serializer.toJson<int>(timeLimitSeconds),
+      'seed': serializer.toJson<int>(seed),
+      'currentIndex': serializer.toJson<int>(currentIndex),
+      'selectedAnswers': serializer.toJson<String>(selectedAnswers),
+      'answerResults': serializer.toJson<String>(answerResults),
+      'timeSpentPerQuestion': serializer.toJson<String>(timeSpentPerQuestion),
+      'flaggedQuestions': serializer.toJson<String>(flaggedQuestions),
+      'visitedQuestions': serializer.toJson<String>(visitedQuestions),
+      'score': serializer.toJson<int>(score),
+      'incorrectCount': serializer.toJson<int>(incorrectCount),
+      'elapsedSeconds': serializer.toJson<int>(elapsedSeconds),
+      'isCompleted': serializer.toJson<bool>(isCompleted),
+      'questionIds': serializer.toJson<String>(questionIds),
+      'questionData': serializer.toJson<String?>(questionData),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  QuizSession copyWith({
+    String? sessionId,
+    String? topicId,
+    String? subject,
+    String? testType,
+    String? quizMode,
+    int? timeLimitSeconds,
+    int? seed,
+    int? currentIndex,
+    String? selectedAnswers,
+    String? answerResults,
+    String? timeSpentPerQuestion,
+    String? flaggedQuestions,
+    String? visitedQuestions,
+    int? score,
+    int? incorrectCount,
+    int? elapsedSeconds,
+    bool? isCompleted,
+    String? questionIds,
+    Value<String?> questionData = const Value.absent(),
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => QuizSession(
+    sessionId: sessionId ?? this.sessionId,
+    topicId: topicId ?? this.topicId,
+    subject: subject ?? this.subject,
+    testType: testType ?? this.testType,
+    quizMode: quizMode ?? this.quizMode,
+    timeLimitSeconds: timeLimitSeconds ?? this.timeLimitSeconds,
+    seed: seed ?? this.seed,
+    currentIndex: currentIndex ?? this.currentIndex,
+    selectedAnswers: selectedAnswers ?? this.selectedAnswers,
+    answerResults: answerResults ?? this.answerResults,
+    timeSpentPerQuestion: timeSpentPerQuestion ?? this.timeSpentPerQuestion,
+    flaggedQuestions: flaggedQuestions ?? this.flaggedQuestions,
+    visitedQuestions: visitedQuestions ?? this.visitedQuestions,
+    score: score ?? this.score,
+    incorrectCount: incorrectCount ?? this.incorrectCount,
+    elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
+    isCompleted: isCompleted ?? this.isCompleted,
+    questionIds: questionIds ?? this.questionIds,
+    questionData: questionData.present ? questionData.value : this.questionData,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  QuizSession copyWithCompanion(QuizSessionsCompanion data) {
+    return QuizSession(
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      topicId: data.topicId.present ? data.topicId.value : this.topicId,
+      subject: data.subject.present ? data.subject.value : this.subject,
+      testType: data.testType.present ? data.testType.value : this.testType,
+      quizMode: data.quizMode.present ? data.quizMode.value : this.quizMode,
+      timeLimitSeconds: data.timeLimitSeconds.present
+          ? data.timeLimitSeconds.value
+          : this.timeLimitSeconds,
+      seed: data.seed.present ? data.seed.value : this.seed,
+      currentIndex: data.currentIndex.present
+          ? data.currentIndex.value
+          : this.currentIndex,
+      selectedAnswers: data.selectedAnswers.present
+          ? data.selectedAnswers.value
+          : this.selectedAnswers,
+      answerResults: data.answerResults.present
+          ? data.answerResults.value
+          : this.answerResults,
+      timeSpentPerQuestion: data.timeSpentPerQuestion.present
+          ? data.timeSpentPerQuestion.value
+          : this.timeSpentPerQuestion,
+      flaggedQuestions: data.flaggedQuestions.present
+          ? data.flaggedQuestions.value
+          : this.flaggedQuestions,
+      visitedQuestions: data.visitedQuestions.present
+          ? data.visitedQuestions.value
+          : this.visitedQuestions,
+      score: data.score.present ? data.score.value : this.score,
+      incorrectCount: data.incorrectCount.present
+          ? data.incorrectCount.value
+          : this.incorrectCount,
+      elapsedSeconds: data.elapsedSeconds.present
+          ? data.elapsedSeconds.value
+          : this.elapsedSeconds,
+      isCompleted: data.isCompleted.present
+          ? data.isCompleted.value
+          : this.isCompleted,
+      questionIds: data.questionIds.present
+          ? data.questionIds.value
+          : this.questionIds,
+      questionData: data.questionData.present
+          ? data.questionData.value
+          : this.questionData,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QuizSession(')
+          ..write('sessionId: $sessionId, ')
+          ..write('topicId: $topicId, ')
+          ..write('subject: $subject, ')
+          ..write('testType: $testType, ')
+          ..write('quizMode: $quizMode, ')
+          ..write('timeLimitSeconds: $timeLimitSeconds, ')
+          ..write('seed: $seed, ')
+          ..write('currentIndex: $currentIndex, ')
+          ..write('selectedAnswers: $selectedAnswers, ')
+          ..write('answerResults: $answerResults, ')
+          ..write('timeSpentPerQuestion: $timeSpentPerQuestion, ')
+          ..write('flaggedQuestions: $flaggedQuestions, ')
+          ..write('visitedQuestions: $visitedQuestions, ')
+          ..write('score: $score, ')
+          ..write('incorrectCount: $incorrectCount, ')
+          ..write('elapsedSeconds: $elapsedSeconds, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('questionIds: $questionIds, ')
+          ..write('questionData: $questionData, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    sessionId,
+    topicId,
+    subject,
+    testType,
+    quizMode,
+    timeLimitSeconds,
+    seed,
+    currentIndex,
+    selectedAnswers,
+    answerResults,
+    timeSpentPerQuestion,
+    flaggedQuestions,
+    visitedQuestions,
+    score,
+    incorrectCount,
+    elapsedSeconds,
+    isCompleted,
+    questionIds,
+    questionData,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QuizSession &&
+          other.sessionId == this.sessionId &&
+          other.topicId == this.topicId &&
+          other.subject == this.subject &&
+          other.testType == this.testType &&
+          other.quizMode == this.quizMode &&
+          other.timeLimitSeconds == this.timeLimitSeconds &&
+          other.seed == this.seed &&
+          other.currentIndex == this.currentIndex &&
+          other.selectedAnswers == this.selectedAnswers &&
+          other.answerResults == this.answerResults &&
+          other.timeSpentPerQuestion == this.timeSpentPerQuestion &&
+          other.flaggedQuestions == this.flaggedQuestions &&
+          other.visitedQuestions == this.visitedQuestions &&
+          other.score == this.score &&
+          other.incorrectCount == this.incorrectCount &&
+          other.elapsedSeconds == this.elapsedSeconds &&
+          other.isCompleted == this.isCompleted &&
+          other.questionIds == this.questionIds &&
+          other.questionData == this.questionData &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class QuizSessionsCompanion extends UpdateCompanion<QuizSession> {
+  final Value<String> sessionId;
+  final Value<String> topicId;
+  final Value<String> subject;
+  final Value<String> testType;
+  final Value<String> quizMode;
+  final Value<int> timeLimitSeconds;
+  final Value<int> seed;
+  final Value<int> currentIndex;
+  final Value<String> selectedAnswers;
+  final Value<String> answerResults;
+  final Value<String> timeSpentPerQuestion;
+  final Value<String> flaggedQuestions;
+  final Value<String> visitedQuestions;
+  final Value<int> score;
+  final Value<int> incorrectCount;
+  final Value<int> elapsedSeconds;
+  final Value<bool> isCompleted;
+  final Value<String> questionIds;
+  final Value<String?> questionData;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  final Value<int> rowid;
+  const QuizSessionsCompanion({
+    this.sessionId = const Value.absent(),
+    this.topicId = const Value.absent(),
+    this.subject = const Value.absent(),
+    this.testType = const Value.absent(),
+    this.quizMode = const Value.absent(),
+    this.timeLimitSeconds = const Value.absent(),
+    this.seed = const Value.absent(),
+    this.currentIndex = const Value.absent(),
+    this.selectedAnswers = const Value.absent(),
+    this.answerResults = const Value.absent(),
+    this.timeSpentPerQuestion = const Value.absent(),
+    this.flaggedQuestions = const Value.absent(),
+    this.visitedQuestions = const Value.absent(),
+    this.score = const Value.absent(),
+    this.incorrectCount = const Value.absent(),
+    this.elapsedSeconds = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.questionIds = const Value.absent(),
+    this.questionData = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  QuizSessionsCompanion.insert({
+    required String sessionId,
+    required String topicId,
+    required String subject,
+    this.testType = const Value.absent(),
+    this.quizMode = const Value.absent(),
+    this.timeLimitSeconds = const Value.absent(),
+    required int seed,
+    this.currentIndex = const Value.absent(),
+    required String selectedAnswers,
+    required String answerResults,
+    required String timeSpentPerQuestion,
+    required String flaggedQuestions,
+    required String visitedQuestions,
+    this.score = const Value.absent(),
+    this.incorrectCount = const Value.absent(),
+    this.elapsedSeconds = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    required String questionIds,
+    this.questionData = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : sessionId = Value(sessionId),
+       topicId = Value(topicId),
+       subject = Value(subject),
+       seed = Value(seed),
+       selectedAnswers = Value(selectedAnswers),
+       answerResults = Value(answerResults),
+       timeSpentPerQuestion = Value(timeSpentPerQuestion),
+       flaggedQuestions = Value(flaggedQuestions),
+       visitedQuestions = Value(visitedQuestions),
+       questionIds = Value(questionIds);
+  static Insertable<QuizSession> custom({
+    Expression<String>? sessionId,
+    Expression<String>? topicId,
+    Expression<String>? subject,
+    Expression<String>? testType,
+    Expression<String>? quizMode,
+    Expression<int>? timeLimitSeconds,
+    Expression<int>? seed,
+    Expression<int>? currentIndex,
+    Expression<String>? selectedAnswers,
+    Expression<String>? answerResults,
+    Expression<String>? timeSpentPerQuestion,
+    Expression<String>? flaggedQuestions,
+    Expression<String>? visitedQuestions,
+    Expression<int>? score,
+    Expression<int>? incorrectCount,
+    Expression<int>? elapsedSeconds,
+    Expression<bool>? isCompleted,
+    Expression<String>? questionIds,
+    Expression<String>? questionData,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (sessionId != null) 'session_id': sessionId,
+      if (topicId != null) 'topic_id': topicId,
+      if (subject != null) 'subject': subject,
+      if (testType != null) 'test_type': testType,
+      if (quizMode != null) 'quiz_mode': quizMode,
+      if (timeLimitSeconds != null) 'time_limit_seconds': timeLimitSeconds,
+      if (seed != null) 'seed': seed,
+      if (currentIndex != null) 'current_index': currentIndex,
+      if (selectedAnswers != null) 'selected_answers': selectedAnswers,
+      if (answerResults != null) 'answer_results': answerResults,
+      if (timeSpentPerQuestion != null)
+        'time_spent_per_question': timeSpentPerQuestion,
+      if (flaggedQuestions != null) 'flagged_questions': flaggedQuestions,
+      if (visitedQuestions != null) 'visited_questions': visitedQuestions,
+      if (score != null) 'score': score,
+      if (incorrectCount != null) 'incorrect_count': incorrectCount,
+      if (elapsedSeconds != null) 'elapsed_seconds': elapsedSeconds,
+      if (isCompleted != null) 'is_completed': isCompleted,
+      if (questionIds != null) 'question_ids': questionIds,
+      if (questionData != null) 'question_data': questionData,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  QuizSessionsCompanion copyWith({
+    Value<String>? sessionId,
+    Value<String>? topicId,
+    Value<String>? subject,
+    Value<String>? testType,
+    Value<String>? quizMode,
+    Value<int>? timeLimitSeconds,
+    Value<int>? seed,
+    Value<int>? currentIndex,
+    Value<String>? selectedAnswers,
+    Value<String>? answerResults,
+    Value<String>? timeSpentPerQuestion,
+    Value<String>? flaggedQuestions,
+    Value<String>? visitedQuestions,
+    Value<int>? score,
+    Value<int>? incorrectCount,
+    Value<int>? elapsedSeconds,
+    Value<bool>? isCompleted,
+    Value<String>? questionIds,
+    Value<String?>? questionData,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return QuizSessionsCompanion(
+      sessionId: sessionId ?? this.sessionId,
+      topicId: topicId ?? this.topicId,
+      subject: subject ?? this.subject,
+      testType: testType ?? this.testType,
+      quizMode: quizMode ?? this.quizMode,
+      timeLimitSeconds: timeLimitSeconds ?? this.timeLimitSeconds,
+      seed: seed ?? this.seed,
+      currentIndex: currentIndex ?? this.currentIndex,
+      selectedAnswers: selectedAnswers ?? this.selectedAnswers,
+      answerResults: answerResults ?? this.answerResults,
+      timeSpentPerQuestion: timeSpentPerQuestion ?? this.timeSpentPerQuestion,
+      flaggedQuestions: flaggedQuestions ?? this.flaggedQuestions,
+      visitedQuestions: visitedQuestions ?? this.visitedQuestions,
+      score: score ?? this.score,
+      incorrectCount: incorrectCount ?? this.incorrectCount,
+      elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
+      isCompleted: isCompleted ?? this.isCompleted,
+      questionIds: questionIds ?? this.questionIds,
+      questionData: questionData ?? this.questionData,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (topicId.present) {
+      map['topic_id'] = Variable<String>(topicId.value);
+    }
+    if (subject.present) {
+      map['subject'] = Variable<String>(subject.value);
+    }
+    if (testType.present) {
+      map['test_type'] = Variable<String>(testType.value);
+    }
+    if (quizMode.present) {
+      map['quiz_mode'] = Variable<String>(quizMode.value);
+    }
+    if (timeLimitSeconds.present) {
+      map['time_limit_seconds'] = Variable<int>(timeLimitSeconds.value);
+    }
+    if (seed.present) {
+      map['seed'] = Variable<int>(seed.value);
+    }
+    if (currentIndex.present) {
+      map['current_index'] = Variable<int>(currentIndex.value);
+    }
+    if (selectedAnswers.present) {
+      map['selected_answers'] = Variable<String>(selectedAnswers.value);
+    }
+    if (answerResults.present) {
+      map['answer_results'] = Variable<String>(answerResults.value);
+    }
+    if (timeSpentPerQuestion.present) {
+      map['time_spent_per_question'] = Variable<String>(
+        timeSpentPerQuestion.value,
+      );
+    }
+    if (flaggedQuestions.present) {
+      map['flagged_questions'] = Variable<String>(flaggedQuestions.value);
+    }
+    if (visitedQuestions.present) {
+      map['visited_questions'] = Variable<String>(visitedQuestions.value);
+    }
+    if (score.present) {
+      map['score'] = Variable<int>(score.value);
+    }
+    if (incorrectCount.present) {
+      map['incorrect_count'] = Variable<int>(incorrectCount.value);
+    }
+    if (elapsedSeconds.present) {
+      map['elapsed_seconds'] = Variable<int>(elapsedSeconds.value);
+    }
+    if (isCompleted.present) {
+      map['is_completed'] = Variable<bool>(isCompleted.value);
+    }
+    if (questionIds.present) {
+      map['question_ids'] = Variable<String>(questionIds.value);
+    }
+    if (questionData.present) {
+      map['question_data'] = Variable<String>(questionData.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QuizSessionsCompanion(')
+          ..write('sessionId: $sessionId, ')
+          ..write('topicId: $topicId, ')
+          ..write('subject: $subject, ')
+          ..write('testType: $testType, ')
+          ..write('quizMode: $quizMode, ')
+          ..write('timeLimitSeconds: $timeLimitSeconds, ')
+          ..write('seed: $seed, ')
+          ..write('currentIndex: $currentIndex, ')
+          ..write('selectedAnswers: $selectedAnswers, ')
+          ..write('answerResults: $answerResults, ')
+          ..write('timeSpentPerQuestion: $timeSpentPerQuestion, ')
+          ..write('flaggedQuestions: $flaggedQuestions, ')
+          ..write('visitedQuestions: $visitedQuestions, ')
+          ..write('score: $score, ')
+          ..write('incorrectCount: $incorrectCount, ')
+          ..write('elapsedSeconds: $elapsedSeconds, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('questionIds: $questionIds, ')
+          ..write('questionData: $questionData, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TopicProgressEntriesTable extends TopicProgressEntries
     with TableInfo<$TopicProgressEntriesTable, TopicProgressEntry> {
   @override
@@ -9321,6 +10552,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $QuestionsTable questions = $QuestionsTable(this);
   late final $QuizAttemptsTable quizAttempts = $QuizAttemptsTable(this);
+  late final $QuizSessionsTable quizSessions = $QuizSessionsTable(this);
   late final $TopicProgressEntriesTable topicProgressEntries =
       $TopicProgressEntriesTable(this);
   late final $BookmarksTable bookmarks = $BookmarksTable(this);
@@ -9347,6 +10579,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     questions,
     quizAttempts,
+    quizSessions,
     topicProgressEntries,
     bookmarks,
     chats,
@@ -10248,6 +11481,534 @@ typedef $$QuizAttemptsTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $QuizAttemptsTable, QuizAttempt>,
       ),
       QuizAttempt,
+      PrefetchHooks Function()
+    >;
+typedef $$QuizSessionsTableCreateCompanionBuilder =
+    QuizSessionsCompanion Function({
+      required String sessionId,
+      required String topicId,
+      required String subject,
+      Value<String> testType,
+      Value<String> quizMode,
+      Value<int> timeLimitSeconds,
+      required int seed,
+      Value<int> currentIndex,
+      required String selectedAnswers,
+      required String answerResults,
+      required String timeSpentPerQuestion,
+      required String flaggedQuestions,
+      required String visitedQuestions,
+      Value<int> score,
+      Value<int> incorrectCount,
+      Value<int> elapsedSeconds,
+      Value<bool> isCompleted,
+      required String questionIds,
+      Value<String?> questionData,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$QuizSessionsTableUpdateCompanionBuilder =
+    QuizSessionsCompanion Function({
+      Value<String> sessionId,
+      Value<String> topicId,
+      Value<String> subject,
+      Value<String> testType,
+      Value<String> quizMode,
+      Value<int> timeLimitSeconds,
+      Value<int> seed,
+      Value<int> currentIndex,
+      Value<String> selectedAnswers,
+      Value<String> answerResults,
+      Value<String> timeSpentPerQuestion,
+      Value<String> flaggedQuestions,
+      Value<String> visitedQuestions,
+      Value<int> score,
+      Value<int> incorrectCount,
+      Value<int> elapsedSeconds,
+      Value<bool> isCompleted,
+      Value<String> questionIds,
+      Value<String?> questionData,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$QuizSessionsTableFilterComposer
+    extends Composer<_$AppDatabase, $QuizSessionsTable> {
+  $$QuizSessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get testType => $composableBuilder(
+    column: $table.testType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get quizMode => $composableBuilder(
+    column: $table.quizMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get timeLimitSeconds => $composableBuilder(
+    column: $table.timeLimitSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get seed => $composableBuilder(
+    column: $table.seed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get currentIndex => $composableBuilder(
+    column: $table.currentIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedAnswers => $composableBuilder(
+    column: $table.selectedAnswers,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get answerResults => $composableBuilder(
+    column: $table.answerResults,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timeSpentPerQuestion => $composableBuilder(
+    column: $table.timeSpentPerQuestion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get flaggedQuestions => $composableBuilder(
+    column: $table.flaggedQuestions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get visitedQuestions => $composableBuilder(
+    column: $table.visitedQuestions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get incorrectCount => $composableBuilder(
+    column: $table.incorrectCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get elapsedSeconds => $composableBuilder(
+    column: $table.elapsedSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionIds => $composableBuilder(
+    column: $table.questionIds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionData => $composableBuilder(
+    column: $table.questionData,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$QuizSessionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $QuizSessionsTable> {
+  $$QuizSessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get testType => $composableBuilder(
+    column: $table.testType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get quizMode => $composableBuilder(
+    column: $table.quizMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get timeLimitSeconds => $composableBuilder(
+    column: $table.timeLimitSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get seed => $composableBuilder(
+    column: $table.seed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentIndex => $composableBuilder(
+    column: $table.currentIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedAnswers => $composableBuilder(
+    column: $table.selectedAnswers,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get answerResults => $composableBuilder(
+    column: $table.answerResults,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timeSpentPerQuestion => $composableBuilder(
+    column: $table.timeSpentPerQuestion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get flaggedQuestions => $composableBuilder(
+    column: $table.flaggedQuestions,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get visitedQuestions => $composableBuilder(
+    column: $table.visitedQuestions,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get incorrectCount => $composableBuilder(
+    column: $table.incorrectCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get elapsedSeconds => $composableBuilder(
+    column: $table.elapsedSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questionIds => $composableBuilder(
+    column: $table.questionIds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questionData => $composableBuilder(
+    column: $table.questionData,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$QuizSessionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $QuizSessionsTable> {
+  $$QuizSessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get sessionId =>
+      $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
+  GeneratedColumn<String> get topicId =>
+      $composableBuilder(column: $table.topicId, builder: (column) => column);
+
+  GeneratedColumn<String> get subject =>
+      $composableBuilder(column: $table.subject, builder: (column) => column);
+
+  GeneratedColumn<String> get testType =>
+      $composableBuilder(column: $table.testType, builder: (column) => column);
+
+  GeneratedColumn<String> get quizMode =>
+      $composableBuilder(column: $table.quizMode, builder: (column) => column);
+
+  GeneratedColumn<int> get timeLimitSeconds => $composableBuilder(
+    column: $table.timeLimitSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get seed =>
+      $composableBuilder(column: $table.seed, builder: (column) => column);
+
+  GeneratedColumn<int> get currentIndex => $composableBuilder(
+    column: $table.currentIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedAnswers => $composableBuilder(
+    column: $table.selectedAnswers,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get answerResults => $composableBuilder(
+    column: $table.answerResults,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get timeSpentPerQuestion => $composableBuilder(
+    column: $table.timeSpentPerQuestion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get flaggedQuestions => $composableBuilder(
+    column: $table.flaggedQuestions,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get visitedQuestions => $composableBuilder(
+    column: $table.visitedQuestions,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<int> get incorrectCount => $composableBuilder(
+    column: $table.incorrectCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get elapsedSeconds => $composableBuilder(
+    column: $table.elapsedSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get questionIds => $composableBuilder(
+    column: $table.questionIds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get questionData => $composableBuilder(
+    column: $table.questionData,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$QuizSessionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $QuizSessionsTable,
+          QuizSession,
+          $$QuizSessionsTableFilterComposer,
+          $$QuizSessionsTableOrderingComposer,
+          $$QuizSessionsTableAnnotationComposer,
+          $$QuizSessionsTableCreateCompanionBuilder,
+          $$QuizSessionsTableUpdateCompanionBuilder,
+          (
+            QuizSession,
+            BaseReferences<_$AppDatabase, $QuizSessionsTable, QuizSession>,
+          ),
+          QuizSession,
+          PrefetchHooks Function()
+        > {
+  $$QuizSessionsTableTableManager(_$AppDatabase db, $QuizSessionsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QuizSessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QuizSessionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QuizSessionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> sessionId = const Value.absent(),
+                Value<String> topicId = const Value.absent(),
+                Value<String> subject = const Value.absent(),
+                Value<String> testType = const Value.absent(),
+                Value<String> quizMode = const Value.absent(),
+                Value<int> timeLimitSeconds = const Value.absent(),
+                Value<int> seed = const Value.absent(),
+                Value<int> currentIndex = const Value.absent(),
+                Value<String> selectedAnswers = const Value.absent(),
+                Value<String> answerResults = const Value.absent(),
+                Value<String> timeSpentPerQuestion = const Value.absent(),
+                Value<String> flaggedQuestions = const Value.absent(),
+                Value<String> visitedQuestions = const Value.absent(),
+                Value<int> score = const Value.absent(),
+                Value<int> incorrectCount = const Value.absent(),
+                Value<int> elapsedSeconds = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                Value<String> questionIds = const Value.absent(),
+                Value<String?> questionData = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QuizSessionsCompanion(
+                sessionId: sessionId,
+                topicId: topicId,
+                subject: subject,
+                testType: testType,
+                quizMode: quizMode,
+                timeLimitSeconds: timeLimitSeconds,
+                seed: seed,
+                currentIndex: currentIndex,
+                selectedAnswers: selectedAnswers,
+                answerResults: answerResults,
+                timeSpentPerQuestion: timeSpentPerQuestion,
+                flaggedQuestions: flaggedQuestions,
+                visitedQuestions: visitedQuestions,
+                score: score,
+                incorrectCount: incorrectCount,
+                elapsedSeconds: elapsedSeconds,
+                isCompleted: isCompleted,
+                questionIds: questionIds,
+                questionData: questionData,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String sessionId,
+                required String topicId,
+                required String subject,
+                Value<String> testType = const Value.absent(),
+                Value<String> quizMode = const Value.absent(),
+                Value<int> timeLimitSeconds = const Value.absent(),
+                required int seed,
+                Value<int> currentIndex = const Value.absent(),
+                required String selectedAnswers,
+                required String answerResults,
+                required String timeSpentPerQuestion,
+                required String flaggedQuestions,
+                required String visitedQuestions,
+                Value<int> score = const Value.absent(),
+                Value<int> incorrectCount = const Value.absent(),
+                Value<int> elapsedSeconds = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                required String questionIds,
+                Value<String?> questionData = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QuizSessionsCompanion.insert(
+                sessionId: sessionId,
+                topicId: topicId,
+                subject: subject,
+                testType: testType,
+                quizMode: quizMode,
+                timeLimitSeconds: timeLimitSeconds,
+                seed: seed,
+                currentIndex: currentIndex,
+                selectedAnswers: selectedAnswers,
+                answerResults: answerResults,
+                timeSpentPerQuestion: timeSpentPerQuestion,
+                flaggedQuestions: flaggedQuestions,
+                visitedQuestions: visitedQuestions,
+                score: score,
+                incorrectCount: incorrectCount,
+                elapsedSeconds: elapsedSeconds,
+                isCompleted: isCompleted,
+                questionIds: questionIds,
+                questionData: questionData,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$QuizSessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $QuizSessionsTable,
+      QuizSession,
+      $$QuizSessionsTableFilterComposer,
+      $$QuizSessionsTableOrderingComposer,
+      $$QuizSessionsTableAnnotationComposer,
+      $$QuizSessionsTableCreateCompanionBuilder,
+      $$QuizSessionsTableUpdateCompanionBuilder,
+      (
+        QuizSession,
+        BaseReferences<_$AppDatabase, $QuizSessionsTable, QuizSession>,
+      ),
+      QuizSession,
       PrefetchHooks Function()
     >;
 typedef $$TopicProgressEntriesTableCreateCompanionBuilder =
@@ -13815,6 +15576,8 @@ class $AppDatabaseManager {
       $$QuestionsTableTableManager(_db, _db.questions);
   $$QuizAttemptsTableTableManager get quizAttempts =>
       $$QuizAttemptsTableTableManager(_db, _db.quizAttempts);
+  $$QuizSessionsTableTableManager get quizSessions =>
+      $$QuizSessionsTableTableManager(_db, _db.quizSessions);
   $$TopicProgressEntriesTableTableManager get topicProgressEntries =>
       $$TopicProgressEntriesTableTableManager(_db, _db.topicProgressEntries);
   $$BookmarksTableTableManager get bookmarks =>
