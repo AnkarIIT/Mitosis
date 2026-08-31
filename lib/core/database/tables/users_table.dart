@@ -30,4 +30,5 @@ class Users extends Table {
   DateTimeColumn get passwordResetExpiresAt => dateTime().nullable()();
   TextColumn get twoFactorCode => text().nullable()();
   DateTimeColumn get twoFactorExpiresAt => dateTime().nullable()();
+  TextColumn get supabaseId => text().nullable()();
 }

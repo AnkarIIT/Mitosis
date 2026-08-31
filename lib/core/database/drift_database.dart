@@ -54,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 27;
+  int get schemaVersion => 28;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -312,6 +312,10 @@ class AppDatabase extends _$AppDatabase {
         await _addColumnSafely(m, users, (users as dynamic).twoFactorCode);
         await _addColumnSafely(m, users, (users as dynamic).twoFactorExpiresAt);
       }
+      if (from < 28) {
+        // Cloud identity linkage: Supabase auth user id (email/password + Google).
+        await _addColumnSafely(m, users, (users as dynamic).supabaseId);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign keys
@@ -371,6 +375,12 @@ class AppDatabase extends _$AppDatabase {
   Future<void> updateLastLogin(int userId) async {
     await (update(users)..where((t) => t.id.equals(userId))).write(
       UsersCompanion(lastLogin: Value(DateTime.now())),
+    );
+  }
+
+  Future<void> setSupabaseId(int userId, String supabaseId) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(supabaseId: Value(supabaseId)),
     );
   }
 

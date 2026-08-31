@@ -3853,6 +3853,17 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         type: DriftSqlType.dateTime,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _supabaseIdMeta = const VerificationMeta(
+    'supabaseId',
+  );
+  @override
+  late final GeneratedColumn<String> supabaseId = GeneratedColumn<String>(
+    'supabase_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3876,6 +3887,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     passwordResetExpiresAt,
     twoFactorCode,
     twoFactorExpiresAt,
+    supabaseId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4047,6 +4059,12 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         ),
       );
     }
+    if (data.containsKey('supabase_id')) {
+      context.handle(
+        _supabaseIdMeta,
+        supabaseId.isAcceptableOrUnknown(data['supabase_id']!, _supabaseIdMeta),
+      );
+    }
     return context;
   }
 
@@ -4140,6 +4158,10 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}two_factor_expires_at'],
       ),
+      supabaseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}supabase_id'],
+      ),
     );
   }
 
@@ -4171,6 +4193,7 @@ class User extends DataClass implements Insertable<User> {
   final DateTime? passwordResetExpiresAt;
   final String? twoFactorCode;
   final DateTime? twoFactorExpiresAt;
+  final String? supabaseId;
   const User({
     required this.id,
     this.email,
@@ -4193,6 +4216,7 @@ class User extends DataClass implements Insertable<User> {
     this.passwordResetExpiresAt,
     this.twoFactorCode,
     this.twoFactorExpiresAt,
+    this.supabaseId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4246,6 +4270,9 @@ class User extends DataClass implements Insertable<User> {
     if (!nullToAbsent || twoFactorExpiresAt != null) {
       map['two_factor_expires_at'] = Variable<DateTime>(twoFactorExpiresAt);
     }
+    if (!nullToAbsent || supabaseId != null) {
+      map['supabase_id'] = Variable<String>(supabaseId);
+    }
     return map;
   }
 
@@ -4298,6 +4325,9 @@ class User extends DataClass implements Insertable<User> {
       twoFactorExpiresAt: twoFactorExpiresAt == null && nullToAbsent
           ? const Value.absent()
           : Value(twoFactorExpiresAt),
+      supabaseId: supabaseId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(supabaseId),
     );
   }
 
@@ -4338,6 +4368,7 @@ class User extends DataClass implements Insertable<User> {
       twoFactorExpiresAt: serializer.fromJson<DateTime?>(
         json['twoFactorExpiresAt'],
       ),
+      supabaseId: serializer.fromJson<String?>(json['supabaseId']),
     );
   }
   @override
@@ -4367,6 +4398,7 @@ class User extends DataClass implements Insertable<User> {
       ),
       'twoFactorCode': serializer.toJson<String?>(twoFactorCode),
       'twoFactorExpiresAt': serializer.toJson<DateTime?>(twoFactorExpiresAt),
+      'supabaseId': serializer.toJson<String?>(supabaseId),
     };
   }
 
@@ -4392,6 +4424,7 @@ class User extends DataClass implements Insertable<User> {
     Value<DateTime?> passwordResetExpiresAt = const Value.absent(),
     Value<String?> twoFactorCode = const Value.absent(),
     Value<DateTime?> twoFactorExpiresAt = const Value.absent(),
+    Value<String?> supabaseId = const Value.absent(),
   }) => User(
     id: id ?? this.id,
     email: email.present ? email.value : this.email,
@@ -4426,6 +4459,7 @@ class User extends DataClass implements Insertable<User> {
     twoFactorExpiresAt: twoFactorExpiresAt.present
         ? twoFactorExpiresAt.value
         : this.twoFactorExpiresAt,
+    supabaseId: supabaseId.present ? supabaseId.value : this.supabaseId,
   );
   User copyWithCompanion(UsersCompanion data) {
     return User(
@@ -4474,6 +4508,9 @@ class User extends DataClass implements Insertable<User> {
       twoFactorExpiresAt: data.twoFactorExpiresAt.present
           ? data.twoFactorExpiresAt.value
           : this.twoFactorExpiresAt,
+      supabaseId: data.supabaseId.present
+          ? data.supabaseId.value
+          : this.supabaseId,
     );
   }
 
@@ -4500,7 +4537,8 @@ class User extends DataClass implements Insertable<User> {
           ..write('passwordResetCode: $passwordResetCode, ')
           ..write('passwordResetExpiresAt: $passwordResetExpiresAt, ')
           ..write('twoFactorCode: $twoFactorCode, ')
-          ..write('twoFactorExpiresAt: $twoFactorExpiresAt')
+          ..write('twoFactorExpiresAt: $twoFactorExpiresAt, ')
+          ..write('supabaseId: $supabaseId')
           ..write(')'))
         .toString();
   }
@@ -4528,6 +4566,7 @@ class User extends DataClass implements Insertable<User> {
     passwordResetExpiresAt,
     twoFactorCode,
     twoFactorExpiresAt,
+    supabaseId,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -4553,7 +4592,8 @@ class User extends DataClass implements Insertable<User> {
           other.passwordResetCode == this.passwordResetCode &&
           other.passwordResetExpiresAt == this.passwordResetExpiresAt &&
           other.twoFactorCode == this.twoFactorCode &&
-          other.twoFactorExpiresAt == this.twoFactorExpiresAt);
+          other.twoFactorExpiresAt == this.twoFactorExpiresAt &&
+          other.supabaseId == this.supabaseId);
 }
 
 class UsersCompanion extends UpdateCompanion<User> {
@@ -4578,6 +4618,7 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<DateTime?> passwordResetExpiresAt;
   final Value<String?> twoFactorCode;
   final Value<DateTime?> twoFactorExpiresAt;
+  final Value<String?> supabaseId;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.email = const Value.absent(),
@@ -4600,6 +4641,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.passwordResetExpiresAt = const Value.absent(),
     this.twoFactorCode = const Value.absent(),
     this.twoFactorExpiresAt = const Value.absent(),
+    this.supabaseId = const Value.absent(),
   });
   UsersCompanion.insert({
     this.id = const Value.absent(),
@@ -4623,6 +4665,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.passwordResetExpiresAt = const Value.absent(),
     this.twoFactorCode = const Value.absent(),
     this.twoFactorExpiresAt = const Value.absent(),
+    this.supabaseId = const Value.absent(),
   }) : username = Value(username);
   static Insertable<User> custom({
     Expression<int>? id,
@@ -4646,6 +4689,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     Expression<DateTime>? passwordResetExpiresAt,
     Expression<String>? twoFactorCode,
     Expression<DateTime>? twoFactorExpiresAt,
+    Expression<String>? supabaseId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4673,6 +4717,7 @@ class UsersCompanion extends UpdateCompanion<User> {
       if (twoFactorCode != null) 'two_factor_code': twoFactorCode,
       if (twoFactorExpiresAt != null)
         'two_factor_expires_at': twoFactorExpiresAt,
+      if (supabaseId != null) 'supabase_id': supabaseId,
     });
   }
 
@@ -4698,6 +4743,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     Value<DateTime?>? passwordResetExpiresAt,
     Value<String?>? twoFactorCode,
     Value<DateTime?>? twoFactorExpiresAt,
+    Value<String?>? supabaseId,
   }) {
     return UsersCompanion(
       id: id ?? this.id,
@@ -4723,6 +4769,7 @@ class UsersCompanion extends UpdateCompanion<User> {
           passwordResetExpiresAt ?? this.passwordResetExpiresAt,
       twoFactorCode: twoFactorCode ?? this.twoFactorCode,
       twoFactorExpiresAt: twoFactorExpiresAt ?? this.twoFactorExpiresAt,
+      supabaseId: supabaseId ?? this.supabaseId,
     );
   }
 
@@ -4798,6 +4845,9 @@ class UsersCompanion extends UpdateCompanion<User> {
         twoFactorExpiresAt.value,
       );
     }
+    if (supabaseId.present) {
+      map['supabase_id'] = Variable<String>(supabaseId.value);
+    }
     return map;
   }
 
@@ -4824,7 +4874,8 @@ class UsersCompanion extends UpdateCompanion<User> {
           ..write('passwordResetCode: $passwordResetCode, ')
           ..write('passwordResetExpiresAt: $passwordResetExpiresAt, ')
           ..write('twoFactorCode: $twoFactorCode, ')
-          ..write('twoFactorExpiresAt: $twoFactorExpiresAt')
+          ..write('twoFactorExpiresAt: $twoFactorExpiresAt, ')
+          ..write('supabaseId: $supabaseId')
           ..write(')'))
         .toString();
   }
@@ -11083,6 +11134,7 @@ typedef $$UsersTableCreateCompanionBuilder =
       Value<DateTime?> passwordResetExpiresAt,
       Value<String?> twoFactorCode,
       Value<DateTime?> twoFactorExpiresAt,
+      Value<String?> supabaseId,
     });
 typedef $$UsersTableUpdateCompanionBuilder =
     UsersCompanion Function({
@@ -11107,6 +11159,7 @@ typedef $$UsersTableUpdateCompanionBuilder =
       Value<DateTime?> passwordResetExpiresAt,
       Value<String?> twoFactorCode,
       Value<DateTime?> twoFactorExpiresAt,
+      Value<String?> supabaseId,
     });
 
 class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
@@ -11219,6 +11272,11 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
 
   ColumnFilters<DateTime> get twoFactorExpiresAt => $composableBuilder(
     column: $table.twoFactorExpiresAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get supabaseId => $composableBuilder(
+    column: $table.supabaseId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -11336,6 +11394,11 @@ class $$UsersTableOrderingComposer
     column: $table.twoFactorExpiresAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get supabaseId => $composableBuilder(
+    column: $table.supabaseId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UsersTableAnnotationComposer
@@ -11433,6 +11496,11 @@ class $$UsersTableAnnotationComposer
     column: $table.twoFactorExpiresAt,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get supabaseId => $composableBuilder(
+    column: $table.supabaseId,
+    builder: (column) => column,
+  );
 }
 
 class $$UsersTableTableManager
@@ -11484,6 +11552,7 @@ class $$UsersTableTableManager
                 Value<DateTime?> passwordResetExpiresAt = const Value.absent(),
                 Value<String?> twoFactorCode = const Value.absent(),
                 Value<DateTime?> twoFactorExpiresAt = const Value.absent(),
+                Value<String?> supabaseId = const Value.absent(),
               }) => UsersCompanion(
                 id: id,
                 email: email,
@@ -11506,6 +11575,7 @@ class $$UsersTableTableManager
                 passwordResetExpiresAt: passwordResetExpiresAt,
                 twoFactorCode: twoFactorCode,
                 twoFactorExpiresAt: twoFactorExpiresAt,
+                supabaseId: supabaseId,
               ),
           createCompanionCallback:
               ({
@@ -11530,6 +11600,7 @@ class $$UsersTableTableManager
                 Value<DateTime?> passwordResetExpiresAt = const Value.absent(),
                 Value<String?> twoFactorCode = const Value.absent(),
                 Value<DateTime?> twoFactorExpiresAt = const Value.absent(),
+                Value<String?> supabaseId = const Value.absent(),
               }) => UsersCompanion.insert(
                 id: id,
                 email: email,
@@ -11552,6 +11623,7 @@ class $$UsersTableTableManager
                 passwordResetExpiresAt: passwordResetExpiresAt,
                 twoFactorCode: twoFactorCode,
                 twoFactorExpiresAt: twoFactorExpiresAt,
+                supabaseId: supabaseId,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
