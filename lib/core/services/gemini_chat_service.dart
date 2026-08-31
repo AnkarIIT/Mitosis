@@ -130,7 +130,75 @@ class GeminiChatService {
       }
     }
 
-    return "AI Tutor is not configured. Please set up the Supabase proxy.";
+    // Fall back to the user's own Gemini key when the shared proxy isn't
+    // enabled (or is unreachable), so the AI tutor works with just a key.
+    return _sendDirect(text, mode: mode);
+  }
+
+  /// Sends [text] directly to Gemini using the locally-stored API key.
+  Future<String> _sendDirect(String text, {ChatMode mode = ChatMode.general}) {
+    final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
+    if (key == null || key.isEmpty || !key.startsWith('AIzaSy')) {
+      return Future.value(
+        'Error: Gemini API Key is not configured. Please add it in Settings.',
+      );
+    }
+    try {
+      final model = GenerativeModel(
+        model: 'gemini-1.5-flash',
+        apiKey: key,
+        systemInstruction: Content.system(_systemPromptFor(mode)),
+      );
+      return model
+          .generateContent([Content.text(text)])
+          .then((response) => response.text ?? 'Error: unable to get a response from the AI tutor.');
+    } catch (e) {
+      debugPrint('❌ Direct Gemini call failed: $e');
+      return Future.value('Error: unable to get a response from the AI tutor.');
+    }
+  }
+
+  /// Direct-Gemini text generation using the stored key and a custom system
+  /// prompt. Used by generation features (e.g. flashcards) that need their own
+  /// instruction set and want to fall back to the user's key when the shared
+  /// proxy isn't enabled.
+  Future<String> generateWithSystemPrompt(String text, String systemPrompt) {
+    final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
+    if (key == null || key.isEmpty || !key.startsWith('AIzaSy')) {
+      return Future.value('Error: Gemini API Key is not configured. Please add it in Settings.');
+    }
+    try {
+      final model = GenerativeModel(
+        model: 'gemini-1.5-flash',
+        apiKey: key,
+        systemInstruction: Content.system(systemPrompt),
+      );
+      return model
+          .generateContent([Content.text(text)])
+          .then((response) => response.text ?? 'Error: unable to generate content.');
+    } catch (e) {
+      return Future.value('Error: unable to generate content.');
+    }
+  }
+
+  Future<String> _chatDirect(
+    String text,
+    GenerativeModel Function() modelFactory, {
+    required String fallback,
+  }) {
+    if (!isConfigured) {
+      return Future.value(
+        'Error: Gemini API Key is not configured. Please add it in Settings.',
+      );
+    }
+    try {
+      return modelFactory()
+          .generateContent([Content.text(text)])
+          .then((response) => response.text ?? fallback);
+    } catch (e) {
+      debugPrint('❌ Direct Gemini call failed: $e');
+      return Future.value(fallback);
+    }
   }
 
   Future<String> sendMultimodalMessage(String text, List<Part> parts) async {
@@ -139,9 +207,10 @@ class GeminiChatService {
     }
 
     try {
+      final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
       final model = GenerativeModel(
         model: 'gemini-1.5-flash',
-        apiKey: _apiKey!,
+        apiKey: key!,
         systemInstruction: Content.system(
           'You are an expert NEET tutor and OCR specialist. Identify the medical entrance exam (NEET) question from the provided image. '
           'Provide a clear, step-by-step solution. State the final correct answer clearly (e.g., Option B). '
@@ -180,7 +249,8 @@ class GeminiChatService {
       }
     }
 
-    return "AI Tutor is not configured. Please set up the Supabase proxy.";
+    // Fall back to the user's own Gemini key when the proxy isn't enabled.
+    return _sendDirect(prompt, mode: ChatMode.quizHint);
   }
 
   Future<String> generateStudyPlan(
@@ -202,9 +272,10 @@ Day 2: Topic Name - Practice Questions
 Make it practical and achievable for a NEET student.''';
 
     try {
+      final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
       final planModel = GenerativeModel(
         model: 'gemini-1.5-flash',
-        apiKey: _apiKey!,
+        apiKey: key!,
         systemInstruction: Content.system(
           'You are a NEET expert study planner. Create practical, achievable study plans.',
         ),
@@ -242,9 +313,10 @@ Make it practical and achievable for a NEET student.''';
     ''';
 
     try {
+      final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
       final genModel = GenerativeModel(
         model: 'gemini-1.5-flash',
-        apiKey: _apiKey!,
+        apiKey: key!,
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
         ),
@@ -296,43 +368,37 @@ Make it practical and achievable for a NEET student.''';
 
     final result = <Map<String, dynamic>>[];
     for (final item in decoded) {
-      if (item is Map<String, dynamic>) {
-        final cleaned = _sanitizeGeneratedQuestion(item);
-        if (cleaned != null) result.add(cleaned);
-      }
+      if (item is! Map) continue;
+      
+      final questionText = item['questionText'];
+      final correctAnswer = item['correctAnswer'];
+      if (questionText is! String || questionText.trim().isEmpty) continue;
+      if (correctAnswer is! String || correctAnswer.trim().isEmpty) continue;
+
+      final options = item['options'];
+      final optionList = options is List
+          ? options.whereType<String>().toList()
+          : <String>[];
+      final type = item['type'] is String
+          ? (item['type'] as String).toLowerCase()
+          : 'mcq';
+      final difficulty = item['difficulty'] is String
+          ? (item['difficulty'] as String)
+          : 'Medium';
+
+      result.add({
+        'questionText': questionText.trim(),
+        'correctAnswer': correctAnswer.trim(),
+        'options': optionList,
+        'type': type,
+        'difficulty': difficulty,
+        'explanation': item['explanation'] is String ? item['explanation'] : '',
+        'ncertReference': item['ncertReference'] is String
+            ? item['ncertReference']
+            : '',
+      });
     }
+
     return result;
-  }
-
-  /// Validates and normalizes a single generated question, returning null if
-  /// it is unusable (missing text or answer).
-  Map<String, dynamic>? _sanitizeGeneratedQuestion(Map<String, dynamic> raw) {
-    final questionText = raw['questionText'];
-    final correctAnswer = raw['correctAnswer'];
-    if (questionText is! String || questionText.trim().isEmpty) return null;
-    if (correctAnswer is! String || correctAnswer.trim().isEmpty) return null;
-
-    final options = raw['options'];
-    final optionList = options is List
-        ? options.whereType<String>().toList()
-        : <String>[];
-    final type = raw['type'] is String
-        ? (raw['type'] as String).toLowerCase()
-        : 'mcq';
-    final difficulty = raw['difficulty'] is String
-        ? (raw['difficulty'] as String)
-        : 'Medium';
-
-    return {
-      'questionText': questionText.trim(),
-      'correctAnswer': correctAnswer.trim(),
-      'options': optionList,
-      'type': type,
-      'difficulty': difficulty,
-      'explanation': raw['explanation'] is String ? raw['explanation'] : '',
-      'ncertReference': raw['ncertReference'] is String
-          ? raw['ncertReference']
-          : '',
-    };
   }
 }

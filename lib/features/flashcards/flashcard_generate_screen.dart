@@ -462,7 +462,9 @@ class _FlashcardGenerateScreenState
 
     try {
       final proxy = ref.read(geminiProxyServiceProvider);
-      if (proxy == null || !proxy.isConfigured) {
+      final gemini = ref.read(geminiServiceProvider);
+      final directConfigured = gemini.isConfigured;
+      if ((proxy == null || !proxy.isConfigured) && !directConfigured) {
         setState(() {
           _isGenerating = false;
           _status = 'AI flashcard generation requires a Gemini API key.';
@@ -473,6 +475,8 @@ class _FlashcardGenerateScreenState
 
       final service = FlashcardGenerationService(
         proxy: proxy,
+        directGenerate: (prompt, systemPrompt) =>
+            gemini.generateWithSystemPrompt(prompt, systemPrompt),
         batchSize: 5,
         delayBetweenBatchesMs: 1200,
       );

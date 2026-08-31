@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+
 import '../../core/services/ncert_book_catalog.dart';
 import '../../core/services/pdf_service.dart';
 import '../../core/services/gemini_proxy_service.dart';
@@ -51,13 +53,48 @@ class GeneratedFlashcard {
 class FlashcardGenerationService {
   FlashcardGenerationService({
     GeminiProxyService? proxy,
+    Future<String> Function(String prompt, String systemPrompt)? directGenerate,
     this.batchSize = 5,
     this.delayBetweenBatchesMs = 1200,
-  }) : _proxy = proxy;
+  }) : _proxy = proxy,
+       _directGenerate = directGenerate;
 
   final GeminiProxyService? _proxy;
+
+  /// Direct-Gemini fallback using the user's own API key (used when the shared
+  /// proxy is disabled/unreachable). Resolves to the response text.
+  final Future<String> Function(String prompt, String systemPrompt)?
+  _directGenerate;
+
   final int batchSize;
   final int delayBetweenBatchesMs;
+
+  /// Whether a generation backend (proxy or direct key) is available.
+  bool get _hasBackend =>
+      (_proxy?.isConfigured ?? false) || _directGenerate != null;
+  /// Sends [prompt] to whichever backend is available: the shared proxy first
+  /// (cache + rate limiting), else the user's direct Gemini key.
+  Future<String> _generateText(String prompt, String systemPrompt) async {
+    final proxy = _proxy;
+    if (proxy != null && proxy.isConfigured) {
+      final result = await proxy.generate(
+        prompt: prompt,
+        systemPrompt: systemPrompt,
+      );
+      if (result.text.trim().isNotEmpty) return result.text;
+      return '';
+    }
+    final direct = _directGenerate;
+    if (direct != null) {
+      try {
+        return (await direct(prompt, systemPrompt)).trim();
+      } catch (e) {
+        debugPrint('❌ Direct flashcard generation failed: $e');
+        return '';
+      }
+    }
+    return '';
+  }
 
   /// Generates [count] flashcards for the given NCERT chapter.
   ///
@@ -75,7 +112,7 @@ class FlashcardGenerationService {
       return;
     }
 
-    if (_proxy == null || !_proxy.isConfigured) {
+    if (!_hasBackend) {
       yield FlashcardGenerationProgress(
         status:
             'AI flashcard generation requires cloud sync. Please enable it in Settings.',
@@ -84,8 +121,6 @@ class FlashcardGenerationService {
       );
       return;
     }
-
-    final proxy = _proxy;
 
     // 1. Resolve asset path.
     final assetPath =
@@ -140,16 +175,6 @@ class FlashcardGenerationService {
     var processed = 0;
     var failed = 0;
 
-    if (!proxy.isConfigured) {
-      yield FlashcardGenerationProgress(
-        status:
-            'AI flashcard generation requires cloud sync. Please enable it in Settings.',
-        currentStep: 'ai',
-        lastError: 'ai_unavailable',
-      );
-      return;
-    }
-
     for (var i = 0; i < total; i += batchSize) {
       final batch = chunks.skip(i).take(batchSize).toList();
 
@@ -164,12 +189,7 @@ class FlashcardGenerationService {
           count: 1,
         );
 
-        final result = await proxy.generate(
-          prompt: prompt,
-          systemPrompt: _systemPrompt,
-        );
-
-        final text = result.text.trim();
+        final text = await _generateText(prompt, _systemPrompt);
         if (text.isEmpty) {
           failed += 1;
           yield FlashcardGenerationProgress(
@@ -177,7 +197,7 @@ class FlashcardGenerationService {
             currentStep: 'generate',
             processed: processed,
             total: total,
-            lastError: result.isRateLimited ? 'Rate limited' : 'Empty response',
+            lastError: 'Empty response',
           );
           continue;
         }
@@ -237,7 +257,7 @@ class FlashcardGenerationService {
     int count = 20,
     String? assetPathOverride,
   }) async {
-    if (_proxy == null || !_proxy.isConfigured) return const [];
+    if (!_hasBackend) return const [];
 
     final cards = <GeneratedFlashcard>[];
 
@@ -264,14 +284,10 @@ class FlashcardGenerationService {
           count: 1,
         );
 
-        final result = await _proxy.generate(
-          prompt: prompt,
-          systemPrompt: _systemPrompt,
-        );
+        final text = await _generateText(prompt, _systemPrompt);
+        if (text.isEmpty) continue;
 
-        if (result.text.trim().isEmpty) continue;
-
-        final parsed = _parseFlashcards(result.text.trim(), chapterTitle);
+        final parsed = _parseFlashcards(text, chapterTitle);
         cards.addAll(parsed);
       }
 
