@@ -194,7 +194,9 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
   }) {
     final selected = _batch == title;
     return Material(
-      color: selected ? color.withValues(alpha: 0.1) : Colors.white,
+      color: selected
+          ? color.withValues(alpha: 0.1)
+          : AdaptiveColors.surface(context),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: () => setState(() => _batch = title),
@@ -204,7 +206,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: selected ? color : AppColors.divider,
+              color: selected ? color : AdaptiveColors.divider(context),
               width: selected ? 2 : 1,
             ),
           ),
@@ -332,7 +334,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
               child: Material(
                 color: selected
                     ? AppColors.primary.withValues(alpha: 0.1)
-                    : Colors.white,
+                    : AdaptiveColors.surface(context),
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
                   onTap: () => setState(() => _commitment = minutes),
@@ -342,7 +344,9 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: selected ? AppColors.primary : AppColors.divider,
+                        color: selected
+                            ? AppColors.primary
+                            : AdaptiveColors.divider(context),
                         width: selected ? 2 : 1,
                       ),
                     ),

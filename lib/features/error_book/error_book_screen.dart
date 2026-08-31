@@ -14,7 +14,7 @@ class ErrorBookScreen extends ConsumerWidget {
     final errorQuestionsAsync = ref.watch(errorBookProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFBF7), // Warm beige background
+      backgroundColor: AdaptiveColors.surfaceWarm(context),
       appBar: AppBar(
         title: const Text('Error Book'),
         backgroundColor: Colors.transparent,
@@ -136,7 +136,9 @@ class ErrorBookScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.divider.withValues(alpha: 0.5)),
+        side: BorderSide(
+          color: AdaptiveColors.divider(context).withValues(alpha: 0.5),
+        ),
       ),
       child: ExpansionTile(
         title: Text(

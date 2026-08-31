@@ -194,7 +194,7 @@ class _FlashcardGenerateScreenState
                   curve: Curves.easeInOut,
                 ),
             const SizedBox(height: 12),
-            _buildShimmerSkeleton(),
+            _buildShimmerSkeleton(context),
           ],
 
           if (_status != null && !_isGenerating) ...[
@@ -367,10 +367,14 @@ class _FlashcardGenerateScreenState
     );
   }
 
-  Widget _buildShimmerSkeleton() {
+  Widget _buildShimmerSkeleton(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: isDark ? AppColors.surfaceDark : Colors.grey.shade300,
+      highlightColor:
+          isDark
+          ? AdaptiveColors.surfaceContainerHighest(context)
+          : Colors.grey.shade100,
       child: Column(
         children: List.generate(
           4,
@@ -378,7 +382,9 @@ class _FlashcardGenerateScreenState
             margin: const EdgeInsets.only(bottom: 10),
             height: 72,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark
+                  ? AppColors.surfaceDark.withValues(alpha: 0.6)
+                  : Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
           ),

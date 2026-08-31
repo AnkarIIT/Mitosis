@@ -354,8 +354,6 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
           maxLines: 4,
           decoration: InputDecoration(
             hintText: 'Type your answer here...',
-            filled: true,
-            fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           ),
         ),

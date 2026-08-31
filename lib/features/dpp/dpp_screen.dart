@@ -257,7 +257,9 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                     const SizedBox(height: 12),
                     LinearProgressIndicator(
                       value: total > 0 ? correct / total : 0,
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: AdaptiveColors.surfaceContainerHighest(
+                        context,
+                      ),
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         Colors.green,
                       ),
@@ -371,7 +373,9 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                                       shape: BoxShape.circle,
                                       color: isCorrect
                                           ? Colors.green
-                                          : Colors.grey[300],
+                                          : AdaptiveColors.surfaceContainerHighest(
+                                                context,
+                                              ),
                                     ),
                                     child: Center(
                                       child: Text(

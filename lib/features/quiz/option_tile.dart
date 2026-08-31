@@ -30,7 +30,7 @@ class OptionTile extends ConsumerWidget {
     final isCorrect = option == question.correctAnswer;
 
     Color borderColor = AdaptiveColors.divider(context);
-    Color bgColor = Colors.white;
+    Color bgColor = AdaptiveColors.surface(context);
     Color textColor = AdaptiveColors.textPrimary(context);
 
     if (isSelected && !isAnswered) {

@@ -631,7 +631,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -811,7 +811,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AdaptiveColors.surface(context),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Center(
@@ -840,7 +840,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AdaptiveColors.surface(context),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -1291,19 +1291,33 @@ class _HomeTabState extends ConsumerState<HomeTab>
   // SHIMMER LOADING SKELETON
   // ────────────────────────────────────────────────────────────
   Widget _buildShimmerSkeleton(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final blockColor =
+        isDark
+        ? AppColors.surfaceDark.withValues(alpha: 0.6)
+        : Colors.white;
+    final innerColor =
+        isDark
+        ? AdaptiveColors.surfaceContainerHighest(context).withValues(
+            alpha: 0.6,
+          )
+        : Colors.grey.shade200;
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: isDark ? AppColors.surfaceDark : Colors.grey.shade300,
+          highlightColor: isDark
+              ? AdaptiveColors.surfaceContainerHighest(context)
+              : Colors.grey.shade100,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Profile row skeleton
               Row(
                 children: [
-                  CircleAvatar(radius: 22, backgroundColor: Colors.white),
+                  CircleAvatar(radius: 22, backgroundColor: blockColor),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -1313,7 +1327,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                           height: 14,
                           width: 120,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: blockColor,
                             borderRadius: BorderRadius.circular(7),
                           ),
                         ),
@@ -1322,7 +1336,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                           height: 10,
                           width: 80,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: blockColor,
                             borderRadius: BorderRadius.circular(5),
                           ),
                         ),
@@ -1333,7 +1347,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                     width: 48,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: blockColor,
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
@@ -1342,7 +1356,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                     width: 48,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: blockColor,
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
@@ -1353,7 +1367,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
               Container(
                 height: 46,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: blockColor,
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
@@ -1369,7 +1383,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                     width: 70,
                     height: 34,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: blockColor,
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
@@ -1381,7 +1395,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                 height: 18,
                 width: 160,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: blockColor,
                   borderRadius: BorderRadius.circular(9),
                 ),
               ),
@@ -1396,7 +1410,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                   itemBuilder: (_, __) => Container(
                     width: 155,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: blockColor,
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
@@ -1408,7 +1422,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                 height: 18,
                 width: 140,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: blockColor,
                   borderRadius: BorderRadius.circular(9),
                 ),
               ),
@@ -1417,7 +1431,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: blockColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -1427,7 +1441,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                       height: 56,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.grey.shade200,
+                        color: innerColor,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -1439,7 +1453,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                             height: 14,
                             width: 100,
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
+                              color: innerColor,
                               borderRadius: BorderRadius.circular(7),
                             ),
                           ),
@@ -1448,7 +1462,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                             height: 6,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
+                              color: innerColor,
                               borderRadius: BorderRadius.circular(3),
                             ),
                           ),
