@@ -7,6 +7,7 @@ import '../../core/models/user_progress_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/services/exam_engine_service.dart';
 import '../../core/services/exam_checkpoint_service.dart';
+import '../../core/services/secure_screen_service.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -112,6 +113,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       DeviceOrientation.portraitDown,
     ]);
     _setFullscreen(true);
+    SecureScreenService.enable();
 
     // Exclude recently seen questions so each mock test feels fresh.
     final seen = ref.read(recentlySeenQuestionIdsProvider(null).future);
@@ -204,6 +206,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     _ticker?.cancel();
     _autosaveTimer?.cancel();
     _setFullscreen(false);
+    SecureScreenService.disable();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
