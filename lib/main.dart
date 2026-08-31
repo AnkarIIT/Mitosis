@@ -85,6 +85,14 @@ Future<void> _initSupabaseBackground(ProviderContainer container) async {
 }
 
 Future<void> _backgroundInit(ProviderContainer container) async {
+  // Heal any previously-scheduled daily study nudge that was lost (e.g. by an
+  // old build or a reboot before the boot receiver existed).
+  try {
+    await NotificationService().ensureDailyReminderScheduled();
+  } catch (e) {
+    debugPrint('❌ Daily nudge re-assert failed: $e');
+  }
+
   try {
     final repository = container.read(questionRepositoryProvider);
     await repository.importBundledQuestions(
