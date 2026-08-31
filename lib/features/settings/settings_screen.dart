@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/config/app_config.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -306,9 +305,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           TextButton(
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
-              final res = await ref.read(authServiceProvider).deleteAccount();
+              final res = await ref
+                  .read(authProvider.notifier)
+                  .deleteAccount();
               if (res.success) {
-                ref.read(authProvider.notifier).logout();
                 context.pop();
                 messenger.showSnackBar(
                   const SnackBar(content: Text('Account deleted successfully.')),
@@ -409,65 +409,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     },
               secondary: const Icon(Icons.security),
             ),
-          ]),
-          const SizedBox(height: 24),
-
-          _buildSectionHeader('Cloud Sync'),
-          _buildSettingsCard([
-            ListTile(
-              leading: Icon(
-                AppConfig.isCloudAuthConfigured
-                    ? Icons.cloud_done_outlined
-                    : Icons.cloud_off_outlined,
-                color: AppConfig.isCloudAuthConfigured
-                    ? AppColors.success
-                    : AppColors.error,
-              ),
-              title: const Text('Supabase Sync'),
-              subtitle: Text(
-                AppConfig.isCloudAuthConfigured
-                    ? 'Cloud sync is active'
-                    : 'Cloud sync is not configured',
-              ),
-              trailing: AppConfig.isCloudAuthConfigured
-                  ? IconButton(
-                      icon: const Icon(Icons.sync),
-                      onPressed: () async {
-                        final sync = ref.read(cloudSyncServiceProvider);
-                        if (sync != null) {
-                          final scaffoldMessenger = ScaffoldMessenger.of(
-                            context,
-                          );
-                          scaffoldMessenger.showSnackBar(
-                            const SnackBar(
-                              content: Text('Syncing with cloud...'),
-                            ),
-                          );
-                          await sync.syncAll();
-                          if (mounted) {
-                            scaffoldMessenger.showSnackBar(
-                              const SnackBar(content: Text('Sync complete!')),
-                            );
-                          }
-                        }
-                      },
-                    )
-                  : null,
-            ),
-            if (!AppConfig.isCloudAuthConfigured)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-child: Text(
-                  AppConfig.cloudAuthHelpText,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AdaptiveColors.textSecondary(context),
-                  ),
-                ),
-              ),
           ]),
           const SizedBox(height: 24),
 

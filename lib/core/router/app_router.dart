@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../providers/providers.dart';
 import '../../features/auth/auth_screen.dart';
-import '../../features/auth/otp_screen.dart';
-import '../../features/auth/two_factor_screen.dart';
+
+
 import '../../features/auth/terms_screen.dart';
 import '../../features/auth/privacy_policy_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
@@ -45,6 +45,8 @@ import '../../features/dpp/dpp_screen.dart';
 import '../../features/dpp/dpp_attempt_screen.dart';
 import '../../features/dpp/dpp_neet_screen.dart';
 
+const _publicRoutes = {'/auth', '/terms', '/privacy', '/loading'};
+
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
@@ -55,20 +57,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = authState.status == AuthStatus.authenticated;
       final isLoading = authState.status == AuthStatus.loading;
 
-      if (path == '/auth') {
-        if (isAuthenticated) return '/';
-        return null;
-      }
-
-      if (path == '/otp') {
-        if (isAuthenticated) return '/';
-        if (authState.status != AuthStatus.awaitingOtp) return '/auth';
-        return null;
-      }
-
-      if (path == '/2fa') {
-        if (isAuthenticated) return '/';
-        if (authState.status != AuthStatus.awaiting2FA) return '/auth';
+      if (_publicRoutes.contains(path)) {
+        if (path == '/auth' && isAuthenticated) return '/';
         return null;
       }
 
@@ -79,8 +69,6 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (isLoading) return '/loading';
 
-      if (authState.status == AuthStatus.awaiting2FA) return '/2fa';
-      if (authState.status == AuthStatus.awaitingOtp) return '/otp';
 
       if (isAuthenticated) {
         final onboardingComplete = ref.read(onboardingCompleteProvider);
@@ -132,8 +120,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(path: '/auth', builder: (_, _) => const AuthScreen()),
-      GoRoute(path: '/otp', builder: (_, _) => const OtpScreen()),
-      GoRoute(path: '/2fa', builder: (_, _) => const TwoFactorScreen()),
       GoRoute(path: '/terms', builder: (_, _) => const TermsScreen()),
       GoRoute(path: '/privacy', builder: (_, _) => const PrivacyPolicyScreen()),
       GoRoute(
@@ -217,6 +203,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/quiz/result',
+        redirect: (context, state) {
+          if (state.extra == null) return '/';
+          return null;
+        },
         builder: (_, state) {
           final attempt = state.extra as dynamic;
           return TestResultScreen(attempt: attempt);
@@ -336,27 +326,27 @@ GoRoute(
         },
       ),
       GoRoute(
-        path: '/dpp/:subject',
-        builder: (_, state) {
-          final subject = state.pathParameters['subject'] ?? 'physics';
-          return DppScreen(subject: subject);
-        },
-      ),
-      GoRoute(
         path: '/dpp/attempt',
+        redirect: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          if (extra == null || extra['dppResult'] == null) return '/';
+          return null;
+        },
         builder: (_, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
-          final dppResult = extra['dppResult'] as DppResult?;
+          final extra = state.extra as Map<String, dynamic>;
+          final dppResult = extra['dppResult'] as DppResult;
           final durationMinutes = extra['durationMinutes'] as int? ?? 20;
-          if (dppResult == null) {
-            return const Scaffold(
-              body: Center(child: Text('No DPP data available')),
-            );
-          }
           return DppAttemptScreen(
             dppResult: dppResult,
             durationMinutes: durationMinutes,
           );
+        },
+      ),
+      GoRoute(
+        path: '/dpp/:subject',
+        builder: (_, state) {
+          final subject = state.pathParameters['subject'] ?? 'physics';
+          return DppScreen(subject: subject);
         },
       ),
     ],

@@ -5,7 +5,6 @@ import '../models/question_model.dart';
 import '../database/drift_database.dart' as db;
 import 'core_providers.dart';
 import 'content_providers.dart';
-import 'auth_providers.dart';
 
 // ============= QUIZ STATE =============
 class QuizState {
@@ -214,9 +213,8 @@ final quizProvider = StateNotifierProvider<QuizNotifier, QuizState>((ref) {
 // ============= BOOKMARKS =============
 class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
   final db.AppDatabase _db;
-  final Ref _ref;
 
-  BookmarksNotifier(this._db, this._ref) : super(const []) {
+  BookmarksNotifier(this._db) : super(const []) {
     loadBookmarks();
   }
 
@@ -249,7 +247,6 @@ class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
         );
       }
       await loadBookmarks();
-      _ref.read(cloudSyncServiceProvider)?.syncAll();
     } catch (e) {
       debugPrint('❌ Error toggling bookmark: $e');
     }
@@ -263,7 +260,7 @@ class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
 final bookmarksProvider =
     StateNotifierProvider<BookmarksNotifier, List<db.Bookmark>>((ref) {
       final database = ref.watch(databaseProvider);
-      return BookmarksNotifier(database, ref);
+      return BookmarksNotifier(database);
     });
 
 // ============= ERROR BOOK =============

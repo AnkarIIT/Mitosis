@@ -20,4 +20,6 @@ class Users extends Table {
   TextColumn get batch => text().nullable()(); // 'Class 11' | 'Class 12' | 'Dropper'
   IntColumn get targetYear => integer().nullable()();
   IntColumn get dailyCommitmentMinutes => integer().nullable()();
+  TextColumn get passwordResetCode => text().nullable()();
+  DateTimeColumn get passwordResetExpiresAt => dateTime().nullable()();
 }

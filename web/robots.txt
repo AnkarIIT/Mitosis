@@ -1,0 +1,9 @@
+# NEET Mitos - robots.txt
+#
+# TODO: Replace the placeholder host with the real public web domain once one
+# is published, and set the sitemap path to match the deployed base-href.
+#
+# User-agent: *
+# Allow: /
+#
+# Sitemap: https://neetmitos.app/sitemap.xml

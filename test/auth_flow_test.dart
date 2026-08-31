@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:neet_mitos/core/providers/providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:neet_mitos/features/auth/auth_screen.dart';
 
 void main() {
   group('AuthNotifier Tests', () {
     test('continueAsGuest sets user as guest and authenticated', () async {
+      SharedPreferences.setMockInitialValues({});
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
       final notifier = container.read(authProvider.notifier);
-      await notifier.checkAuth();
+      // The notifier constructor kicks off checkAuth();
+      // let it settle so it can't overwrite the guest state below.
+      await Future<void>.delayed(Duration.zero);
       await notifier.continueAsGuest();
 
       final state = container.read(authProvider);
@@ -21,23 +25,22 @@ void main() {
       expect(state.user, isNull);
     });
 
-    test('signInWithMicrosoft handles unconfigured cloud auth gracefully', () async {
+    test('toggle2FA is a no-op after local auth migration', () async {
+      SharedPreferences.setMockInitialValues({});
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
       final notifier = container.read(authProvider.notifier);
       await notifier.checkAuth();
-      final success = await notifier.signInWithMicrosoft();
+      final enabled = await notifier.toggle2FA(true);
 
-      expect(success, isFalse);
-      final state = container.read(authProvider);
-      expect(state.error, contains('configured'));
-      expect(state.status, AuthStatus.unauthenticated);
+      expect(enabled, isFalse);
     });
   });
 
   group('AuthScreen Widget Tests', () {
-    testWidgets('renders NEET Mitos title and tab controls', (tester) async {
+    testWidgets('renders welcome text and sign-in controls', (tester) async {
+      SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -45,16 +48,15 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
-      expect(find.text('NEET Mitos'), findsOneWidget);
-      expect(find.text('Your AI-Powered NEET Partner'), findsOneWidget);
-      expect(find.text('Log In'), findsOneWidget);
-      expect(find.text('Sign Up'), findsOneWidget);
-      expect(find.text('OTP'), findsOneWidget);
-      expect(find.text('SKIP FOR NOW'), findsOneWidget);
+      expect(find.text('Welcome back'), findsOneWidget);
+      expect(find.text('SIGN IN'), findsOneWidget);
+      expect(find.text('Continue as Guest'), findsOneWidget);
     });
 
     testWidgets('switches fields when changing auth mode tabs', (tester) async {
+      SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -62,25 +64,18 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
-      // Initially in Log In mode: Full Name field should NOT be present
+      // Initially in Login mode: Full Name field should NOT be present
       expect(find.text('Full Name'), findsNothing);
 
       // Tap Sign Up tab
-      await tester.tap(find.text('Sign Up'));
+      await tester.tap(find.text("Don't have an account? Sign up"));
       await tester.pumpAndSettle();
 
       // Sign Up mode: Full Name field should now be present
       expect(find.text('Full Name'), findsOneWidget);
-      expect(find.text('Username (Optional)'), findsOneWidget);
-
-      // Tap OTP tab
-      await tester.tap(find.text('OTP'));
-      await tester.pumpAndSettle();
-
-      // OTP mode: Password field should NOT be present
-      expect(find.text('Password'), findsNothing);
-      expect(find.text('SEND VERIFICATION OTP'), findsOneWidget);
+      expect(find.text('Username'), findsOneWidget);
     });
   });
 }

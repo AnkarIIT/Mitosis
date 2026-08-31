@@ -51,10 +51,10 @@ class AppDatabase extends _$AppDatabase {
   }
 
   AppDatabase._internal([QueryExecutor? executor])
-      : super(executor ?? conn.connect());
+    : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 25;
+  int get schemaVersion => 26;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -77,8 +77,16 @@ class AppDatabase extends _$AppDatabase {
         await _addColumnSafely(m, questions, (questions as dynamic).imageUrl);
       }
       if (from < 4) {
-        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).testType);
-        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).subjectScores);
+        await _addColumnSafely(
+          m,
+          quizAttempts,
+          (quizAttempts as dynamic).testType,
+        );
+        await _addColumnSafely(
+          m,
+          quizAttempts,
+          (quizAttempts as dynamic).subjectScores,
+        );
       }
       if (from < 5) {
         await m.createTable(chats);
@@ -90,7 +98,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(users);
       }
       if (from < 8) {
-        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).incorrectCount);
+        await _addColumnSafely(
+          m,
+          quizAttempts,
+          (quizAttempts as dynamic).incorrectCount,
+        );
       }
       if (from < 9) {
         await m.createTable(errorBook);
@@ -131,7 +143,11 @@ class AppDatabase extends _$AppDatabase {
         // Timestamp-first cloud sync: every user-data row carries a local
         // last-modified marker so the sync layer can reconcile Drift writes
         // with Supabase upserts instead of blindly last-writer-wins.
-        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).updatedAt);
+        await _addColumnSafely(
+          m,
+          quizAttempts,
+          (quizAttempts as dynamic).updatedAt,
+        );
         await _addColumnSafely(
           m,
           topicProgressEntries,
@@ -185,7 +201,9 @@ class AppDatabase extends _$AppDatabase {
             "SELECT id, CAST(question_id AS TEXT), subject, topic_id, added_at, is_resolved, notes FROM error_book",
           );
           await m.deleteTable('error_book');
-          await customStatement('ALTER TABLE error_book_new RENAME TO error_book');
+          await customStatement(
+            'ALTER TABLE error_book_new RENAME TO error_book',
+          );
         } catch (_) {}
         try {
           await customStatement(
@@ -208,7 +226,9 @@ class AppDatabase extends _$AppDatabase {
             "SELECT id, CAST(question_id AS TEXT), subject, topic_id, box, ease_factor, interval_days, repetitions, lapses, due_at, last_reviewed_at FROM spaced_repetition",
           );
           await m.deleteTable('spaced_repetition');
-          await customStatement('ALTER TABLE spaced_repetition_new RENAME TO spaced_repetition');
+          await customStatement(
+            'ALTER TABLE spaced_repetition_new RENAME TO spaced_repetition',
+          );
         } catch (_) {}
         try {
           await customStatement(
@@ -226,7 +246,9 @@ class AppDatabase extends _$AppDatabase {
             "SELECT CAST(question_id AS TEXT), subject, topic_id, bookmarked_at, updated_at FROM bookmarks",
           );
           await m.deleteTable('bookmarks');
-          await customStatement('ALTER TABLE bookmarks_new RENAME TO bookmarks');
+          await customStatement(
+            'ALTER TABLE bookmarks_new RENAME TO bookmarks',
+          );
           await customStatement(
             'CREATE UNIQUE INDEX IF NOT EXISTS bookmarks_question_id_unique '
             'ON bookmarks(question_id)',
@@ -237,15 +259,24 @@ class AppDatabase extends _$AppDatabase {
         // Persist real ±marks on each attempt (single source of truth for the
         // NEET score, instead of re-deriving with a hardcoded 4/−1 formula).
         await _addColumnSafely(
-            m, quizAttempts, (quizAttempts as dynamic).rawScore);
+          m,
+          quizAttempts,
+          (quizAttempts as dynamic).rawScore,
+        );
         await _addColumnSafely(
-            m, quizAttempts, (quizAttempts as dynamic).maxMarks);
+          m,
+          quizAttempts,
+          (quizAttempts as dynamic).maxMarks,
+        );
       }
       if (from < 23) {
         // Track which question IDs were presented per attempt so later
         // sessions can exclude them and avoid repeats across quizzes/mocks.
         await _addColumnSafely(
-            m, quizAttempts, (quizAttempts as dynamic).questionIds);
+          m,
+          quizAttempts,
+          (quizAttempts as dynamic).questionIds,
+        );
         // Mark the origin of each question: bundled sample, downloaded PYQ,
         // generated DPP, or user-imported file.
         await _addColumnSafely(m, questions, (questions as dynamic).source);
@@ -256,14 +287,25 @@ class AppDatabase extends _$AppDatabase {
       if (from < 24) {
         // Persist the shuffle seed for each attempt so the question order
         // can be reproduced in review and diagnostics.
-        await _addColumnSafely(
-            m, quizAttempts, (quizAttempts as dynamic).seed);
+        await _addColumnSafely(m, quizAttempts, (quizAttempts as dynamic).seed);
       }
       if (from < 25) {
         // DPP-specific duration so DPP sets are not forced into the 180-minute
         // NEET mock timer.
         await _addColumnSafely(
-            m, dppSets, (dppSets as dynamic).durationMinutes);
+          m,
+          dppSets,
+          (dppSets as dynamic).durationMinutes,
+        );
+      }
+      if (from < 26) {
+        // Password reset fields for local auth.
+        await _addColumnSafely(m, users, (users as dynamic).passwordResetCode);
+        await _addColumnSafely(
+          m,
+          users,
+          (users as dynamic).passwordResetExpiresAt,
+        );
       }
     },
     beforeOpen: (details) async {
@@ -274,7 +316,11 @@ class AppDatabase extends _$AppDatabase {
 
   /// Safely attempts to add a column, ignoring 'duplicate column' errors.
   /// This handles cases where the user's local DB is in a partial state.
-  Future<void> _addColumnSafely(Migrator m, TableInfo table, GeneratedColumn column) async {
+  Future<void> _addColumnSafely(
+    Migrator m,
+    TableInfo table,
+    GeneratedColumn column,
+  ) async {
     try {
       await m.addColumn(table, column);
     } catch (e) {
@@ -294,18 +340,19 @@ class AppDatabase extends _$AppDatabase {
   Future<void> removeFromErrorBook(String questionId) =>
       (delete(errorBook)..where((t) => t.questionId.equals(questionId))).go();
 
-  Future<List<ErrorBookData>> getErrorBookEntries() =>
-      select(errorBook).get();
+  Future<List<ErrorBookData>> getErrorBookEntries() => select(errorBook).get();
 
   Future<void> resolveErrorBookEntry(String questionId) async {
-    await (update(errorBook)..where((t) => t.questionId.equals(questionId))).write(
-      const ErrorBookCompanion(isResolved: Value(true)),
-    );
+    await (update(errorBook)..where((t) => t.questionId.equals(questionId)))
+        .write(const ErrorBookCompanion(isResolved: Value(true)));
   }
 
   // ============= USERS =============
 
-  Future<void> registerUser(UsersCompanion user) => into(users).insert(user);
+  Future<User?> registerUser(UsersCompanion user) async {
+    final id = await into(users).insert(user);
+    return getUserById(id);
+  }
 
   Future<User?> getUserByEmail(String email) =>
       (select(users)..where((t) => t.email.equals(email))).getSingleOrNull();
@@ -355,6 +402,58 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  Future<void> updateUserPassword(int userId, String passwordHash) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(passwordHash: Value(passwordHash)),
+    );
+  }
+
+  Future<void> updateUserPasswordReset(
+    int userId,
+    String code,
+    DateTime expiresAt,
+  ) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(
+        passwordResetCode: Value(code),
+        passwordResetExpiresAt: Value(expiresAt),
+      ),
+    );
+  }
+
+  Future<({int userId, String code, DateTime expiresAt})?>
+  getActivePasswordReset(int userId) async {
+    final row = await (select(
+      users,
+    )..where((t) => t.id.equals(userId))).getSingleOrNull();
+    if (row == null ||
+        row.passwordResetCode == null ||
+        row.passwordResetExpiresAt == null) {
+      return null;
+    }
+    if (row.passwordResetExpiresAt!.isBefore(DateTime.now())) {
+      return null;
+    }
+    return (
+      userId: row.id,
+      code: row.passwordResetCode!,
+      expiresAt: row.passwordResetExpiresAt!,
+    );
+  }
+
+  Future<void> clearPasswordReset(int userId) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      const UsersCompanion(
+        passwordResetCode: Value(null),
+        passwordResetExpiresAt: Value(null),
+      ),
+    );
+  }
+
+  Future<void> clearUserData(int userId) async {
+    await (delete(users)..where((t) => t.id.equals(userId))).go();
+  }
+
   // ============= DAILY GOALS =============
 
   Future<void> upsertDailyGoal(DailyGoalsCompanion goal) =>
@@ -397,9 +496,9 @@ class AppDatabase extends _$AppDatabase {
     // An older schema could produce multiple local rows sharing an
     // `attempted_at`. Updating every match (instead of `getSingleOrNull`,
     // which would throw) keeps the pull loop crash-free.
-    final existing = await (select(quizAttempts)
-          ..where((t) => t.attemptedAt.equals(attemptedAt)))
-        .get();
+    final existing = await (select(
+      quizAttempts,
+    )..where((t) => t.attemptedAt.equals(attemptedAt))).get();
 
     if (existing.isEmpty) {
       await into(quizAttempts).insert(attempt);
@@ -407,8 +506,9 @@ class AppDatabase extends _$AppDatabase {
     }
 
     for (final row in existing) {
-      await (update(quizAttempts)..where((t) => t.id.equals(row.id)))
-          .write(attempt);
+      await (update(
+        quizAttempts,
+      )..where((t) => t.id.equals(row.id))).write(attempt);
     }
   }
 
@@ -454,9 +554,9 @@ class AppDatabase extends _$AppDatabase {
   // ============= CONTENT SYNC WATERMARKS =============
 
   Future<DateTime?> getLastSyncTimestamp(String tableName) async {
-    final row = await (select(syncWatermarks)
-          ..where((t) => t.remoteTable.equals(tableName)))
-        .getSingleOrNull();
+    final row = await (select(
+      syncWatermarks,
+    )..where((t) => t.remoteTable.equals(tableName))).getSingleOrNull();
     return row?.lastSyncedAt;
   }
 
@@ -471,25 +571,24 @@ class AppDatabase extends _$AppDatabase {
   /// Local ids of every remote-sourced (catalog) question, used to reconcile
   /// rows that were removed/deactivated on the server.
   Future<List<String>> getRemoteQuestionLocalIds() async {
-    final rows = await (select(questions)
-          ..where((t) => t.remoteId.isNotNull()))
-        .get();
+    final rows = await (select(
+      questions,
+    )..where((t) => t.remoteId.isNotNull())).get();
     return rows.map((r) => r.id).toList();
   }
 
   // ============= SPACED REPETITION =============
 
-  Future<void> upsertSpacedRepetition(
-    Insertable<SpacedRepetitionData> entry,
-  ) =>
+  Future<void> upsertSpacedRepetition(Insertable<SpacedRepetitionData> entry) =>
       into(spacedRepetition).insertOnConflictUpdate(entry);
 
   Future<List<SpacedRepetitionData>> getSpacedRepetitionCards() =>
       select(spacedRepetition).get();
 
-  Future<SpacedRepetitionData?> getSpacedRepetition(String questionId) => (select(
-    spacedRepetition,
-  )..where((t) => t.questionId.equals(questionId))).getSingleOrNull();
+  Future<SpacedRepetitionData?> getSpacedRepetition(String questionId) =>
+      (select(
+        spacedRepetition,
+      )..where((t) => t.questionId.equals(questionId))).getSingleOrNull();
 
   Future<List<SpacedRepetitionData>> getDueSpacedRepetition(DateTime now) {
     final query = select(spacedRepetition)
@@ -498,9 +597,9 @@ class AppDatabase extends _$AppDatabase {
     return query.get();
   }
 
-  Future<void> removeSpacedRepetition(String questionId) =>
-      (delete(spacedRepetition)..where((t) => t.questionId.equals(questionId)))
-          .go();
+  Future<void> removeSpacedRepetition(String questionId) => (delete(
+    spacedRepetition,
+  )..where((t) => t.questionId.equals(questionId))).go();
 
   // ============= FLASHCARDS =============
 
@@ -508,7 +607,9 @@ class AppDatabase extends _$AppDatabase {
       into(flashcards).insert(card, mode: InsertMode.insertOrReplace);
 
   Future<void> insertFlashcardsBatch(List<FlashcardsCompanion> cards) async {
-    await batch((b) => b.insertAll(flashcards, cards, mode: InsertMode.insertOrReplace));
+    await batch(
+      (b) => b.insertAll(flashcards, cards, mode: InsertMode.insertOrReplace),
+    );
   }
 
   Future<List<Flashcard>> getAllFlashcards() => select(flashcards).get();
@@ -559,16 +660,19 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List> getRecentQuizAttempts(int maxAttempts) async {
     final query = select(quizAttempts)
-      ..orderBy([(t) => OrderingTerm(expression: t.attemptedAt, mode: OrderingMode.desc)])
+      ..orderBy([
+        (t) => OrderingTerm(expression: t.attemptedAt, mode: OrderingMode.desc),
+      ])
       ..limit(maxAttempts);
     return query.get();
   }
 
-  Future<void> updateQuizAttemptQuestionIds(int attemptId, String questionIdsJson) async {
+  Future<void> updateQuizAttemptQuestionIds(
+    int attemptId,
+    String questionIdsJson,
+  ) async {
     await (update(quizAttempts)..where((t) => t.id.equals(attemptId))).write(
-      QuizAttemptsCompanion(
-        questionIds: Value(questionIdsJson),
-      ),
+      QuizAttemptsCompanion(questionIds: Value(questionIdsJson)),
     );
   }
 
@@ -578,15 +682,17 @@ class AppDatabase extends _$AppDatabase {
 
   Future getTodayDppSet(String subject) async {
     final today = DateTime.now();
-    final dateStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
     final query = select(dppSets)
       ..where((t) => t.date.equals(dateStr) & t.subject.equals(subject));
     return query.getSingleOrNull();
   }
 
-  Future<int> insertDppSet(dppSet) => into(dppSets).insert(dppSet);
+  Future<int> insertDppSet(DppSetsCompanion dppSet) =>
+      into(dppSets).insert(dppSet);
 
-  Future<void> updateDppSet(dppSet) async {
+  Future<void> updateDppSet(DppSet dppSet) async {
     await update(dppSets).replace(dppSet);
   }
 

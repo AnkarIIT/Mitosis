@@ -12,7 +12,6 @@ import 'package:neet_mitos/features/profile/profile_screen.dart';
 import 'package:neet_mitos/features/study_plan/study_plan_screen.dart';
 import 'package:neet_mitos/features/topic_browser/topic_detail_screen.dart';
 import 'package:neet_mitos/main.dart';
-import 'package:neet_mitos/core/providers/settings_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 GoRouter _testRouter({required Widget child}) {
@@ -33,10 +32,26 @@ GoRouter _testRouter({required Widget child}) {
           );
         },
       ),
-      GoRoute(path: '/chat', builder: (_, _) => const Scaffold(body: Center(child: Text('AI Doubt Solver')))),
-      GoRoute(path: '/test-series', builder: (_, _) => const Scaffold(body: Center(child: Text('Test Series')))),
-      GoRoute(path: '/quiz', builder: (_, _) => const Scaffold(body: Center(child: Text('Quiz')))),
-      GoRoute(path: '/progress', builder: (_, _) => const Scaffold(body: Center(child: Text('Subject-wise Performance')))),
+      GoRoute(
+        path: '/chat',
+        builder: (_, _) =>
+            const Scaffold(body: Center(child: Text('AI Doubt Solver'))),
+      ),
+      GoRoute(
+        path: '/test-series',
+        builder: (_, _) =>
+            const Scaffold(body: Center(child: Text('Test Series'))),
+      ),
+      GoRoute(
+        path: '/quiz',
+        builder: (_, _) => const Scaffold(body: Center(child: Text('Quiz'))),
+      ),
+      GoRoute(
+        path: '/progress',
+        builder: (_, _) => const Scaffold(
+          body: Center(child: Text('Subject-wise Performance')),
+        ),
+      ),
     ],
   );
 }
@@ -55,13 +70,15 @@ void main() {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
     await tester.binding.setSurfaceSize(const Size(420, 900));
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        authProvider.overrideWith((ref) => _FakeAuthNotifier()),
-        onboardingCompleteProvider.overrideWith((ref) => true),
-      ],
-      child: const MyApp(),
-    ));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+          onboardingCompleteProvider.overrideWith((ref) => true),
+        ],
+        child: const MyApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Featured Subjects'), findsOneWidget);
@@ -86,13 +103,15 @@ void main() {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
     await tester.binding.setSurfaceSize(const Size(420, 900));
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        authProvider.overrideWith((ref) => _FakeAuthNotifier()),
-        onboardingCompleteProvider.overrideWith((ref) => true),
-      ],
-      child: const MyApp(),
-    ));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+          onboardingCompleteProvider.overrideWith((ref) => true),
+        ],
+        child: const MyApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Ongoing Progress'), findsOneWidget);
@@ -104,24 +123,28 @@ void main() {
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
     await tester.binding.setSurfaceSize(const Size(420, 900));
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        authProvider.overrideWith((ref) => _FakeAuthNotifier()),
-        onboardingCompleteProvider.overrideWith((ref) => true),
-        weakTopicsProvider.overrideWith((ref) => [
-          Topic(
-            id: 'weak_topic_1',
-            name: 'Rotation',
-            chapterId: 'physics_ch4',
-            difficulty: 'Hard',
-            summary: 'Weak topic for testing',
-            keyPoints: ['Torque', 'Angular Momentum'],
-            questionCount: 3,
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+          onboardingCompleteProvider.overrideWith((ref) => true),
+          weakTopicsProvider.overrideWith(
+            (ref) => [
+              Topic(
+                id: 'weak_topic_1',
+                name: 'Rotation',
+                chapterId: 'physics_ch4',
+                difficulty: 'Hard',
+                summary: 'Weak topic for testing',
+                keyPoints: ['Torque', 'Angular Momentum'],
+                questionCount: 3,
+              ),
+            ],
           ),
-        ]),
-      ],
-      child: const MyApp(),
-    ));
+        ],
+        child: const MyApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     // The home tab should show the Weak Topics banner when weak topics exist
@@ -276,41 +299,32 @@ class _FakeAuthNotifier extends StateNotifier<AuthState>
   Future<bool> toggle2FA(bool enabled) async => false;
 
   @override
-  Future<bool> sendOtp(String email) async => false;
-
-  @override
-  Future<bool> verifyOtp(String code) async => false;
-
-  @override
-  Future<bool> verify2FA(String code) async => false;
-
-  @override
-  Future<void> resend2FA() async {}
-
-  @override
   Future<bool> register({
     required String email,
     required String username,
     required String password,
     String? fullName,
-  }) async =>
-      false;
+  }) async => false;
 
   @override
   Future<bool> login({required String email, required String password}) async =>
       false;
 
   @override
-  Future<bool> resetPassword(String email) async => false;
-
-  @override
-  Future<void> logout() async {}
-
-  @override
   Future<bool> signInWithGoogle() async => false;
 
   @override
-  Future<bool> signInWithMicrosoft() async => false;
+  Future<bool> resetPassword(String email) async => false;
+
+  @override
+  Future<bool> verifyResetCode({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async => true;
+
+  @override
+  Future<void> logout() async {}
 
   @override
   Future<({bool success, String message})> deleteAccount() async {

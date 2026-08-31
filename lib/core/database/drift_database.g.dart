@@ -3808,6 +3808,29 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _passwordResetCodeMeta = const VerificationMeta(
+    'passwordResetCode',
+  );
+  @override
+  late final GeneratedColumn<String> passwordResetCode =
+      GeneratedColumn<String>(
+        'password_reset_code',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _passwordResetExpiresAtMeta =
+      const VerificationMeta('passwordResetExpiresAt');
+  @override
+  late final GeneratedColumn<DateTime> passwordResetExpiresAt =
+      GeneratedColumn<DateTime>(
+        'password_reset_expires_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3827,6 +3850,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     batch,
     targetYear,
     dailyCommitmentMinutes,
+    passwordResetCode,
+    passwordResetExpiresAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3962,6 +3987,24 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         ),
       );
     }
+    if (data.containsKey('password_reset_code')) {
+      context.handle(
+        _passwordResetCodeMeta,
+        passwordResetCode.isAcceptableOrUnknown(
+          data['password_reset_code']!,
+          _passwordResetCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('password_reset_expires_at')) {
+      context.handle(
+        _passwordResetExpiresAtMeta,
+        passwordResetExpiresAt.isAcceptableOrUnknown(
+          data['password_reset_expires_at']!,
+          _passwordResetExpiresAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -4039,6 +4082,14 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         DriftSqlType.int,
         data['${effectivePrefix}daily_commitment_minutes'],
       ),
+      passwordResetCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}password_reset_code'],
+      ),
+      passwordResetExpiresAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}password_reset_expires_at'],
+      ),
     );
   }
 
@@ -4066,6 +4117,8 @@ class User extends DataClass implements Insertable<User> {
   final String? batch;
   final int? targetYear;
   final int? dailyCommitmentMinutes;
+  final String? passwordResetCode;
+  final DateTime? passwordResetExpiresAt;
   const User({
     required this.id,
     this.email,
@@ -4084,6 +4137,8 @@ class User extends DataClass implements Insertable<User> {
     this.batch,
     this.targetYear,
     this.dailyCommitmentMinutes,
+    this.passwordResetCode,
+    this.passwordResetExpiresAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4122,6 +4177,14 @@ class User extends DataClass implements Insertable<User> {
     }
     if (!nullToAbsent || dailyCommitmentMinutes != null) {
       map['daily_commitment_minutes'] = Variable<int>(dailyCommitmentMinutes);
+    }
+    if (!nullToAbsent || passwordResetCode != null) {
+      map['password_reset_code'] = Variable<String>(passwordResetCode);
+    }
+    if (!nullToAbsent || passwordResetExpiresAt != null) {
+      map['password_reset_expires_at'] = Variable<DateTime>(
+        passwordResetExpiresAt,
+      );
     }
     return map;
   }
@@ -4163,6 +4226,12 @@ class User extends DataClass implements Insertable<User> {
       dailyCommitmentMinutes: dailyCommitmentMinutes == null && nullToAbsent
           ? const Value.absent()
           : Value(dailyCommitmentMinutes),
+      passwordResetCode: passwordResetCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(passwordResetCode),
+      passwordResetExpiresAt: passwordResetExpiresAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(passwordResetExpiresAt),
     );
   }
 
@@ -4193,6 +4262,12 @@ class User extends DataClass implements Insertable<User> {
       dailyCommitmentMinutes: serializer.fromJson<int?>(
         json['dailyCommitmentMinutes'],
       ),
+      passwordResetCode: serializer.fromJson<String?>(
+        json['passwordResetCode'],
+      ),
+      passwordResetExpiresAt: serializer.fromJson<DateTime?>(
+        json['passwordResetExpiresAt'],
+      ),
     );
   }
   @override
@@ -4216,6 +4291,10 @@ class User extends DataClass implements Insertable<User> {
       'batch': serializer.toJson<String?>(batch),
       'targetYear': serializer.toJson<int?>(targetYear),
       'dailyCommitmentMinutes': serializer.toJson<int?>(dailyCommitmentMinutes),
+      'passwordResetCode': serializer.toJson<String?>(passwordResetCode),
+      'passwordResetExpiresAt': serializer.toJson<DateTime?>(
+        passwordResetExpiresAt,
+      ),
     };
   }
 
@@ -4237,6 +4316,8 @@ class User extends DataClass implements Insertable<User> {
     Value<String?> batch = const Value.absent(),
     Value<int?> targetYear = const Value.absent(),
     Value<int?> dailyCommitmentMinutes = const Value.absent(),
+    Value<String?> passwordResetCode = const Value.absent(),
+    Value<DateTime?> passwordResetExpiresAt = const Value.absent(),
   }) => User(
     id: id ?? this.id,
     email: email.present ? email.value : this.email,
@@ -4259,6 +4340,12 @@ class User extends DataClass implements Insertable<User> {
     dailyCommitmentMinutes: dailyCommitmentMinutes.present
         ? dailyCommitmentMinutes.value
         : this.dailyCommitmentMinutes,
+    passwordResetCode: passwordResetCode.present
+        ? passwordResetCode.value
+        : this.passwordResetCode,
+    passwordResetExpiresAt: passwordResetExpiresAt.present
+        ? passwordResetExpiresAt.value
+        : this.passwordResetExpiresAt,
   );
   User copyWithCompanion(UsersCompanion data) {
     return User(
@@ -4295,6 +4382,12 @@ class User extends DataClass implements Insertable<User> {
       dailyCommitmentMinutes: data.dailyCommitmentMinutes.present
           ? data.dailyCommitmentMinutes.value
           : this.dailyCommitmentMinutes,
+      passwordResetCode: data.passwordResetCode.present
+          ? data.passwordResetCode.value
+          : this.passwordResetCode,
+      passwordResetExpiresAt: data.passwordResetExpiresAt.present
+          ? data.passwordResetExpiresAt.value
+          : this.passwordResetExpiresAt,
     );
   }
 
@@ -4317,7 +4410,9 @@ class User extends DataClass implements Insertable<User> {
           ..write('lastActivityDate: $lastActivityDate, ')
           ..write('batch: $batch, ')
           ..write('targetYear: $targetYear, ')
-          ..write('dailyCommitmentMinutes: $dailyCommitmentMinutes')
+          ..write('dailyCommitmentMinutes: $dailyCommitmentMinutes, ')
+          ..write('passwordResetCode: $passwordResetCode, ')
+          ..write('passwordResetExpiresAt: $passwordResetExpiresAt')
           ..write(')'))
         .toString();
   }
@@ -4341,6 +4436,8 @@ class User extends DataClass implements Insertable<User> {
     batch,
     targetYear,
     dailyCommitmentMinutes,
+    passwordResetCode,
+    passwordResetExpiresAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -4362,7 +4459,9 @@ class User extends DataClass implements Insertable<User> {
           other.lastActivityDate == this.lastActivityDate &&
           other.batch == this.batch &&
           other.targetYear == this.targetYear &&
-          other.dailyCommitmentMinutes == this.dailyCommitmentMinutes);
+          other.dailyCommitmentMinutes == this.dailyCommitmentMinutes &&
+          other.passwordResetCode == this.passwordResetCode &&
+          other.passwordResetExpiresAt == this.passwordResetExpiresAt);
 }
 
 class UsersCompanion extends UpdateCompanion<User> {
@@ -4383,6 +4482,8 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<String?> batch;
   final Value<int?> targetYear;
   final Value<int?> dailyCommitmentMinutes;
+  final Value<String?> passwordResetCode;
+  final Value<DateTime?> passwordResetExpiresAt;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.email = const Value.absent(),
@@ -4401,6 +4502,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.batch = const Value.absent(),
     this.targetYear = const Value.absent(),
     this.dailyCommitmentMinutes = const Value.absent(),
+    this.passwordResetCode = const Value.absent(),
+    this.passwordResetExpiresAt = const Value.absent(),
   });
   UsersCompanion.insert({
     this.id = const Value.absent(),
@@ -4420,6 +4523,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.batch = const Value.absent(),
     this.targetYear = const Value.absent(),
     this.dailyCommitmentMinutes = const Value.absent(),
+    this.passwordResetCode = const Value.absent(),
+    this.passwordResetExpiresAt = const Value.absent(),
   }) : username = Value(username);
   static Insertable<User> custom({
     Expression<int>? id,
@@ -4439,6 +4544,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     Expression<String>? batch,
     Expression<int>? targetYear,
     Expression<int>? dailyCommitmentMinutes,
+    Expression<String>? passwordResetCode,
+    Expression<DateTime>? passwordResetExpiresAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4460,6 +4567,9 @@ class UsersCompanion extends UpdateCompanion<User> {
       if (targetYear != null) 'target_year': targetYear,
       if (dailyCommitmentMinutes != null)
         'daily_commitment_minutes': dailyCommitmentMinutes,
+      if (passwordResetCode != null) 'password_reset_code': passwordResetCode,
+      if (passwordResetExpiresAt != null)
+        'password_reset_expires_at': passwordResetExpiresAt,
     });
   }
 
@@ -4481,6 +4591,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     Value<String?>? batch,
     Value<int?>? targetYear,
     Value<int?>? dailyCommitmentMinutes,
+    Value<String?>? passwordResetCode,
+    Value<DateTime?>? passwordResetExpiresAt,
   }) {
     return UsersCompanion(
       id: id ?? this.id,
@@ -4501,6 +4613,9 @@ class UsersCompanion extends UpdateCompanion<User> {
       targetYear: targetYear ?? this.targetYear,
       dailyCommitmentMinutes:
           dailyCommitmentMinutes ?? this.dailyCommitmentMinutes,
+      passwordResetCode: passwordResetCode ?? this.passwordResetCode,
+      passwordResetExpiresAt:
+          passwordResetExpiresAt ?? this.passwordResetExpiresAt,
     );
   }
 
@@ -4560,6 +4675,14 @@ class UsersCompanion extends UpdateCompanion<User> {
         dailyCommitmentMinutes.value,
       );
     }
+    if (passwordResetCode.present) {
+      map['password_reset_code'] = Variable<String>(passwordResetCode.value);
+    }
+    if (passwordResetExpiresAt.present) {
+      map['password_reset_expires_at'] = Variable<DateTime>(
+        passwordResetExpiresAt.value,
+      );
+    }
     return map;
   }
 
@@ -4582,7 +4705,9 @@ class UsersCompanion extends UpdateCompanion<User> {
           ..write('lastActivityDate: $lastActivityDate, ')
           ..write('batch: $batch, ')
           ..write('targetYear: $targetYear, ')
-          ..write('dailyCommitmentMinutes: $dailyCommitmentMinutes')
+          ..write('dailyCommitmentMinutes: $dailyCommitmentMinutes, ')
+          ..write('passwordResetCode: $passwordResetCode, ')
+          ..write('passwordResetExpiresAt: $passwordResetExpiresAt')
           ..write(')'))
         .toString();
   }
@@ -10837,6 +10962,8 @@ typedef $$UsersTableCreateCompanionBuilder =
       Value<String?> batch,
       Value<int?> targetYear,
       Value<int?> dailyCommitmentMinutes,
+      Value<String?> passwordResetCode,
+      Value<DateTime?> passwordResetExpiresAt,
     });
 typedef $$UsersTableUpdateCompanionBuilder =
     UsersCompanion Function({
@@ -10857,6 +10984,8 @@ typedef $$UsersTableUpdateCompanionBuilder =
       Value<String?> batch,
       Value<int?> targetYear,
       Value<int?> dailyCommitmentMinutes,
+      Value<String?> passwordResetCode,
+      Value<DateTime?> passwordResetExpiresAt,
     });
 
 class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
@@ -10949,6 +11078,16 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
 
   ColumnFilters<int> get dailyCommitmentMinutes => $composableBuilder(
     column: $table.dailyCommitmentMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get passwordResetCode => $composableBuilder(
+    column: $table.passwordResetCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get passwordResetExpiresAt => $composableBuilder(
+    column: $table.passwordResetExpiresAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -11046,6 +11185,16 @@ class $$UsersTableOrderingComposer
     column: $table.dailyCommitmentMinutes,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get passwordResetCode => $composableBuilder(
+    column: $table.passwordResetCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get passwordResetExpiresAt => $composableBuilder(
+    column: $table.passwordResetExpiresAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UsersTableAnnotationComposer
@@ -11123,6 +11272,16 @@ class $$UsersTableAnnotationComposer
     column: $table.dailyCommitmentMinutes,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get passwordResetCode => $composableBuilder(
+    column: $table.passwordResetCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get passwordResetExpiresAt => $composableBuilder(
+    column: $table.passwordResetExpiresAt,
+    builder: (column) => column,
+  );
 }
 
 class $$UsersTableTableManager
@@ -11170,6 +11329,8 @@ class $$UsersTableTableManager
                 Value<String?> batch = const Value.absent(),
                 Value<int?> targetYear = const Value.absent(),
                 Value<int?> dailyCommitmentMinutes = const Value.absent(),
+                Value<String?> passwordResetCode = const Value.absent(),
+                Value<DateTime?> passwordResetExpiresAt = const Value.absent(),
               }) => UsersCompanion(
                 id: id,
                 email: email,
@@ -11188,6 +11349,8 @@ class $$UsersTableTableManager
                 batch: batch,
                 targetYear: targetYear,
                 dailyCommitmentMinutes: dailyCommitmentMinutes,
+                passwordResetCode: passwordResetCode,
+                passwordResetExpiresAt: passwordResetExpiresAt,
               ),
           createCompanionCallback:
               ({
@@ -11208,6 +11371,8 @@ class $$UsersTableTableManager
                 Value<String?> batch = const Value.absent(),
                 Value<int?> targetYear = const Value.absent(),
                 Value<int?> dailyCommitmentMinutes = const Value.absent(),
+                Value<String?> passwordResetCode = const Value.absent(),
+                Value<DateTime?> passwordResetExpiresAt = const Value.absent(),
               }) => UsersCompanion.insert(
                 id: id,
                 email: email,
@@ -11226,6 +11391,8 @@ class $$UsersTableTableManager
                 batch: batch,
                 targetYear: targetYear,
                 dailyCommitmentMinutes: dailyCommitmentMinutes,
+                passwordResetCode: passwordResetCode,
+                passwordResetExpiresAt: passwordResetExpiresAt,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -1,8 +1,8 @@
-import 'dart:math';
+import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../database/drift_database.dart' as db;
 import '../config/app_config.dart';
 import 'email_service.dart';
@@ -10,295 +10,199 @@ import 'email_service.dart';
 class AuthService {
   final db.AppDatabase _db;
   final EmailService? _emailService;
-  final FlutterSecureStorage _secureStorage;
-  final Map<String, DateTime> _lastAuthAttempts = {};
+  static const _resetCodeTTL = Duration(minutes: 15);
 
-  AuthService(this._db, [this._emailService, FlutterSecureStorage? secureStorage])
-      : _secureStorage = secureStorage ?? const FlutterSecureStorage();
-
-  bool _isRateLimited(String identifier, {int cooldownSeconds = 3}) {
-    final now = DateTime.now();
-    final last = _lastAuthAttempts[identifier];
-    if (last != null && now.difference(last).inSeconds < cooldownSeconds) {
-      return true;
-    }
-    _lastAuthAttempts[identifier] = now;
-    return false;
-  }
-
-  supabase.SupabaseClient? get _supabaseClient =>
-      AppConfig.enableCloudAuth && AppConfig.isCloudAuthConfigured
-          ? supabase.Supabase.instance.client
-          : null;
-
-  bool get _cloudAuthEnabled => _supabaseClient != null;
-
-  Future<void> _upsertLocalUser({
-    required String email,
-    required String username,
-    String? fullName,
-  }) async {
-    final existing = await _db.getUserByEmail(email);
-
-    if (existing != null) {
-      await (_db.update(_db.users)..where((t) => t.id.equals(existing.id))).write(
-        db.UsersCompanion(
-          email: Value(email),
-          username: Value(username),
-          fullName: Value(fullName),
-        ),
-      );
-      return;
-    }
-
-    await _db.registerUser(
-      db.UsersCompanion.insert(
-        username: username,
-        email: Value(email),
-        fullName: Value(fullName),
-        passwordHash: const Value('cloud_auth'),
-      ),
-    );
-  }
-
-  Future<({bool success, String message})> sendOtp(String email) async {
-    if (_isRateLimited('otp_$email', cooldownSeconds: 10)) {
-      return (success: false, message: 'Please wait a few seconds before requesting another OTP');
-    }
-
-    if (!_cloudAuthEnabled) {
-      return (success: false, message: AppConfig.cloudAuthHelpText);
-    }
-
-    try {
-      final client = _supabaseClient;
-      if (client == null) return (success: false, message: 'Cloud auth disabled');
-      await client.auth.signInWithOtp(
-        email: email,
-        shouldCreateUser: true,
-      );
-      return (success: true, message: 'OTP sent to $email');
-    } catch (e) {
-      return (success: false, message: 'Error: $e');
-    }
-  }
-
-  Future<({bool success, String message, db.User? user})> verifyOtp(
-    String email,
-    String code,
-  ) async {
-    final client = _supabaseClient;
-    if (client == null) return (success: false, message: 'Cloud auth disabled', user: null);
-
-    try {
-      final response = await client.auth.verifyOTP(
-        email: email,
-        token: code,
-        type: supabase.OtpType.email,
-      );
-
-      final user = response.user;
-      if (user == null) return (success: false, message: 'Verification failed', user: null);
-
-      final username = user.userMetadata?['username'] ?? email.split('@').first;
-      await _upsertLocalUser(email: email, username: username);
-
-      final localUser = await _db.getUserByEmail(email);
-      return (success: true, message: 'Verified', user: localUser);
-    } catch (e) {
-      return (success: false, message: 'Error: $e', user: null);
-    }
-  }
+  AuthService(this._db, [this._emailService]);
 
   Future<({bool success, String message, db.User? user})> register({
     required String email,
-    required String username,
     required String password,
+    String? username,
     String? fullName,
   }) async {
-    if (_isRateLimited('reg_$email', cooldownSeconds: 5)) {
-      return (success: false, message: 'Too many requests. Please try again shortly.', user: null);
+    final trimmedEmail = email.trim().toLowerCase();
+    final trimmedUsername =
+        (username ?? trimmedEmail.split('@').first).trim();
+
+    if (trimmedEmail.isEmpty || password.length < 6) {
+      return (success: false, message: 'Enter a valid email and a password with at least 6 characters.', user: null);
     }
 
-    if (!_cloudAuthEnabled) return (success: false, message: 'Cloud auth disabled', user: null);
-
-    try {
-      final response = await _supabaseClient!.auth.signUp(
-        email: email,
-        password: password,
-        data: {'username': username, 'full_name': fullName},
-      );
-
-      if (response.user == null) return (success: false, message: 'Signup failed', user: null);
-
-      await _upsertLocalUser(email: email, username: username, fullName: fullName);
-      final localUser = await _db.getUserByEmail(email);
-      return (success: true, message: 'Registered', user: localUser);
-    } catch (e) {
-      return (success: false, message: 'Error: $e', user: null);
+    final existing = await _db.getUserByEmail(trimmedEmail);
+    if (existing != null) {
+      return (success: false, message: 'An account with this email already exists.', user: null);
     }
+
+    final passwordHash = _hashPassword(password);
+    final now = DateTime.now();
+
+    final user = await _db.registerUser(
+      db.UsersCompanion.insert(
+        email: Value(trimmedEmail),
+        username: trimmedUsername,
+        fullName: Value(fullName),
+        passwordHash: Value(passwordHash),
+        createdAt: Value(now),
+        lastLogin: Value(now),
+      ),
+    );
+
+    return (success: true, message: 'Registered', user: user);
   }
 
   Future<({bool success, String message, db.User? user})> login({
     required String email,
     required String password,
   }) async {
-    if (_isRateLimited('login_$email', cooldownSeconds: 2)) {
-      return (success: false, message: 'Too many login attempts. Please wait.', user: null);
+    final trimmedEmail = email.trim().toLowerCase();
+
+    final user = await _db.getUserByEmail(trimmedEmail);
+    if (user == null) {
+      return (success: false, message: 'No account found for this email.', user: null);
     }
 
-    if (!_cloudAuthEnabled) return (success: false, message: 'Cloud auth disabled', user: null);
-
-    try {
-      final response = await _supabaseClient!.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-
-      if (response.user == null) return (success: false, message: 'Login failed', user: null);
-
-      final user = response.user!;
-      final username = user.userMetadata?['username'] ?? email.split('@').first;
-      await _upsertLocalUser(email: email, username: username);
-
-      final localUser = await _db.getUserByEmail(email);
-      
-      // Check 2FA
-      if (localUser != null && localUser.isTwoFactorEnabled == true) {
-        // Sign out the Supabase session — 2FA must be verified first.
-        await _supabaseClient!.auth.signOut();
-        return (success: true, message: '2FA_REQUIRED', user: localUser);
-      }
-
-      return (success: true, message: 'Logged in', user: localUser);
-    } catch (e) {
-      return (success: false, message: 'Error: $e', user: null);
+    if (user.passwordHash == null || user.passwordHash!.isEmpty) {
+      return (success: false, message: 'This account was created with social sign-in. Use the original sign-in method or reset credentials.', user: null);
     }
+
+    final hash = _hashPassword(password);
+    if (!_constantTimeEquals(hash, user.passwordHash!)) {
+      return (success: false, message: 'Incorrect password.', user: null);
+    }
+
+    await _db.updateLastLogin(user.id);
+    final updated = await _db.getUserById(user.id);
+    return (success: true, message: 'Logged in', user: updated);
   }
 
   Future<db.User?> tryAutoLogin() async {
-    if (!_cloudAuthEnabled) return null;
-    final session = _supabaseClient!.auth.currentSession;
+    final session = await _loadSession();
     if (session == null) return null;
 
-    final email = session.user.email;
-    if (email == null) return null;
-
-    final user = await _db.getUserByEmail(email);
-    // If 2FA was enabled after login, sign out and force re-auth.
-    if (user != null && user.isTwoFactorEnabled == true) {
-      await _supabaseClient!.auth.signOut();
+    final user = await _db.getUserById(session['userId'] as int);
+    if (user == null) {
+      await _clearSession();
       return null;
     }
     return user;
   }
 
   Future<void> logout() async {
-    if (_cloudAuthEnabled) {
-      await _supabaseClient!.auth.signOut();
-    }
+    await _clearSession();
   }
 
-  Future<({bool success, String message})> deleteAccount() async {
-    if (!_cloudAuthEnabled) return (success: false, message: 'Cloud auth disabled');
-    try {
-      // 1. Clear local data
-      await _db.clearAllProgress();
-      // 2. Sign out
-      await logout();
-      return (success: true, message: 'Data cleared and signed out');
-    } catch (e) {
-      return (success: false, message: 'Error: $e');
-    }
-  }
-
-  static const Duration _otpLifetime = Duration(minutes: 10);
-  static const String _secure2FACodeKey = 'neet_mitos_2fa_code';
-  static const String _secure2FAExpiryKey = 'neet_mitos_2fa_expiry';
-
-  Future<({bool success, String message})> send2FAEmail(String email) async {
-    final service = _emailService;
-    if (service == null) return (success: false, message: 'Email service missing');
-    final otp = _generateOtp();
-    final expiry = DateTime.now().add(_otpLifetime);
-    await _secureStorage.write(key: _secure2FACodeKey, value: otp);
-    await _secureStorage.write(key: _secure2FAExpiryKey, value: expiry.toIso8601String());
-    final res = await service.sendOtpEmail(to: email, otp: otp, purpose: '2FA');
-    return (success: res.success, message: res.message);
-  }
-
-  Future<({bool success, String message, db.User? user})> verify2FA(String email, String code) async {
-    final pendingCode = await _secureStorage.read(key: _secure2FACodeKey);
-    final expiryStr = await _secureStorage.read(key: _secure2FAExpiryKey);
-    final expiry = expiryStr != null ? DateTime.tryParse(expiryStr) : null;
-
-    if (pendingCode == null ||
-        expiry == null ||
-        DateTime.now().isAfter(expiry)) {
-      await _secureStorage.delete(key: _secure2FACodeKey);
-      await _secureStorage.delete(key: _secure2FAExpiryKey);
-      return (success: false, message: 'Code expired. Please request a new one.', user: null);
+  Future<({bool success, String message})> sendPasswordReset({
+    required String email,
+  }) async {
+    final trimmedEmail = email.trim().toLowerCase();
+    final user = await _db.getUserByEmail(trimmedEmail);
+    if (user == null) {
+      // Don't reveal whether email exists.
+      return (success: true, message: 'If an account exists, a reset code has been sent.');
     }
 
-    if (code != pendingCode) {
-      return (success: false, message: 'Invalid code', user: null);
+    if (_emailService == null || !_emailService.isConfigured) {
+      return (success: false, message: 'Password reset email is not configured in Settings.');
     }
 
-    await _secureStorage.delete(key: _secure2FACodeKey);
-    await _secureStorage.delete(key: _secure2FAExpiryKey);
-    final user = await _db.getUserByEmail(email);
-    return (success: true, message: 'Verified', user: user);
-  }
-
-  String _generateOtp() {
-    final random = Random.secure();
-    return (100000 + random.nextInt(900000)).toString();
-  }
-
-  Future<({bool success, String message})> resetPassword(String email) async {
-    if (!_cloudAuthEnabled) return (success: false, message: 'Cloud auth disabled');
-    try {
-      await _supabaseClient!.auth.resetPasswordForEmail(email);
-      return (success: true, message: 'Reset link sent');
-    } catch (e) {
-      return (success: false, message: 'Error: $e');
-    }
-  }
-
-  Future<({bool success, String message, db.User? user})> signInWithMicrosoft() async {
-    if (!_cloudAuthEnabled) {
-      return (success: false, message: 'Cloud auth is not configured', user: null);
-    }
+    final code = _generateNumericCode(6);
+    final expiry = DateTime.now().add(_resetCodeTTL);
 
     try {
-      final client = _supabaseClient!;
-      final bool launched = await client.auth.signInWithOAuth(
-        supabase.OAuthProvider.azure,
-      );
-
-      if (!launched) {
-        return (success: false, message: 'Could not launch Microsoft authentication', user: null);
-      }
-
-      final session = client.auth.currentSession;
-      if (session != null) {
-        final email = session.user.email ?? 'user@microsoft.com';
-        final username = email.split('@').first;
-        final fullName = session.user.userMetadata?['full_name'] ??
-            session.user.userMetadata?['name'] ??
-            username;
-        await _upsertLocalUser(email: email, username: username, fullName: fullName);
-        final localUser = await _db.getUserByEmail(email);
-        return (success: true, message: 'Signed in with Microsoft', user: localUser);
-      }
-
-      return (
-        success: true,
-        message: 'Redirecting to Microsoft sign-in...',
-        user: null,
+      await _emailService.sendTransactionalEmail(
+        to: trimmedEmail,
+        subject: 'Reset your NEET Mitos password',
+        html: _buildResetEmailHtml(user.username, code),
+        text: 'Your NEET Mitos password reset code is: $code. It expires in 15 minutes.',
       );
     } catch (e) {
-      return (success: false, message: 'Microsoft sign-in error: $e', user: null);
+      return (success: false, message: 'Could not send reset email. Please try again later.');
     }
+
+    await _db.updateUserPasswordReset(user.id, code, expiry);
+    return (success: true, message: 'Reset code sent to $trimmedEmail');
+  }
+
+  Future<({bool success, String message, db.User? user})> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    final trimmedEmail = email.trim().toLowerCase();
+    final user = await _db.getUserByEmail(trimmedEmail);
+    if (user == null) {
+      return (success: false, message: 'Invalid request.', user: null);
+    }
+
+    final reset = await _db.getActivePasswordReset(user.id);
+    if (reset == null ||
+        reset.code != code ||
+        reset.expiresAt.isBefore(DateTime.now())) {
+      return (success: false, message: 'Invalid or expired reset code.', user: null);
+    }
+
+    final passwordHash = _hashPassword(newPassword);
+    await _db.updateUserPassword(user.id, passwordHash);
+    await _db.clearPasswordReset(user.id);
+
+    final updated = await _db.getUserById(user.id);
+    return (success: true, message: 'Password updated', user: updated);
+  }
+
+  Future<void> saveSession(int userId) async {
+    final prefs = await _loadPrefs();
+    await prefs.setInt('auth_user_id', userId);
+  }
+
+  // ============= INTERNALS =============
+
+  static String _hashPassword(String password) {
+    final bytes = utf8.encode('neet_mitos_local:$password');
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
+  static bool _constantTimeEquals(String a, String b) {
+    final aBytes = utf8.encode(a);
+    final bBytes = utf8.encode(b);
+    var result = 0;
+    for (var i = 0; i < aBytes.length && i < bBytes.length; i++) {
+      result |= aBytes[i] ^ bBytes[i];
+    }
+    return result == 0 && aBytes.length == bBytes.length;
+  }
+
+  static String _generateNumericCode(int length) {
+    final random = DateTime.now().microsecondsSinceEpoch % 1000000;
+    final padded = random.toString().padLeft(6, '0');
+    return padded.substring(0, length);
+  }
+
+  Future<SharedPreferences> _loadPrefs() async {
+    return await AppConfig.sharedPreferences;
+  }
+
+  Future<Map<String, dynamic>?> _loadSession() async {
+    final prefs = await _loadPrefs();
+    final userId = prefs.getInt('auth_user_id');
+    if (userId == null) return null;
+    return {'userId': userId};
+  }
+
+  Future<void> _clearSession() async {
+    final prefs = await _loadPrefs();
+    await prefs.remove('auth_user_id');
+  }
+
+  String _buildResetEmailHtml(String username, String code) {
+    return '''
+      <div style="font-family: Arial, sans-serif; color: #1f2937;">
+        <h2 style="color: #2563eb;">Reset your NEET Mitos password</h2>
+        <p>Hi $username,</p>
+        <p>Use this code to reset your password:</p>
+        <p style="font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #111827;">$code</p>
+        <p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>
+      </div>
+    ''';
   }
 }

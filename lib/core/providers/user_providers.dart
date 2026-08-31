@@ -11,7 +11,6 @@ import '../services/exam_engine_service.dart';
 import '../services/mark_booster_service.dart';
 import '../services/spaced_repetition_service.dart';
 import 'core_providers.dart';
-import 'auth_providers.dart';
 import 'content_providers.dart';
 import 'quiz_providers.dart';
 import 'spaced_providers.dart';
@@ -224,8 +223,6 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
 
       _ref.invalidate(errorBookProvider);
       _ref.read(dailyGoalProvider.notifier).incrementProgress(attempt.totalQuestions);
-      _ref.read(cloudSyncServiceProvider)?.syncAll();
-
     } catch (e) {
       debugPrint('❌ Error saving quiz attempt: $e');
     }
@@ -307,7 +304,6 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
         attemptedAt: attempt.attemptedAt,
       );
     }
-    _ref.read(cloudSyncServiceProvider)?.syncAll();
   }
 
   Future<void> _applyTopicProgress({
@@ -382,7 +378,6 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
           isCompleted: Value(updated.isCompleted),
         ),
       );
-      _ref.read(cloudSyncServiceProvider)?.syncAll();
     } catch (e) {
       debugPrint('❌ Error recording topic view: $e');
     }

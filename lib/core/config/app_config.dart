@@ -1,6 +1,14 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppConfig {
+  static SharedPreferences? _prefs;
+
+  static Future<SharedPreferences> get sharedPreferences async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
+
   static String? _env(String key) {
     try {
       return dotenv.env[key];
@@ -23,10 +31,8 @@ class AppConfig {
   static String get cloudAuthHelpText =>
       'Set SUPABASE_URL and SUPABASE_ANON_KEY in .env to enable free cloud sign-in. You can still continue as guest.';
 
-  // ---------------------------------------------------------------------------
-  // Local-first flags: cloud features are OPTIONAL.
-  // enableCloudAuth auto-enables when credentials are present in .env or dart-define.
-  // ---------------------------------------------------------------------------
+  // Cloud features remain optional. Auth auto-enables when credentials are
+  // present in .env or supplied via dart-define.
   static bool get enableCloudAuth => isCloudAuthConfigured;
   static const bool enableCloudSync = false;
   static const bool enableAiProxy = false;
@@ -36,4 +42,3 @@ class AppConfig {
 
   static String? get googleServerClientId => _env('GOOGLE_SERVER_CLIENT_ID');
 }
-

@@ -6,7 +6,7 @@ import '../services/connectivity_service.dart';
 import 'service_providers.dart';
 
 final mlServiceProvider = Provider<MLService>((ref) {
-  final service = MLService();
+  final service = createMLService();
   service.initializeModels();
   return service;
 });
