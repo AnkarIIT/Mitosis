@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
@@ -82,8 +84,8 @@ class AuthService {
       );
     }
 
-    final hash = _hashPassword(password);
-    if (!_constantTimeEquals(hash, user.passwordHash!)) {
+    final hash = _verifyPassword(password, user.passwordHash!);
+    if (!hash) {
       return (success: false, message: 'Incorrect password.', user: null);
     }
 
@@ -163,7 +165,7 @@ class AuthService {
 
     final reset = await _db.getActivePasswordReset(user.id);
     if (reset == null ||
-        reset.code != code ||
+        !_constantTimeEquals(reset.code, code) ||
         reset.expiresAt.isBefore(DateTime.now())) {
       return (
         success: false,
@@ -187,10 +189,88 @@ class AuthService {
 
   // ============= INTERNALS =============
 
+  // ---------------------------------------------------------------------------
+  // Password hashing: PBKDF2-HMAC-SHA256 with a random per-user salt.
+  // Stored format: "pbkdf2-sha256$<iterations>$<base64salt>$<base64key>".
+  // Legacy "sha256('neet_mitos_local:$password')" hashes remain verifiable so
+  // accounts created before this change can still sign in.
+  // ---------------------------------------------------------------------------
+  static const int _pbkdf2Iterations = 600000;
+  static const int _saltLength = 16;
+  static const int _keyLength = 32;
+
   static String _hashPassword(String password) {
-    final bytes = utf8.encode('neet_mitos_local:$password');
-    final digest = sha256.convert(bytes);
-    return digest.toString();
+    final salt = _randomBytes(_saltLength);
+    final key = _pbkdf2Sha256(
+      utf8.encode(password),
+      salt,
+      _pbkdf2Iterations,
+      _keyLength,
+    );
+    return 'pbkdf2-sha256\$$_pbkdf2Iterations\$'
+        '${base64Encode(salt)}\$${base64Encode(key)}';
+  }
+
+  static bool _verifyPassword(String password, String stored) {
+    final parts = stored.split('\$');
+    if (parts.length == 4 && parts[0] == 'pbkdf2-sha256') {
+      final iterations = int.tryParse(parts[1]) ?? _pbkdf2Iterations;
+      final salt = base64Decode(parts[2]);
+      final expected = base64Decode(parts[3]);
+      final actual = _pbkdf2Sha256(
+        utf8.encode(password),
+        salt,
+        iterations,
+        expected.length,
+      );
+      return _constantTimeEqualsBytes(expected, actual);
+    }
+
+    // Legacy format: plain SHA-256 of "neet_mitos_local:$password".
+    final legacy = sha256.convert(utf8.encode('neet_mitos_local:$password'));
+    return _constantTimeEquals(legacy.toString(), stored);
+  }
+
+  static List<int> _randomBytes(int length) {
+    final random = Random.secure();
+    return List<int>.generate(length, (_) => random.nextInt(256));
+  }
+
+  static List<int> _pbkdf2Sha256(
+    List<int> password,
+    List<int> salt,
+    int iterations,
+    int keyLength,
+  ) {
+    final hmac = Hmac(sha256, password);
+    final numBlocks = (keyLength / 32).ceil();
+    final output = <int>[];
+
+    for (var block = 1; block <= numBlocks; block++) {
+      final blockIndexBytes = ByteData(4)..setUint32(0, block, Endian.big);
+      final blockIndex = blockIndexBytes.buffer.asUint8List();
+      final u0 = hmac.convert([...salt, ...blockIndex]).bytes;
+      var u = List<int>.from(u0);
+      final t = List<int>.from(u);
+
+      for (var i = 1; i < iterations; i++) {
+        u = hmac.convert(u).bytes;
+        for (var j = 0; j < t.length; j++) {
+          t[j] ^= u[j];
+        }
+      }
+      output.addAll(t);
+    }
+    return output.sublist(0, keyLength);
+  }
+
+  static bool _constantTimeEqualsBytes(List<int> a, List<int> b) {
+    var result = a.length ^ b.length;
+    final maxLen = a.length > b.length ? a.length : b.length;
+    for (var i = 0; i < maxLen; i++) {
+      result |= (i < a.length ? a[i] : 0) ^ (i < b.length ? b[i] : 0);
+    }
+    return result == 0;
   }
 
   static bool _constantTimeEquals(String a, String b) {
@@ -204,9 +284,12 @@ class AuthService {
   }
 
   static String _generateNumericCode(int length) {
-    final random = DateTime.now().microsecondsSinceEpoch % 1000000;
-    final padded = random.toString().padLeft(6, '0');
-    return padded.substring(0, length);
+    final random = Random.secure();
+    final buffer = StringBuffer();
+    for (var i = 0; i < length; i++) {
+      buffer.write(random.nextInt(10));
+    }
+    return buffer.toString();
   }
 
   Future<SharedPreferences> _loadPrefs() async {
