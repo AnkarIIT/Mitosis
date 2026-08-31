@@ -23,6 +23,7 @@ import '../../features/test_series/question_paper_selector.dart';
 import '../../features/test_series/pdf_picker_screen.dart';
 import '../../features/exam_engine/cbt_test_screen.dart';
 import '../../features/exam_engine/cbt_result_screen.dart';
+import '../../features/exam_engine/cbt_instructions_screen.dart';
 import '../../core/services/exam_engine_service.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/services/exam_checkpoint_service.dart';
@@ -44,6 +45,8 @@ import '../../features/study_modules/allen_study_module_screen.dart';
 import '../../features/dpp/dpp_screen.dart';
 import '../../features/dpp/dpp_attempt_screen.dart';
 import '../../features/dpp/dpp_neet_screen.dart';
+import '../../features/pyq/pyq_download_screen.dart';
+import '../../features/test/test_module_screen.dart';
 
 const _publicRoutes = {'/auth', '/terms', '/privacy', '/loading'};
 
@@ -223,6 +226,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/cbt/instructions',
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final config = extra['config'] as ExamConfig? ?? ExamConfig.neet();
+          final questionPool = extra['questionPool'] as List<Question>? ?? [];
+          return CbtInstructionsScreen(
+            config: config,
+            questionPool: questionPool,
+          );
+        },
+      ),
+      GoRoute(
         path: '/cbt',
         builder: (_, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
@@ -347,6 +362,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           final subject = state.pathParameters['subject'] ?? 'physics';
           return DppScreen(subject: subject);
         },
+      ),
+      GoRoute(
+        path: '/pyq',
+        builder: (_, _) => const PyqDownloadScreen(),
+      ),
+      GoRoute(
+        path: '/test',
+        builder: (_, _) => const TestModuleScreen(),
       ),
     ],
   );
