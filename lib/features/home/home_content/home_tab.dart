@@ -166,6 +166,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
             _buildResumeMockCard(context),
             // CBT Mock Test CTA
             _buildCbtMockTestCard(context, subjects),
+            _buildAllenStudyModulesCard(context),
             _buildDppBanner(context),
             if (dueCount > 0) ...[
               const SizedBox(height: 12),
@@ -1140,6 +1141,69 @@ class _HomeTabState extends ConsumerState<HomeTab>
                   Text(
                     '$dueCount cards due for review',
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white60,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    ).animate().fade(delay: 300.ms, duration: 400.ms);
+  }
+
+  // Allen Study Modules CTA
+  Widget _buildAllenStudyModulesCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push('/study-modules'),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.secondary.withValues(alpha: 0.9),
+              AppColors.secondary.withValues(alpha: 0.7),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.menu_book_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Allen Study Modules',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    'Chapter-wise theory, illustrations & exercises',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),

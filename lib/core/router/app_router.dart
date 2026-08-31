@@ -40,6 +40,7 @@ import '../../features/settings/settings_screen.dart';
 import '../../features/settings/import_questions_screen.dart';
 import '../../features/pdf/ncert_pdf_screen.dart';
 import '../../features/bookmarks/bookmarks_dashboard.dart';
+import '../../features/study_modules/allen_study_module_screen.dart';
 import '../../features/dpp/dpp_screen.dart';
 import '../../features/dpp/dpp_attempt_screen.dart';
 import '../../features/dpp/dpp_neet_screen.dart';
@@ -297,6 +298,26 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const ImportQuestionsScreen(),
       ),
       GoRoute(path: '/study-plan', builder: (_, _) => const StudyPlanScreen()),
+      GoRoute(
+        path: '/study-modules',
+        builder: (_, state) {
+          final subjectId = state.uri.queryParameters['subjectId'];
+          return AllenStudyModuleScreen(initialSubjectId: subjectId);
+        },
+      ),
+      GoRoute(
+        path: '/study-modules/chapter',
+        builder: (_, state) {
+          final subjectId = state.uri.queryParameters['subjectId'] ?? '';
+          final chapterName = state.uri.queryParameters['chapterName'] ?? '';
+          final topicId = state.uri.queryParameters['topicId'] ?? '';
+          return AllenChapterDetailScreen(
+            subjectId: subjectId,
+            chapterName: chapterName,
+            topicId: topicId,
+          );
+        },
+      ),
       GoRoute(
         path: '/dpp/neet',
         builder: (_, _) {
