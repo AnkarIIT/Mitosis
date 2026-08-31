@@ -721,6 +721,8 @@ class CbtResultScreen extends ConsumerWidget {
         answers,
       );
 
+      if (!context.mounted) return;
+
       if (path == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -795,7 +797,7 @@ class CbtResultScreen extends ConsumerWidget {
                   Text('0s', style: Theme.of(context).textTheme.labelSmall),
                   const Spacer(),
                   Text(
-                    '${_formatTime(maxSeconds.toInt())}',
+                    _formatTime(maxSeconds.toInt()),
                     style: Theme.of(context).textTheme.labelSmall,
                   ),
                 ],

@@ -461,11 +461,12 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
       },
       proxy: ref.read(geminiProxyServiceProvider),
       onProgress: (completed, total) {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _seedCompleted = completed;
             _seedTotal = total;
           });
+        }
       },
     );
 

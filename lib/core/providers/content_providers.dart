@@ -161,8 +161,9 @@ final questionsForSubjectProvider =
 
 // ============= CONTENT CATALOG SYNC =============
 final contentSyncServiceProvider = Provider<ContentSyncService?>((ref) {
-  if (!AppConfig.enableCloudAuth || !AppConfig.isCloudAuthConfigured)
+  if (!AppConfig.enableCloudAuth || !AppConfig.isCloudAuthConfigured) {
     return null;
+  }
   try {
     final database = ref.watch(databaseProvider);
     return ContentSyncService(database, supabase.Supabase.instance.client);

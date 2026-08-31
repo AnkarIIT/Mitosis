@@ -405,8 +405,9 @@ class _FlashcardGenerateScreenState
   }
 
   List<NcertBookEntry> _chaptersForSelection() {
-    if (_selectedSubject == null || _selectedClassLevel == null)
+    if (_selectedSubject == null || _selectedClassLevel == null) {
       return const [];
+    }
     return NcertBookCatalog.allEntries
         .where(
           (e) =>

@@ -419,8 +419,9 @@ OUTPUT FORMAT (strict JSON array, no markdown):
       final back = item['back']?.toString().trim();
       final source = item['source']?.toString().trim() ?? '';
 
-      if (front == null || front.isEmpty || back == null || back.isEmpty)
+      if (front == null || front.isEmpty || back == null || back.isEmpty) {
         continue;
+      }
 
       final page = _extractPageNumber(source);
 

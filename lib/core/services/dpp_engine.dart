@@ -154,8 +154,9 @@ class DppEngine {
   static String _normalizeDifficulty(String difficulty) {
     final d = difficulty.trim().toLowerCase();
     if (d == 'easy' || d == 'simple') return 'Easy';
-    if (d == 'medium' || d == 'moderate' || d == 'avg' || d == 'average')
+    if (d == 'medium' || d == 'moderate' || d == 'avg' || d == 'average') {
       return 'Medium';
+    }
     if (d == 'hard' || d == 'difficult' || d == 'tough') return 'Hard';
     return 'Medium'; // default fallback
   }

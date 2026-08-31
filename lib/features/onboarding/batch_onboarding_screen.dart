@@ -390,10 +390,12 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
 
   String _commitmentLabel(int minutes) {
     if (minutes == 30) return '30 min — Light (${_targetLabel(minutes)} q/day)';
-    if (minutes == 60)
+    if (minutes == 60) {
       return '1 hour — Standard (${_targetLabel(minutes)} q/day)';
-    if (minutes == 90)
+    }
+    if (minutes == 90) {
       return '1.5 hours — Intense (${_targetLabel(minutes)} q/day)';
+    }
     return '2+ hours — Extreme (${_targetLabel(minutes)} q/day)';
   }
 

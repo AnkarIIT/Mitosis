@@ -62,7 +62,7 @@ class MitosSectionHeader extends StatelessWidget {
               letterSpacing: 1.2,
             ),
           ),
-          if (trailing != null) trailing!,
+          ?trailing,
         ],
       ),
     );

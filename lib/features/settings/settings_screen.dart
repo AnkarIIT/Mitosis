@@ -279,6 +279,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               await ref.read(userProgressProvider.notifier).clearAllProgress();
+              if (!context.mounted) return;
               context.pop();
               messenger.showSnackBar(
                 const SnackBar(content: Text('Progress has been reset.')),
@@ -309,6 +310,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               final res = await ref.read(authProvider.notifier).deleteAccount();
+              if (!context.mounted) return;
               if (res.success) {
                 context.pop();
                 messenger.showSnackBar(
@@ -443,7 +445,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           isLoading = false;
                           codeSent = success;
                         });
-                        if (success && mounted) {
+                        if (!context.mounted) return;
+                        if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text('Verification code sent to your email.')),
@@ -466,7 +469,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               codeController.text.trim(),
                             );
                         setDialogState(() => isLoading = false);
-                        if (success && mounted) {
+                        if (!context.mounted) return;
+                        if (success) {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -556,7 +560,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           await ref
                               .read(authProvider.notifier)
                               .disable2FA();
-                          if (mounted) {
+                          if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text('Two-factor authentication disabled.')),

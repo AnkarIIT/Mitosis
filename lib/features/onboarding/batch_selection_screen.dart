@@ -61,7 +61,7 @@ class _BatchSelectionScreenState extends ConsumerState<BatchSelectionScreen> {
 
   Widget _buildBatchDropdown() {
     return DropdownButtonFormField<BatchType>(
-      value: _selectedBatch,
+      initialValue: _selectedBatch,
       decoration: const InputDecoration(
         labelText: 'Batch Type',
         border: OutlineInputBorder(),
@@ -99,7 +99,7 @@ class _BatchSelectionScreenState extends ConsumerState<BatchSelectionScreen> {
 
   Widget _buildStudyModeDropdown() {
     return DropdownButtonFormField<StudyMode>(
-      value: _selectedMode,
+      initialValue: _selectedMode,
       decoration: const InputDecoration(
         labelText: 'Study Mode',
         border: OutlineInputBorder(),

@@ -1378,8 +1378,8 @@ class _HomeTabState extends ConsumerState<HomeTab>
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: 4,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (_, __) => Container(
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (_, _) => Container(
                     width: 70,
                     height: 34,
                     decoration: BoxDecoration(
@@ -1406,8 +1406,8 @@ class _HomeTabState extends ConsumerState<HomeTab>
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: 3,
-                  separatorBuilder: (_, __) => const SizedBox(width: 14),
-                  itemBuilder: (_, __) => Container(
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
+                  itemBuilder: (_, _) => Container(
                     width: 155,
                     decoration: BoxDecoration(
                       color: blockColor,

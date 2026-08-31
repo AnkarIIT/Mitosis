@@ -48,6 +48,8 @@ class DppNeetScreen extends ConsumerWidget {
                     forceRefresh: true,
                   );
 
+                  if (!context.mounted) return;
+
                   if (result.questions.isNotEmpty) {
                     await GoRouter.of(context).push(
                       '/dpp/attempt',

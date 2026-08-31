@@ -601,20 +601,14 @@ class AuthService {
         ? 'Use this code to enable two-factor authentication on your NEET Mitos account:'
         : 'Use this code to verify your login:';
 
-    return '<div style="font-family: Arial, sans-serif; color: #1f2937;">'
-            '<h2 style="color: #2563eb;">' +
-        title +
-        '</h2>'
-            '<p>Hi ' +
-        username +
-        ',</p>'
-            '<p>' +
-        body +
-        '</p>'
-            '<p style="font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #111827;">' +
-        code +
-        '</p>'
-            '<p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>'
-            '</div>';
+    return '''
+      <div style="font-family: Arial, sans-serif; color: #1f2937;">
+        <h2 style="color: #2563eb;">$title</h2>
+        <p>Hi $username,</p>
+        <p>$body</p>
+        <p style="font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #111827;">$code</p>
+        <p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>
+      </div>
+    ''';
   }
 }
