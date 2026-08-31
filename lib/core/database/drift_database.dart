@@ -54,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 26;
+  int get schemaVersion => 27;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -307,6 +307,11 @@ class AppDatabase extends _$AppDatabase {
           (users as dynamic).passwordResetExpiresAt,
         );
       }
+      if (from < 27) {
+        // Email OTP two-factor authentication fields.
+        await _addColumnSafely(m, users, (users as dynamic).twoFactorCode);
+        await _addColumnSafely(m, users, (users as dynamic).twoFactorExpiresAt);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign keys
@@ -387,7 +392,11 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  Future<void> setTwoFactorCode(int userId, String code, DateTime expiresAt) async {
+  Future<void> setTwoFactorCode(
+    int userId,
+    String code,
+    DateTime expiresAt,
+  ) async {
     await (update(users)..where((t) => t.id.equals(userId))).write(
       UsersCompanion(
         twoFactorCode: Value(code),
@@ -405,11 +414,11 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  Future<({int userId, String code, DateTime expiresAt})?> getActiveTwoFactorCode(
-    int userId,
-  ) async {
-    final row = await (select(users)..where((t) => t.id.equals(userId)))
-        .getSingleOrNull();
+  Future<({int userId, String code, DateTime expiresAt})?>
+  getActiveTwoFactorCode(int userId) async {
+    final row = await (select(
+      users,
+    )..where((t) => t.id.equals(userId))).getSingleOrNull();
     if (row == null ||
         row.twoFactorCode == null ||
         row.twoFactorExpiresAt == null) {
