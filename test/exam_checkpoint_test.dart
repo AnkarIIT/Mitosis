@@ -105,5 +105,34 @@ void main() {
       expect(restored.breakDeadlineEpochMs, 1893495800000);
       expect(restored.phase, 'break_');
     });
+
+    test('violations default to 0 when absent (backward compatible)', () {
+      final cp = _sample();
+      expect(cp.violations, 0);
+    });
+
+    test('violations survive a JSON round-trip', () {
+      final cp = ExamCheckpoint(
+        attemptId: 'a',
+        configJson: ExamConfig.neet().toJson(),
+        sectionQuestionIds: const [
+          ['1'],
+        ],
+        answersByIndex: const {},
+        flagged: const [],
+        visited: const [0],
+        currentIndex: 0,
+        currentSection: 0,
+        phase: 'taking',
+        deadlineEpochMs: 1893499200000,
+        startedAtEpochMs: 1893495600000,
+        savedAtEpochMs: 1893495700000,
+        violations: 3,
+      );
+      final restored = ExamCheckpoint.fromJson(
+        jsonDecode(jsonEncode(cp.toJson())) as Map<String, dynamic>,
+      );
+      expect(restored.violations, 3);
+    });
   });
 }
