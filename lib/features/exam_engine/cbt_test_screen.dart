@@ -124,15 +124,6 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     final resume = widget.resumeFrom;
     final rebuilt = resume != null ? _rebuildSections(resume) : null;
 
-    // Check if we're replaying from a route with a seed
-    final routeExtra =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final replaySeed = routeExtra?['seed'] as int?;
-    final replayConfig = routeExtra?['config'] as ExamConfig?;
-    final replayQuestionPool = routeExtra?['questionPool'] as List<Question>?;
-
-    final bool isReplay = replaySeed != null;
-
     if (resume != null && rebuilt != null) {
       _attemptId = resume.attemptId;
       _seed = resume.attemptId.hashCode;
@@ -155,24 +146,6 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _flagged.addAll(resume.flagged);
       _visited.addAll(resume.visited);
       _violations = resume.violations;
-    } else if (isReplay) {
-      final seed = replaySeed;
-      _attemptId = 'cbt_replay_${DateTime.now().millisecondsSinceEpoch}';
-      _seed = seed;
-      _startedAt = DateTime.now();
-      final pool = replayQuestionPool ?? widget.questionPool;
-      final config = replayConfig ?? widget.config;
-      _sectionQuestions = ExamEngineService.allocateQuestions(
-        pool,
-        config,
-        seed: _seed,
-        excludedIds: _excludedIds,
-      );
-      _deadline = DateTime.now().add(
-        Duration(seconds: config.totalDurationSeconds),
-      );
-      // Use the replay seed for the allocation
-      _seed = seed;
     } else {
       _attemptId = 'cbt_${DateTime.now().millisecondsSinceEpoch}';
       _seed = DateTime.now().millisecondsSinceEpoch;
