@@ -27,6 +27,10 @@ class ExamCheckpoint {
   final int startedAtEpochMs;
   final int savedAtEpochMs;
 
+  /// Count of proctoring violations (app switched away / backgrounded) during
+  /// the active test. Persisted so they survive a crash or resume.
+  final int violations;
+
   const ExamCheckpoint({
     required this.attemptId,
     required this.configJson,
@@ -42,6 +46,7 @@ class ExamCheckpoint {
     required this.savedAtEpochMs,
     this.breakDeadlineEpochMs,
     this.sectionDeadlineEpochMs,
+    this.violations = 0,
   });
 
   ExamConfig get config => ExamConfig.fromJson(configJson);
@@ -67,6 +72,7 @@ class ExamCheckpoint {
     'sectionDeadlineEpochMs': sectionDeadlineEpochMs,
     'startedAtEpochMs': startedAtEpochMs,
     'savedAtEpochMs': savedAtEpochMs,
+    'violations': violations,
   };
 
   factory ExamCheckpoint.fromJson(Map<String, dynamic> json) => ExamCheckpoint(
@@ -88,6 +94,7 @@ class ExamCheckpoint {
     sectionDeadlineEpochMs: (json['sectionDeadlineEpochMs'] as num?)?.toInt(),
     startedAtEpochMs: (json['startedAtEpochMs'] as num).toInt(),
     savedAtEpochMs: (json['savedAtEpochMs'] as num).toInt(),
+    violations: (json['violations'] as num?)?.toInt() ?? 0,
   );
 }
 

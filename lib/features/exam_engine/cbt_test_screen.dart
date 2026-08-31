@@ -13,6 +13,7 @@ import '../../core/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/database/drift_database.dart' as db;
 import '../../core/theme/app_theme.dart';
+import 'on_screen_calculator.dart';
 
 enum _SessionPhase { taking, break_ }
 
@@ -75,6 +76,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   bool _submitted = false;
   bool _confirmDialogOpen = false;
 
+  // Proctoring: fullscreen lock is on while the test is live, and leaving the
+  // app (app-switch / background) during the answering phase counts as an
+  // integrity violation. Count persists across crashes via the checkpoint.
+  int _violations = 0;
+  bool _fullscreenOn = false;
+
   bool get _checkpointable => widget.config.isFullLengthMock;
 
   int get _remainingSeconds {
@@ -104,6 +111,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    _setFullscreen(true);
 
     // Exclude recently seen questions so each mock test feels fresh.
     final seen = ref.read(recentlySeenQuestionIdsProvider(null).future);
@@ -146,6 +154,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       }
       _flagged.addAll(resume.flagged);
       _visited.addAll(resume.visited);
+      _violations = resume.violations;
     } else if (isReplay) {
       final seed = replaySeed;
       _attemptId = 'cbt_replay_${DateTime.now().millisecondsSinceEpoch}';
@@ -221,6 +230,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     WidgetsBinding.instance.removeObserver(this);
     _ticker?.cancel();
     _autosaveTimer?.cancel();
+    _setFullscreen(false);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -230,6 +240,20 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     super.dispose();
   }
 
+  /// Turns the immersive fullscreen lock on (during the test) or off (when the
+  /// screen is disposed) so the user can't peek at other apps' status bar /
+  /// system UI. Restores normal chrome when the test ends.
+  void _setFullscreen(bool on) {
+    if (_fullscreenOn == on) return;
+    _fullscreenOn = on;
+    SystemChrome.setEnabledSystemUIMode(
+      on ? SystemUiMode.immersiveSticky : SystemUiMode.edgeToEdge,
+    );
+    // Re-hide the overlays immediately so the change is visible without a
+    // gesture; immersiveSticky already auto-hides but this makes it snappy.
+    SystemChrome.restoreSystemUIOverlays();
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_questions.isEmpty || _submitted) return;
@@ -237,6 +261,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
+      // Leaving the app during the answering phase is a proctoring violation.
+      // We count it BEFORE backgrounding so a kill/resume can't dodge it.
+      if (_phase == _SessionPhase.taking && !_submitting && !_submitted) {
+        _violations++;
+        if (mounted) setState(() {});
+      }
       // Bank the current question's time and persist before we may be killed.
       _accrueTimeOnLeave();
       _questionEnteredAt = null;
@@ -525,6 +555,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       sectionDeadlineEpochMs: _sectionDeadline?.millisecondsSinceEpoch,
       startedAtEpochMs: _startedAt.millisecondsSinceEpoch,
       savedAtEpochMs: DateTime.now().millisecondsSinceEpoch,
+      violations: _violations,
     );
     // Fire-and-forget; a failed autosave must never interrupt the test.
     ref.read(examCheckpointServiceProvider).save(cp).catchError((_) {});
@@ -542,10 +573,13 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   // Submission
   // ─────────────────────────────────────────────────────────────
 
+  void _openCalculator() {
+    showOnScreenCalculator(context);
+  }
+
   Future<void> _confirmSubmit() async {
     if (_submitting || _submitted) return;
-    _confirmDialogOpen = true;
-    final confirmed = await showDialog<bool>(
+    _confirmDialogOpen = true;    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Submit Test?'),
@@ -758,6 +792,15 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
           ),
           centerTitle: true,
           actions: [
+            if (!_submitting)
+              IconButton(
+                tooltip: 'Calculator',
+                icon: Icon(
+                  Icons.calculate_outlined,
+                  color: AdaptiveColors.textPrimary(context),
+                ),
+                onPressed: () => _openCalculator(),
+              ),
             if (_submitting)
               const Padding(
                 padding: EdgeInsets.only(right: 16),
@@ -846,6 +889,40 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               backgroundColor: AdaptiveColors.divider(context),
               valueColor: AlwaysStoppedAnimation(
                 sectionRemaining < 120 ? AppColors.error : AppColors.primary,
+              ),
+            ),
+          ],
+          if (_violations > 0) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.5),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.gpp_maybe,
+                    size: 14,
+                    color: AppColors.warning,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _violations == 1
+                        ? 'Proctoring: You left the exam once'
+                        : 'Proctoring: You left the exam $_violations times',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AdaptiveColors.textPrimary(context),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
