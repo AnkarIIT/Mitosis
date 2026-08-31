@@ -324,6 +324,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
 
       await _db.clearUserData(user.id);
+      await _authService.deleteCloudAccount(user.id);
       await _authService.logout();
       state = AuthState(status: AuthStatus.unauthenticated);
       return (success: true, message: 'Account deleted');

@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../database/drift_database.dart' as db;
 import '../config/app_config.dart';
 import 'email_service.dart';
@@ -59,6 +62,16 @@ class AuthService {
       ),
     );
 
+    if (user != null) {
+      unawaited(
+        _syncAccountToCloud(
+          localUserId: user.id,
+          email: trimmedEmail,
+          password: password,
+        ),
+      );
+    }
+
     return (success: true, message: 'Registered', user: user);
   }
 
@@ -93,6 +106,15 @@ class AuthService {
 
     await _db.updateLastLogin(user.id);
     final updated = await _db.getUserById(user.id);
+
+    unawaited(
+      _syncAccountToCloud(
+        localUserId: user.id,
+        email: trimmedEmail,
+        password: password,
+      ),
+    );
+
     return (success: true, message: 'Logged in', user: updated);
   }
 
@@ -105,11 +127,138 @@ class AuthService {
       await _clearSession();
       return null;
     }
+
+    // Provision anything missed earlier (e.g. Supabase was still initializing
+    // when the account was registered) once a session is restored.
+    unawaited(_syncProfileFromSession(user));
     return user;
   }
 
   Future<void> logout() async {
     await _clearSession();
+    await _signOutCloud();
+  }
+
+  /// The cloud client is best-effort: only present when credentials are
+  /// configured (`.env`) *and* `Supabase.initialize` has completed. Calls that
+  /// depend on it must tolerate it being null (offline-first).
+  supabase.SupabaseClient? get _supabaseClient {
+    if (!AppConfig.enableCloudAuth) return null;
+    try {
+      return supabase.Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _signOutCloud() async {
+    final client = _supabaseClient;
+    if (client == null) return;
+    try {
+      await client.auth.signOut();
+    } catch (e) {
+      developer.log('Cloud sign-out skipped: $e');
+    }
+  }
+
+  /// Ensures a Supabase auth identity exists and syncs the profile row. Used by
+  /// register/login: signUp first (throws if already registered), then falls
+  /// back to signInWithPassword so pre-existing/legacy accounts get linked too.
+  Future<void> _syncAccountToCloud({
+    required int localUserId,
+    required String email,
+    required String password,
+  }) async {
+    final client = _supabaseClient;
+    if (client == null) return;
+
+    try {
+      supabase.AuthResponse res;
+      try {
+        res = await client.auth.signUp(email: email, password: password);
+      } on supabase.AuthException {
+        res = await client.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
+      }
+      final cloudUser = res.user;
+      if (cloudUser == null) return;
+
+      final localUser = await _db.getUserById(localUserId);
+      if (localUser == null) return;
+
+      if (localUser.supabaseId != cloudUser.id) {
+        await _db.setSupabaseId(localUserId, cloudUser.id);
+      }
+      final linked = await _db.getUserById(localUserId);
+      await _upsertCloudProfile(client, linked ?? localUser);
+    } catch (e) {
+      // Never block local auth on cloud sync problems.
+      developer.log('Cloud account sync skipped: $e');
+    }
+  }
+
+  /// Re-syncs the profile using the already-persisted Supabase session (no
+  /// password needed); used on auto-login so accounts created while the client
+  /// was still initializing get provisioned on the next launch.
+  Future<void> _syncProfileFromSession(db.User user) async {
+    final client = _supabaseClient;
+    final supabaseId = user.supabaseId;
+    if (client == null || supabaseId == null || supabaseId.isEmpty) return;
+    if (client.auth.currentSession == null) return;
+    try {
+      await _upsertCloudProfile(client, user);
+    } catch (e) {
+      developer.log('Cloud profile re-sync skipped: $e');
+    }
+  }
+
+  Future<void> _upsertCloudProfile(
+    supabase.SupabaseClient client,
+    db.User user,
+  ) async {
+    final supabaseId = user.supabaseId;
+    if (supabaseId == null || supabaseId.isEmpty) return;
+    await client.from('profiles').upsert({
+      'id': supabaseId,
+      'email': user.email ?? '',
+      'username': user.username,
+      'full_name': user.fullName,
+      'two_factor_enabled': user.isTwoFactorEnabled,
+      'created_at': user.createdAt.toUtc().toIso8601String(),
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }, onConflict: 'id');
+  }
+
+  Future<void> deleteCloudAccount(int userId) async {
+    final client = _supabaseClient;
+    final user = await _db.getUserById(userId);
+    final supabaseId = user?.supabaseId;
+    if (client == null || supabaseId == null || supabaseId.isEmpty) return;
+    try {
+      await client.from('profiles').delete().eq('id', supabaseId);
+    } catch (e) {
+      developer.log('Cloud profile delete skipped: $e');
+    }
+  }
+
+  Future<void> _syncCloudTwoFactor(int userId, bool enabled) async {
+    final client = _supabaseClient;
+    final user = await _db.getUserById(userId);
+    final supabaseId = user?.supabaseId;
+    if (client == null || supabaseId == null || supabaseId.isEmpty) return;
+    try {
+      await client
+          .from('profiles')
+          .update({
+            'two_factor_enabled': enabled,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', supabaseId);
+    } catch (e) {
+      developer.log('2FA flag sync skipped: $e');
+    }
   }
 
   Future<({bool success, String message})> sendPasswordReset({
@@ -242,12 +391,14 @@ class AuthService {
 
     await _db.updateTwoFactorStatus(user.id, true);
     await _db.clearTwoFactorCode(user.id);
+    unawaited(_syncCloudTwoFactor(user.id, true));
     return (success: true, message: 'Two-factor authentication enabled.');
   }
 
   Future<({bool success, String message})> disable2FA(int userId) async {
     await _db.updateTwoFactorStatus(userId, false);
     await _db.clearTwoFactorCode(userId);
+    unawaited(_syncCloudTwoFactor(userId, false));
     return (success: true, message: 'Two-factor authentication disabled.');
   }
 
@@ -451,11 +602,19 @@ class AuthService {
         : 'Use this code to verify your login:';
 
     return '<div style="font-family: Arial, sans-serif; color: #1f2937;">'
-        '<h2 style="color: #2563eb;">' + title + '</h2>'
-        '<p>Hi ' + username + ',</p>'
-        '<p>' + body + '</p>'
-        '<p style="font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #111827;">' + code + '</p>'
-        '<p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>'
-        '</div>';
+            '<h2 style="color: #2563eb;">' +
+        title +
+        '</h2>'
+            '<p>Hi ' +
+        username +
+        ',</p>'
+            '<p>' +
+        body +
+        '</p>'
+            '<p style="font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #111827;">' +
+        code +
+        '</p>'
+            '<p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>'
+            '</div>';
   }
 }
