@@ -52,3 +52,6 @@ app.*.map.json
 # Environment secrets
 .env
 .env*.local
+
+# Concurrent-agent scratch artifacts (never commit)
+/.pi-subagents/
