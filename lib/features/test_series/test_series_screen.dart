@@ -276,7 +276,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
     }
 
     context.push(
-      '/cbt',
+      '/cbt/instructions',
       extra: {'config': ExamConfig.neet(), 'questionPool': pool},
     );
   }
@@ -651,6 +651,6 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
       durationMinutes: _durationMinutes,
     );
     context.pop();
-    context.push('/cbt', extra: {'config': config, 'questionPool': pool});
+    context.push('/cbt/instructions', extra: {'config': config, 'questionPool': pool});
   }
 }
