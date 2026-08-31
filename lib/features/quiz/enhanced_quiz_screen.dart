@@ -19,6 +19,7 @@ class EnhancedQuizScreen extends ConsumerStatefulWidget {
   final String topicId;
   final String subject;
   final String? testType;
+  final int? timeLimitSeconds; // Total time limit (default: 60s per question)
 
   const EnhancedQuizScreen({
     super.key,
@@ -27,6 +28,7 @@ class EnhancedQuizScreen extends ConsumerStatefulWidget {
     required this.topicId,
     required this.subject,
     this.testType,
+    this.timeLimitSeconds,
   });
 
   @override
@@ -45,6 +47,11 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
 
   bool _hasNavigatedToResults = false;
   bool _showPalette = false;
+  bool _autoSubmitted = false;
+
+  int get _timeLimitSeconds => widget.timeLimitSeconds ?? (widget.questions?.length ?? 10) * 60;
+  int get _remainingSeconds => (_timeLimitSeconds - _elapsedSeconds).clamp(0, _timeLimitSeconds);
+  bool get _isTimeUp => _remainingSeconds <= 0 && _timeLimitSeconds > 0;
 
   @override
   void initState() {
@@ -57,7 +64,10 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         if (widget.questions != null) {
-          ref.read(quizProvider.notifier).initializeQuiz(widget.questions!);
+          ref.read(quizProvider.notifier).initializeQuiz(
+            widget.questions!,
+            timeLimitSeconds: _timeLimitSeconds,
+          );
         } else if (widget.topicId.isNotEmpty) {
           _loadQuestionsFromProvider();
         }
@@ -83,8 +93,51 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
         _elapsedSeconds = _stopwatch.elapsed.inSeconds;
       });
       ref.read(quizProvider.notifier).updateTimeElapsed(_elapsedSeconds);
+
+      // Auto-submit when time runs out
+      if (_isTimeUp && !_autoSubmitted && !ref.read(quizProvider).isCompleted) {
+        _autoSubmitted = true;
+        _handleTimeUp();
+        return false;
+      }
+
       return !ref.read(quizProvider).isCompleted && mounted;
     });
+  }
+
+  void _handleTimeUp() {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Time\'s Up!'),
+        content: const Text('The quiz time has expired. Your answers will be submitted automatically.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _submitQuiz();
+            },
+            child: const Text('Submit Now'),
+          ),
+        ],
+      ),
+    );
+    // Auto-submit after 5 seconds if user doesn't respond
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted && !_hasNavigatedToResults) {
+        _submitQuiz();
+      }
+    });
+  }
+
+  void _submitQuiz() {
+    if (_hasNavigatedToResults) return;
+    _hasNavigatedToResults = true;
+    _stopwatch.stop();
+    ref.read(quizProvider.notifier).completeQuiz();
+    _navigateToResults();
   }
 
   @override
