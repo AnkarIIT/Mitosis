@@ -12,6 +12,7 @@ import '../services/content_sync_service.dart';
 import '../services/question_history_service.dart';
 import '../services/dpp_engine.dart';
 import '../services/mastery_service.dart';
+import '../services/unified_question_pool_service.dart';
 import 'core_providers.dart';
 import '../database/drift_database.dart' as db;
 
@@ -302,4 +303,78 @@ Future<Map<DateTime, double>> _computeWeeklyAccuracy(
   } catch (e) {
     return {};
   }
+}
+
+// ============= UNIFIED QUESTION POOL =============
+
+final unifiedQuestionPoolServiceProvider = Provider<UnifiedQuestionPoolService>((ref) {
+  final database = ref.watch(databaseProvider);
+  final repo = ref.watch(questionRepositoryProvider);
+  final history = ref.watch(questionHistoryServiceProvider);
+  final mastery = ref.watch(masteryServiceProvider);
+  return UnifiedQuestionPoolService(database, repo, history, mastery);
+});
+
+final questionHistoryServiceProvider = Provider<QuestionHistoryService>((ref) {
+  final database = ref.watch(databaseProvider);
+  return QuestionHistoryService(database);
+});
+
+final masteryServiceProvider = Provider<MasteryService>((ref) {
+  final database = ref.watch(databaseProvider);
+  final questionBank = ref.watch(allQuestionsProvider.future);
+  return MasteryService(database, questionBank);
+});
+
+// Adaptive quiz questions with mastery-based selection and anti-repetition
+final adaptiveQuizQuestionsProvider = FutureProvider.family<List<Question>, AdaptiveQuizRequest>((ref, request) async {
+  final poolService = ref.watch(unifiedQuestionPoolServiceProvider);
+  final questionRequest = QuestionRequest(
+    subjects: request.subjects,
+    chapterId: request.chapterId,
+    topicId: request.topicId,
+    count: request.count,
+    easyPercent: request.easyPercent,
+    mediumPercent: request.mediumPercent,
+    hardPercent: request.hardPercent,
+    excludeRecent: request.excludeRecent,
+    applyCooldown: request.applyCooldown,
+    biasWeakTopics: request.biasWeakTopics,
+    useChapterWeights: request.useChapterWeights,
+    deduplicateConcepts: request.deduplicateConcepts,
+    subjectWeights: request.subjectWeights,
+  );
+  return poolService.getQuestions(request: questionRequest);
+});
+
+class AdaptiveQuizRequest {
+  final List<String> subjects;
+  final String? chapterId;
+  final String? topicId;
+  final int count;
+  final int easyPercent;
+  final int mediumPercent;
+  final int hardPercent;
+  final bool excludeRecent;
+  final bool applyCooldown;
+  final bool biasWeakTopics;
+  final bool useChapterWeights;
+  final bool deduplicateConcepts;
+  final Map<String, int>? subjectWeights;
+
+  const AdaptiveQuizRequest({
+    required this.subjects,
+    this.chapterId,
+    this.topicId,
+    required this.count,
+    this.easyPercent = 30,
+    this.mediumPercent = 50,
+    this.hardPercent = 20,
+    this.excludeRecent = true,
+    this.applyCooldown = true,
+    this.biasWeakTopics = true,
+    this.useChapterWeights = true,
+    this.deduplicateConcepts = true,
+    this.subjectWeights,
+  });
 }

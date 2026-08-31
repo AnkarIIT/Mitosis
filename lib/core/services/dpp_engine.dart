@@ -7,6 +7,54 @@ import '../models/question_model.dart';
 import '../services/question_history_service.dart';
 import '../services/mastery_service.dart';
 
+/// NEET high-yield chapter weights based on PYQ analysis (questions per year).
+/// Higher weight = more likely to appear in NEET, so we boost these chapters.
+/// Keys are "Subject:Chapter" to avoid collisions (e.g., Biomolecules appears in both Bio & Chem).
+const Map<String, int> _neetChapterWeights = {
+  // Biology - High yield (10-12 questions/year)
+  'Biology:Human Physiology': 12,
+  'Biology:Plant Physiology': 10,
+  'Biology:Genetics and Evolution': 10,
+  'Biology:Ecology': 9,
+  'Biology:Cell Biology': 8,
+  'Biology:Biotechnology': 7,
+  'Biology:Human Reproduction': 7,
+  'Biology:Plant Reproduction': 6,
+  'Biology:Microbes in Human Welfare': 5,
+  'Biology:Biomolecules': 8,
+  
+  // Physics - High yield (8-10 questions/year)
+  'Physics:Mechanics': 10,
+  'Physics:Electrodynamics': 9,
+  'Physics:Modern Physics': 8,
+  'Physics:Optics': 7,
+  'Physics:Thermodynamics': 7,
+  'Physics:Waves': 6,
+  'Physics:SHM': 5,
+  'Physics:Semiconductors': 6,
+  'Physics:Communication Systems': 4,
+  
+  // Chemistry - High yield (8-10 questions/year)
+  'Chemistry:Chemical Bonding': 10,
+  'Chemistry:Coordination Compounds': 8,
+  'Chemistry:p-Block Elements': 8,
+  'Chemistry:d- and f-Block Elements': 7,
+  'Chemistry:Organic Chemistry - Basic Principles': 9,
+  'Chemistry:Hydrocarbons': 8,
+  'Chemistry:Alcohols, Phenols, Ethers': 7,
+  'Chemistry:Aldehydes, Ketones, Carboxylic Acids': 7,
+  'Chemistry:Biomolecules': 6,
+  'Chemistry:Polymers': 5,
+  'Chemistry:Chemistry in Everyday Life': 4,
+  'Chemistry:Electrochemistry': 7,
+  'Chemistry:Chemical Kinetics': 6,
+  'Chemistry:Surface Chemistry': 5,
+  'Chemistry:Solutions': 6,
+  'Chemistry:Solid State': 5,
+  'Chemistry:Thermodynamics': 7,
+  'Chemistry:Equilibrium': 7,
+};
+
 /// Configuration for a single Daily Practice Paper (DPP).
 class DppConfig {
   /// Subjects to include. Use a list of 1–3 subjects for a mixed DPP, or a
@@ -26,6 +74,19 @@ class DppConfig {
   /// If null, defaults to equal distribution across subjects.
   final Map<String, int>? subjectWeights;
 
+  /// Enable chapter frequency weighting based on NEET PYQ analysis.
+  /// High-yield chapters get boosted probability.
+  final bool useChapterWeights;
+
+  /// Enable concept deduplication - avoid same concept questions in one DPP.
+  final bool deduplicateConcepts;
+
+  /// Enable adaptive difficulty - increase difficulty if student performs well.
+  final bool adaptiveDifficulty;
+
+  /// Student's recent accuracy (0.0-1.0) for adaptive difficulty.
+  final double? recentAccuracy;
+
   const DppConfig({
     this.subjects = const ['Physics', 'Chemistry', 'Biology'],
     this.chapterId,
@@ -37,6 +98,10 @@ class DppConfig {
     this.hardPercent = 20,
     this.includeWeakTopics = true,
     this.subjectWeights,
+    this.useChapterWeights = true,
+    this.deduplicateConcepts = true,
+    this.adaptiveDifficulty = false,
+    this.recentAccuracy,
   });
 
   /// Legacy single-subject constructor for backward compatibility.
@@ -47,6 +112,8 @@ class DppConfig {
     int totalQuestions = 20,
     int durationMinutes = 20,
     bool includeWeakTopics = true,
+    bool useChapterWeights = true,
+    bool deduplicateConcepts = true,
   }) {
     return DppConfig(
       subjects: [subject],
@@ -55,6 +122,8 @@ class DppConfig {
       totalQuestions: totalQuestions,
       durationMinutes: durationMinutes,
       includeWeakTopics: includeWeakTopics,
+      useChapterWeights: useChapterWeights,
+      deduplicateConcepts: deduplicateConcepts,
     );
   }
 
@@ -64,12 +133,16 @@ class DppConfig {
     int totalQuestions = 180,
     int durationMinutes = 180,
     bool includeWeakTopics = true,
+    bool useChapterWeights = true,
+    bool deduplicateConcepts = true,
   }) {
     return DppConfig(
       subjects: const ['Physics', 'Chemistry', 'Botany', 'Zoology'],
       totalQuestions: totalQuestions,
       durationMinutes: durationMinutes,
       includeWeakTopics: includeWeakTopics,
+      useChapterWeights: useChapterWeights,
+      deduplicateConcepts: deduplicateConcepts,
       subjectWeights: const {
         'Physics': 45,
         'Chemistry': 45,
@@ -86,12 +159,16 @@ class DppConfig {
     int totalQuestions = 60,
     int durationMinutes = 60,
     bool includeWeakTopics = true,
+    bool useChapterWeights = true,
+    bool deduplicateConcepts = true,
   }) {
     return DppConfig(
       subjects: subjects,
       totalQuestions: totalQuestions,
       durationMinutes: durationMinutes,
       includeWeakTopics: includeWeakTopics,
+      useChapterWeights: useChapterWeights,
+      deduplicateConcepts: deduplicateConcepts,
       subjectWeights: weights,
     );
   }
@@ -150,6 +227,13 @@ class DppEngine {
     Random? random,
   }) : _random = random ?? Random();
 
+  /// Cooldown days per difficulty level.
+  static const Map<String, int> _cooldownDays = {
+    'Easy': 1,
+    'Medium': 3,
+    'Hard': 7,
+  };
+
   /// Normalizes difficulty string to standard values.
   static String _normalizeDifficulty(String difficulty) {
     final d = difficulty.trim().toLowerCase();
@@ -159,6 +243,12 @@ class DppEngine {
     }
     if (d == 'hard' || d == 'difficult' || d == 'tough') return 'Hard';
     return 'Medium'; // default fallback
+  }
+
+  /// Returns topic IDs sorted by ascending mastery (weakest first) for the
+  /// given subjects, using the [MasteryService].
+  Future<List<String>> _getWeakTopicIds(List<String> subjects) async {
+    return _mastery.weakTopicIds(subjects, limit: 20);
   }
 
   /// Generates a DPP for today. If one already exists for the given config,
@@ -275,15 +365,32 @@ class DppEngine {
     final all = await _questionRepo.getAllQuestionsFromDb();
     var pool = all.where((q) => config.subjects.contains(q.subject)).toList();
 
-    // Exclude recently seen questions.
+    // Exclude recently seen questions (full history).
     if (excludedIds.isNotEmpty) {
       pool = pool.where((q) => !excludedIds.contains(q.id)).toList();
     }
 
+    // Exclude questions in cooldown period based on difficulty.
+    final cooldownIds = await _getCooldownQuestionIds(config.subjects);
+    if (cooldownIds.isNotEmpty) {
+      pool = pool.where((q) => !cooldownIds.contains(q.id)).toList();
+    }
+
     // If too few unseen questions remain, relax the exclusion to avoid
-    // an empty pool.
+    // an empty pool (but keep cooldown).
     if (pool.length < config.totalQuestions ~/ 2) {
       pool = all.where((q) => config.subjects.contains(q.subject)).toList();
+      if (excludedIds.isNotEmpty) {
+        pool = pool.where((q) => !excludedIds.contains(q.id)).toList();
+      }
+      if (cooldownIds.isNotEmpty) {
+        pool = pool.where((q) => !cooldownIds.contains(q.id)).toList();
+      }
+    }
+
+    // Apply chapter frequency weighting (NEET PYQ-based boost).
+    if (config.useChapterWeights) {
+      pool = _applyChapterWeights(pool);
     }
 
     // Bias toward weak topics when configured.
@@ -313,9 +420,61 @@ class DppEngine {
     return pool;
   }
 
-  Future<Set<String>> _getWeakTopicIds(List<String> subjects) async {
-    final weak = await _mastery.weakTopicIds(subjects);
-    return weak.toSet();
+  /// Applies NEET chapter frequency weights to boost high-yield chapters.
+  /// Questions from high-yield chapters get duplicated in the pool to increase
+  /// their selection probability proportionally.
+  List<Question> _applyChapterWeights(List<Question> pool) {
+    final weightedPool = <Question>[];
+    for (final q in pool) {
+      // Key is just chapter name (matching _neetChapterWeights map keys)
+      final weight = _neetChapterWeights[q.chapter] ?? 1;
+      // Add the question multiple times based on weight (capped at 3x for performance)
+      final copies = weight.clamp(1, 3);
+      for (int i = 0; i < copies; i++) {
+        weightedPool.add(q);
+      }
+    }
+    return weightedPool;
+  }
+
+  /// Gets question IDs that are in cooldown period based on their difficulty.
+  /// Easy: 1 day, Medium: 3 days, Hard: 7 days since last attempt.
+  Future<Set<String>> _getCooldownQuestionIds(List<String> subjects) async {
+    final attempts = await _db.getAllQuizAttempts();
+    final cooldownIds = <String>{};
+    final now = DateTime.now();
+
+    // Build a map of questionId -> difficulty from the questions table
+    final questionDifficulties = <String, String>{};
+    for (final subject in subjects) {
+      final questions = await _questionRepo.getQuestionsBySubject(subject);
+      for (final q in questions) {
+        questionDifficulties[q.id] = q.difficulty;
+      }
+    }
+
+    for (final attempt in attempts) {
+      if (!subjects.contains(attempt.subject)) continue;
+      final raw = attempt.questionIds;
+      if (raw == null || raw.isEmpty) continue;
+      try {
+        final list = (jsonDecode(raw) as List).cast<String>();
+        final daysSinceAttempt = now.difference(attempt.attemptedAt).inDays;
+
+        for (final qId in list) {
+          final difficulty = questionDifficulties[qId] ?? 'Medium';
+          final normalizedDiff = _normalizeDifficulty(difficulty);
+          final cooldownDays = _cooldownDays[normalizedDiff] ?? 3;
+          
+          if (daysSinceAttempt < cooldownDays) {
+            cooldownIds.add(qId);
+          }
+        }
+      } on FormatException {
+        // ignore malformed JSON
+      }
+    }
+    return cooldownIds;
   }
 
   List<Question> _sample(List<Question> pool, int count, DppConfig config) {
@@ -328,9 +487,24 @@ class DppEngine {
 
     // Otherwise, use difficulty-based sampling
     final shuffled = List<Question>.from(pool)..shuffle(_random);
-    final easy = count * config.easyPercent ~/ 100;
-    final medium = count * config.mediumPercent ~/ 100;
-    final hard = count - easy - medium;
+    
+    // Apply adaptive difficulty if enabled and student is performing well
+    int easy = count * config.easyPercent ~/ 100;
+    int medium = count * config.mediumPercent ~/ 100;
+    int hard = count - easy - medium;
+    if (config.adaptiveDifficulty && config.recentAccuracy != null) {
+      if (config.recentAccuracy! >= 0.8) {
+        // Student scoring 80%+ - shift toward harder questions
+        easy = (easy * 0.5).round();
+        medium = (medium * 0.7).round();
+        hard = count - easy - medium;
+      } else if (config.recentAccuracy! <= 0.4) {
+        // Student struggling - shift toward easier questions
+        hard = (hard * 0.5).round();
+        medium = (medium * 0.8).round();
+        easy = count - medium - hard;
+      }
+    }
 
     final buckets = <List<Question>>[
       shuffled
@@ -345,21 +519,53 @@ class DppEngine {
     ];
 
     final picked = <Question>[];
+    final usedConcepts = <String>{};
     final targets = [easy, medium, hard];
+    
     for (int i = 0; i < 3; i++) {
-      final take = min(targets[i], buckets[i].length);
       buckets[i].shuffle(_random);
-      picked.addAll(buckets[i].take(take));
+      var taken = 0;
+      for (final q in buckets[i]) {
+        if (taken >= targets[i]) break;
+        // Concept deduplication: skip if we already have a question with same concept
+        if (config.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+          continue;
+        }
+        picked.add(q);
+        _addQuestionConcepts(q, usedConcepts);
+        taken++;
+      }
     }
 
     // Backfill if we're short.
     if (picked.length < count) {
       final remaining = pool.where((q) => !picked.contains(q)).toList();
       remaining.shuffle(_random);
-      picked.addAll(remaining.take(count - picked.length));
+      for (final q in remaining) {
+        if (picked.length >= count) break;
+        if (config.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+          continue;
+        }
+        picked.add(q);
+        _addQuestionConcepts(q, usedConcepts);
+      }
     }
 
     return picked.take(count).toList();
+  }
+
+  /// Checks if a question shares concepts with already picked questions.
+  /// Uses tags field as proxy for concepts.
+  bool _hasConceptOverlap(Question q, Set<String> usedConcepts) {
+    final questionConcepts = q.tags.map((t) => t.toLowerCase()).toSet();
+    return questionConcepts.any((c) => usedConcepts.contains(c));
+  }
+
+  /// Adds question's concepts to the used set.
+  void _addQuestionConcepts(Question q, Set<String> usedConcepts) {
+    for (final tag in q.tags) {
+      usedConcepts.add(tag.toLowerCase());
+    }
   }
 
   List<Question> _sampleBySubject(
@@ -369,6 +575,7 @@ class DppEngine {
   ) {
     final weights = config.subjectWeights!;
     final picked = <Question>[];
+    final usedConcepts = <String>{};
     final subjectPools = <String, List<Question>>{};
     final subjectPickedCount = <String, int>{};
 
@@ -404,9 +611,22 @@ class DppEngine {
       if (subjectPool.isEmpty) continue;
 
       final shuffled = List<Question>.from(subjectPool)..shuffle(_random);
-      final easy = target * config.easyPercent ~/ 100;
-      final medium = target * config.mediumPercent ~/ 100;
-      final hard = target - easy - medium;
+      
+      // Apply adaptive difficulty per subject
+      int easy = target * config.easyPercent ~/ 100;
+      int medium = target * config.mediumPercent ~/ 100;
+      int hard = target - easy - medium;
+      if (config.adaptiveDifficulty && config.recentAccuracy != null) {
+        if (config.recentAccuracy! >= 0.8) {
+          easy = (easy * 0.5).round();
+          medium = (medium * 0.7).round();
+          hard = target - easy - medium;
+        } else if (config.recentAccuracy! <= 0.4) {
+          hard = (hard * 0.5).round();
+          medium = (medium * 0.8).round();
+          easy = target - medium - hard;
+        }
+      }
 
       final buckets = <List<Question>>[
         shuffled
@@ -422,15 +642,21 @@ class DppEngine {
 
       final targetsPerDiff = [easy, medium, hard];
       for (int i = 0; i < 3; i++) {
-        final take = min(targetsPerDiff[i], buckets[i].length);
         buckets[i].shuffle(_random);
-        final taken = buckets[i].take(take).toList();
-        picked.addAll(taken);
-        subjectPickedCount[subject] =
-            (subjectPickedCount[subject] ?? 0) + taken.length;
+        var taken = 0;
+        for (final q in buckets[i]) {
+          if (taken >= targetsPerDiff[i]) break;
+          // Concept deduplication
+          if (config.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+            continue;
+          }
+          picked.add(q);
+          _addQuestionConcepts(q, usedConcepts);
+          taken++;
+        }
       }
 
-      // Backfill if short for this subject - use tracked count instead of filtering entire picked list
+      // Backfill if short for this subject
       final currentSubjectCount = subjectPickedCount[subject] ?? 0;
       if (currentSubjectCount < target) {
         final remaining = subjectPool
@@ -438,9 +664,17 @@ class DppEngine {
             .toList();
         remaining.shuffle(_random);
         final needed = target - currentSubjectCount;
-        final taken = remaining.take(needed).toList();
-        picked.addAll(taken);
-        subjectPickedCount[subject] = currentSubjectCount + taken.length;
+        var backfillTaken = 0;
+        for (final q in remaining) {
+          if (backfillTaken >= needed) break;
+          if (config.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+            continue;
+          }
+          picked.add(q);
+          _addQuestionConcepts(q, usedConcepts);
+          backfillTaken++;
+        }
+        subjectPickedCount[subject] = currentSubjectCount + backfillTaken;
       }
     }
 
@@ -448,7 +682,14 @@ class DppEngine {
     if (picked.length < totalCount) {
       final remaining = pool.where((q) => !picked.contains(q)).toList();
       remaining.shuffle(_random);
-      picked.addAll(remaining.take(totalCount - picked.length));
+      for (final q in remaining) {
+        if (picked.length >= totalCount) break;
+        if (config.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+          continue;
+        }
+        picked.add(q);
+        _addQuestionConcepts(q, usedConcepts);
+      }
     }
 
     // Shuffle the final picked list to mix subjects

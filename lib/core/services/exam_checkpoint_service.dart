@@ -31,6 +31,11 @@ class ExamCheckpoint {
   /// the active test. Persisted so they survive a crash or resume.
   final int violations;
 
+  /// Schema version of this checkpoint. Bumped whenever the persisted shape
+  /// changes so `fromJson`/[ExamCheckpointService] can migrate or safely drop
+  /// stale checkpoints from an older app build.
+  final int version;
+
   const ExamCheckpoint({
     required this.attemptId,
     required this.configJson,
@@ -47,7 +52,15 @@ class ExamCheckpoint {
     this.breakDeadlineEpochMs,
     this.sectionDeadlineEpochMs,
     this.violations = 0,
+    this.version = kCurrentCheckpointVersion,
   });
+
+  /// Current checkpoint schema version.
+  static const int kCurrentCheckpointVersion = 2;
+
+  /// The oldest checkpoint version this build can still read. Anything older
+  /// is treated as incompatible and discarded by the service's `read()`.
+  static const int kMinSupportedCheckpointVersion = 1;
 
   ExamConfig get config => ExamConfig.fromJson(configJson);
 
@@ -73,6 +86,7 @@ class ExamCheckpoint {
     'startedAtEpochMs': startedAtEpochMs,
     'savedAtEpochMs': savedAtEpochMs,
     'violations': violations,
+    'version': version,
   };
 
   factory ExamCheckpoint.fromJson(Map<String, dynamic> json) => ExamCheckpoint(
@@ -95,6 +109,8 @@ class ExamCheckpoint {
     startedAtEpochMs: (json['startedAtEpochMs'] as num).toInt(),
     savedAtEpochMs: (json['savedAtEpochMs'] as num).toInt(),
     violations: (json['violations'] as num?)?.toInt() ?? 0,
+    // Checkpoints saved before the `version` field existed default to v1.
+    version: (json['version'] as num?)?.toInt() ?? 1,
   );
 }
 
@@ -117,6 +133,12 @@ class ExamCheckpointService {
     if (raw == null || raw.isEmpty) return null;
     try {
       final json = jsonDecode(raw) as Map<String, dynamic>;
+      final version = (json['version'] as num?)?.toInt() ?? 1;
+      // Drop checkpoints from older, incompatible schema versions.
+      if (version < ExamCheckpoint.kMinSupportedCheckpointVersion) {
+        await prefs.remove(_key);
+        return null;
+      }
       return ExamCheckpoint.fromJson(json);
     } catch (_) {
       // Corrupt/incompatible checkpoint — drop it so we don't keep failing.

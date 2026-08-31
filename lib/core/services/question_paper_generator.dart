@@ -12,6 +12,7 @@ class QuestionPaperGenerator {
     required PaperStandard standard,
     bool removeYearMarking = true,
     List<Question>? questionPool,
+    Map<String, int>? chapterQuotas,
   }) async {
     try {
       final config = PaperConfig.getConfig(standard);
@@ -30,7 +31,11 @@ class QuestionPaperGenerator {
           : targetCount;
 
       // Select random questions without repetition (balanced difficulty)
-      final selectedQuestions = _selectRandomQuestions(allPYQs, actualCount);
+      final selectedQuestions = _selectRandomQuestions(
+        allPYQs,
+        actualCount,
+        chapterQuotas: chapterQuotas,
+      );
 
       // Shuffle questions
       selectedQuestions.shuffle(_random);
@@ -88,12 +93,16 @@ class QuestionPaperGenerator {
   }
 
   /// Select random questions without repetition, targeting ~40% Easy / 40% Medium / 20% Hard
+  /// Optionally enforces [chapterQuotas] which limits the max questions per chapter.
   List<Question> _selectRandomQuestions(
     List<Question> availableQuestions,
-    int count,
-  ) {
+    int count, {
+    Map<String, int>? chapterQuotas,
+  }) {
     final selected = <Question>[];
     final usedIds = <String>{};
+    // Track how many questions we've taken per chapter.
+    final chapterCounts = <String, int>{};
 
     // Bucket by difficulty
     final easy = availableQuestions
@@ -115,9 +124,30 @@ class QuestionPaperGenerator {
     if (hardCount < 0) hardCount = 0;
 
     // Add from buckets (no dups within)
-    _addRandomQuestions(selected, usedIds, easy, easyCount);
-    _addRandomQuestions(selected, usedIds, medium, mediumCount);
-    _addRandomQuestions(selected, usedIds, hard, hardCount);
+    _addRandomQuestions(
+      selected,
+      usedIds,
+      easy,
+      easyCount,
+      chapterQuotas: chapterQuotas,
+      chapterCounts: chapterCounts,
+    );
+    _addRandomQuestions(
+      selected,
+      usedIds,
+      medium,
+      mediumCount,
+      chapterQuotas: chapterQuotas,
+      chapterCounts: chapterCounts,
+    );
+    _addRandomQuestions(
+      selected,
+      usedIds,
+      hard,
+      hardCount,
+      chapterQuotas: chapterQuotas,
+      chapterCounts: chapterCounts,
+    );
 
     // Fallback: fill any remaining from unused (handles low counts per bucket)
     while (selected.length < count) {
@@ -127,9 +157,21 @@ class QuestionPaperGenerator {
 
       if (remaining.isEmpty) break;
 
-      final question = remaining[_random.nextInt(remaining.length)];
+      // Filter remaining by chapter quotas
+      final filteredRemaining = chapterQuotas != null
+          ? remaining.where((q) {
+              final current = chapterCounts[q.chapter] ?? 0;
+              final quota = chapterQuotas[q.chapter];
+              return quota == null || current < quota;
+            }).toList()
+          : remaining;
+
+      if (filteredRemaining.isEmpty) break;
+
+      final question = filteredRemaining[_random.nextInt(filteredRemaining.length)];
       selected.add(question);
       usedIds.add(question.id);
+      chapterCounts[question.chapter] = (chapterCounts[question.chapter] ?? 0) + 1;
     }
 
     // Guard: never return more than the requested count.
@@ -140,19 +182,34 @@ class QuestionPaperGenerator {
     return selected;
   }
 
-  /// Add up to `count` random unused questions from source list
+  /// Add up to `count` random unused questions from source list,
+  /// optionally respecting [chapterQuotas] and updating [chapterCounts].
   void _addRandomQuestions(
     List<Question> selected,
     Set<String> usedIds,
     List<Question> source,
-    int count,
-  ) {
-    final available = source.where((q) => !usedIds.contains(q.id)).toList();
+    int count, {
+    Map<String, int>? chapterQuotas,
+    Map<String, int>? chapterCounts,
+  }) {
+    var available = source.where((q) => !usedIds.contains(q.id)).toList();
+
+    // Filter by chapter quotas if provided
+    if (chapterQuotas != null && chapterCounts != null) {
+      available = available.where((q) {
+        final current = chapterCounts[q.chapter] ?? 0;
+        final quota = chapterQuotas[q.chapter];
+        return quota == null || current < quota;
+      }).toList();
+    }
 
     for (int i = 0; i < count && available.isNotEmpty; i++) {
       final question = available[_random.nextInt(available.length)];
       selected.add(question);
       usedIds.add(question.id);
+      if (chapterCounts != null) {
+        chapterCounts[question.chapter] = (chapterCounts[question.chapter] ?? 0) + 1;
+      }
       available.remove(question);
     }
   }

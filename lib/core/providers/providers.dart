@@ -7,3 +7,4 @@ export 'user_providers.dart';
 export 'drill_providers.dart';
 export 'settings_providers.dart';
 export 'service_providers.dart';
+export 'ui_providers.dart';
