@@ -10,6 +10,7 @@ import '../../../core/services/exam_engine_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/tokens.dart';
+import '../../../core/widgets/modern_sidebar.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
@@ -1596,6 +1597,48 @@ class _HomeTabState extends ConsumerState<HomeTab>
     final m = seconds ~/ 60;
     final s = seconds % 60;
     return s > 0 ? '${m}m ${s}s' : '${m}m';
+  }
+
+  void _showMobileSidebar(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Sidebar content
+              Expanded(
+                child: ModernSidebar(
+                  isVisible: true,
+                  onToggle: () => Navigator.of(context).pop(),
+                  isMobile: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

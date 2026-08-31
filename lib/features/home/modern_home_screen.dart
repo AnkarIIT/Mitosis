@@ -98,7 +98,7 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                           onTap: () => Navigator.pushNamed(context, '/pyq'),
                         ),
                         QuickActionButton(
-                          icon: Icons.auto_automation,
+                          icon: Icons.smart_toy,
                           label: 'AI Tutor',
                           color: Colors.purple,
                           onTap: () => Navigator.pushNamed(context, '/chatbot'),
@@ -261,7 +261,7 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                         const SizedBox(height: 16),
                         const Text(
                           'Download and practice from the last 19 years of NEET question papers (2006-2024).',
-                          style: TextStyle(color: Colors.grey.shade600),
+                          style: TextStyle(color: Colors.grey),
                         ),
                         const SizedBox(height: 16),
                         Row(
