@@ -59,7 +59,7 @@ lib/
 │   ├── utils/            # Security, helpers, rank predictor
 │   └── widgets/          # Design system (AppButton, AppCard, AppTextField)
 ├── features/
-│   ├── auth/             # Login, OTP, 2FA, onboarding
+│   ├── auth/             # Login (email/password, Google OAuth), terms, privacy
 │   ├── chatbot/          # AI tutor chat
 │   ├── dpp/              # Daily Practice Paper (gen + attempt)
 │   ├── error_book/       # Wrong question review
@@ -70,7 +70,7 @@ lib/
 │   ├── pdf/              # NCERT PDF viewer
 │   ├── quiz/             # Topic-wise MCQ practice
 │   ├── review/           # Spaced repetition + error book
-│   ├── settings/         # Preferences, cloud sync toggle
+│   ├── settings/         # Preferences, biometric lock
 │   ├── study_plan/       # Schedule generator
 │   ├── test_series/      # Pre-built mock papers
 │   └── topic_browser/    # Subject → Chapter → Topic hierarchy
@@ -154,7 +154,7 @@ accuracy = correct / (correct + incorrect) × 100
 | `flashcards` | AI/manual cards | `front`, `back`, `subject`, `box`, `dueAt`, `isGenerated` |
 | `dpp_sets` | Daily papers | `date`, `subject`, `totalQuestions`, `durationMinutes` |
 | `dpp_questions` | DPP questions | `dppSetId`, `questionId`, `difficulty`, `options` (JSON) |
-| `users` | Local user mirror | `email`, `username`, `isTwoFactorEnabled`, `batch`, `targetYear` |
+| `users` | Local user + auth | `email`, `username`, `passwordHash`, `isTwoFactorEnabled` (legacy), `batch`, `targetYear`, `passwordResetCode`, `passwordResetExpiresAt` |
 | `sync_watermarks` | Delta sync cursors | `remoteTable`, `lastSyncedAt` |
 
 ### 4.2 Supabase Schema (RLS Enabled)
@@ -175,7 +175,7 @@ accuracy = correct / (correct + incorrect) × 100
 
 | Layer | Implementation |
 |-------|----------------|
-| **Auth** | Supabase Auth (OTP, Email/Password, Google OAuth, 2FA via email) |
+| **Auth** | Local email/password (PBKDF2) + optional Supabase Auth (Google OAuth, email/password) when configured; guest mode otherwise |
 | **Secrets** | `.env` in `.gitignore`; Supabase keys via `flutter_dotenv`; Edge function secrets via `supabase secrets set` |
 | **Password Hashing** | PBKDF2-HMAC-SHA256 (10k iterations, 16-byte salt) with legacy SHA-256 migration |
 | **Biometric** | `local_auth` with `FlutterSecureStorage` for enabled flag |
@@ -208,13 +208,14 @@ flutter run --profile    # Performance profiling, no asserts
 flutter build apk --release --split-per-abi  # Production
 ```
 
-### CI/CD (GitHub Actions)
+### CI/CD (GitHub Actions — recommended, not yet committed)
 ```yaml
 # .github/workflows/ci.yml
 - flutter analyze
 - flutter test --coverage
 - genhtml coverage/lcov.info -o coverage/html
 - flutter build apk --release
+- flutter build web
 - upload artifact
 ```
 
@@ -261,7 +262,7 @@ flutter build apk --release --split-per-abi  # Production
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `enableCloudAuth` | `isCloudAuthConfigured` | Supabase Auth (OTP, Google, 2FA) |
+| `enableCloudAuth` | `isCloudAuthConfigured` | Supabase Auth (email/password, Google OAuth) when credentials present |
 | `enableCloudSync` | `false` | User data sync (attempts, progress, bookmarks) |
 | `enableAiProxy` | `false` | AI tutor via edge function |
 | `googleSignInAvailable` | `isCloudAuthConfigured` | Google OAuth button |
@@ -282,7 +283,7 @@ flutter build apk --release --split-per-abi  # Production
 
 | Priority | Feature | Effort |
 |----------|---------|--------|
-| P0 | Web build + App Indexing / Universal Links | Medium |
+| P0 | Deploy web PWA shell + App Indexing / Universal Links | Medium |
 | P0 | Sentry crash reporting + performance monitoring | Low |
 | P1 | Parent/Teacher dashboard (read-only progress) | Medium |
 | P1 | Offline NCERT PDF search (SQLite FTS5) | Medium |

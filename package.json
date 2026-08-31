@@ -1,28 +1,34 @@
 {
-  "name": "neet_mitos",
+  "name": "neet-mitos",
   "version": "1.0.0",
-  "description": "A new Flutter project.",
-  "main": "index.js",
+  "description": "A free, offline-first NEET preparation app (Flutter): DPPs, mock tests, full-length mocks, flashcards, AI tutor and daily study plans for Biology, Chemistry and Physics.",
+  "main": "lib/main.dart",
   "directories": {
     "lib": "lib",
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "flutter test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AnkarIIT/Mitosis.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "neet",
+    "neet-ug",
+    "biology",
+    "chemistry",
+    "physics",
+    "exam-prep",
+    "flutter",
+    "offline-first",
+    "education"
+  ],
+  "author": "Ankar IIT",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/AnkarIIT/Mitosis/issues"
   },
-  "homepage": "https://github.com/AnkarIIT/Mitosis#readme",
-  "dependencies": {
-    "@supabase/ssr": "^0.12.5",
-    "@supabase/supabase-js": "^2.112.4"
-  }
+  "homepage": "https://github.com/AnkarIIT/Mitosis#readme"
 }
