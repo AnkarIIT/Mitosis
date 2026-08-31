@@ -5,7 +5,14 @@ import '../services/google_auth_service.dart';
 import 'core_providers.dart';
 import 'service_providers.dart';
 
-enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
+enum AuthStatus {
+  initial,
+  loading,
+  authenticated,
+  unauthenticated,
+  awaiting2FA,
+  error,
+}
 
 class AuthState {
   final db.User? user;
@@ -41,7 +48,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService;
   final GoogleAuthService _googleAuthService;
   final db.AppDatabase _db;
-
   AuthNotifier(this._authService, this._googleAuthService, this._db)
     : super(AuthState()) {
     checkAuth();
@@ -73,11 +79,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       isGuest: true,
       error: null,
     );
-  }
-
-  Future<bool> toggle2FA(bool enabled) async {
-    // 2FA removed in local auth. Keeping the method for settings compatibility.
-    return false;
   }
 
   Future<bool> register({
@@ -118,6 +119,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final result = await _authService.login(email: email, password: password);
 
     if (result.success) {
+      if (result.user?.isTwoFactorEnabled == true) {
+        final otpResult = await _authService.sendLogin2FAEmail(result.user!.id);
+        if (otpResult.success) {
+          state = state.copyWith(
+            status: AuthStatus.awaiting2FA,
+            user: result.user,
+            isGuest: false,
+            error: null,
+          );
+          return true;
+        } else {
+          state = state.copyWith(
+            status: AuthStatus.unauthenticated,
+            error: otpResult.message,
+            isGuest: false,
+          );
+          return false;
+        }
+      }
+
       await _authService.saveSession(result.user!.id);
       state = state.copyWith(
         status: AuthStatus.authenticated,
@@ -159,6 +180,100 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return false;
   }
 
+  Future<bool> verifyLogin2FA(String code) async {
+    final user = state.user;
+    if (user == null) return false;
+
+    state = state.copyWith(status: AuthStatus.loading, error: null);
+    final result = await _authService.verifyLogin2FA(user.id, code);
+
+    if (result.success) {
+      await _authService.saveSession(result.user!.id);
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: result.user,
+        isGuest: false,
+        error: null,
+      );
+      return true;
+    }
+
+    state = state.copyWith(
+      status: AuthStatus.awaiting2FA,
+      error: result.message,
+    );
+    return false;
+  }
+
+  Future<bool> resendLogin2FA() async {
+    final user = state.user;
+    if (user == null) return false;
+
+    state = state.copyWith(status: AuthStatus.loading, error: null);
+    final result = await _authService.sendLogin2FAEmail(user.id);
+    state = state.copyWith(
+      status: AuthStatus.awaiting2FA,
+      error: result.success ? null : result.message,
+    );
+    return result.success;
+  }
+
+  Future<bool> enable2FA(String email) async {
+    state = state.copyWith(status: AuthStatus.loading, error: null);
+    final result = await _authService.enable2FA(email);
+    state = state.copyWith(
+      status: AuthStatus.authenticated,
+      error: result.message,
+    );
+    return result.success;
+  }
+
+  Future<bool> confirmEnable2FA(String email, String code) async {
+    state = state.copyWith(status: AuthStatus.loading, error: null);
+    final result = await _authService.confirmEnable2FA(email, code);
+
+    if (result.success) {
+      final user = await _db.getUserByEmail(email.trim().toLowerCase());
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: user,
+        isGuest: false,
+        error: null,
+      );
+      return true;
+    }
+
+    state = state.copyWith(
+      status: AuthStatus.unauthenticated,
+      error: result.message,
+    );
+    return false;
+  }
+
+  Future<bool> disable2FA() async {
+    final user = state.user;
+    if (user == null) return false;
+
+    final result = await _authService.disable2FA(user.id);
+    if (result.success) {
+      final updated = await _db.getUserById(user.id);
+      state = state.copyWith(user: updated, error: null);
+    } else {
+      state = state.copyWith(error: result.message);
+    }
+    return result.success;
+  }
+
+  Future<bool> toggle2FA(bool enabled) async {
+    if (state.user == null) return false;
+
+    if (enabled) {
+      return await enable2FA(state.user!.email!);
+    } else {
+      return await disable2FA();
+    }
+  }
+
   Future<bool> resetPassword(String email) async {
     final result = await _authService.sendPasswordReset(email: email);
     state = state.copyWith(error: result.message);
@@ -191,7 +306,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(
       status: AuthStatus.unauthenticated,
       error: result.message,
-      isGuest: false,
     );
     return false;
   }

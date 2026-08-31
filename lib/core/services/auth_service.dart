@@ -13,6 +13,8 @@ class AuthService {
   final db.AppDatabase _db;
   final EmailService? _emailService;
   static const _resetCodeTTL = Duration(minutes: 15);
+  static const _twoFactorCodeTTL = Duration(minutes: 15);
+  static const int _twoFactorCodeLength = 6;
 
   AuthService(this._db, [this._emailService]);
 
@@ -187,6 +189,126 @@ class AuthService {
     await prefs.setInt('auth_user_id', userId);
   }
 
+  Future<({bool success, String message})> enable2FA(String email) async {
+    final trimmedEmail = email.trim().toLowerCase();
+    final user = await _db.getUserByEmail(trimmedEmail);
+    if (user == null) {
+      return (success: false, message: 'Account not found.');
+    }
+
+    if (_emailService == null || !_emailService.isConfigured) {
+      return (
+        success: false,
+        message: 'Email service is not configured in Settings.',
+      );
+    }
+
+    final code = _generateNumericCode(_twoFactorCodeLength);
+    final expiry = DateTime.now().add(_twoFactorCodeTTL);
+
+    try {
+      await _emailService.sendTransactionalEmail(
+        to: trimmedEmail,
+        subject: 'Enable two-factor authentication for NEET Mitos',
+        html: _build2FAEmailHtml(user.username, code, 'enable'),
+        text:
+            'Your NEET Mitos 2FA verification code is: $code. It expires in 15 minutes.',
+      );
+    } catch (e) {
+      return (
+        success: false,
+        message: 'Could not send email. Please try again later.',
+      );
+    }
+
+    await _db.setTwoFactorCode(user.id, code, expiry);
+    return (success: true, message: 'Verification code sent to $trimmedEmail');
+  }
+
+  Future<({bool success, String message})> confirmEnable2FA(
+    String email,
+    String code,
+  ) async {
+    final trimmedEmail = email.trim().toLowerCase();
+    final user = await _db.getUserByEmail(trimmedEmail);
+    if (user == null) {
+      return (success: false, message: 'Account not found.');
+    }
+
+    final active = await _db.getActiveTwoFactorCode(user.id);
+    if (active == null || !_constantTimeEquals(active.code, code)) {
+      return (success: false, message: 'Invalid or expired verification code.');
+    }
+
+    await _db.updateTwoFactorStatus(user.id, true);
+    await _db.clearTwoFactorCode(user.id);
+    return (success: true, message: 'Two-factor authentication enabled.');
+  }
+
+  Future<({bool success, String message})> disable2FA(int userId) async {
+    await _db.updateTwoFactorStatus(userId, false);
+    await _db.clearTwoFactorCode(userId);
+    return (success: true, message: 'Two-factor authentication disabled.');
+  }
+
+  Future<({bool success, String message, db.User? user})> sendLogin2FAEmail(
+    int userId,
+  ) async {
+    final user = await _db.getUserById(userId);
+    if (user == null) {
+      return (success: false, message: 'User not found.', user: null);
+    }
+
+    if (_emailService == null || !_emailService.isConfigured) {
+      return (
+        success: false,
+        message: 'Email service is not configured.',
+        user: null,
+      );
+    }
+
+    final code = _generateNumericCode(_twoFactorCodeLength);
+    final expiry = DateTime.now().add(_twoFactorCodeTTL);
+
+    try {
+      await _emailService.sendTransactionalEmail(
+        to: user.email!,
+        subject: 'Your NEET Mitos login verification code',
+        html: _build2FAEmailHtml(user.username, code, 'login'),
+        text: 'Your NEET Mitos login code is: $code. It expires in 15 minutes.',
+      );
+    } catch (e) {
+      return (
+        success: false,
+        message: 'Could not send verification email.',
+        user: null,
+      );
+    }
+
+    await _db.setTwoFactorCode(user.id, code, expiry);
+    return (success: true, message: 'Verification code sent.', user: user);
+  }
+
+  Future<({bool success, String message, db.User? user})> verifyLogin2FA(
+    int userId,
+    String code,
+  ) async {
+    final user = await _db.getUserById(userId);
+    if (user == null) {
+      return (success: false, message: 'User not found.', user: null);
+    }
+
+    final active = await _db.getActiveTwoFactorCode(userId);
+    if (active == null || !_constantTimeEquals(active.code, code)) {
+      return (success: false, message: 'Invalid or expired code.', user: null);
+    }
+
+    await _db.clearTwoFactorCode(userId);
+    await _db.updateLastLogin(user.id);
+    final updated = await _db.getUserById(userId);
+    return (success: true, message: 'Verified.', user: updated);
+  }
+
   // ============= INTERNALS =============
 
   // ---------------------------------------------------------------------------
@@ -318,5 +440,22 @@ class AuthService {
         <p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>
       </div>
     ''';
+  }
+
+  String _build2FAEmailHtml(String username, String code, String purpose) {
+    final title = purpose == 'enable'
+        ? 'Enable two-factor authentication'
+        : 'Login verification';
+    final body = purpose == 'enable'
+        ? 'Use this code to enable two-factor authentication on your NEET Mitos account:'
+        : 'Use this code to verify your login:';
+
+    return '<div style="font-family: Arial, sans-serif; color: #1f2937;">'
+        '<h2 style="color: #2563eb;">' + title + '</h2>'
+        '<p>Hi ' + username + ',</p>'
+        '<p>' + body + '</p>'
+        '<p style="font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #111827;">' + code + '</p>'
+        '<p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>'
+        '</div>';
   }
 }

@@ -299,6 +299,21 @@ class _FakeAuthNotifier extends StateNotifier<AuthState>
   Future<bool> toggle2FA(bool enabled) async => false;
 
   @override
+  Future<bool> enable2FA(String email) async => false;
+
+  @override
+  Future<bool> confirmEnable2FA(String email, String code) async => false;
+
+  @override
+  Future<bool> disable2FA() async => false;
+
+  @override
+  Future<bool> verifyLogin2FA(String code) async => false;
+
+  @override
+  Future<bool> resendLogin2FA() async => false;
+
+  @override
   Future<bool> register({
     required String email,
     required String username,

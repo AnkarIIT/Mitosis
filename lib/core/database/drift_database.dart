@@ -387,6 +387,44 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  Future<void> setTwoFactorCode(int userId, String code, DateTime expiresAt) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(
+        twoFactorCode: Value(code),
+        twoFactorExpiresAt: Value(expiresAt),
+      ),
+    );
+  }
+
+  Future<void> clearTwoFactorCode(int userId) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      const UsersCompanion(
+        twoFactorCode: Value(null),
+        twoFactorExpiresAt: Value(null),
+      ),
+    );
+  }
+
+  Future<({int userId, String code, DateTime expiresAt})?> getActiveTwoFactorCode(
+    int userId,
+  ) async {
+    final row = await (select(users)..where((t) => t.id.equals(userId)))
+        .getSingleOrNull();
+    if (row == null ||
+        row.twoFactorCode == null ||
+        row.twoFactorExpiresAt == null) {
+      return null;
+    }
+    if (row.twoFactorExpiresAt!.isBefore(DateTime.now())) {
+      return null;
+    }
+    return (
+      userId: row.id,
+      code: row.twoFactorCode!,
+      expiresAt: row.twoFactorExpiresAt!,
+    );
+  }
+
   Future<void> updateUserPreferences(
     int userId, {
     String? batch,

@@ -374,6 +374,127 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  Future<void> _showEnable2FADialog() async {
+    final authStateLocal = ref.read(authProvider);
+    final emailController = TextEditingController(text: authStateLocal.user?.email ?? '');
+    final codeController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool codeSent = false;
+    bool isLoading = false;
+
+    if (!mounted) return;
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(codeSent ? 'Enter verification code' : 'Enable Two-Factor Authentication'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!codeSent)
+                  TextFormField(
+                    controller: emailController,
+                    enabled: false,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email_outlined),
+                    ),
+                  )
+                else
+                  TextFormField(
+                    controller: codeController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    decoration: const InputDecoration(
+                      labelText: 'Verification Code',
+                      prefixIcon: Icon(Icons.pin_outlined),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().length != 6) {
+                        return 'Enter the 6-digit code';
+                      }
+                      return null;
+                    },
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading
+                  ? null
+                  : () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      if (!codeSent) {
+                        if (emailController.text.trim().isEmpty) return;
+                        setDialogState(() => isLoading = true);
+                        final success = await ref
+                            .read(authProvider.notifier)
+                            .enable2FA(emailController.text.trim());
+                        setDialogState(() {
+                          isLoading = false;
+                          codeSent = success;
+                        });
+                        if (success && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Verification code sent to your email.')),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    ref.read(authProvider).error ?? 'Could not enable 2FA.')),
+                          );
+                          Navigator.pop(context);
+                        }
+                      } else {
+                        if (!formKey.currentState!.validate()) return;
+                        setDialogState(() => isLoading = true);
+                        final success = await ref
+                            .read(authProvider.notifier)
+                            .confirmEnable2FA(
+                              emailController.text.trim(),
+                              codeController.text.trim(),
+                            );
+                        setDialogState(() => isLoading = false);
+                        if (success && mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Two-factor authentication enabled.')),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    ref.read(authProvider).error ?? 'Invalid or expired code.')),
+                          );
+                        }
+                      }
+                    },
+              child: isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(codeSent ? 'VERIFY' : 'SEND CODE'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
@@ -409,8 +530,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               value: authState.user?.isTwoFactorEnabled ?? false,
               onChanged: authState.user == null
                   ? null
-                  : (value) {
-                      ref.read(authProvider.notifier).toggle2FA(value);
+                  : (value) async {
+                      if (value) {
+                        await _showEnable2FADialog();
+                      } else {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Disable Two-Factor Authentication?'),
+                            content: const Text(
+                                'Your account will be less secure without 2FA.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('CANCEL'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('DISABLE'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirmed == true) {
+                          await ref
+                              .read(authProvider.notifier)
+                              .disable2FA();
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Two-factor authentication disabled.')),
+                            );
+                          }
+                        }
+                      }
                     },
               secondary: const Icon(Icons.security),
             ),

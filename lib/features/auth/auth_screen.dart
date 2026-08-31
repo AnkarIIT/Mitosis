@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/config/app_config.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 
-enum AuthMode { login, signUp, forgotPassword, resetPassword }
+enum AuthMode { login, signUp, forgotPassword, resetPassword, twoFactor }
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -25,6 +24,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _fullNameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _resetCodeController = TextEditingController();
+  final _twoFactorController = TextEditingController();
   final _newPasswordController = TextEditingController();
 
   bool _obscurePassword = true;
@@ -37,17 +37,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     super.initState();
     _emailController.addListener(_onFieldChanged);
     _passwordController.addListener(_onFieldChanged);
+    _twoFactorController.addListener(_onFieldChanged);
   }
 
   @override
   void dispose() {
     _emailController.removeListener(_onFieldChanged);
     _passwordController.removeListener(_onFieldChanged);
+    _twoFactorController.removeListener(_onFieldChanged);
     _emailController.dispose();
     _passwordController.dispose();
     _fullNameController.dispose();
     _usernameController.dispose();
     _resetCodeController.dispose();
+    _twoFactorController.dispose();
     _newPasswordController.dispose();
     super.dispose();
   }
@@ -62,6 +65,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   bool get _canSubmit {
+    if (_mode == AuthMode.twoFactor) {
+      return _twoFactorController.text.trim().length == 6;
+    }
     if (!_termsAccepted) return false;
     if (!_isEmailValid) return false;
 
@@ -75,6 +81,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       case AuthMode.resetPassword:
         return _resetCodeController.text.trim().length == 6 &&
             _newPasswordController.text.trim().length >= 6;
+      case AuthMode.twoFactor:
+        return _twoFactorController.text.trim().length == 6;
     }
   }
 
@@ -94,11 +102,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       case AuthMode.resetPassword:
         await _handleResetPassword();
         break;
+      case AuthMode.twoFactor:
+        await _handleVerify2FA();
+        break;
     }
   }
 
-  Future<void> _handleGoogleSignIn() async {
-    final success = await ref.read(authProvider.notifier).signInWithGoogle();
+  Future<void> _handleVerify2FA() async {
+    final code = _twoFactorController.text.trim();
+    final success = await ref.read(authProvider.notifier).verifyLogin2FA(code);
     if (!mounted) return;
 
     if (success) {
@@ -106,15 +118,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       return;
     }
 
-    final error = ref.read(authProvider).error;
-    if (error != null && error.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_friendlyAuthError(error)),
-          behavior: SnackBarBehavior.floating,
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Invalid or expired verification code.')),
+    );
+  }
+
+  Future<void> _handleResend2FA() async {
+    final success = await ref.read(authProvider.notifier).resendLogin2FA();
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success ? 'Verification code resent.' : 'Could not resend code.',
         ),
-      );
-    }
+      ),
+    );
   }
 
   Future<void> _handleLogin() async {
@@ -126,6 +145,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         .login(email: email, password: password);
 
     if (success && mounted) {
+      final authState = ref.read(authProvider);
+      if (authState.status == AuthStatus.awaiting2FA) {
+        setState(() => _mode = AuthMode.twoFactor);
+        return;
+      }
       context.go('/');
     }
   }
@@ -206,7 +230,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final isAuthLoading = authState.status == AuthStatus.loading;
-    final showGoogleButton = AppConfig.googleSignInAvailable;
 
     return Scaffold(
       body: Container(
@@ -251,6 +274,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ? 'Create account'
                         : _mode == AuthMode.forgotPassword
                         ? 'Reset password'
+                        : _mode == AuthMode.twoFactor
+                        ? 'Two-factor verification'
                         : 'Enter reset code',
                     style: const TextStyle(
                       fontSize: 28,
@@ -267,6 +292,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ? 'Start your NEET prep journey'
                         : _mode == AuthMode.forgotPassword
                         ? 'We will send you a reset code'
+                        : _mode == AuthMode.twoFactor
+                        ? 'Check your email for the 6-digit code'
                         : 'Check your email for the 6-digit code',
                     style: TextStyle(
                       fontSize: 14,
@@ -275,15 +302,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  if (showGoogleButton && _mode == AuthMode.login) ...[
-                    _GoogleSignInButton(
-                      onPressed: _handleGoogleSignIn,
-                      isLoading: isAuthLoading,
-                    ),
-                    const SizedBox(height: 16),
-                    const _DividerOr(),
-                    const SizedBox(height: 16),
-                  ],
+
                   if (_mode != AuthMode.resetPassword) ...[
                     TextFormField(
                       controller: _emailController,
@@ -369,7 +388,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     const SizedBox(height: 16),
                   ],
                   if (_mode != AuthMode.forgotPassword &&
-                      _mode != AuthMode.resetPassword) ...[
+                      _mode != AuthMode.resetPassword &&
+                      _mode != AuthMode.twoFactor) ...[
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -486,57 +506,107 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     ),
                     const SizedBox(height: 16),
                   ],
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _termsAccepted,
-                        onChanged: (value) {
-                          setState(() => _termsAccepted = value ?? false);
-                        },
-                        fillColor: WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.selected)) {
-                            return Colors.white;
-                          }
-                          return Colors.white.withValues(alpha: 0.3);
-                        }),
-                        checkColor: AppColors.primary,
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _termsAccepted = !_termsAccepted),
-                          child: RichText(
-                            text: TextSpan(
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 12,
-                              ),
-                              children: [
-                                const TextSpan(text: 'I agree to the '),
-                                TextSpan(
-                                  text: 'Terms',
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () => context.push('/terms'),
-                                ),
-                                const TextSpan(text: ' and '),
-                                TextSpan(
-                                  text: 'Privacy Policy',
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () => context.push('/privacy'),
-                                ),
-                              ],
-                            ),
+                  if (_mode == AuthMode.twoFactor) ...[
+                    TextFormField(
+                      controller: _twoFactorController,
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Verification Code',
+                        labelStyle: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.pin_outlined,
+                          color: Colors.white70,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white.withValues(alpha: 0.1),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                      validator: (value) {
+                        if (value == null || value.trim().length != 6) {
+                          return 'Enter the 6-digit code';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton.icon(
+                      onPressed: isAuthLoading ? null : _handleResend2FA,
+                      icon: const Icon(
+                        Icons.refresh_rounded,
+                        color: Colors.white70,
+                      ),
+                      label: Text(
+                        'Resend code',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (_mode != AuthMode.twoFactor) ...[
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _termsAccepted,
+                          onChanged: (value) {
+                            setState(() => _termsAccepted = value ?? false);
+                          },
+                          fillColor: WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return Colors.white;
+                            }
+                            return Colors.white.withValues(alpha: 0.3);
+                          }),
+                          checkColor: AppColors.primary,
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(
+                              () => _termsAccepted = !_termsAccepted,
+                            ),
+                            child: RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 12,
+                                ),
+                                children: [
+                                  const TextSpan(text: 'I agree to the '),
+                                  TextSpan(
+                                    text: 'Terms',
+                                    style: const TextStyle(
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => context.push('/terms'),
+                                  ),
+                                  const TextSpan(text: ' and '),
+                                  TextSpan(
+                                    text: 'Privacy Policy',
+                                    style: const TextStyle(
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => context.push('/privacy'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
@@ -569,6 +639,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   ? 'CREATE ACCOUNT'
                                   : _mode == AuthMode.forgotPassword
                                   ? 'SEND RESET CODE'
+                                  : _mode == AuthMode.twoFactor
+                                  ? 'VERIFY CODE'
                                   : 'RESET PASSWORD',
                             ),
                     ),
@@ -594,6 +666,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     () => _mode = AuthMode.forgotPassword,
                                   );
                                   break;
+                                case AuthMode.twoFactor:
+                                  setState(() => _mode = AuthMode.login);
+                                  break;
                               }
                             },
                       child: Text(
@@ -602,6 +677,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             : _mode == AuthMode.signUp
                             ? 'Already have an account? Sign in'
                             : _mode == AuthMode.forgotPassword
+                            ? 'Back to sign in'
+                            : _mode == AuthMode.twoFactor
                             ? 'Back to sign in'
                             : 'Back to forgot password',
                         style: TextStyle(
@@ -662,119 +739,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  String _friendlyAuthError(String rawError) {
-    final lower = rawError.toLowerCase();
-    if (lower.contains('socketexception') ||
-        lower.contains('failed host lookup') ||
-        lower.contains('network') ||
-        lower.contains('unreachable')) {
-      return 'Network error. Please check your internet connection and try again.';
-    }
-    if (lower.contains('invalid login credentials') ||
-        lower.contains('invalid_signin')) {
-      return 'Invalid email or password. Please try again.';
-    }
-    if (lower.contains('too many requests') || lower.contains('rate limit')) {
-      return 'Too many attempts. Please wait a moment and try again.';
-    }
-    return rawError;
-  }
-}
-
-class _GoogleSignInButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final bool isLoading;
-
-  const _GoogleSignInButton({required this.onPressed, required this.isLoading});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: AppColors.primary,
-          elevation: 0,
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.55)),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppColors.primary,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const _GoogleIcon(),
-                  const SizedBox(width: 10),
-                  const Text('Continue with Google'),
-                ],
-              ),
-      ),
-    );
-  }
-}
-
-class _GoogleIcon extends StatelessWidget {
-  const _GoogleIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 18,
-      height: 18,
-      child: Stack(
-        children: [
-          Positioned(top: 0, left: 0, child: _dot(const Color(0xFF4285F4))),
-          Positioned(top: 0, right: 0, child: _dot(const Color(0xFFEA4335))),
-          Positioned(bottom: 0, left: 0, child: _dot(const Color(0xFFFBBC05))),
-          Positioned(bottom: 0, right: 0, child: _dot(const Color(0xFF34A853))),
-        ],
-      ),
-    );
-  }
-
-  Widget _dot(Color color) {
-    return Container(
-      width: 9,
-      height: 9,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
-  }
-}
-
-class _DividerOr extends StatelessWidget {
-  const _DividerOr();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            'or continue with email',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
-      ],
     );
   }
 }

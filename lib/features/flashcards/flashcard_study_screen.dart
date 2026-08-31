@@ -188,19 +188,14 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                   animation: _flipAnimation,
                   builder: (context, child) {
                     final angle = _flipAnimation.value * pi;
-                    final isBack = angle > pi / 2;
+                    // Front is shown when angle < pi/2, back when angle > pi/2
+                    final showFront = angle <= pi / 2;
                     return Transform(
                       transform: Matrix4.identity()
                         ..setEntry(3, 2, 0.001)
-                        ..rotateY(isBack ? pi - angle : angle),
+                        ..rotateY(showFront ? angle : pi - angle),
                       alignment: Alignment.center,
-                      child: isBack
-                          ? Transform(
-                              transform: Matrix4.identity()..rotateY(pi),
-                              alignment: Alignment.center,
-                              child: _buildBack(card),
-                            )
-                          : _buildFront(card),
+                      child: showFront ? _buildFront(card) : _buildBack(card),
                     );
                   },
                 ),
