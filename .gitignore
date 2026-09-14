@@ -56,3 +56,4 @@ app.*.map.json
 # NEET PYQ downloaded PDFs (runtime downloaded or kept local)
 /assets/pyq/downloaded/
 
+.aider*
