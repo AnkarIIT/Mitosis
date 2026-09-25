@@ -151,7 +151,7 @@ class TopicDetailScreen extends ConsumerWidget {
                       _InfoPill(
                         label: 'Difficulty',
                         value: resolvedTopic.difficulty,
-                        color: AppColors.secondary.withValues(alpha: 0.15),
+                        color: AdaptiveColors.outlineVariant(context),
                       ),
                       const SizedBox(width: 12),
                       _InfoPill(
@@ -178,9 +178,11 @@ class TopicDetailScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.amber.withValues(alpha: 0.05),
+                color: AdaptiveColors.warning(context).withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.amber.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: AdaptiveColors.warning(context).withValues(alpha: 0.22),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +202,7 @@ class TopicDetailScreen extends ConsumerWidget {
                     icon: const Icon(Icons.menu_book, size: 18),
                     label: const Text('Read Full Revision Notes'),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.amber.shade800,
+                      foregroundColor: AdaptiveColors.warning(context),
                     ),
                   ),
                 ],
@@ -481,7 +483,10 @@ class TopicDetailScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Row(
               children: [
-                const Icon(Icons.menu_book, color: Colors.amber),
+                Icon(
+                  Icons.menu_book,
+                  color: AdaptiveColors.warning(context),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -638,7 +643,7 @@ class TopicDetailScreen extends ConsumerWidget {
                 sections: [
                   if (easyCount > 0)
                     PieChartSectionData(
-                      color: Colors.green.shade400,
+                      color: AdaptiveColors.success(context),
                       value: easyCount.toDouble(),
                       title: '${(easyCount / questions.length * 100).toInt()}%',
                       radius: 40,
@@ -650,7 +655,7 @@ class TopicDetailScreen extends ConsumerWidget {
                     ),
                   if (mediumCount > 0)
                     PieChartSectionData(
-                      color: Colors.orange.shade400,
+                      color: AdaptiveColors.warning(context),
                       value: mediumCount.toDouble(),
                       title:
                           '${(mediumCount / questions.length * 100).toInt()}%',
@@ -663,7 +668,7 @@ class TopicDetailScreen extends ConsumerWidget {
                     ),
                   if (hardCount > 0)
                     PieChartSectionData(
-                      color: Colors.red.shade400,
+                      color: AdaptiveColors.error(context),
                       value: hardCount.toDouble(),
                       title: '${(hardCount / questions.length * 100).toInt()}%',
                       radius: 40,
@@ -686,19 +691,19 @@ class TopicDetailScreen extends ConsumerWidget {
                 _DifficultyLegend(
                   label: 'Easy',
                   count: easyCount,
-                  color: Colors.green.shade400,
+                  color: AdaptiveColors.success(context),
                 ),
                 const SizedBox(height: 8),
                 _DifficultyLegend(
                   label: 'Medium',
                   count: mediumCount,
-                  color: Colors.orange.shade400,
+                  color: AdaptiveColors.warning(context),
                 ),
                 const SizedBox(height: 8),
                 _DifficultyLegend(
                   label: 'Hard',
                   count: hardCount,
-                  color: Colors.red.shade400,
+                  color: AdaptiveColors.error(context),
                 ),
               ],
             ),

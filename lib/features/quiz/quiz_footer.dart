@@ -70,13 +70,13 @@ class QuizFooter extends ConsumerWidget {
                   onPressed: onFlagToggle,
                   icon: Icon(
                     isFlagged ? Icons.flag : Icons.flag_outlined,
-                    color: isFlagged ? Colors.orange : null,
+                    color: isFlagged ? AdaptiveColors.warning(context) : null,
                     size: 18,
                   ),
                   label: Text(
                     isFlagged ? 'Unmark' : 'Flag',
                     style: TextStyle(
-                      color: isFlagged ? Colors.orange : null,
+                      color: isFlagged ? AdaptiveColors.warning(context) : null,
                       fontWeight: isFlagged
                           ? FontWeight.w600
                           : FontWeight.normal,
@@ -85,7 +85,7 @@ class QuizFooter extends ConsumerWidget {
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
                       color: isFlagged
-                          ? Colors.orange
+                          ? AdaptiveColors.warning(context)
                           : AdaptiveColors.divider(context),
                     ),
                   ),
@@ -101,7 +101,7 @@ class QuizFooter extends ConsumerWidget {
                     icon: const Icon(Icons.flag_rounded, size: 18),
                     label: const Text('Mark & Next'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: AdaptiveColors.warning(context),
                       foregroundColor: Colors.white,
                     ),
                   ),

@@ -210,12 +210,12 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                       height: 50,
                       decoration: BoxDecoration(
                         color: isDownloaded 
-                            ? Colors.green.withOpacity(0.1)
+                            ? AppColors.success.withOpacity(0.1)
                             : theme.colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isDownloaded 
-                              ? Colors.green.withOpacity(0.3)
+                              ? AppColors.success.withOpacity(0.3)
                               : theme.colorScheme.primary.withOpacity(0.3),
                         ),
                       ),
@@ -225,7 +225,7 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
-                            color: isDownloaded ? Colors.green : theme.colorScheme.primary,
+                            color: isDownloaded ? AppColors.success : theme.colorScheme.primary,
                           ),
                         ),
                       ),
@@ -255,20 +255,20 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
+                          color: AppColors.success.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.check_circle, size: 14, color: Colors.green),
+                            const Icon(Icons.check_circle, size: 14, color: AppColors.success),
                             const SizedBox(width: 4),
                             Text(
                               'Downloaded',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.green,
+                                color: AppColors.success,
                               ),
                             ),
                           ],
@@ -451,7 +451,7 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Downloaded NEET $year $subject paper'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
       }
@@ -460,7 +460,7 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to download: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -495,7 +495,7 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Downloaded all subjects for NEET $year'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
       }
@@ -504,7 +504,7 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to download: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }

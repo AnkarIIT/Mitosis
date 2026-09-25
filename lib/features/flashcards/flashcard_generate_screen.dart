@@ -238,9 +238,9 @@ class _FlashcardGenerateScreenState
                       const SizedBox(height: 6),
                       Text(
                         '${_processed!} / ${_total!}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSubtle,
+                          color: AdaptiveColors.textSecondary(context),
                         ),
                       ),
                     ],
@@ -370,11 +370,10 @@ class _FlashcardGenerateScreenState
   Widget _buildShimmerSkeleton(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: isDark ? AppColors.surfaceDark : Colors.grey.shade300,
-      highlightColor:
-          isDark
-          ? AdaptiveColors.surfaceContainerHighest(context)
-          : Colors.grey.shade100,
+      baseColor: isDark
+          ? AppColors.surfaceDark
+          : AdaptiveColors.outlineVariant(context),
+      highlightColor: AdaptiveColors.surfaceContainerHighest(context),
       child: Column(
         children: List.generate(
           4,

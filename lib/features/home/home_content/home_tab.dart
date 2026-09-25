@@ -247,25 +247,27 @@ class _HomeTabState extends ConsumerState<HomeTab>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Colors.orange.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+              color: AdaptiveColors.warning(context).withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppRadius.full),
+              border: Border.all(
+                color: AdaptiveColors.warning(context).withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.local_fire_department,
+                Icon(
+                  Icons.local_fire_department_rounded,
                   size: 14,
-                  color: Colors.orange,
+                  color: AdaptiveColors.warning(context),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '$streak',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+                    color: AdaptiveColors.warning(context),
                   ),
                 ),
               ],
@@ -276,26 +278,30 @@ class _HomeTabState extends ConsumerState<HomeTab>
         // Accuracy badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: SubjectColors.physics.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: SubjectColors.physics.withValues(alpha: 0.3),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.trending_up, size: 14, color: SubjectColors.physics),
-              const SizedBox(width: 4),
-              Text(
-                '${accuracy.toStringAsFixed(0)}%',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: SubjectColors.physics,
-                ),
+            decoration: BoxDecoration(
+              color: AdaptiveColors.primary(context).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppRadius.full),
+              border: Border.all(
+                color: AdaptiveColors.primary(context).withValues(alpha: 0.28),
               ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.trending_up_rounded,
+                  size: 14,
+                  color: AdaptiveColors.primary(context),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${accuracy.toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AdaptiveColors.primary(context),
+                  ),
+                ),
             ],
           ),
         ),
@@ -447,7 +453,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
               child: Text(
                 'See all',
                 style: TextStyle(
-                  color: SubjectColors.physics,
+                  color: AdaptiveColors.primary(context),
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -662,8 +668,8 @@ class _HomeTabState extends ConsumerState<HomeTab>
                       backgroundColor: AdaptiveColors.surface(context),
                       valueColor: AlwaysStoppedAnimation(
                         animValue >= 1.0
-                            ? AppColors.success
-                            : SubjectColors.physics,
+                            ? AdaptiveColors.success(context)
+                            : AdaptiveColors.primary(context),
                       ),
                     ),
                     Center(
@@ -673,8 +679,8 @@ class _HomeTabState extends ConsumerState<HomeTab>
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                           color: animValue >= 1.0
-                              ? AppColors.success
-                              : SubjectColors.physics,
+                              ? AdaptiveColors.success(context)
+                              : AdaptiveColors.primary(context),
                         ),
                       ),
                     ),
@@ -713,8 +719,8 @@ class _HomeTabState extends ConsumerState<HomeTab>
                     backgroundColor: AdaptiveColors.surface(context),
                     valueColor: AlwaysStoppedAnimation(
                       progress >= 1.0
-                          ? AppColors.success
-                          : SubjectColors.physics,
+                          ? AdaptiveColors.success(context)
+                          : AdaptiveColors.primary(context),
                     ),
                   ),
                 ),
@@ -1033,15 +1039,15 @@ class _HomeTabState extends ConsumerState<HomeTab>
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.success.withValues(alpha: 0.9),
-                AppColors.success.withValues(alpha: 0.7),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [
+              AdaptiveColors.primary(context),
+              AdaptiveColors.primary(context).withValues(alpha: 0.82),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Row(
             children: [
@@ -1166,13 +1172,13 @@ class _HomeTabState extends ConsumerState<HomeTab>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.secondary.withValues(alpha: 0.9),
-              AppColors.secondary.withValues(alpha: 0.7),
+              AdaptiveColors.primary(context),
+              AdaptiveColors.primary(context).withValues(alpha: 0.82),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Row(
           children: [
@@ -1235,13 +1241,13 @@ class _HomeTabState extends ConsumerState<HomeTab>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.secondary.withValues(alpha: 0.9),
-              AppColors.secondary.withValues(alpha: 0.7),
+              AdaptiveColors.primary(context),
+              AdaptiveColors.primary(context).withValues(alpha: 0.82),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Row(
           children: [
@@ -1366,16 +1372,16 @@ class _HomeTabState extends ConsumerState<HomeTab>
         ? AdaptiveColors.surfaceContainerHighest(context).withValues(
             alpha: 0.6,
           )
-        : Colors.grey.shade200;
+        : AdaptiveColors.outlineVariant(context);
 
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Shimmer.fromColors(
-          baseColor: isDark ? AppColors.surfaceDark : Colors.grey.shade300,
-          highlightColor: isDark
-              ? AdaptiveColors.surfaceContainerHighest(context)
-              : Colors.grey.shade100,
+          baseColor: isDark
+              ? AppColors.surfaceDark
+              : AdaptiveColors.outlineVariant(context),
+          highlightColor: AdaptiveColors.surfaceContainerHighest(context),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1622,7 +1628,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                 height: 4,
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade400,
+                  color: AdaptiveColors.outline(context),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1714,7 +1720,7 @@ class _NeetSearchDelegate extends SearchDelegate<String?> {
             Icon(
               Icons.search_off_rounded,
               size: 64,
-              color: Colors.grey.shade300,
+              color: AdaptiveColors.outlineVariant(context),
             ),
             const SizedBox(height: 16),
             Text(

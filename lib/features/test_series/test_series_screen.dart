@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/exam_engine_service.dart';
 import '../../core/services/exam_checkpoint_service.dart';
@@ -75,7 +76,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
               title: 'CBT Practice Mode',
               subtitle: 'Timed computer-based practice • No section lock',
               icon: Icons.desktop_windows,
-              color: Colors.teal,
+              color: AppColors.primary,
               onTap: () => _showCbtPracticeDialog(context, allQuestions),
             ),
             const SizedBox(height: 12),
@@ -84,7 +85,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
               title: 'Dynamic Test Builder',
               subtitle: 'Select subjects, difficulty, and question types',
               icon: Icons.tune,
-              color: Colors.purple,
+              color: SubjectColors.chemistry,
               onTap: () => _showCustomTestDialog(context, allQuestions),
             ),
             const SizedBox(height: 12),
@@ -188,16 +189,16 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.secondary,
+                        color: AdaptiveColors.textSecondary(context),
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: AppColors.secondary,
+                color: AdaptiveColors.textSecondary(context),
               ),
             ],
           ),
@@ -324,7 +325,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
                     Text(
                       '$answered/$total answered • ${_fmtRemaining(remaining)} left',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.secondary,
+                        color: AdaptiveColors.textSecondary(context),
                       ),
                     ),
                   ],
@@ -401,11 +402,11 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
   Color _getSubjectColor(String name) {
     switch (name.toLowerCase()) {
       case 'biology':
-        return Colors.green;
+        return SubjectColors.biology;
       case 'chemistry':
-        return Colors.blue;
+        return SubjectColors.chemistry;
       case 'physics':
-        return Colors.orange;
+        return SubjectColors.physics;
       default:
         return AppColors.primary;
     }
@@ -594,7 +595,7 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
             'marking, and instant analytics.',
             style: Theme.of(
               context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.secondary),
+            ).textTheme.bodySmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
           ),
           const SizedBox(height: 20),
           Text(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/providers.dart';
+import '../theme/app_colors.dart';
 import '../../features/auth/auth_screen.dart';
 
 import '../../features/auth/terms_screen.dart';
@@ -92,7 +93,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF216869),
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(

@@ -93,9 +93,9 @@ class _ParagraphQuestionPoolSheetState
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.82,
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceWarm,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: AdaptiveColors.surfaceWarm(context),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +106,7 @@ class _ParagraphQuestionPoolSheetState
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.divider,
+                color: AdaptiveColors.outline(context),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -194,7 +194,7 @@ class _ParagraphQuestionPoolSheetState
                     child: Material(
                       color: selected
                           ? AppColors.primary.withValues(alpha: 0.08)
-                          : AppColors.surface,
+                          : AdaptiveColors.surface(context),
                       borderRadius: BorderRadius.circular(12),
                       child: InkWell(
                         onTap: () => _onParagraphTap(index),
@@ -206,7 +206,7 @@ class _ParagraphQuestionPoolSheetState
                             border: Border.all(
                               color: selected
                                   ? AppColors.primary
-                                  : AppColors.divider,
+                                  : AdaptiveColors.outline(context),
                             ),
                           ),
                           child: Row(
@@ -216,7 +216,7 @@ class _ParagraphQuestionPoolSheetState
                                 radius: 12,
                                 backgroundColor: selected
                                     ? AppColors.primary
-                                    : AppColors.divider,
+                                    : AdaptiveColors.outlineVariant(context),
                                 child: Text(
                                   '${index + 1}',
                                   style: TextStyle(
@@ -224,7 +224,7 @@ class _ParagraphQuestionPoolSheetState
                                     fontWeight: FontWeight.bold,
                                     color: selected
                                         ? Colors.white
-                                        : AppColors.textSubtle,
+                                        : AdaptiveColors.textSecondary(context),
                                   ),
                                 ),
                               ),
@@ -285,12 +285,12 @@ class _ParagraphQuestionPoolSheetState
                     ),
                   ),
                 if (visible.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Center(
                       child: Text(
                         'No questions tagged to this chapter yet.',
-                        style: TextStyle(color: AppColors.textSubtle),
+                        style: TextStyle(color: AdaptiveColors.textSecondary(context)),
                       ),
                     ),
                   )
@@ -308,7 +308,7 @@ class _ParagraphQuestionPoolSheetState
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: AppColors.surface,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: () => _startQuiz([q], source: q.topic),
@@ -317,7 +317,7 @@ class _ParagraphQuestionPoolSheetState
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.divider),
+              border: Border.all(color: AdaptiveColors.outline(context)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

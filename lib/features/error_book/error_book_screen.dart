@@ -50,12 +50,12 @@ class ErrorBookScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               'Incorrectly answered questions will appear here automatically for you to practice.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSubtle),
+              style: TextStyle(color: AdaptiveColors.textSecondary(context)),
             ),
           ),
         ],
@@ -149,7 +149,7 @@ class ErrorBookScreen extends ConsumerWidget {
         ),
         subtitle: Text(
           '${question.subject} • ${question.chapter}',
-          style: const TextStyle(fontSize: 12, color: AppColors.textSubtle),
+          style: TextStyle(fontSize: 12, color: AdaptiveColors.textSecondary(context)),
         ),
         children: [
           Padding(
@@ -191,7 +191,9 @@ class ErrorBookScreen extends ConsumerWidget {
                       },
                       icon: const Icon(Icons.delete_outline, size: 18),
                       label: const Text('Remove from Error Book'),
-                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AdaptiveColors.error(context),
+                      ),
                     ),
                   ],
                 ),

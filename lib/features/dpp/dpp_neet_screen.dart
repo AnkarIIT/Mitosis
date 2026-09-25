@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/providers/content_providers.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/models/subject_model.dart';
+import '../../core/theme/app_colors.dart';
 
 class DppNeetScreen extends ConsumerWidget {
   const DppNeetScreen({super.key});
@@ -65,7 +66,7 @@ class DppNeetScreen extends ConsumerWidget {
                         content: Text(
                           'Not enough questions for NEET pattern. Please import more questions.',
                         ),
-                        backgroundColor: Colors.orange,
+                        backgroundColor: AppColors.warning,
                       ),
                     );
                   }

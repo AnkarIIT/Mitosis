@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import '../theme/tokens.dart';
 
 class AppButton extends StatelessWidget {
   final String label;
@@ -23,20 +23,23 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveBg = backgroundColor ?? AppColors.primary;
-    final effectiveFg = textColor ?? Colors.white;
+    final scheme = Theme.of(context).colorScheme;
+    final effectiveBg = backgroundColor ?? scheme.primary;
+    final effectiveFg = textColor ?? scheme.onPrimary;
 
     if (isOutlined) {
       return OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: effectiveBg),
+          foregroundColor: backgroundColor ?? scheme.primary,
+          side: BorderSide(color: (backgroundColor ?? scheme.primary).withValues(alpha: 0.5)),
+          minimumSize: const Size(48, 48),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         ),
-        child: _buildChild(context, effectiveBg),
+        child: _buildChild(context, backgroundColor ?? scheme.primary),
       );
     }
 
@@ -46,7 +49,10 @@ class AppButton extends StatelessWidget {
         backgroundColor: effectiveBg,
         foregroundColor: effectiveFg,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        minimumSize: const Size(48, 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       ),
       child: _buildChild(context, effectiveFg),
@@ -71,7 +77,7 @@ class AppButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 20, color: fgColor),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Text(
             label,
             style: TextStyle(

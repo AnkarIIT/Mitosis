@@ -34,7 +34,7 @@ class CbtResultScreen extends ConsumerWidget {
         : (ratio >= 0.25 ? AppColors.warning : AppColors.error);
 
     return Scaffold(
-      backgroundColor: AppColors.surfaceWarm,
+      backgroundColor: AdaptiveColors.surfaceWarm(context),
       appBar: AppBar(
         title: const Text('Test Result'),
         elevation: 0,
@@ -166,7 +166,7 @@ class CbtResultScreen extends ConsumerWidget {
                     '${analytics.score.correct} correct • '
                     '${analytics.score.incorrect} wrong',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSubtle,
+                      color: AdaptiveColors.textSecondary(context),
                     ),
                   ),
                 ],
@@ -222,9 +222,9 @@ class CbtResultScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: AdaptiveColors.outline(context)),
       ),
       child: Column(
         children: [
@@ -234,7 +234,7 @@ class CbtResultScreen extends ConsumerWidget {
             label,
             style: Theme.of(
               context,
-            ).textTheme.labelSmall?.copyWith(color: AppColors.textSubtle),
+            ).textTheme.labelSmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
           ),
           const SizedBox(height: 4),
           Text(
@@ -280,9 +280,9 @@ class CbtResultScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: AdaptiveColors.outline(context)),
       ),
       child: Column(
         children: subjects.map((subject) {
@@ -322,7 +322,7 @@ class CbtResultScreen extends ConsumerWidget {
                             : (subject.accuracy / 100).clamp(0.0, 1.0),
                         minHeight: 8,
                         borderRadius: BorderRadius.circular(4),
-                        backgroundColor: AppColors.divider,
+                        backgroundColor: AdaptiveColors.outlineVariant(context),
                         valueColor: AlwaysStoppedAnimation(color),
                       ),
                     ),
@@ -387,9 +387,9 @@ class CbtResultScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: AdaptiveColors.outline(context)),
       ),
       child: Column(
         children: [
@@ -399,7 +399,7 @@ class CbtResultScreen extends ConsumerWidget {
             label,
             style: Theme.of(
               context,
-            ).textTheme.labelSmall?.copyWith(color: AppColors.textSubtle),
+            ).textTheme.labelSmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
           ),
           const SizedBox(height: 4),
           Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -573,7 +573,7 @@ class CbtResultScreen extends ConsumerWidget {
                                       ? AppColors.success
                                       : (isUserChoice
                                             ? AppColors.error
-                                            : AppColors.divider),
+                                            : AdaptiveColors.outlineVariant(context)),
                                 ),
                                 child: Center(
                                   child: Text(
@@ -676,7 +676,7 @@ class CbtResultScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Cannot replay: missing seed or question pool.'),
-            backgroundColor: Colors.orange,
+            backgroundColor: AppColors.warning,
           ),
         );
         return;
@@ -695,7 +695,7 @@ class CbtResultScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to replay: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -709,7 +709,7 @@ class CbtResultScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('No attempt data available to export.'),
-            backgroundColor: Colors.orange,
+            backgroundColor: AppColors.warning,
           ),
         );
         return;
@@ -727,7 +727,7 @@ class CbtResultScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to export CSV.'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
         return;
@@ -750,7 +750,7 @@ class CbtResultScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Export failed: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -785,9 +785,9 @@ class CbtResultScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: AdaptiveColors.surface(context),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.divider),
+            border: Border.all(color: AdaptiveColors.outline(context)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -812,7 +812,7 @@ class CbtResultScreen extends ConsumerWidget {
                   final result = results.length > i ? results[i] : null;
                   Color barColor;
                   if (result == null) {
-                    barColor = AppColors.divider;
+                    barColor = AdaptiveColors.outlineVariant(context);
                   } else if (result.isCorrect) {
                     barColor = AppColors.success;
                   } else if (result.isIncorrect) {

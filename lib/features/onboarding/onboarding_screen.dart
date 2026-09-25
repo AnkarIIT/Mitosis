@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 import 'batch_onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,15 +32,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       title: 'AI-Powered Doubt Solving',
       description:
           'Stuck on a question? Take a photo or type it in, and our AI Tutor will guide you to the answer.',
-      icon: Icons.psychology,
-      color: Colors.purple,
+      icon: Icons.psychology_rounded,
+      color: AppColors.primary,
     ),
     OnboardingPage(
       title: 'Track Your Progress',
       description:
           'Identify your weak spots with smart analytics and focus on what matters most.',
-      icon: Icons.analytics,
-      color: Colors.blue,
+      icon: Icons.analytics_rounded,
+      color: AppColors.primary,
     ),
   ];
 
@@ -93,9 +94,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               curve: Curves.easeInOut,
                             );
                           },
-                          child: const Text(
+                          child: Text(
                             'SKIP',
-                            style: TextStyle(color: AppColors.secondary),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         )
                       else
@@ -111,7 +115,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             decoration: BoxDecoration(
                               color: _currentPage == index
                                   ? AppColors.primary
-                                  : AppColors.divider,
+                                  : AdaptiveColors.outline(context),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -157,7 +161,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           const SizedBox(height: 20),
           Text(
             page.description,
-            style: const TextStyle(fontSize: 16, color: AppColors.secondary),
+            style: TextStyle(
+              fontSize: 16,
+              height: 1.5,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -185,7 +193,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           const Text(
             'To enable the AI Tutor, enter your free Gemini API Key (you can also do this later in settings).',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.secondary),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 32),
           TextField(
@@ -194,7 +205,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               hintText: 'Enter Gemini API Key',
               prefixIcon: const Icon(Icons.vpn_key),
               filled: true,
-              fillColor: AppColors.surface,
+              fillColor: AdaptiveColors.surface(context),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,

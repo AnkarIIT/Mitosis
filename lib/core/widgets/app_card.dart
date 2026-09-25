@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import '../theme/app_theme.dart';
+import '../theme/tokens.dart';
 
 class AppCard extends StatelessWidget {
   final Widget child;
@@ -16,45 +17,36 @@ class AppCard extends StatelessWidget {
     this.onTap,
     this.backgroundColor,
     this.border,
-    this.borderRadius = 16.0,
+    this.borderRadius = AppRadius.lg,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg =
-        backgroundColor ?? (isDark ? AppColors.surfaceDark : AppColors.cardBg);
+    final isDark = AdaptiveColors.isDark(context);
+    final bg = backgroundColor ?? AdaptiveColors.cardBackground(context);
 
-    final cardChild = Container(
-      padding: padding ?? const EdgeInsets.all(16),
+    final cardChild = AnimatedContainer(
+      duration: AppDuration.fast,
+      padding: padding ?? const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(borderRadius),
         border:
             border ??
-            Border.all(
-              color: isDark
-                  ? Colors.white12
-                  : Colors.black.withValues(alpha: 0.05),
-            ),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+            Border.all(color: AdaptiveColors.outlineVariant(context)),
+        boxShadow: AppShadows.card(isDark),
       ),
       child: child,
     );
 
     if (onTap != null) {
-      return InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: cardChild,
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: cardChild,
+        ),
       );
     }
 

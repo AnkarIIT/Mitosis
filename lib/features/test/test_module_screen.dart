@@ -47,7 +47,7 @@ class _TestModuleScreenState extends ConsumerState<TestModuleScreen>
           isScrollable: true,
           indicatorColor: theme.colorScheme.primary,
           labelColor: theme.colorScheme.primary,
-          unselectedLabelColor: Colors.grey.shade600,
+          unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
           tabs: const [
             Tab(icon: Icon(Icons.science), text: 'Mock Test'),
             Tab(icon: Icon(Icons.assignment), text: 'DPP'),
@@ -70,7 +70,11 @@ class _TestModuleScreenState extends ConsumerState<TestModuleScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.warning_amber_rounded, size: 64, color: Colors.orange),
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        size: 64,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
                       const SizedBox(height: 16),
                       const Text('No questions available for mock test'),
                       const SizedBox(height: 8),
@@ -148,7 +152,10 @@ class _TestModuleScreenState extends ConsumerState<TestModuleScreen>
   Widget _buildRecentSession(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: const Icon(Icons.schedule, color: Colors.blue),
+        leading: Icon(
+          Icons.schedule,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         title: const Text('Yesterday - Biology: Cell Division'),
         subtitle: const Text('10 questions | 15 min'),
         trailing: IconButton(
@@ -191,7 +198,12 @@ class _PracticeCard extends StatelessWidget {
           child: Icon(icon, color: theme.colorScheme.primary),
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(description, style: TextStyle(color: Colors.grey.shade600)),
+        subtitle: Text(
+          description,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () {
           // Handle practice selection

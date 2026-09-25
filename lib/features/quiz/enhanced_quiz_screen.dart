@@ -479,7 +479,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppColors.divider,
+                        color: AdaptiveColors.outline(context),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),

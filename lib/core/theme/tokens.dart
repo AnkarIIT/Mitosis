@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Design tokens for NEET Mitos.
-/// All spacing, radii, durations, and subject colors live here.
-/// Import this file — never hardcode these values in screens.
+/// Design tokens for NEET Mitos. Never hardcode these in screens.
 abstract final class AppSpacing {
   static const double xs = 4;
   static const double sm = 8;
@@ -26,6 +24,12 @@ abstract final class AppSpacing {
   static const SizedBox xlHeight = SizedBox(height: xl);
   static const SizedBox xxlHeight = SizedBox(height: xxl);
   static const SizedBox xxxlHeight = SizedBox(height: xxxl);
+
+  static const EdgeInsets page = EdgeInsets.symmetric(
+    horizontal: 20,
+    vertical: 12,
+  );
+  static const EdgeInsets card = EdgeInsets.all(lg);
 }
 
 abstract final class AppRadius {
@@ -63,28 +67,68 @@ abstract final class AppDuration {
   static const Duration celebration = Duration(milliseconds: 800);
 }
 
-/// Unified subject color palette.
-/// Biology = teal-green, Chemistry = purple, Physics = amber.
+abstract final class AppShadows {
+  static List<BoxShadow> card(bool isDark) => isDark
+      ? const []
+      : [
+          BoxShadow(
+            color: Color(0x0F0F172A),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ];
+
+  static List<BoxShadow> raised(bool isDark) => isDark
+      ? [
+          BoxShadow(
+            color: Color(0x66000000),
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ]
+      : [
+          BoxShadow(
+            color: Color(0x140F172A),
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ];
+
+  static List<BoxShadow> nav(bool isDark) => [
+    BoxShadow(
+      color: isDark ? const Color(0x66000000) : const Color(0x140F172A),
+      blurRadius: 20,
+      offset: const Offset(0, -2),
+    ),
+  ];
+}
+
+/// Biology = teal-green, Chemistry = violet, Physics = amber.
 abstract final class SubjectColors {
-  static const Color biology = Color(0xFF10B981);
+  static const Color biology = Color(0xFF059669);
   static const Color biologyLight = Color(0xFFD1FAE5);
-  static const Color biologyDark = Color(0xFF059669);
+  static const Color biologyDark = Color(0xFF047857);
 
-  static const Color chemistry = Color(0xFF9D4EDD);
-  static const Color chemistryLight = Color(0xFFEDE9F6);
-  static const Color chemistryDark = Color(0xFF7C3AED);
+  static const Color chemistry = Color(0xFF7C3AED);
+  static const Color chemistryLight = Color(0xFFEDE9FE);
+  static const Color chemistryDark = Color(0xFF6D28D9);
 
-  static const Color physics = Color(0xFFF59E0B);
+  static const Color physics = Color(0xFFD97706);
   static const Color physicsLight = Color(0xFFFEF3C7);
-  static const Color physicsDark = Color(0xFFD97706);
+  static const Color physicsDark = Color(0xFFB45309);
 
   static Color of(String subject) {
     switch (subject.toLowerCase()) {
       case 'biology':
+      case 'bio':
+      case 'botany':
+      case 'zoology':
         return biology;
       case 'chemistry':
+      case 'chem':
         return chemistry;
       case 'physics':
+      case 'phys':
         return physics;
       default:
         return biology;
@@ -94,10 +138,15 @@ abstract final class SubjectColors {
   static Color lightOf(String subject) {
     switch (subject.toLowerCase()) {
       case 'biology':
+      case 'bio':
+      case 'botany':
+      case 'zoology':
         return biologyLight;
       case 'chemistry':
+      case 'chem':
         return chemistryLight;
       case 'physics':
+      case 'phys':
         return physicsLight;
       default:
         return biologyLight;
@@ -107,10 +156,15 @@ abstract final class SubjectColors {
   static Color darkOf(String subject) {
     switch (subject.toLowerCase()) {
       case 'biology':
+      case 'bio':
+      case 'botany':
+      case 'zoology':
         return biologyDark;
       case 'chemistry':
+      case 'chem':
         return chemistryDark;
       case 'physics':
+      case 'phys':
         return physicsDark;
       default:
         return biologyDark;

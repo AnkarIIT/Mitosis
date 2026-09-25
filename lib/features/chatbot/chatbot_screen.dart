@@ -339,9 +339,9 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                         context.pop();
                         _clearChat();
                       },
-                      child: const Text(
+                      child: Text(
                         'Clear',
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(color: AdaptiveColors.error(context)),
                       ),
                     ),
                   ],
@@ -441,7 +441,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               ? AdaptiveColors.primary(context)
               : (isError
                     ? AppColors.errorLight
-                    : AdaptiveColors.secondary(context).withValues(alpha: 0.3)),
+                    : AdaptiveColors.surfaceContainerHighest(context)),
           borderRadius: BorderRadius.circular(16).copyWith(
             bottomRight: message.isUser ? const Radius.circular(0) : null,
             bottomLeft: !message.isUser ? const Radius.circular(0) : null,
@@ -533,7 +533,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                     child: ActionChip(
                       label: Text(prompt),
                       labelStyle: TextStyle(
-                        color: AdaptiveColors.onPrimary(context),
+                        color: AdaptiveColors.primary(context),
                         fontSize: 12,
                       ),
                       backgroundColor: AdaptiveColors.primary(
@@ -566,7 +566,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
         color: AdaptiveColors.background(context),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
+            color: AdaptiveColors.outline(context).withValues(alpha: 0.35),
             spreadRadius: 1,
             blurRadius: 10,
             offset: const Offset(0, -2),
@@ -598,9 +598,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: AdaptiveColors.secondary(
-                    context,
-                  ).withValues(alpha: 0.3),
+                  fillColor: AdaptiveColors.surfaceContainerHighest(context),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,

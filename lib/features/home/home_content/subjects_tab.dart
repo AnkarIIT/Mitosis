@@ -41,13 +41,13 @@ class SubjectsTab extends ConsumerWidget {
                   Icon(
                     Icons.book_outlined,
                     size: 64,
-                    color: AppColors.secondary.withValues(alpha: 0.4),
+                    color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No subjects available',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.secondary.withValues(alpha: 0.6),
+                      color: AdaptiveColors.textSecondary(context),
                     ),
                   ),
                 ],
@@ -144,9 +144,7 @@ class SubjectsTab extends ConsumerWidget {
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.secondary.withValues(
-                                        alpha: 0.3,
-                                      ),
+                                       color: AppColors.textLight.withValues(alpha: 0.22),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(

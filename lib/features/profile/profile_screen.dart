@@ -125,8 +125,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         icon: const Icon(Icons.logout_rounded),
         label: const Text('Logout'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.red.shade400,
-          side: BorderSide(color: Colors.red.shade400.withValues(alpha: 0.3)),
+          foregroundColor: AdaptiveColors.error(context),
+          side: BorderSide(
+            color: AdaptiveColors.error(context).withValues(alpha: 0.35),
+          ),
           padding: const EdgeInsets.symmetric(vertical: 14),
         ),
       ),
@@ -148,7 +150,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               right: 0,
               child: CircleAvatar(
                 radius: 20,
-                backgroundColor: AppColors.secondary,
+                 backgroundColor: AdaptiveColors.surface(context),
                 child: IconButton(
                   icon: const Icon(
                     Icons.edit,
@@ -168,7 +170,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         Text(
           auth.user?.email ?? 'Complete your profile to sync data',
-          style: const TextStyle(color: AppColors.textSubtle),
+          style: TextStyle(color: AdaptiveColors.textSecondary(context)),
         ),
       ],
     );
@@ -424,7 +426,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.divider.withValues(alpha: 0.5)),
+        side: BorderSide(color: AdaptiveColors.outline(context).withValues(alpha: 0.5)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -439,7 +441,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             Text(
               label,
-              style: const TextStyle(fontSize: 11, color: AppColors.textSubtle),
+              style: TextStyle(fontSize: 11, color: AdaptiveColors.textSecondary(context)),
             ),
           ],
         ),
@@ -453,7 +455,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       color: AdaptiveColors.surface(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AppColors.divider.withValues(alpha: 0.5)),
+        side: BorderSide(color: AdaptiveColors.outline(context).withValues(alpha: 0.5)),
       ),
       child: ListTile(
         leading: Container(
@@ -505,11 +507,11 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 180, maxWidth: 220),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: locked ? AppColors.surface : color.withValues(alpha: 0.08),
+        color: locked ? AdaptiveColors.surface(context) : color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: locked
-              ? AppColors.divider.withValues(alpha: 0.4)
+              ? AdaptiveColors.outline(context).withValues(alpha: 0.4)
               : color.withValues(alpha: 0.25),
         ),
       ),
@@ -519,14 +521,14 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: (locked ? AppColors.divider : color).withValues(
+              color: (locked ? AdaptiveColors.outline(context) : color).withValues(
                 alpha: locked ? 0.1 : 0.15,
               ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               locked ? Icons.lock_outline : icon,
-              color: locked ? AppColors.divider : color,
+              color: locked ? AdaptiveColors.outline(context) : color,
               size: 22,
             ),
           ),
@@ -551,7 +553,9 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
                   description,
                   style: TextStyle(
                     fontSize: 12,
-                    color: locked ? AppColors.divider : AppColors.textSubtle,
+                    color: locked
+                        ? AdaptiveColors.outline(context)
+                        : AdaptiveColors.textSecondary(context),
                     height: 1.3,
                   ),
                   maxLines: 2,
@@ -577,9 +581,9 @@ class _LockedAchievementChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.divider.withValues(alpha: 0.4)),
+        border: Border.all(color: AdaptiveColors.outline(context).withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

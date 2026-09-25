@@ -4,6 +4,7 @@ import '../../core/models/user_preferences_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 
 /// Batch onboarding triage — a 3-step flow embedded in the onboarding
 /// PageView:
@@ -154,7 +155,10 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
           const Text(
             'This personalizes your syllabus — Class 11 & 12 students see only '
             'their NCERT chapters, while droppers get the full syllabus.',
-            style: TextStyle(color: AppColors.secondary, height: 1.4),
+            style: TextStyle(
+              color: AdaptiveColors.textSecondary(context),
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 24),
           _personaCard(
@@ -162,7 +166,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
             icon: Icons.biotech,
             title: NeetBatch.class11.displayName,
             subtitle: 'Studying Class 11 NCERT',
-            color: Colors.green,
+            color: SubjectColors.biology,
           ),
           const SizedBox(height: 12),
           _personaCard(
@@ -170,7 +174,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
             icon: Icons.science,
             title: NeetBatch.class12.displayName,
             subtitle: 'Studying Class 12 NCERT',
-            color: Colors.blue,
+            color: AdaptiveColors.primary(context),
           ),
           const SizedBox(height: 12),
           _personaCard(
@@ -178,7 +182,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
             icon: Icons.flag,
             title: NeetBatch.dropper.displayName,
             subtitle: 'Completed 12th, full syllabus',
-            color: Colors.deepPurple,
+            color: SubjectColors.chemistry,
           ),
         ],
       ),
@@ -235,9 +239,9 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                     ),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.secondary,
+                        color: AdaptiveColors.textSecondary(context),
                       ),
                     ),
                   ],
@@ -246,7 +250,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
               if (selected)
                 Icon(Icons.check_circle, color: color)
               else
-                Icon(Icons.circle_outlined, color: AppColors.divider),
+                Icon(Icons.circle_outlined, color: AdaptiveColors.outline(context)),
             ],
           ),
         ),
@@ -271,7 +275,10 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
           const SizedBox(height: 8),
           const Text(
             'We\'ll use this to pace your plan toward the exam.',
-            style: TextStyle(color: AppColors.secondary, height: 1.4),
+            style: TextStyle(
+              color: AdaptiveColors.textSecondary(context),
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 24),
           Wrap(
@@ -324,7 +331,10 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
           const SizedBox(height: 8),
           const Text(
             'This sets your daily question target so the plan stays realistic.',
-            style: TextStyle(color: AppColors.secondary, height: 1.4),
+            style: TextStyle(
+              color: AdaptiveColors.textSecondary(context),
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 24),
           ..._commitmentOptions.map((minutes) {
@@ -356,7 +366,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                           Icons.schedule,
                           color: selected
                               ? AppColors.primary
-                              : AppColors.secondary,
+                              : AdaptiveColors.textSecondary(context),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -375,7 +385,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                             color: AppColors.primary,
                           )
                         else
-                          Icon(Icons.circle_outlined, color: AppColors.divider),
+                          Icon(Icons.circle_outlined, color: AdaptiveColors.outline(context)),
                       ],
                     ),
                   ),
@@ -412,7 +422,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
           onPressed: _saving ? null : widget.onDone,
           child: const Text(
             'SKIP',
-            style: TextStyle(color: AppColors.secondary),
+            style: TextStyle(color: AdaptiveColors.textSecondary(context)),
           ),
         ),
         const Spacer(),

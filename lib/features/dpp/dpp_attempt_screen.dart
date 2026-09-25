@@ -228,7 +228,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to export CSV.'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
         return;
@@ -250,7 +250,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Export failed: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -317,7 +317,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
             LinearProgressIndicator(
               value: (_currentQuestionIndex + 1) / _questions.length,
               minHeight: 6,
-              backgroundColor: AppColors.divider,
+                  backgroundColor: AdaptiveColors.outlineVariant(context),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -367,12 +367,12 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? AppColors.primary.withValues(alpha: 0.1)
-                                  : AppColors.surface,
+                                  : AdaptiveColors.surface(context),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: isSelected
                                     ? AppColors.primary
-                                    : AppColors.divider,
+                                    : AdaptiveColors.outline(context),
                                 width: isSelected ? 2 : 1,
                               ),
                             ),
@@ -385,7 +385,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                                     shape: BoxShape.circle,
                                     color: isSelected
                                         ? AppColors.primary
-                                        : AppColors.divider,
+                                        : AdaptiveColors.outlineVariant(context),
                                   ),
                                   child: Center(
                                     child: Text(
@@ -531,9 +531,9 @@ class _DppReviewSheet extends StatelessWidget {
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: AdaptiveColors.surface(context),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -543,7 +543,7 @@ class _DppReviewSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.divider,
+              color: AdaptiveColors.outline(context),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -618,7 +618,7 @@ class _DppReviewSheet extends StatelessWidget {
                 LinearProgressIndicator(
                   value: total > 0 ? correct / total : 0,
                   minHeight: 8,
-                  backgroundColor: AppColors.divider,
+              backgroundColor: AdaptiveColors.outlineVariant(context),
                   valueColor: const AlwaysStoppedAnimation(AppColors.success),
                 ),
                 const SizedBox(height: 4),
@@ -696,7 +696,7 @@ class _DppReviewSheet extends StatelessWidget {
                                               ? AppColors.success
                                               : (isUserChoice
                                                     ? AppColors.error
-                                                    : AppColors.divider),
+                                                    : AdaptiveColors.outlineVariant(context)),
                                         ),
                                         child: Center(
                                           child: Text(

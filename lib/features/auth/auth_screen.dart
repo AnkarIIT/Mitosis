@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 
 enum AuthMode { login, signUp, forgotPassword, resetPassword, twoFactor }
 
@@ -226,515 +228,393 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     await ref.read(authProvider.notifier).continueAsGuest();
   }
 
+
+  InputDecoration _fieldDecoration({
+    required String label,
+    required IconData icon,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon),
+      suffixIcon: suffixIcon,
+    );
+  }
+
+  String get _title {
+    switch (_mode) {
+      case AuthMode.login:
+        return 'Welcome back';
+      case AuthMode.signUp:
+        return 'Create account';
+      case AuthMode.forgotPassword:
+        return 'Reset password';
+      case AuthMode.twoFactor:
+        return 'Two-factor verification';
+      case AuthMode.resetPassword:
+        return 'Enter reset code';
+    }
+  }
+
+  String get _subtitle {
+    switch (_mode) {
+      case AuthMode.login:
+        return 'Sign in to sync your progress across devices';
+      case AuthMode.signUp:
+        return 'Start your NEET prep journey';
+      case AuthMode.forgotPassword:
+        return 'We will send you a reset code';
+      case AuthMode.twoFactor:
+      case AuthMode.resetPassword:
+        return 'Check your email for the 6-digit code';
+    }
+  }
+
+  String get _submitLabel {
+    switch (_mode) {
+      case AuthMode.login:
+        return 'Sign in';
+      case AuthMode.signUp:
+        return 'Create account';
+      case AuthMode.forgotPassword:
+        return 'Send reset code';
+      case AuthMode.twoFactor:
+        return 'Verify code';
+      case AuthMode.resetPassword:
+        return 'Reset password';
+    }
+  }
+
+  String get _switchLabel {
+    switch (_mode) {
+      case AuthMode.login:
+        return "Don't have an account? Sign up";
+      case AuthMode.signUp:
+        return 'Already have an account? Sign in';
+      case AuthMode.forgotPassword:
+      case AuthMode.twoFactor:
+        return 'Back to sign in';
+      case AuthMode.resetPassword:
+        return 'Back to forgot password';
+    }
+  }
+
+  void _switchMode() {
+    switch (_mode) {
+      case AuthMode.login:
+        setState(() => _mode = AuthMode.signUp);
+        break;
+      case AuthMode.signUp:
+      case AuthMode.forgotPassword:
+      case AuthMode.twoFactor:
+        setState(() => _mode = AuthMode.login);
+        break;
+      case AuthMode.resetPassword:
+        setState(() => _mode = AuthMode.forgotPassword);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final isAuthLoading = authState.status == AuthStatus.loading;
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primary,
-              AppColors.primary.withValues(alpha: 0.88),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 48),
-                  Container(
+      backgroundColor: AdaptiveColors.background(context),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 28),
+                Center(
+                  child: Container(
                     width: 72,
                     height: 72,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(16),
+                      color: scheme.primary,
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.school_rounded,
                       size: 40,
-                      color: Colors.white,
+                      color: scheme.onPrimary,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    _mode == AuthMode.login
-                        ? 'Welcome back'
-                        : _mode == AuthMode.signUp
-                        ? 'Create account'
-                        : _mode == AuthMode.forgotPassword
-                        ? 'Reset password'
-                        : _mode == AuthMode.twoFactor
-                        ? 'Two-factor verification'
-                        : 'Enter reset code',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'NEET Mitos',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: scheme.primary,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AdaptiveColors.textSecondary(context),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
+                if (_mode != AuthMode.resetPassword) ...[
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: _fieldDecoration(
+                      label: 'Email',
+                      icon: Icons.email_outlined,
                     ),
-                    textAlign: TextAlign.center,
+                    validator: (value) {
+                      if (value == null ||
+                          value.trim().isEmpty ||
+                          !value.contains('@')) {
+                        return 'Enter a valid email';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (_mode == AuthMode.signUp) ...[
+                  TextFormField(
+                    controller: _fullNameController,
+                    decoration: _fieldDecoration(
+                      label: 'Full Name',
+                      icon: Icons.person_outline,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: _fieldDecoration(
+                      label: 'Username',
+                      icon: Icons.alternate_email,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (_mode != AuthMode.forgotPassword &&
+                    _mode != AuthMode.resetPassword &&
+                    _mode != AuthMode.twoFactor) ...[
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    decoration: _fieldDecoration(
+                      label: 'Password',
+                      icon: Icons.lock_outline,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (_mode == AuthMode.resetPassword) ...[
+                  TextFormField(
+                    controller: _resetCodeController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    decoration: _fieldDecoration(
+                      label: 'Reset Code',
+                      icon: Icons.pin_outlined,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().length != 6) {
+                        return 'Enter the 6-digit code';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _newPasswordController,
+                    obscureText: _obscurePassword,
+                    decoration: _fieldDecoration(
+                      label: 'New Password',
+                      icon: Icons.lock_outline,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (_mode == AuthMode.twoFactor) ...[
+                  TextFormField(
+                    controller: _twoFactorController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    decoration: _fieldDecoration(
+                      label: 'Verification Code',
+                      icon: Icons.pin_outlined,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().length != 6) {
+                        return 'Enter the 6-digit code';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    _mode == AuthMode.login
-                        ? 'Sign in to sync your progress across devices'
-                        : _mode == AuthMode.signUp
-                        ? 'Start your NEET prep journey'
-                        : _mode == AuthMode.forgotPassword
-                        ? 'We will send you a reset code'
-                        : _mode == AuthMode.twoFactor
-                        ? 'Check your email for the 6-digit code'
-                        : 'Check your email for the 6-digit code',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withValues(alpha: 0.8),
-                    ),
-                    textAlign: TextAlign.center,
+                  TextButton.icon(
+                    onPressed: isAuthLoading ? null : _handleResend2FA,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Resend code'),
                   ),
-                  const SizedBox(height: 32),
-
-                  if (_mode != AuthMode.resetPassword) ...[
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        labelStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.email_outlined,
-                          color: Colors.white70,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
+                  const SizedBox(height: 8),
+                ],
+                if (_mode != AuthMode.twoFactor) ...[
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _termsAccepted,
+                        onChanged: (value) {
+                          setState(() => _termsAccepted = value ?? false);
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null ||
-                            value.trim().isEmpty ||
-                            !value.contains('@')) {
-                          return 'Enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  if (_mode == AuthMode.signUp) ...[
-                    TextFormField(
-                      controller: _fullNameController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Full Name',
-                        labelStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.person_outline,
-                          color: Colors.white70,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.2),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(
+                            () => _termsAccepted = !_termsAccepted,
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  if (_mode == AuthMode.signUp) ...[
-                    TextFormField(
-                      controller: _usernameController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Username',
-                        labelStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.alternate_email,
-                          color: Colors.white70,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  if (_mode != AuthMode.forgotPassword &&
-                      _mode != AuthMode.resetPassword &&
-                      _mode != AuthMode.twoFactor) ...[
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.lock_outline,
-                          color: Colors.white70,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.white70,
-                          ),
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  if (_mode == AuthMode.resetPassword) ...[
-                    TextFormField(
-                      controller: _resetCodeController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 6,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Reset Code',
-                        labelStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.pin_outlined,
-                          color: Colors.white70,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().length != 6) {
-                          return 'Enter the 6-digit code';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _newPasswordController,
-                      obscureText: _obscurePassword,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'New Password',
-                        labelStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.lock_outline,
-                          color: Colors.white70,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.white70,
-                          ),
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  if (_mode == AuthMode.twoFactor) ...[
-                    TextFormField(
-                      controller: _twoFactorController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 6,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Verification Code',
-                        labelStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.pin_outlined,
-                          color: Colors.white70,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().length != 6) {
-                          return 'Enter the 6-digit code';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton.icon(
-                      onPressed: isAuthLoading ? null : _handleResend2FA,
-                      icon: const Icon(
-                        Icons.refresh_rounded,
-                        color: Colors.white70,
-                      ),
-                      label: Text(
-                        'Resend code',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  if (_mode != AuthMode.twoFactor) ...[
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _termsAccepted,
-                          onChanged: (value) {
-                            setState(() => _termsAccepted = value ?? false);
-                          },
-                          fillColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return Colors.white;
-                            }
-                            return Colors.white.withValues(alpha: 0.3);
-                          }),
-                          checkColor: AppColors.primary,
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(
-                              () => _termsAccepted = !_termsAccepted,
-                            ),
-                            child: RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  fontSize: 12,
+                          child: RichText(
+                            text: TextSpan(
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: AdaptiveColors.textSecondary(
+                                      context,
+                                    ),
+                                  ),
+                              children: [
+                                const TextSpan(text: 'I agree to the '),
+                                TextSpan(
+                                  text: 'Terms',
+                                  style: TextStyle(
+                                    color: scheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () => context.push('/terms'),
                                 ),
-                                children: [
-                                  const TextSpan(text: 'I agree to the '),
-                                  TextSpan(
-                                    text: 'Terms',
-                                    style: const TextStyle(
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () => context.push('/terms'),
+                                const TextSpan(text: ' and '),
+                                TextSpan(
+                                  text: 'Privacy Policy',
+                                  style: TextStyle(
+                                    color: scheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                    decoration: TextDecoration.underline,
                                   ),
-                                  const TextSpan(text: ' and '),
-                                  TextSpan(
-                                    text: 'Privacy Policy',
-                                    style: const TextStyle(
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () => context.push('/privacy'),
-                                  ),
-                                ],
-                              ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () => context.push('/privacy'),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: _canSubmit && !isAuthLoading
-                          ? _handleSubmit
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.primary,
-                        textStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
                       ),
-                      child: isAuthLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.primary,
-                              ),
-                            )
-                          : Text(
-                              _mode == AuthMode.login
-                                  ? 'SIGN IN'
-                                  : _mode == AuthMode.signUp
-                                  ? 'CREATE ACCOUNT'
-                                  : _mode == AuthMode.forgotPassword
-                                  ? 'SEND RESET CODE'
-                                  : _mode == AuthMode.twoFactor
-                                  ? 'VERIFY CODE'
-                                  : 'RESET PASSWORD',
-                            ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
+                ],
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _canSubmit && !isAuthLoading
+                        ? _handleSubmit
+                        : null,
+                    child: isAuthLoading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: scheme.onPrimary,
+                            ),
+                          )
+                        : Text(_submitLabel),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: TextButton(
+                    onPressed: isAuthLoading ? null : _switchMode,
+                    child: Text(_switchLabel),
+                  ),
+                ),
+                if (_mode == AuthMode.login)
                   Center(
                     child: TextButton(
                       onPressed: isAuthLoading
                           ? null
-                          : () {
-                              switch (_mode) {
-                                case AuthMode.login:
-                                  setState(() => _mode = AuthMode.signUp);
-                                  break;
-                                case AuthMode.signUp:
-                                  setState(() => _mode = AuthMode.login);
-                                  break;
-                                case AuthMode.forgotPassword:
-                                  setState(() => _mode = AuthMode.login);
-                                  break;
-                                case AuthMode.resetPassword:
-                                  setState(
-                                    () => _mode = AuthMode.forgotPassword,
-                                  );
-                                  break;
-                                case AuthMode.twoFactor:
-                                  setState(() => _mode = AuthMode.login);
-                                  break;
-                              }
-                            },
-                      child: Text(
-                        _mode == AuthMode.login
-                            ? 'Don\'t have an account? Sign up'
-                            : _mode == AuthMode.signUp
-                            ? 'Already have an account? Sign in'
-                            : _mode == AuthMode.forgotPassword
-                            ? 'Back to sign in'
-                            : _mode == AuthMode.twoFactor
-                            ? 'Back to sign in'
-                            : 'Back to forgot password',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
+                          : () => setState(
+                              () => _mode = AuthMode.forgotPassword,
+                            ),
+                      child: const Text('Forgot password?'),
                     ),
                   ),
-                  if (_mode == AuthMode.login) ...[
-                    const SizedBox(height: 8),
-                    Center(
-                      child: TextButton(
-                        onPressed: isAuthLoading
-                            ? null
-                            : () => setState(
-                                () => _mode = AuthMode.forgotPassword,
-                              ),
-                        child: Text(
-                          'Forgot password?',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ),
+                if (authState.error != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    authState.error!,
+                    style: TextStyle(
+                      color: AdaptiveColors.error(context),
+                      fontSize: 13,
                     ),
-                  ],
-                  const SizedBox(height: 24),
-                  if (authState.error != null)
-                    Center(
-                      child: Text(
-                        authState.error!,
-                        style: const TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 13,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: isAuthLoading ? null : _handleGuestContinue,
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.4),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Text(
-                      'Continue as Guest',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
-              ),
+                const SizedBox(height: 16),
+                OutlinedButton(
+                  onPressed: isAuthLoading ? null : _handleGuestContinue,
+                  child: const Text('Continue as Guest'),
+                ),
+              ],
             ),
           ),
         ),

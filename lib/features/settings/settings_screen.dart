@@ -352,7 +352,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         messenger.showSnackBar(
           SnackBar(
             content: Text('Successfully downloaded $count NEET PYQ questions!'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
       } else {
@@ -361,7 +361,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             content: Text(
               'No new questions downloaded. Sources may be unavailable.',
             ),
-            backgroundColor: Colors.orange,
+            backgroundColor: AppColors.warning,
           ),
         );
       }
@@ -370,7 +370,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       messenger.showSnackBar(
         SnackBar(
           content: Text('Download failed: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }

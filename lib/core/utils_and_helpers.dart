@@ -19,13 +19,13 @@ class AppUtils {
   static Color getDifficultyColor(String difficulty) {
     switch (difficulty.toLowerCase()) {
       case 'easy':
-        return const Color(0xFF22C55E); // Green
+        return AppColors.success;
       case 'medium':
-        return AppColors.secondary;
+        return AppColors.warning;
       case 'hard':
-        return const Color(0xFFEF4444); // Red
+        return AppColors.error;
       default:
-        return AppColors.secondary;
+        return AppColors.textSubtle;
     }
   }
 
@@ -45,10 +45,10 @@ class AppUtils {
 
   /// Calculate accuracy color based on percentage
   static Color getAccuracyColor(double accuracy) {
-    if (accuracy >= 80) return const Color(0xFF22C55E); // Green
-    if (accuracy >= 60) return const Color(0xFFF59E0B); // Amber
-    if (accuracy >= 40) return const Color(0xFFF97316); // Orange
-    return const Color(0xFFEF4444); // Red
+    if (accuracy >= 80) return AppColors.success;
+    if (accuracy >= 60) return AppColors.warning;
+    if (accuracy >= 40) return AppColors.physicsAccent;
+    return AppColors.error;
   }
 
   /// Get subject emoji/icon

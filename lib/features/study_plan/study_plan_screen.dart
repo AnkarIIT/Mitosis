@@ -58,14 +58,17 @@ class StudyPlanScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.orange.shade400, Colors.orange.shade700],
+          colors: [
+            AdaptiveColors.warning(context),
+            AdaptiveColors.warning(context).withValues(alpha: 0.82),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withValues(alpha: 0.3),
+            color: AdaptiveColors.warning(context).withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -136,7 +139,9 @@ class StudyPlanScreen extends ConsumerWidget {
                 Text(
                   '${(percent * 100).toInt()}% Done',
                   style: TextStyle(
-                    color: percent >= 1.0 ? Colors.green : AppColors.primary,
+                    color: percent >= 1.0
+                        ? AdaptiveColors.success(context)
+                        : AppColors.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -150,7 +155,9 @@ class StudyPlanScreen extends ConsumerWidget {
                 minHeight: 12,
                 backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                 valueColor: AlwaysStoppedAnimation(
-                  percent >= 1.0 ? Colors.green : AppColors.primary,
+                  percent >= 1.0
+                      ? AdaptiveColors.success(context)
+                      : AppColors.primary,
                 ),
               ),
             ),
@@ -228,10 +235,14 @@ class StudyPlanScreen extends ConsumerWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.red.withValues(alpha: 0.1),
+            color: AdaptiveColors.error(context).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.priority_high, color: Colors.red, size: 20),
+          child: Icon(
+            Icons.priority_high,
+            color: AdaptiveColors.error(context),
+            size: 20,
+          ),
         ),
         title: Text(
           topic.name,
@@ -286,7 +297,7 @@ class StudyPlanScreen extends ConsumerWidget {
               title: 'Target Score',
               subtitle: '$targetScore points goal',
               icon: Icons.flag,
-              color: Colors.teal,
+              color: AppColors.primary,
             ),
             const SizedBox(height: 12),
             _buildMilestoneCard(
@@ -294,7 +305,7 @@ class StudyPlanScreen extends ConsumerWidget {
               title: 'Current Accuracy',
               subtitle: '${accuracy.toStringAsFixed(0)}% accuracy',
               icon: Icons.track_changes,
-              color: Colors.blue,
+              color: AppColors.primary,
             ),
             const SizedBox(height: 12),
             _buildMilestoneCard(
@@ -302,7 +313,7 @@ class StudyPlanScreen extends ConsumerWidget {
               title: 'Streak Hunter',
               subtitle: '$streak Day Current Streak',
               icon: Icons.local_fire_department,
-              color: Colors.orange,
+              color: AppColors.warning,
             ),
           ],
         );
@@ -362,7 +373,11 @@ class StudyPlanScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.stars, color: Colors.amber, size: 40),
+          Icon(
+            Icons.stars,
+            color: AdaptiveColors.warning(context),
+            size: 40,
+          ),
           const SizedBox(height: 12),
           Text(
             message,

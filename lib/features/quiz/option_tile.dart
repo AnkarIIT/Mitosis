@@ -54,12 +54,12 @@ class OptionTile extends ConsumerWidget {
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
             ),
             child: InkWell(
               onTap: isAnswered ? null : onTap,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(

@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/models/flashcard_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
 
@@ -71,7 +73,7 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                         icon: Icons.schedule,
                       ),
                     ),
-                    Container(height: 40, width: 1, color: AppColors.divider),
+                    Container(height: 40, width: 1, color: AdaptiveColors.divider(context)),
                     Expanded(
                       child: _StatItem(
                         label: 'Total Cards',
@@ -80,7 +82,7 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                         icon: Icons.style,
                       ),
                     ),
-                    Container(height: 40, width: 1, color: AppColors.divider),
+                    Container(height: 40, width: 1, color: AdaptiveColors.divider(context)),
                     Expanded(
                       child: _StatItem(
                         label: 'Mastered',
@@ -105,7 +107,7 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textSubtle,
+                      color: AdaptiveColors.textSecondary(context),
                     ),
                   ),
                 ],
@@ -145,7 +147,7 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                       Text(
                         'Create from topics',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSubtle,
+                          color: AdaptiveColors.textSecondary(context),
                         ),
                       ),
                     ],
@@ -173,7 +175,7 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                       Text(
                         'Spaced repetition',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSubtle,
+                          color: AdaptiveColors.textSecondary(context),
                         ),
                       ),
                     ],
@@ -228,13 +230,13 @@ class FlashcardDashboardScreen extends ConsumerWidget {
   Color _getSubjectColor(String subject) {
     switch (subject.toLowerCase()) {
       case 'physics':
-        return Colors.blue;
+        return SubjectColors.physics;
       case 'chemistry':
-        return Colors.orange;
+        return SubjectColors.chemistry;
       case 'biology':
       case 'botany':
       case 'zoology':
-        return Colors.green;
+        return SubjectColors.biology;
       default:
         return AppColors.primary;
     }
@@ -271,7 +273,7 @@ class _StatItem extends StatelessWidget {
           label,
           style: Theme.of(
             context,
-          ).textTheme.bodySmall?.copyWith(color: AppColors.textSubtle),
+           ).textTheme.bodySmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/models/question_paper_model.dart';
 import '../../core/services/question_paper_generator.dart';
 import '../../core/providers/providers.dart';
@@ -55,11 +56,11 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
                             });
                           },
                           selectedColor: AppColors.primary,
-                          backgroundColor: AppColors.surfaceWarm,
+                          backgroundColor: AdaptiveColors.surfaceWarm(context),
                           labelStyle: TextStyle(
                             color: selectedSubjects.contains(subject)
                                 ? Colors.white
-                                : AppColors.textSubtle,
+                                : AdaptiveColors.textSecondary(context),
                           ),
                         ),
                       )
@@ -150,7 +151,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.divider,
+          color: isSelected ? AppColors.primary : AdaptiveColors.outline(context),
           width: isSelected ? 2 : 1,
         ),
         borderRadius: BorderRadius.circular(12),
@@ -171,7 +172,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
                   isSelected
                       ? Icons.radio_button_checked
                       : Icons.radio_button_unchecked,
-                  color: isSelected ? AppColors.primary : AppColors.textSubtle,
+                  color: isSelected ? AppColors.primary : AdaptiveColors.textSecondary(context),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -188,7 +189,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
                       Text(
                         config.description,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.textSubtle,
+                          color: AdaptiveColors.textSecondary(context),
                         ),
                       ),
                     ],
@@ -274,7 +275,7 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
       if (!mounted) return;
       context.pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
       );
     } finally {
       if (mounted) {

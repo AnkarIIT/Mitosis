@@ -40,13 +40,13 @@ class TopicBrowserScreen extends ConsumerWidget {
                   Icon(
                     Icons.book_outlined,
                     size: 64,
-                    color: AppColors.secondary.withValues(alpha: 0.4),
+                    color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No chapters available',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.secondary.withValues(alpha: 0.6),
+                      color: AdaptiveColors.textSecondary(context),
                     ),
                   ),
                 ],
@@ -163,10 +163,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                             .withValues(
                                                               alpha: 0.2,
                                                             )
-                                                      : AppColors.secondary
-                                                            .withValues(
-                                                              alpha: 0.15,
-                                                            ),
+                                                      : AdaptiveColors.outlineVariant(context),
                                                 ),
                                                 child: Center(
                                                   child: isCompleted
@@ -261,10 +258,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                               .withValues(
                                                                 alpha: 0.15,
                                                               )
-                                                        : AppColors.secondary
-                                                              .withValues(
-                                                                alpha: 0.15,
-                                                              ),
+                                                        : AdaptiveColors.outlineVariant(context),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           20,
@@ -275,10 +269,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                                 .withValues(
                                                                   alpha: 0.3,
                                                                 )
-                                                          : AppColors.secondary
-                                                                .withValues(
-                                                                  alpha: 0.3,
-                                                                ),
+                                                          : AdaptiveColors.outline(context),
                                                     ),
                                                   ),
                                                   child: Text(
@@ -287,7 +278,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                       fontSize: 12,
                                                       color: accuracy >= 70
                                                           ? AppColors.primary
-                                                          : AppColors.secondary,
+                                                          : AdaptiveColors.textSecondary(context),
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
@@ -297,8 +288,7 @@ class TopicBrowserScreen extends ConsumerWidget {
                                               // Trailing arrow
                                               Icon(
                                                 Icons.chevron_right,
-                                                color: AppColors.secondary
-                                                    .withValues(alpha: 0.5),
+                                                color: AdaptiveColors.textSecondary(context),
                                                 size: 20,
                                               ),
                                             ],

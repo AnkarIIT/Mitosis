@@ -10,10 +10,11 @@ import '../../core/services/exam_checkpoint_service.dart';
 import '../../core/services/secure_screen_service.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 
 import 'package:go_router/go_router.dart';
 import '../../core/database/drift_database.dart' as db;
-import '../../core/theme/app_theme.dart';
 import 'on_screen_calculator.dart';
 
 enum _SessionPhase { taking, break_ }
@@ -44,7 +45,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   Set<String>? _excludedIds;
 
   // Palette state colours (NTA-style).
-  static const Color _cMarked = Color(0xFF7E57C2); // purple
+  static const Color _cMarked = SubjectColors.chemistry;
 
   late final String _attemptId;
   late final int _seed;

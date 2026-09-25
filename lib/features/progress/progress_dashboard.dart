@@ -80,11 +80,11 @@ class ProgressDashboard extends ConsumerWidget {
                                 child: CircularProgressIndicator(
                                   value: (stats['accuracy'] as double) / 100,
                                   strokeWidth: 12,
-                                  backgroundColor: AdaptiveColors.secondary(
+                                  backgroundColor: AdaptiveColors.onPrimary(
                                     context,
                                   ).withValues(alpha: 0.2),
                                   valueColor: AlwaysStoppedAnimation(
-                                    AdaptiveColors.secondary(context),
+                                    AdaptiveColors.onPrimary(context),
                                   ),
                                 ),
                               ),
@@ -109,9 +109,9 @@ class ProgressDashboard extends ConsumerWidget {
                                         .textTheme
                                         .labelSmall
                                         ?.copyWith(
-                                          color: AdaptiveColors.secondary(
+                                          color: AdaptiveColors.onPrimary(
                                             context,
-                                          ),
+                                          ).withValues(alpha: 0.8),
                                         ),
                                   ),
                                 ],
@@ -241,7 +241,7 @@ class ProgressDashboard extends ConsumerWidget {
                                     toY: attempt.accuracy,
                                     color: attempt.accuracy >= 70
                                         ? AdaptiveColors.primary(context)
-                                        : AdaptiveColors.secondary(context),
+                                        : AdaptiveColors.warning(context),
                                     width: 16,
                                     borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(4),
@@ -280,7 +280,10 @@ class ProgressDashboard extends ConsumerWidget {
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side: const BorderSide(color: Colors.red, width: 0.5),
+                           side: BorderSide(
+                             color: AdaptiveColors.error(context),
+                             width: 0.5,
+                           ),
                         ),
                         child: InkWell(
                           onTap: () {
@@ -305,9 +308,9 @@ class ProgressDashboard extends ConsumerWidget {
                                 const Spacer(),
                                 Row(
                                   children: [
-                                    const Icon(
+                                    Icon(
                                       Icons.warning,
-                                      color: Colors.red,
+                                      color: AdaptiveColors.error(context),
                                       size: 14,
                                     ),
                                     const SizedBox(width: 4),
@@ -316,7 +319,11 @@ class ProgressDashboard extends ConsumerWidget {
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelSmall
-                                          ?.copyWith(color: Colors.red),
+                                           ?.copyWith(
+                                             color: AdaptiveColors.error(
+                                               context,
+                                             ),
+                                           ),
                                     ),
                                   ],
                                 ),
@@ -373,7 +380,7 @@ class ProgressDashboard extends ConsumerWidget {
                                     ? AdaptiveColors.primary(
                                         context,
                                       ).withValues(alpha: 0.2)
-                                    : AdaptiveColors.secondary(
+                                    : AdaptiveColors.warning(
                                         context,
                                       ).withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
@@ -384,7 +391,7 @@ class ProgressDashboard extends ConsumerWidget {
                                   fontWeight: FontWeight.bold,
                                   color: accuracy >= 70
                                       ? AdaptiveColors.primary(context)
-                                      : AdaptiveColors.secondary(context),
+                                      : AdaptiveColors.warning(context),
                                 ),
                               ),
                             ),
@@ -396,13 +403,13 @@ class ProgressDashboard extends ConsumerWidget {
                           child: LinearProgressIndicator(
                             value: totalQuestions == 0 ? 0 : accuracy / 100,
                             minHeight: 6,
-                            backgroundColor: AdaptiveColors.secondary(
+                            backgroundColor: AdaptiveColors.outlineVariant(
                               context,
-                            ).withValues(alpha: 0.2),
+                            ),
                             valueColor: AlwaysStoppedAnimation(
                               accuracy >= 70
                                   ? AdaptiveColors.primary(context)
-                                  : AdaptiveColors.secondary(context),
+                                  : AdaptiveColors.warning(context),
                             ),
                           ),
                         ),
@@ -492,14 +499,14 @@ class ProgressDashboard extends ConsumerWidget {
                   backgroundColor: AdaptiveColors.divider(context),
                   valueColor: AlwaysStoppedAnimation(
                     percent >= 1.0
-                        ? Colors.green
+                        ? AdaptiveColors.success(context)
                         : AdaptiveColors.primary(context),
                   ),
                 ),
                 Icon(
                   percent >= 1.0 ? Icons.check : Icons.flag,
                   color: percent >= 1.0
-                      ? Colors.green
+                      ? AdaptiveColors.success(context)
                       : AdaptiveColors.primary(context),
                   size: 20,
                 ),
@@ -521,7 +528,7 @@ class ProgressDashboard extends ConsumerWidget {
                 Text(
                   '$completed / $target questions answered today',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AdaptiveColors.secondary(context),
+                    color: AdaptiveColors.textSecondary(context),
                   ),
                 ),
               ],
@@ -646,7 +653,7 @@ class ProgressDashboard extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
-                  color: AdaptiveColors.secondary(context),
+                  color: AdaptiveColors.textSecondary(context),
                 ),
               ),
               if (!hasMock)
@@ -683,7 +690,7 @@ class _StatItem extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: AdaptiveColors.secondary(context), size: 20),
+            Icon(icon, color: AdaptiveColors.onPrimary(context), size: 20),
             const SizedBox(width: 8),
             Text(
               value,
@@ -698,7 +705,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: AdaptiveColors.secondary(context),
+            color: AdaptiveColors.onPrimary(context).withValues(alpha: 0.8),
             fontSize: 12,
           ),
         ),

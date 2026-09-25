@@ -167,7 +167,7 @@ class ModernSidebar extends ConsumerWidget {
                       'NEET Aspirant',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.grey.shade600,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -191,7 +191,7 @@ class ModernSidebar extends ConsumerWidget {
                 context: context,
                 icon: Icons.local_fire_department,
                 label: '$streak',
-                color: Colors.orange,
+                color: theme.colorScheme.tertiary,
               ),
               const SizedBox(width: 8),
               _buildStatChip(
@@ -261,7 +261,7 @@ class ModernSidebar extends ConsumerWidget {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        _buildSectionHeader('MAIN'),
+        _buildSectionHeader(context, 'MAIN'),
         _buildNavTile(
           context: context,
           icon: Icons.home_outlined,
@@ -287,7 +287,7 @@ class ModernSidebar extends ConsumerWidget {
           currentLocation: currentLocation,
         ),
 
-        _buildSectionHeader('STUDY TOOLS'),
+        _buildSectionHeader(context, 'STUDY TOOLS'),
         _buildNavTile(
           context: context,
           icon: Icons.psychology_outlined,
@@ -337,7 +337,7 @@ class ModernSidebar extends ConsumerWidget {
           currentLocation: currentLocation,
         ),
 
-        _buildSectionHeader('MY PROGRESS'),
+        _buildSectionHeader(context, 'MY PROGRESS'),
         _buildNavTile(
           context: context,
           icon: Icons.bar_chart_outlined,
@@ -371,7 +371,7 @@ class ModernSidebar extends ConsumerWidget {
           currentLocation: currentLocation,
         ),
 
-        _buildSectionHeader('LEARNING'),
+        _buildSectionHeader(context, 'LEARNING'),
         _buildNavTile(
           context: context,
           icon: Icons.calendar_today_outlined,
@@ -392,7 +392,7 @@ class ModernSidebar extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Text(
@@ -400,7 +400,7 @@ class ModernSidebar extends ConsumerWidget {
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
-          color: Colors.grey.shade500,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
           letterSpacing: 0.5,
         ),
       ),
@@ -423,7 +423,7 @@ class ModernSidebar extends ConsumerWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       leading: Icon(
         isSelected ? selectedIcon : icon,
-        color: isSelected ? theme.colorScheme.primary : Colors.grey.shade600,
+        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
         size: 22,
       ),
       title: Text(
@@ -432,7 +432,7 @@ class ModernSidebar extends ConsumerWidget {
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           color: isSelected
               ? theme.colorScheme.onSurface
-              : Colors.grey.shade700,
+              : theme.colorScheme.onSurfaceVariant,
           fontSize: 14,
         ),
       ),
@@ -493,7 +493,7 @@ class AboutDialog extends StatelessWidget {
           SizedBox(height: 8),
           Text(
             'Your complete NEET preparation companion',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
           SizedBox(height: 16),
           Text('Features:', style: TextStyle(fontWeight: FontWeight.w600)),

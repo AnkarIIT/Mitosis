@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../core/providers/content_providers.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/services/dpp_engine.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 
 class DppScreen extends ConsumerStatefulWidget {
   final String subject;
@@ -54,7 +56,7 @@ class _DppScreenState extends ConsumerState<DppScreen> {
             content: Text(
               'Not enough questions available for DPP. Please import more questions.',
             ),
-            backgroundColor: Colors.orange,
+            backgroundColor: AppColors.warning,
           ),
         );
       }
@@ -63,7 +65,7 @@ class _DppScreenState extends ConsumerState<DppScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to generate DPP: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     } finally {
@@ -237,19 +239,19 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                         'Correct',
                         '$correct',
                         context,
-                        color: Colors.green,
+                        color: AdaptiveColors.success(context),
                       ),
                       _buildStat(
                         'Incorrect',
                         '$incorrect',
                         context,
-                        color: Colors.red,
+                        color: AdaptiveColors.error(context),
                       ),
                       _buildStat(
                         'Skipped',
                         '$unattempted',
                         context,
-                        color: Colors.orange,
+                        color: AdaptiveColors.warning(context),
                       ),
                     ],
                   ),
@@ -260,8 +262,8 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                       backgroundColor: AdaptiveColors.surfaceContainerHighest(
                         context,
                       ),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        Colors.green,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AdaptiveColors.success(context),
                       ),
                     ),
                   ],
@@ -372,7 +374,7 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: isCorrect
-                                          ? Colors.green
+                                          ? AdaptiveColors.success(context)
                                           : AdaptiveColors.surfaceContainerHighest(
                                                 context,
                                               ),
@@ -461,9 +463,9 @@ class _DppScreenState extends ConsumerState<DppScreen> {
 
   Color _subjectColor(String subject) {
     final s = subject.toLowerCase();
-    if (s.contains('physics')) return Colors.blue;
-    if (s.contains('chem')) return Colors.orange;
-    return Colors.green;
+    if (s.contains('physics')) return SubjectColors.physics;
+    if (s.contains('chem')) return SubjectColors.chemistry;
+    return SubjectColors.biology;
   }
 
   Widget _buildStat(

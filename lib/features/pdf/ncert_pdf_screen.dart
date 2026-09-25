@@ -112,7 +112,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
     final chapterQuestions = _questionsForChapter(allQuestions);
 
     return Scaffold(
-      backgroundColor: AppColors.surfaceWarm,
+      backgroundColor: AdaptiveColors.surfaceWarm(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -131,7 +131,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
             Text(
               '${_entry.subject} • ${_entry.classLevel} • '
               'Chapter ${_entry.chapterNumber}',
-              style: const TextStyle(fontSize: 11, color: AppColors.textSubtle),
+              style: TextStyle(fontSize: 11, color: AdaptiveColors.textSecondary(context)),
             ),
           ],
         ),
@@ -174,7 +174,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
                         radius: 14,
                         backgroundColor: isCurrent
                             ? AppColors.primary.withValues(alpha: 0.15)
-                            : AppColors.divider,
+                            : AdaptiveColors.outlineVariant(context),
                         child: Text(
                           '${entry.chapterNumber}',
                           style: TextStyle(
@@ -182,7 +182,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
                             fontWeight: FontWeight.bold,
                             color: isCurrent
                                 ? AppColors.primary
-                                : AppColors.textSubtle,
+                                : AdaptiveColors.textSecondary(context),
                           ),
                         ),
                       ),
@@ -244,7 +244,7 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
           ),
           if (chapterQuestions.isNotEmpty)
             Container(
-              color: AppColors.surface,
+              color: AdaptiveColors.surface(context),
               padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
               child: SafeArea(
                 top: false,

@@ -4,6 +4,7 @@ import '../../core/models/user_progress_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 import 'package:go_router/go_router.dart';
 
 class TestResultScreen extends ConsumerWidget {
@@ -15,8 +16,10 @@ class TestResultScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final accuracy = attempt.accuracy;
     final color = accuracy >= 70
-        ? Colors.green
-        : (accuracy >= 40 ? Colors.orange : Colors.red);
+        ? AdaptiveColors.success(context)
+        : (accuracy >= 40
+              ? AdaptiveColors.warning(context)
+              : AdaptiveColors.error(context));
 
     return Scaffold(
       appBar: AppBar(
@@ -168,7 +171,7 @@ class TestResultScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 LinearProgressIndicator(
                   value: (score / total).clamp(0.0, 1.0),
-                  backgroundColor: AppColors.divider,
+                  backgroundColor: AdaptiveColors.outlineVariant(context),
                   valueColor: AlwaysStoppedAnimation(_getSubjectColor(subject)),
                 ),
               ],
@@ -224,9 +227,9 @@ class TestResultScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: AdaptiveColors.background(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: AdaptiveColors.outline(context)),
       ),
       child: Column(
         children: [
@@ -249,11 +252,11 @@ class TestResultScreen extends ConsumerWidget {
   Color _getSubjectColor(String name) {
     switch (name.toLowerCase()) {
       case 'biology':
-        return Colors.green;
+        return SubjectColors.biology;
       case 'chemistry':
-        return Colors.blue;
+        return SubjectColors.chemistry;
       case 'physics':
-        return Colors.orange;
+        return SubjectColors.physics;
       default:
         return AppColors.primary;
     }
@@ -292,7 +295,12 @@ class TestResultScreen extends ConsumerWidget {
         Row(
           children: [
             Expanded(
-              child: _buildDifficultyBox(context, 'Easy', easy, Colors.green),
+              child: _buildDifficultyBox(
+                context,
+                'Easy',
+                easy,
+                AdaptiveColors.success(context),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -300,12 +308,17 @@ class TestResultScreen extends ConsumerWidget {
                 context,
                 'Medium',
                 medium,
-                Colors.orange,
+                AdaptiveColors.warning(context),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildDifficultyBox(context, 'Hard', hard, Colors.red),
+              child: _buildDifficultyBox(
+                context,
+                'Hard',
+                hard,
+                AdaptiveColors.error(context),
+              ),
             ),
           ],
         ),
@@ -351,26 +364,26 @@ class TestResultScreen extends ConsumerWidget {
     final accuracy = attempt.accuracy;
     String message = '';
     IconData icon = Icons.info;
-    Color color = Colors.blue;
+    Color color = AdaptiveColors.primary(context);
 
     if (accuracy >= 80) {
-      message = '🎉 Excellent! You have a strong command of this topic.';
+      message = 'Excellent! You have a strong command of this topic.';
       icon = Icons.stars;
-      color = Colors.green;
+      color = AdaptiveColors.success(context);
     } else if (accuracy >= 60) {
       message =
-          '👍 Good performance! Focus on the weak areas to improve further.';
+          'Good performance! Focus on the weak areas to improve further.';
       icon = Icons.thumb_up;
-      color = Colors.blue;
+      color = AdaptiveColors.primary(context);
     } else if (accuracy >= 40) {
-      message = '📚 Need improvement. Review the concepts and practice more.';
+      message = 'Need improvement. Review the concepts and practice more.';
       icon = Icons.school;
-      color = Colors.orange;
+      color = AdaptiveColors.warning(context);
     } else {
       message =
-          '⚠️ This topic needs urgent attention. Revisit the fundamentals.';
+          'This topic needs urgent attention. Revisit the fundamentals.';
       icon = Icons.warning;
-      color = Colors.red;
+      color = AdaptiveColors.error(context);
     }
 
     return Container(

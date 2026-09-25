@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Quick action button widget
+import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/tokens.dart';
+
 class QuickActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -8,12 +10,12 @@ class QuickActionButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const QuickActionButton({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,24 +23,24 @@ class QuickActionButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        child: Ink(
+          padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.2)),
+            color: color.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: color.withValues(alpha: 0.22)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon, size: 32, color: color),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 label,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: color,
+                  color: AdaptiveColors.textPrimary(context),
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),

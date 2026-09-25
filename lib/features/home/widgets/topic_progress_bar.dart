@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Topic progress bar widget
+import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/tokens.dart';
+
 class TopicProgressBar extends StatelessWidget {
   final String topic;
   final double progress;
@@ -8,26 +10,26 @@ class TopicProgressBar extends StatelessWidget {
   final int mastered;
 
   const TopicProgressBar({
-    Key? key,
+    super.key,
     required this.topic,
     required this.progress,
     required this.questions,
     required this.mastered,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    final color = progress >= 0.8 
-        ? Colors.green 
-        : progress >= 0.6 
-            ? Colors.blue 
-            : Colors.orange;
+    final color = progress >= 0.8
+        ? AdaptiveColors.success(context)
+        : progress >= 0.6
+        ? AdaptiveColors.primary(context)
+        : AdaptiveColors.warning(context);
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        color: AdaptiveColors.surfaceWarm(context),
+        borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,19 +47,19 @@ class TopicProgressBar extends StatelessWidget {
               Text(
                 '$mastered/$questions',
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: AdaptiveColors.textSecondary(context),
                   fontSize: 12,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppRadius.sm),
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 8,
-              backgroundColor: Colors.grey.shade300,
+              backgroundColor: AdaptiveColors.outlineVariant(context),
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),

@@ -46,13 +46,13 @@ class _AllenStudyModuleScreenState extends ConsumerState<AllenStudyModuleScreen>
                   Icon(
                     Icons.menu_book_outlined,
                     size: 64,
-                    color: AppColors.secondary.withValues(alpha: 0.4),
+                    color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No subjects available',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: AppColors.secondary.withValues(alpha: 0.6),
+                          color: AdaptiveColors.textSecondary(context),
                         ),
                   ),
                 ],
@@ -529,7 +529,7 @@ class AllenChapterDetailScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.auto_stories_outlined, color: AppColors.secondary, size: 20),
+              Icon(Icons.auto_stories_outlined, color: AdaptiveColors.textSecondary(context), size: 20),
               const SizedBox(width: 8),
               Text(
                 'Illustrations & Examples',
@@ -552,13 +552,13 @@ class AllenChapterDetailScreen extends ConsumerWidget {
                     margin: const EdgeInsets.only(top: 2),
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withValues(alpha: 0.12),
+                      color: AdaptiveColors.primary(context).withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.check,
                       size: 10,
-                      color: AppColors.secondary,
+                      color: AdaptiveColors.primary(context),
                     ),
                   ),
                   const SizedBox(width: 10),

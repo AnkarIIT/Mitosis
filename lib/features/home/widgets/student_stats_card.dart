@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Student statistics overview card
+import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/tokens.dart';
+
 class StudentStatsCard extends StatelessWidget {
   final int targetScore;
   final int currentScore;
@@ -8,29 +10,26 @@ class StudentStatsCard extends StatelessWidget {
   final int daysStudied;
 
   const StudentStatsCard({
-    Key? key,
+    super.key,
     required this.targetScore,
     required this.currentScore,
     required this.studyHours,
     required this.daysStudied,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    final percentage = (currentScore / targetScore) * 100;
-    final progressColor = percentage >= 80 
-        ? Colors.green 
-        : percentage >= 60 
-            ? Colors.orange 
-            : Colors.red;
+    final safeTarget = targetScore == 0 ? 1 : targetScore;
+    final percentage = (currentScore / safeTarget) * 100;
+    final progressColor = percentage >= 80
+        ? AdaptiveColors.success(context)
+        : percentage >= 60
+        ? AdaptiveColors.warning(context)
+        : AdaptiveColors.error(context);
 
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -40,9 +39,7 @@ class StudentStatsCard extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 16),
-            
-            // Score Progress
+            const SizedBox(height: AppSpacing.lg),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -51,72 +48,72 @@ class StudentStatsCard extends StatelessWidget {
                   children: [
                     Text(
                       '$currentScore / $targetScore',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     Text(
                       'NEET Score',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
+                        color: AdaptiveColors.textSecondary(context),
                       ),
                     ),
                   ],
                 ),
                 SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Center(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          value: currentScore / targetScore,
-                          strokeWidth: 8,
-                          valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                  width: 88,
+                  height: 88,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        value: (currentScore / safeTarget).clamp(0.0, 1.0),
+                        strokeWidth: 8,
+                        backgroundColor: AdaptiveColors.primary(
+                          context,
+                        ).withValues(alpha: 0.12),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          progressColor,
                         ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '${percentage.toInt()}%',
-                              style: TextStyle(
-                                color: progressColor,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18,
-                              ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${percentage.toInt()}%',
+                            style: TextStyle(
+                              color: progressColor,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
                             ),
-                            Text(
-                              'ready',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey.shade600,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                          Text(
+                            'ready',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: AdaptiveColors.textSecondary(context),
+                                  fontSize: 10,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            
-            const SizedBox(height: 20),
-            
-            // Study Stats
+            const SizedBox(height: AppSpacing.xl),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildStatItem(
                   context,
-                  icon: Icons.timer,
+                  icon: Icons.timer_outlined,
                   value: studyHours.toString(),
                   label: 'Study Hours',
                 ),
                 _buildStatItem(
                   context,
-                  icon: Icons.calendar_today,
+                  icon: Icons.calendar_today_outlined,
                   value: daysStudied.toString(),
                   label: 'Days',
                 ),
@@ -128,25 +125,26 @@ class StudentStatsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(BuildContext context, {
+  Widget _buildStatItem(
+    BuildContext context, {
     required IconData icon,
     required String value,
     required String label,
   }) {
     return Column(
       children: [
-        Icon(icon, size: 24, color: Colors.blue.shade300),
-        const SizedBox(height: 8),
+        Icon(icon, size: 24, color: AdaptiveColors.primary(context)),
+        const SizedBox(height: AppSpacing.sm),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Colors.grey.shade600,
+            color: AdaptiveColors.textSecondary(context),
             fontSize: 11,
           ),
         ),

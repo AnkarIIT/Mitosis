@@ -211,7 +211,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
       final isSelected = _selected == option;
       final isCorrect = option == question.correctAnswer;
 
-      Color borderColor = AppColors.divider;
+      Color borderColor = AdaptiveColors.outline(context);
       Color bgColor = AdaptiveColors.surface(context);
       Color textColor = AdaptiveColors.textPrimary(context);
 

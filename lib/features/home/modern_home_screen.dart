@@ -5,6 +5,8 @@ import './widgets/student_stats_card.dart';
 import './widgets/quick_action_button.dart';
 import './widgets/topic_progress_bar.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/services/pyq_pdf_downloader_service.dart';
 
 /// Modern, student-focused home screen with quick actions and progress tracking
@@ -94,25 +96,25 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                         QuickActionButton(
                           icon: Icons.book,
                           label: 'PYQ Downloads',
-                          color: Colors.blue,
+                          color: AdaptiveColors.primary(context),
                           onTap: () => Navigator.pushNamed(context, '/pyq'),
                         ),
                         QuickActionButton(
                           icon: Icons.smart_toy,
                           label: 'AI Tutor',
-                          color: Colors.purple,
+                          color: SubjectColors.chemistry,
                           onTap: () => Navigator.pushNamed(context, '/chatbot'),
                         ),
                         QuickActionButton(
                           icon: Icons.flash_on,
                           label: 'Flashcards',
-                          color: Colors.orange,
+                          color: SubjectColors.physics,
                           onTap: () => Navigator.pushNamed(context, '/flashcards'),
                         ),
                         QuickActionButton(
                           icon: Icons.search,
                           label: 'Topic Bank',
-                          color: Colors.green,
+                          color: SubjectColors.biology,
                           onTap: () => Navigator.pushNamed(context, '/topics'),
                         ),
                       ],
@@ -248,7 +250,7 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.menu_book, size: 20, color: Colors.blue),
+                            Icon(Icons.menu_book, size: 20, color: theme.colorScheme.primary),
                             const SizedBox(width: 8),
                             Text(
                               'NEET Previous Year Papers',
@@ -261,19 +263,19 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                         const SizedBox(height: 16),
                         const Text(
                           'Download and practice from the last 19 years of NEET question papers (2006-2024).',
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(color: AdaptiveColors.textSecondary(context)),
                         ),
                         const SizedBox(height: 16),
                         Row(
                           children: [
                             Expanded(
-                              child: _buildYearBadge('2024', Colors.red),
+                              child: _buildYearBadge('2024', AppColors.error),
                             ),
                             Expanded(
-                              child: _buildYearBadge('2023', Colors.pink),
+                              child: _buildYearBadge('2023', AppColors.biologyAccent),
                             ),
                             Expanded(
-                              child: _buildYearBadge('2022', Colors.deepPurple),
+                              child: _buildYearBadge('2022', AppColors.chemistryAccent),
                             ),
                           ],
                         ),
@@ -287,7 +289,7 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Downloading 19 years of NEET PYQs...'),
-                                  backgroundColor: Colors.blue,
+                                  backgroundColor: AppColors.primary,
                                 ),
                               );
                               // Trigger download

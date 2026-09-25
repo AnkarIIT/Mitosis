@@ -204,7 +204,7 @@ class _HeroCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [AppColors.primary, Color(0xFF143D3E)],
+          colors: [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -464,9 +464,9 @@ class _MasteredTopicRow extends StatelessWidget {
                 ),
                 Text(
                   '${mastered.chapterName} · ${mastered.subjectName}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSubtle,
+                    color: AdaptiveColors.textSecondary(context),
                   ),
                 ),
               ],
