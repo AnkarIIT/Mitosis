@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
+import 'package:drift/web.dart';
 
 QueryExecutor connect() {
-  return LazyDatabase(() async {
-    throw UnsupportedError('Web is not supported for sqlite3 database');
-  });
+  return WebDatabase('neet_mitos_db');
 }

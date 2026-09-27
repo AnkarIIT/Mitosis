@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 class DailyGoals extends Table {
+  IntColumn get userId => integer().withDefault(const Constant(0))();
   DateTimeColumn get date => dateTime()(); // YYYY-MM-DD format
   IntColumn get target =>
       integer().withDefault(const Constant(50))(); // questions target
@@ -11,5 +12,5 @@ class DailyGoals extends Table {
   )(); // pending, in_progress, completed
 
   @override
-  Set<Column> get primaryKey => {date};
+  Set<Column> get primaryKey => {userId, date};
 }

@@ -11,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../database/drift_database.dart' as db;
 import '../config/app_config.dart';
 import 'email_service.dart';
+import '../utils/security_utils.dart';
 
 class AuthService {
   final db.AppDatabase _db;
@@ -30,11 +31,39 @@ class AuthService {
     final trimmedEmail = email.trim().toLowerCase();
     final trimmedUsername = (username ?? trimmedEmail.split('@').first).trim();
 
-    if (trimmedEmail.isEmpty || password.length < 6) {
+    // Stronger password policy: min 8 chars, uppercase, lowercase, digit, special char
+    if (trimmedEmail.isEmpty || password.length < 8) {
       return (
         success: false,
-        message:
-            'Enter a valid email and a password with at least 6 characters.',
+        message: 'Enter a valid email and a password with at least 8 characters.',
+        user: null,
+      );
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      return (
+        success: false,
+        message: 'Password must contain at least one uppercase letter.',
+        user: null,
+      );
+    }
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      return (
+        success: false,
+        message: 'Password must contain at least one lowercase letter.',
+        user: null,
+      );
+    }
+    if (!RegExp(r'\d').hasMatch(password)) {
+      return (
+        success: false,
+        message: 'Password must contain at least one number.',
+        user: null,
+      );
+    }
+    if (!RegExp(r'[!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?]').hasMatch(password)) {
+      return (
+        success: false,
+        message: 'Password must contain at least one special character (!@#\$%^&*...).',
         user: null,
       );
     }
@@ -90,6 +119,15 @@ class AuthService {
       );
     }
 
+    // Check if account is locked
+    if (await _db.isAccountLocked(user.id)) {
+      return (
+        success: false,
+        message: 'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.',
+        user: null,
+      );
+    }
+
     if (user.passwordHash == null || user.passwordHash!.isEmpty) {
       return (
         success: false,
@@ -101,9 +139,12 @@ class AuthService {
 
     final hash = _verifyPassword(password, user.passwordHash!);
     if (!hash) {
+      await _db.incrementFailedLoginAttempts(user.id);
       return (success: false, message: 'Incorrect password.', user: null);
     }
 
+    // Reset failed attempts on successful login
+    await _db.resetFailedLoginAttempts(user.id);
     await _db.updateLastLogin(user.id);
     final updated = await _db.getUserById(user.id);
 
@@ -199,6 +240,72 @@ class AuthService {
     }
   }
 
+  /// Attempts to sign in with Supabase and creates/updates local user record.
+  /// This enables login on a new device where the local database is empty.
+  Future<({bool success, String message, db.User? user})> cloudLogin({
+    required String email,
+    required String password,
+  }) async {
+    final client = _supabaseClient;
+    if (client == null) {
+      return (
+        success: false,
+        message: 'Cloud authentication is not available.',
+        user: null,
+      );
+    }
+
+    try {
+      final res = await client.auth.signInWithPassword(
+        email: email.trim().toLowerCase(),
+        password: password,
+      );
+      final cloudUser = res.user;
+      if (cloudUser == null) {
+        return (success: false, message: 'Authentication failed.', user: null);
+      }
+
+      // Check if local user exists for this email
+      final trimmedEmail = email.trim().toLowerCase();
+      var localUser = await _db.getUserByEmail(trimmedEmail);
+
+      if (localUser == null) {
+        // Create new local user from cloud user
+        final username = cloudUser.email?.split('@').first ?? 'user';
+        final created = await _db.createUserFromCloud(
+          email: trimmedEmail,
+          username: username,
+          supabaseId: cloudUser.id,
+          fullName: cloudUser.userMetadata?['full_name'] as String?,
+        );
+        if (created == null) {
+          return (
+            success: false,
+            message: 'Failed to create local user.',
+            user: null,
+          );
+        }
+        localUser = created;
+      } else if (localUser.supabaseId != cloudUser.id) {
+        // Link existing local user to cloud identity
+        await _db.setSupabaseId(localUser.id, cloudUser.id);
+        localUser = (await _db.getUserById(localUser.id))!;
+      }
+
+      // Sync profile
+      await _upsertCloudProfile(client, localUser);
+
+      await _db.updateLastLogin(localUser.id);
+      await saveSession(localUser.id);
+
+      return (success: true, message: 'Logged in via cloud', user: localUser);
+    } on supabase.AuthException catch (e) {
+      return (success: false, message: e.message, user: null);
+    } catch (e) {
+      return (success: false, message: 'Cloud login failed: $e', user: null);
+    }
+  }
+
   /// Re-syncs the profile using the already-persisted Supabase session (no
   /// password needed); used on auto-login so accounts created while the client
   /// was still initializing get provisioned on the next launch.
@@ -236,7 +343,15 @@ class AuthService {
     final user = await _db.getUserById(userId);
     final supabaseId = user?.supabaseId;
     if (client == null || supabaseId == null || supabaseId.isEmpty) return;
+    await deleteCloudAccountBySupabaseId(supabaseId);
+  }
+
+  Future<void> deleteCloudAccountBySupabaseId(String supabaseId) async {
+    final client = _supabaseClient;
+    if (client == null) return;
     try {
+      // Delete the Supabase auth user (requires admin privileges or user's own session)
+      // For now, delete the profile; auth deletion requires server-side function
       await client.from('profiles').delete().eq('id', supabaseId);
     } catch (e) {
       developer.log('Cloud profile delete skipped: $e');
@@ -314,10 +429,8 @@ class AuthService {
       return (success: false, message: 'Invalid request.', user: null);
     }
 
-    final reset = await _db.getActivePasswordReset(user.id);
-    if (reset == null ||
-        !_constantTimeEquals(reset.code, code) ||
-        reset.expiresAt.isBefore(DateTime.now())) {
+    final reset = await _db.getActivePasswordReset(user.id, code);
+    if (reset == null) {
       return (
         success: false,
         message: 'Invalid or expired reset code.',
@@ -328,6 +441,20 @@ class AuthService {
     final passwordHash = _hashPassword(newPassword);
     await _db.updateUserPassword(user.id, passwordHash);
     await _db.clearPasswordReset(user.id);
+
+    // Also update cloud password if user has a Supabase identity
+    final client = _supabaseClient;
+    if (client != null &&
+        user.supabaseId != null &&
+        user.supabaseId!.isNotEmpty) {
+      try {
+        await client.auth.updateUser(
+          supabase.UserAttributes(password: newPassword),
+        );
+      } catch (e) {
+        developer.log('Cloud password update skipped: $e');
+      }
+    }
 
     final updated = await _db.getUserById(user.id);
     return (success: true, message: 'Password updated', user: updated);
@@ -384,8 +511,8 @@ class AuthService {
       return (success: false, message: 'Account not found.');
     }
 
-    final active = await _db.getActiveTwoFactorCode(user.id);
-    if (active == null || !_constantTimeEquals(active.code, code)) {
+    final active = await _db.getActiveTwoFactorCode(user.id, code);
+    if (active == null) {
       return (success: false, message: 'Invalid or expired verification code.');
     }
 
@@ -449,8 +576,8 @@ class AuthService {
       return (success: false, message: 'User not found.', user: null);
     }
 
-    final active = await _db.getActiveTwoFactorCode(userId);
-    if (active == null || !_constantTimeEquals(active.code, code)) {
+    final active = await _db.getActiveTwoFactorCode(userId, code);
+    if (active == null) {
       return (success: false, message: 'Invalid or expired code.', user: null);
     }
 

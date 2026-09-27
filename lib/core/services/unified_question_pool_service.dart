@@ -114,7 +114,9 @@ class UnifiedQuestionPoolService {
 
     // Anti-repetition: exclude recently seen questions
     if (request.excludeRecent) {
-      final subjectFilter = request.subjects.length == 1 ? request.subjects.first : null;
+      final subjectFilter = request.subjects.length == 1
+          ? request.subjects.first
+          : null;
       final excludedIds = await _history.getRecentSeenQuestionIds(
         subject: subjectFilter,
       );
@@ -135,8 +137,12 @@ class UnifiedQuestionPoolService {
     if (request.biasWeakTopics) {
       final weakTopicIds = await _mastery.weakTopicIds(request.subjects);
       if (weakTopicIds.isNotEmpty) {
-        final weak = pool.where((q) => weakTopicIds.contains(q.topicId)).toList();
-        final others = pool.where((q) => !weakTopicIds.contains(q.topicId)).toList();
+        final weak = pool
+            .where((q) => weakTopicIds.contains(q.topicId))
+            .toList();
+        final others = pool
+            .where((q) => !weakTopicIds.contains(q.topicId))
+            .toList();
         weak.shuffle(_random);
         others.shuffle(_random);
         pool = [...weak, ...others];
@@ -152,14 +158,22 @@ class UnifiedQuestionPoolService {
     final minPoolSize = (request.count * 2).clamp(20, 200);
     if (pool.length < minPoolSize && request.excludeRecent) {
       // Relax exclusion but keep cooldown
-      final allSubjectQuestions = all.where((q) => request.subjects.contains(q.subject)).toList();
+      final allSubjectQuestions = all
+          .where((q) => request.subjects.contains(q.subject))
+          .toList();
       final cooldownIds = await _getCooldownQuestionIds(request.subjects);
-      pool = allSubjectQuestions.where((q) => !cooldownIds.contains(q.id)).toList();
+      pool = allSubjectQuestions
+          .where((q) => !cooldownIds.contains(q.id))
+          .toList();
       if (request.biasWeakTopics) {
         final weakTopicIds = await _mastery.weakTopicIds(request.subjects);
         if (weakTopicIds.isNotEmpty) {
-          final weak = pool.where((q) => weakTopicIds.contains(q.topicId)).toList();
-          final others = pool.where((q) => !weakTopicIds.contains(q.topicId)).toList();
+          final weak = pool
+              .where((q) => weakTopicIds.contains(q.topicId))
+              .toList();
+          final others = pool
+              .where((q) => !weakTopicIds.contains(q.topicId))
+              .toList();
           weak.shuffle(_random);
           others.shuffle(_random);
           pool = [...weak, ...others];
@@ -171,7 +185,10 @@ class UnifiedQuestionPoolService {
   }
 
   /// Selects questions from pool based on request parameters.
-  List<Question> _selectQuestions(List<Question> pool, QuestionRequest request) {
+  List<Question> _selectQuestions(
+    List<Question> pool,
+    QuestionRequest request,
+  ) {
     if (pool.isEmpty) return [];
 
     final shuffled = List<Question>.from(pool)..shuffle(_random);
@@ -186,21 +203,20 @@ class UnifiedQuestionPoolService {
   }
 
   /// Samples questions with difficulty distribution.
-  List<Question> _sampleByDifficulty(List<Question> pool, QuestionRequest request) {
+  List<Question> _sampleByDifficulty(
+    List<Question> pool,
+    QuestionRequest request,
+  ) {
     final easyTarget = request.count * request.easyPercent ~/ 100;
     final mediumTarget = request.count * request.mediumPercent ~/ 100;
     final hardTarget = request.count - easyTarget - mediumTarget;
 
     final buckets = <List<Question>>[
-      pool
-          .where((q) => _normalizeDifficulty(q.difficulty) == 'Easy')
-          .toList(),
+      pool.where((q) => _normalizeDifficulty(q.difficulty) == 'Easy').toList(),
       pool
           .where((q) => _normalizeDifficulty(q.difficulty) == 'Medium')
           .toList(),
-      pool
-          .where((q) => _normalizeDifficulty(q.difficulty) == 'Hard')
-          .toList(),
+      pool.where((q) => _normalizeDifficulty(q.difficulty) == 'Hard').toList(),
     ];
 
     final picked = <Question>[];
@@ -212,7 +228,8 @@ class UnifiedQuestionPoolService {
       var taken = 0;
       for (final q in buckets[i]) {
         if (taken >= targets[i]) break;
-        if (request.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+        if (request.deduplicateConcepts &&
+            _hasConceptOverlap(q, usedConcepts)) {
           continue;
         }
         picked.add(q);
@@ -227,7 +244,8 @@ class UnifiedQuestionPoolService {
       remaining.shuffle(_random);
       for (final q in remaining) {
         if (picked.length >= request.count) break;
-        if (request.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+        if (request.deduplicateConcepts &&
+            _hasConceptOverlap(q, usedConcepts)) {
           continue;
         }
         picked.add(q);
@@ -239,7 +257,10 @@ class UnifiedQuestionPoolService {
   }
 
   /// Samples questions per subject with weights.
-  List<Question> _sampleBySubject(List<Question> pool, QuestionRequest request) {
+  List<Question> _sampleBySubject(
+    List<Question> pool,
+    QuestionRequest request,
+  ) {
     final weights = request.subjectWeights!;
     final picked = <Question>[];
     final usedConcepts = <String>{};
@@ -254,7 +275,8 @@ class UnifiedQuestionPoolService {
     var allocated = 0;
     for (int i = 0; i < request.subjects.length; i++) {
       final subject = request.subjects[i];
-      final weight = weights[subject] ?? (totalWeight ~/ request.subjects.length);
+      final weight =
+          weights[subject] ?? (totalWeight ~/ request.subjects.length);
       int target;
       if (i == request.subjects.length - 1) {
         target = request.count - allocated;
@@ -276,9 +298,15 @@ class UnifiedQuestionPoolService {
       final hard = target - easy - medium;
 
       final buckets = <List<Question>>[
-        shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Easy').toList(),
-        shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Medium').toList(),
-        shuffled.where((q) => _normalizeDifficulty(q.difficulty) == 'Hard').toList(),
+        shuffled
+            .where((q) => _normalizeDifficulty(q.difficulty) == 'Easy')
+            .toList(),
+        shuffled
+            .where((q) => _normalizeDifficulty(q.difficulty) == 'Medium')
+            .toList(),
+        shuffled
+            .where((q) => _normalizeDifficulty(q.difficulty) == 'Hard')
+            .toList(),
       ];
 
       final targetsPerDiff = [easy, medium, hard];
@@ -287,7 +315,8 @@ class UnifiedQuestionPoolService {
         var taken = 0;
         for (final q in buckets[i]) {
           if (taken >= targetsPerDiff[i]) break;
-          if (request.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+          if (request.deduplicateConcepts &&
+              _hasConceptOverlap(q, usedConcepts)) {
             continue;
           }
           picked.add(q);
@@ -298,11 +327,14 @@ class UnifiedQuestionPoolService {
 
       // Backfill for this subject
       if (picked.where((q) => q.subject == subject).length < target) {
-        final remaining = subjectPool.where((q) => !picked.contains(q)).toList();
+        final remaining = subjectPool
+            .where((q) => !picked.contains(q))
+            .toList();
         remaining.shuffle(_random);
         for (final q in remaining) {
           if (picked.where((q) => q.subject == subject).length >= target) break;
-          if (request.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+          if (request.deduplicateConcepts &&
+              _hasConceptOverlap(q, usedConcepts)) {
             continue;
           }
           picked.add(q);
@@ -317,7 +349,8 @@ class UnifiedQuestionPoolService {
       remaining.shuffle(_random);
       for (final q in remaining) {
         if (picked.length >= request.count) break;
-        if (request.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+        if (request.deduplicateConcepts &&
+            _hasConceptOverlap(q, usedConcepts)) {
           continue;
         }
         picked.add(q);
@@ -348,9 +381,16 @@ class UnifiedQuestionPoolService {
     }
   }
 
-  String _buildAiPrompt(String subject, String? chapterId, String? topicId, int count) {
+  String _buildAiPrompt(
+    String subject,
+    String? chapterId,
+    String? topicId,
+    int count,
+  ) {
     final context = StringBuffer();
-    context.writeln('You are an expert NEET question setter. Generate $count accurate, NCERT-based MCQ questions.');
+    context.writeln(
+      'You are an expert NEET question setter. Generate $count accurate, NCERT-based MCQ questions.',
+    );
     context.writeln('Subject: $subject');
     if (chapterId != null) context.writeln('Chapter: $chapterId');
     if (topicId != null) context.writeln('Topic: $topicId');
@@ -358,9 +398,13 @@ class UnifiedQuestionPoolService {
     context.writeln('Format each question as JSON:');
     context.writeln('{');
     context.writeln('  "questionText": "Question text here",');
-    context.writeln('  "options": ["Option A", "Option B", "Option C", "Option D"],');
+    context.writeln(
+      '  "options": ["Option A", "Option B", "Option C", "Option D"],',
+    );
     context.writeln('  "correctAnswer": "Option A",');
-    context.writeln('  "explanation": "Detailed explanation referencing NCERT",');
+    context.writeln(
+      '  "explanation": "Detailed explanation referencing NCERT",',
+    );
     context.writeln('  "difficulty": "Easy|Medium|Hard",');
     context.writeln('  "tags": ["tag1", "tag2"]');
     context.writeln('}');
@@ -368,7 +412,11 @@ class UnifiedQuestionPoolService {
     return context.toString();
   }
 
-  List<Question> _parseAiQuestions(String response, String subject, Set<String> excludedIds) {
+  List<Question> _parseAiQuestions(
+    String response,
+    String subject,
+    Set<String> excludedIds,
+  ) {
     // Parse JSON array from AI response
     // This is a simplified parser - in production, use a robust JSON parser
     final questions = <Question>[];
@@ -408,10 +456,10 @@ class UnifiedQuestionPoolService {
           // Get question difficulty from database
           final question = await _questionRepo.getQuestionById(qId);
           if (question == null) continue;
-          
+
           final difficulty = _normalizeDifficulty(question.difficulty);
           final cooldownDays = _cooldownDays[difficulty] ?? 3;
-          
+
           if (daysSinceAttempt < cooldownDays) {
             cooldownIds.add(qId);
           }
@@ -426,7 +474,8 @@ class UnifiedQuestionPoolService {
   static String _normalizeDifficulty(String difficulty) {
     final d = difficulty.trim().toLowerCase();
     if (d == 'easy' || d == 'simple') return 'Easy';
-    if (d == 'medium' || d == 'moderate' || d == 'avg' || d == 'average') return 'Medium';
+    if (d == 'medium' || d == 'moderate' || d == 'avg' || d == 'average')
+      return 'Medium';
     if (d == 'hard' || d == 'difficult' || d == 'tough') return 'Hard';
     return 'Medium';
   }

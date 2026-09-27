@@ -97,7 +97,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           child: Text(
                             'SKIP',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -190,7 +192,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'To enable the AI Tutor, enter your free Gemini API Key (you can also do this later in settings).',
             textAlign: TextAlign.center,
             style: TextStyle(

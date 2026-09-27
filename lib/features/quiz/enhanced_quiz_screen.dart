@@ -49,8 +49,10 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   bool _showPalette = false;
   bool _autoSubmitted = false;
 
-  int get _timeLimitSeconds => widget.timeLimitSeconds ?? (widget.questions?.length ?? 10) * 60;
-  int get _remainingSeconds => (_timeLimitSeconds - _elapsedSeconds).clamp(0, _timeLimitSeconds);
+  int get _timeLimitSeconds =>
+      widget.timeLimitSeconds ?? (widget.questions?.length ?? 10) * 60;
+  int get _remainingSeconds =>
+      (_timeLimitSeconds - _elapsedSeconds).clamp(0, _timeLimitSeconds);
   bool get _isTimeUp => _remainingSeconds <= 0 && _timeLimitSeconds > 0;
 
   @override
@@ -63,25 +65,40 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
+        final sessionId = 'quiz_${DateTime.now().millisecondsSinceEpoch}';
         if (widget.questions != null) {
-          ref.read(quizProvider.notifier).initializeQuiz(
-            widget.questions!,
-            timeLimitSeconds: _timeLimitSeconds,
-          );
+          ref
+              .read(quizProvider.notifier)
+              .initializeQuiz(
+                widget.questions!,
+                timeLimitSeconds: _timeLimitSeconds,
+                sessionId: sessionId,
+                topicId: widget.topicId,
+                subject: widget.subject,
+                testType: widget.testType ?? 'topic',
+              );
         } else if (widget.topicId.isNotEmpty) {
-          _loadQuestionsFromProvider();
+          _loadQuestionsFromProvider(sessionId: sessionId);
         }
       }
     });
     _startTimer();
   }
 
-  Future<void> _loadQuestionsFromProvider() async {
+  Future<void> _loadQuestionsFromProvider({required String sessionId}) async {
     final questions = await ref.read(
       questionsForTopicProvider(widget.topicId).future,
     );
     if (mounted && questions.isNotEmpty) {
-      ref.read(quizProvider.notifier).initializeQuiz(questions);
+      ref
+          .read(quizProvider.notifier)
+          .initializeQuiz(
+            questions,
+            sessionId: sessionId,
+            topicId: widget.topicId,
+            subject: widget.subject,
+            testType: widget.testType ?? 'topic',
+          );
     }
   }
 
@@ -112,7 +129,9 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('Time\'s Up!'),
-        content: const Text('The quiz time has expired. Your answers will be submitted automatically.'),
+        content: const Text(
+          'The quiz time has expired. Your answers will be submitted automatically.',
+        ),
         actions: [
           TextButton(
             onPressed: () {

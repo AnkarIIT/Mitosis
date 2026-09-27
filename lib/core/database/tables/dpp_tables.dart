@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 class DppSets extends Table {
   IntColumn get id => integer().autoIncrement()();
+  IntColumn get userId => integer()();
   TextColumn get date => text()(); // YYYY-MM-DD
   TextColumn get subject => text()();
   TextColumn get chapterId => text().nullable()();
@@ -21,6 +22,7 @@ class DppSets extends Table {
 
 class DppQuestions extends Table {
   IntColumn get id => integer().autoIncrement()();
+  IntColumn get userId => integer()();
   IntColumn get dppSetId => integer().nullable()();
   TextColumn get questionId => text()();
   TextColumn get subject => text()();

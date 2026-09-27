@@ -17,13 +17,14 @@ class AllenStudyModuleScreen extends ConsumerStatefulWidget {
       _AllenStudyModuleScreenState();
 }
 
-class _AllenStudyModuleScreenState extends ConsumerState<AllenStudyModuleScreen> {
+class _AllenStudyModuleScreenState
+    extends ConsumerState<AllenStudyModuleScreen> {
   @override
   Widget build(BuildContext context) {
     final subjects = ref.watch(subjectsProvider);
     final initialSubjectId = widget.initialSubjectId;
-    final selectedSubjectId = initialSubjectId ??
-        (subjects.isNotEmpty ? subjects.first.id : null);
+    final selectedSubjectId =
+        initialSubjectId ?? (subjects.isNotEmpty ? subjects.first.id : null);
 
     return Scaffold(
       backgroundColor: AdaptiveColors.background(context),
@@ -46,14 +47,16 @@ class _AllenStudyModuleScreenState extends ConsumerState<AllenStudyModuleScreen>
                   Icon(
                     Icons.menu_book_outlined,
                     size: 64,
-                    color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.4),
+                    color: AdaptiveColors.textSecondary(
+                      context,
+                    ).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No subjects available',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: AdaptiveColors.textSecondary(context),
-                        ),
+                      color: AdaptiveColors.textSecondary(context),
+                    ),
                   ),
                 ],
               ),
@@ -65,11 +68,7 @@ class _AllenStudyModuleScreenState extends ConsumerState<AllenStudyModuleScreen>
                 Expanded(
                   child: selectedSubjectId == null
                       ? const SizedBox.shrink()
-                      : _buildModuleList(
-                          context,
-                          subjects,
-                          selectedSubjectId,
-                        ),
+                      : _buildModuleList(context, subjects, selectedSubjectId),
                 ),
               ],
             ),
@@ -117,7 +116,9 @@ class _AllenStudyModuleScreenState extends ConsumerState<AllenStudyModuleScreen>
               avatar: Icon(
                 _getSubjectIcon(subject.id),
                 size: 18,
-                color: isSelected ? color : AdaptiveColors.textSecondary(context),
+                color: isSelected
+                    ? color
+                    : AdaptiveColors.textSecondary(context),
               ),
             ),
           );
@@ -255,11 +256,7 @@ class _AllenModuleCard extends StatelessWidget {
               color: accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              _getSubjectIcon(subjectId),
-              color: accent,
-              size: 22,
-            ),
+            child: Icon(_getSubjectIcon(subjectId), color: accent, size: 22),
           ),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           children: chapter.topics.map((topic) {
@@ -402,17 +399,22 @@ class AllenChapterDetailScreen extends ConsumerWidget {
     final allSubjects = ref.watch(subjectsProvider);
     final subject = allSubjects.firstWhere(
       (s) => s.id == subjectId,
-      orElse: () => allSubjects.isNotEmpty ? allSubjects.first : allSubjects.first,
+      orElse: () =>
+          allSubjects.isNotEmpty ? allSubjects.first : allSubjects.first,
     );
 
     final chapter = subject.chapters.firstWhere(
       (c) => c.name == chapterName,
-      orElse: () => subject.chapters.isNotEmpty ? subject.chapters.first : subject.chapters.first,
+      orElse: () => subject.chapters.isNotEmpty
+          ? subject.chapters.first
+          : subject.chapters.first,
     );
 
     final topic = chapter.topics.firstWhere(
       (t) => t.id == topicId,
-      orElse: () => chapter.topics.isNotEmpty ? chapter.topics.first : chapter.topics.first,
+      orElse: () => chapter.topics.isNotEmpty
+          ? chapter.topics.first
+          : chapter.topics.first,
     );
 
     return Scaffold(
@@ -477,7 +479,11 @@ class AllenChapterDetailScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.menu_book_outlined, color: AppColors.primary, size: 20),
+              Icon(
+                Icons.menu_book_outlined,
+                color: AppColors.primary,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Theory',
@@ -508,11 +514,11 @@ class AllenChapterDetailScreen extends ConsumerWidget {
     final items = illustrations != null && illustrations.isNotEmpty
         ? illustrations
         : <String>[
-              'Understand the definition and core principle behind ${topic.name}.',
-              'Relate this concept to previous topics you have already studied.',
-              'Draw a quick diagram or flowchart in your notebook.',
-              'Note down the most common mistakes students make in NEET.',
-            ];
+            'Understand the definition and core principle behind ${topic.name}.',
+            'Relate this concept to previous topics you have already studied.',
+            'Draw a quick diagram or flowchart in your notebook.',
+            'Note down the most common mistakes students make in NEET.',
+          ];
 
     return Container(
       width: double.infinity,
@@ -529,7 +535,11 @@ class AllenChapterDetailScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.auto_stories_outlined, color: AdaptiveColors.textSecondary(context), size: 20),
+              Icon(
+                Icons.auto_stories_outlined,
+                color: AdaptiveColors.textSecondary(context),
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Illustrations & Examples',
@@ -552,7 +562,9 @@ class AllenChapterDetailScreen extends ConsumerWidget {
                     margin: const EdgeInsets.only(top: 2),
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: AdaptiveColors.primary(context).withValues(alpha: 0.12),
+                      color: AdaptiveColors.primary(
+                        context,
+                      ).withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -653,10 +665,7 @@ class AllenChapterDetailScreen extends ConsumerWidget {
         ),
         child: Text(
           hasQuestions ? 'START TOPIC TEST' : 'TRY TEST SERIES INSTEAD',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
         ),
       ),
     );

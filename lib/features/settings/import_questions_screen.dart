@@ -147,7 +147,10 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
             'Bulk-import questions from a JSON or CSV file (or pasted text). '
             'Useful for loading large NCERT / PYQ banks. Existing question '
             'texts are skipped automatically.',
-            style: TextStyle(fontSize: 13, color: AdaptiveColors.textSecondary(context)),
+            style: TextStyle(
+              fontSize: 13,
+              color: AdaptiveColors.textSecondary(context),
+            ),
           ),
           const SizedBox(height: 16),
           Card(
@@ -182,7 +185,10 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
                   Text(
                     'Import pre-bundled NEET question banks (no file picker needed). '
                     'Questions are deduplicated automatically.',
-                    style: TextStyle(fontSize: 13, color: AdaptiveColors.textSecondary(context)),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AdaptiveColors.textSecondary(context),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -350,7 +356,9 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AdaptiveColors.outline(context).withValues(alpha: 0.5)),
+        side: BorderSide(
+          color: AdaptiveColors.outline(context).withValues(alpha: 0.5),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -501,7 +509,9 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AdaptiveColors.outline(context).withValues(alpha: 0.5)),
+        side: BorderSide(
+          color: AdaptiveColors.outline(context).withValues(alpha: 0.5),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -523,7 +533,10 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
               'Generate NCERT-grounded explanations for every question that '
               'is missing one. Uses the AI proxy so cache hits are free and '
               'the rate limit is enforced automatically.',
-              style: TextStyle(fontSize: 12, color: AdaptiveColors.textSecondary(context)),
+              style: TextStyle(
+                fontSize: 12,
+                color: AdaptiveColors.textSecondary(context),
+              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -604,7 +617,9 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AdaptiveColors.outline(context).withValues(alpha: 0.5)),
+        side: BorderSide(
+          color: AdaptiveColors.outline(context).withValues(alpha: 0.5),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -627,7 +642,10 @@ class _ImportQuestionsScreenState extends ConsumerState<ImportQuestionsScreen> {
               'option1, option2, ... columns.\n\n'
               'Subjects are auto-mapped: bio→Biology, chem→Chemistry, '
               'phys→Physics.',
-              style: TextStyle(fontSize: 12, color: AdaptiveColors.textSecondary(context)),
+              style: TextStyle(
+                fontSize: 12,
+                color: AdaptiveColors.textSecondary(context),
+              ),
             ),
           ],
         ),

@@ -40,19 +40,34 @@ class CbtInstructionsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context, totalQuestions, totalMinutes, hasSections, sectionCount),
+              _buildHeader(
+                context,
+                totalQuestions,
+                totalMinutes,
+                hasSections,
+                sectionCount,
+              ),
               const SizedBox(height: 24),
-              _buildSection('General Instructions', _generalInstructions(totalQuestions, totalMinutes)),
+              _buildSection(
+                'General Instructions',
+                _generalInstructions(totalQuestions, totalMinutes),
+              ),
               const SizedBox(height: 16),
               if (hasSections) ...[
-                _buildSection('Section Structure', _sectionInstructions(sectionCount, config)),
+                _buildSection(
+                  'Section Structure',
+                  _sectionInstructions(sectionCount, config),
+                ),
                 const SizedBox(height: 16),
               ],
               _buildSection('Marking Scheme', _markingInstructions()),
               const SizedBox(height: 16),
               _buildSection('Navigation & Controls', _navigationInstructions()),
               const SizedBox(height: 16),
-              _buildSection('Proctoring & Integrity', _proctoringInstructions()),
+              _buildSection(
+                'Proctoring & Integrity',
+                _proctoringInstructions(),
+              ),
               const SizedBox(height: 16),
               _buildSection('Emergency & Technical', _emergencyInstructions()),
               const SizedBox(height: 32),
@@ -91,15 +106,19 @@ class CbtInstructionsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.assignment_outlined, color: AppColors.primary, size: 28),
+              Icon(
+                Icons.assignment_outlined,
+                color: AppColors.primary,
+                size: 28,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'NEET Mock Test',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
@@ -109,10 +128,19 @@ class CbtInstructionsScreen extends StatelessWidget {
             spacing: 12,
             runSpacing: 8,
             children: [
-              _InfoChip(label: '$totalQuestions Questions', icon: Icons.help_outline),
-              _InfoChip(label: '$totalMinutes Minutes', icon: Icons.timer_outlined),
+              _InfoChip(
+                label: '$totalQuestions Questions',
+                icon: Icons.help_outline,
+              ),
+              _InfoChip(
+                label: '$totalMinutes Minutes',
+                icon: Icons.timer_outlined,
+              ),
               if (hasSections)
-                _InfoChip(label: '$sectionCount Sections', icon: Icons.view_module_outlined),
+                _InfoChip(
+                  label: '$sectionCount Sections',
+                  icon: Icons.view_module_outlined,
+                ),
               _InfoChip(
                 label: config.isFullLengthMock ? 'Full Length' : 'Practice',
                 icon: Icons.flag_outlined,
@@ -143,47 +171,47 @@ class CbtInstructionsScreen extends StatelessWidget {
   }
 
   List<String> _generalInstructions(int totalQuestions, int totalMinutes) => [
-        'This test contains $totalQuestions questions to be completed in $totalMinutes minutes.',
-        'The timer starts immediately when you tap "Start Test" and cannot be paused.',
-        'All questions are multiple-choice with a single correct answer.',
-        'Read each question carefully before selecting your answer.',
-      ];
+    'This test contains $totalQuestions questions to be completed in $totalMinutes minutes.',
+    'The timer starts immediately when you tap "Start Test" and cannot be paused.',
+    'All questions are multiple-choice with a single correct answer.',
+    'Read each question carefully before selecting your answer.',
+  ];
 
   List<String> _sectionInstructions(int sectionCount, ExamConfig config) => [
-        'The test is divided into $sectionCount sections as per the NTA NEET pattern.',
-        'Each section has a fixed time limit. You cannot return to a section after its time expires.',
-        'A warning will appear 5 minutes before each section ends.',
-        'Section-wise submission is mandatory — you must submit the current section to proceed.',
-      ];
+    'The test is divided into $sectionCount sections as per the NTA NEET pattern.',
+    'Each section has a fixed time limit. You cannot return to a section after its time expires.',
+    'A warning will appear 5 minutes before each section ends.',
+    'Section-wise submission is mandatory — you must submit the current section to proceed.',
+  ];
 
   List<String> _markingInstructions() => [
-        'Correct answer: +4 marks',
-        'Incorrect answer: −1 mark (negative marking)',
-        'Unattempted question: 0 marks',
-        'Marking multiple options for the same question is treated as incorrect (−1).',
-      ];
+    'Correct answer: +4 marks',
+    'Incorrect answer: −1 mark (negative marking)',
+    'Unattempted question: 0 marks',
+    'Marking multiple options for the same question is treated as incorrect (−1).',
+  ];
 
   List<String> _navigationInstructions() => [
-        'Use "Save & Next" to save your answer and move to the next question.',
-        'Use "Mark & Next" to flag a question for review and move forward.',
-        'Use "Clear" to remove your selected answer for the current question.',
-        'The question palette on the right shows: Answered (green), Marked (orange), Not Answered (gray), Current (blue).',
-        'You can jump to any question by tapping its number in the palette.',
-        'Questions marked for review appear with an orange dot in the palette.',
-      ];
+    'Use "Save & Next" to save your answer and move to the next question.',
+    'Use "Mark & Next" to flag a question for review and move forward.',
+    'Use "Clear" to remove your selected answer for the current question.',
+    'The question palette on the right shows: Answered (green), Marked (orange), Not Answered (gray), Current (blue).',
+    'You can jump to any question by tapping its number in the palette.',
+    'Questions marked for review appear with an orange dot in the palette.',
+  ];
 
   List<String> _proctoringInstructions() => [
-        'This test runs in secure mode — screenshots and screen recording are blocked.',
-        'Leaving the app or switching windows during the test is recorded as a violation.',
-        'More than 3 violations may result in test termination.',
-        'Do not minimize, switch apps, or use split-screen while the test is active.',
-      ];
+    'This test runs in secure mode — screenshots and screen recording are blocked.',
+    'Leaving the app or switching windows during the test is recorded as a violation.',
+    'More than 3 violations may result in test termination.',
+    'Do not minimize, switch apps, or use split-screen while the test is active.',
+  ];
 
   List<String> _emergencyInstructions() => [
-        'If the app crashes or you lose internet, reopen the app — your progress is auto-saved every 15 seconds.',
-        'You can resume from the "Resume" button on the home screen or test series screen.',
-        'In case of a critical issue, contact support immediately with your attempt ID.',
-      ];
+    'If the app crashes or you lose internet, reopen the app — your progress is auto-saved every 15 seconds.',
+    'You can resume from the "Resume" button on the home screen or test series screen.',
+    'In case of a critical issue, contact support immediately with your attempt ID.',
+  ];
 
   Widget _buildAcknowledgeAndStart(BuildContext context) {
     return Column(
@@ -203,7 +231,11 @@ class CbtInstructionsScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 24),
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: AppColors.warning,
+                    size: 24,
+                  ),
                   const SizedBox(width: 10),
                   Text(
                     'Important',
@@ -241,7 +273,9 @@ class CbtInstructionsScreen extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
               elevation: 2,
             ),
           ),
@@ -253,10 +287,7 @@ class CbtInstructionsScreen extends StatelessWidget {
   void _startTest(BuildContext context) {
     context.push(
       '/cbt',
-      extra: {
-        'config': config,
-        'questionPool': questionPool,
-      },
+      extra: {'config': config, 'questionPool': questionPool},
     );
   }
 }
@@ -324,7 +355,9 @@ class _BulletPoint extends StatelessWidget {
               text,
               style: TextStyle(
                 fontSize: 14,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.85),
                 height: 1.5,
               ),
             ),

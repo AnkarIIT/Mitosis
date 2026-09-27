@@ -278,30 +278,30 @@ class _HomeTabState extends ConsumerState<HomeTab>
         // Accuracy badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: AdaptiveColors.primary(context).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppRadius.full),
-              border: Border.all(
-                color: AdaptiveColors.primary(context).withValues(alpha: 0.28),
-              ),
+          decoration: BoxDecoration(
+            color: AdaptiveColors.primary(context).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppRadius.full),
+            border: Border.all(
+              color: AdaptiveColors.primary(context).withValues(alpha: 0.28),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.trending_up_rounded,
-                  size: 14,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.trending_up_rounded,
+                size: 14,
+                color: AdaptiveColors.primary(context),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${accuracy.toStringAsFixed(0)}%',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
                   color: AdaptiveColors.primary(context),
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  '${accuracy.toStringAsFixed(0)}%',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: AdaptiveColors.primary(context),
-                  ),
-                ),
+              ),
             ],
           ),
         ),
@@ -1039,15 +1039,15 @@ class _HomeTabState extends ConsumerState<HomeTab>
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AdaptiveColors.primary(context),
-              AdaptiveColors.primary(context).withValues(alpha: 0.82),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+            gradient: LinearGradient(
+              colors: [
+                AdaptiveColors.primary(context),
+                AdaptiveColors.primary(context).withValues(alpha: 0.82),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Row(
             children: [
@@ -1363,15 +1363,11 @@ class _HomeTabState extends ConsumerState<HomeTab>
   // ────────────────────────────────────────────────────────────
   Widget _buildShimmerSkeleton(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final blockColor =
-        isDark
+    final blockColor = isDark
         ? AppColors.surfaceDark.withValues(alpha: 0.6)
         : Colors.white;
-    final innerColor =
-        isDark
-        ? AdaptiveColors.surfaceContainerHighest(context).withValues(
-            alpha: 0.6,
-          )
+    final innerColor = isDark
+        ? AdaptiveColors.surfaceContainerHighest(context).withValues(alpha: 0.6)
         : AdaptiveColors.outlineVariant(context);
 
     return SafeArea(

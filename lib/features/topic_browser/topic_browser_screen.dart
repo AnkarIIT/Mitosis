@@ -40,7 +40,9 @@ class TopicBrowserScreen extends ConsumerWidget {
                   Icon(
                     Icons.book_outlined,
                     size: 64,
-                    color: AdaptiveColors.textSecondary(context).withValues(alpha: 0.4),
+                    color: AdaptiveColors.textSecondary(
+                      context,
+                    ).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -163,7 +165,9 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                             .withValues(
                                                               alpha: 0.2,
                                                             )
-                                                      : AdaptiveColors.outlineVariant(context),
+                                                      : AdaptiveColors.outlineVariant(
+                                                          context,
+                                                        ),
                                                 ),
                                                 child: Center(
                                                   child: isCompleted
@@ -258,7 +262,9 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                               .withValues(
                                                                 alpha: 0.15,
                                                               )
-                                                        : AdaptiveColors.outlineVariant(context),
+                                                        : AdaptiveColors.outlineVariant(
+                                                            context,
+                                                          ),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           20,
@@ -269,7 +275,9 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                                 .withValues(
                                                                   alpha: 0.3,
                                                                 )
-                                                          : AdaptiveColors.outline(context),
+                                                          : AdaptiveColors.outline(
+                                                              context,
+                                                            ),
                                                     ),
                                                   ),
                                                   child: Text(
@@ -278,7 +286,9 @@ class TopicBrowserScreen extends ConsumerWidget {
                                                       fontSize: 12,
                                                       color: accuracy >= 70
                                                           ? AppColors.primary
-                                                          : AdaptiveColors.textSecondary(context),
+                                                          : AdaptiveColors.textSecondary(
+                                                              context,
+                                                            ),
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
@@ -288,7 +298,10 @@ class TopicBrowserScreen extends ConsumerWidget {
                                               // Trailing arrow
                                               Icon(
                                                 Icons.chevron_right,
-                                                color: AdaptiveColors.textSecondary(context),
+                                                color:
+                                                    AdaptiveColors.textSecondary(
+                                                      context,
+                                                    ),
                                                 size: 20,
                                               ),
                                             ],

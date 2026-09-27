@@ -35,12 +35,40 @@ class ContentSyncService {
         query = query.gt('updated_at', watermark.toUtc().toIso8601String());
       }
 
-      final response = await query;
-      final rows = List<Map<String, dynamic>>.from(response);
+      // Paginate through all results using range
+      const int pageSize = 1000;
+      int offset = 0;
+      int totalPulled = 0;
+      DateTime? latest = watermark;
 
-      if (rows.isNotEmpty) {
-        await _upsertRows(rows, watermark);
-        debugPrint('✅ Content sync pulled ${rows.length} catalog rows');
+      while (true) {
+        final pageQuery = query.range(offset, offset + pageSize - 1);
+        final response = await pageQuery;
+        final rows = List<Map<String, dynamic>>.from(response);
+
+        if (rows.isEmpty) break;
+
+        await _upsertRows(rows, latest);
+        totalPulled += rows.length;
+
+        // Update latest watermark from this page
+        for (final row in rows) {
+          final updatedAt = _parseDate(row['updated_at']);
+          if (updatedAt != null &&
+              (latest == null || updatedAt.isAfter(latest!))) {
+            latest = updatedAt;
+          }
+        }
+
+        if (rows.length < pageSize) break;
+        offset += pageSize;
+      }
+
+      if (totalPulled > 0) {
+        if (latest != null) {
+          await _localDb.setSyncTimestamp(_catalogTable, latest);
+        }
+        debugPrint('✅ Content sync pulled $totalPulled catalog rows');
       }
 
       await _reconcileActiveSet(client);
@@ -111,13 +139,28 @@ class ContentSyncService {
   /// no longer returned as active by the server (removed or soft-disabled).
   Future<void> _reconcileActiveSet(SupabaseClient client) async {
     try {
-      final active = await client
-          .from(_catalogTable)
-          .select('id')
-          .eq('is_active', true);
-      final activeLocalIds = active
-          .map((r) => _remoteToLocalId(r['id'].toString()))
-          .toSet();
+      const int pageSize = 1000;
+      int offset = 0;
+      final activeLocalIds = <String>{};
+
+      while (true) {
+        final response = await client
+            .from(_catalogTable)
+            .select('id')
+            .eq('is_active', true)
+            .range(offset, offset + pageSize - 1);
+        final rows = List<Map<String, dynamic>>.from(response);
+
+        if (rows.isEmpty) break;
+
+        for (final r in rows) {
+          activeLocalIds.add(_remoteToLocalId(r['id'].toString()));
+        }
+
+        if (rows.length < pageSize) break;
+        offset += pageSize;
+      }
+
       final localRemoteIds = await _localDb.getRemoteQuestionLocalIds();
 
       for (final localId in localRemoteIds) {

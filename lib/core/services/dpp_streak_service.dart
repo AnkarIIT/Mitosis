@@ -14,7 +14,7 @@ class DppStreakService {
     final subjectSets = sets
         .where((s) => s.subject == subject && s.isCompleted)
         .toList();
-    
+
     if (subjectSets.isEmpty) return 0;
 
     // Sort by date descending
@@ -24,8 +24,10 @@ class DppStreakService {
     DateTime expectedDate = DateTime.now();
     // Check if today's DPP is completed
     final todayStr = _dateStr(expectedDate);
-    final todayCompleted = subjectSets.any((s) => s.date == todayStr && s.isCompleted);
-    
+    final todayCompleted = subjectSets.any(
+      (s) => s.date == todayStr && s.isCompleted,
+    );
+
     if (!todayCompleted) {
       // Check yesterday
       expectedDate = expectedDate.subtract(const Duration(days: 1));
@@ -50,7 +52,7 @@ class DppStreakService {
     final subjectSets = sets
         .where((s) => s.subject == subject && s.isCompleted)
         .toList();
-    
+
     if (subjectSets.isEmpty) return 0;
 
     subjectSets.sort((a, b) => a.date.compareTo(b.date));
@@ -80,7 +82,7 @@ class DppStreakService {
   Future<DppAnalytics> getAnalytics(String subject) async {
     final sets = await _db.getDppSets();
     final subjectSets = sets.where((s) => s.subject == subject).toList();
-    
+
     if (subjectSets.isEmpty) {
       return DppAnalytics(
         subject: subject,
@@ -117,15 +119,18 @@ class DppStreakService {
 
         final date = DateTime.parse(set.date);
         final weekStart = _weekStart(date);
-        
-        weeklyData.putIfAbsent(weekStart, () => DppWeeklyData(
-          weekStart: weekStart,
-          attempts: 0,
-          completed: 0,
-          totalQuestions: 0,
-          correctCount: 0,
-          totalTimeSeconds: 0,
-        ));
+
+        weeklyData.putIfAbsent(
+          weekStart,
+          () => DppWeeklyData(
+            weekStart: weekStart,
+            attempts: 0,
+            completed: 0,
+            totalQuestions: 0,
+            correctCount: 0,
+            totalTimeSeconds: 0,
+          ),
+        );
         final weekData = weeklyData[weekStart]!;
         weekData.attempts++;
         weekData.completed++;
@@ -137,18 +142,21 @@ class DppStreakService {
         final questions = await _db.getDppQuestions(set.id);
         for (final q in questions) {
           final subj = q.subject;
-          subjectBreakdown.putIfAbsent(subj, () => DppSubjectBreakdown(
-            subject: subj,
-            attempts: 0,
-            correct: 0,
-            total: 0,
-          ));
+          subjectBreakdown.putIfAbsent(
+            subj,
+            () => DppSubjectBreakdown(
+              subject: subj,
+              attempts: 0,
+              correct: 0,
+              total: 0,
+            ),
+          );
           subjectBreakdown[subj]!.attempts++;
           subjectBreakdown[subj]!.total++;
           // We'd need to check if this specific question was answered correctly
           // For now, we'll estimate based on overall accuracy
         }
-        
+
         if (prevDate != null) {
           final diff = date.difference(prevDate).inDays;
           // Track streaks
@@ -171,7 +179,8 @@ class DppStreakService {
     // Calculate per-subject breakdown accuracy
     for (final breakdown in subjectBreakdown.values) {
       if (breakdown.total > 0 && completedCount > 0) {
-        breakdown.correct = (breakdown.total * correctCount / totalQuestions).round();
+        breakdown.correct = (breakdown.total * correctCount / totalQuestions)
+            .round();
       }
     }
 
@@ -181,8 +190,12 @@ class DppStreakService {
       completedCount: completedCount,
       totalQuestions: totalQuestions,
       correctCount: correctCount,
-      averageAccuracy: completedCount > 0 ? (correctCount / totalQuestions * 100) : 0.0,
-      averageTimeMinutes: completedCount > 0 ? (totalTimeSeconds / completedCount / 60) : 0.0,
+      averageAccuracy: completedCount > 0
+          ? (correctCount / totalQuestions * 100)
+          : 0.0,
+      averageTimeMinutes: completedCount > 0
+          ? (totalTimeSeconds / completedCount / 60)
+          : 0.0,
       currentStreak: currentStreak,
       longestStreak: longestStreak,
       weeklyData: weeklyData.map((k, v) => MapEntry(k, v)),
@@ -194,7 +207,7 @@ class DppStreakService {
   Future<Map<String, DppAnalytics>> getAllAnalytics() async {
     final sets = await _db.getDppSets();
     final subjects = sets.map((s) => s.subject).toSet();
-    
+
     final analytics = <String, DppAnalytics>{};
     for (final subject in subjects) {
       analytics[subject] = await getAnalytics(subject);
@@ -262,8 +275,10 @@ class DppWeeklyData {
     required this.totalTimeSeconds,
   });
 
-  double get accuracy => totalQuestions > 0 ? (correctCount / totalQuestions * 100) : 0.0;
-  double get avgTimeMinutes => completed > 0 ? (totalTimeSeconds / completed / 60) : 0.0;
+  double get accuracy =>
+      totalQuestions > 0 ? (correctCount / totalQuestions * 100) : 0.0;
+  double get avgTimeMinutes =>
+      completed > 0 ? (totalTimeSeconds / completed / 60) : 0.0;
 }
 
 /// Per-subject breakdown for multi-subject DPPs.

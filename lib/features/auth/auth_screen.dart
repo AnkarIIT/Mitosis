@@ -228,7 +228,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     await ref.read(authProvider.notifier).continueAsGuest();
   }
 
-
   InputDecoration _fieldDecoration({
     required String label,
     required IconData icon,
@@ -518,9 +517,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       ),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => setState(
-                            () => _termsAccepted = !_termsAccepted,
-                          ),
+                          onTap: () =>
+                              setState(() => _termsAccepted = !_termsAccepted),
                           child: RichText(
                             text: TextSpan(
                               style: Theme.of(context).textTheme.bodySmall
@@ -592,9 +590,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     child: TextButton(
                       onPressed: isAuthLoading
                           ? null
-                          : () => setState(
-                              () => _mode = AuthMode.forgotPassword,
-                            ),
+                          : () =>
+                                setState(() => _mode = AuthMode.forgotPassword),
                       child: const Text('Forgot password?'),
                     ),
                   ),

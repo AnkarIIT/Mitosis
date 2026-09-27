@@ -90,10 +90,10 @@ class _OnScreenCalculatorState extends State<OnScreenCalculator> {
                   _current,
                   key: const Key('calc-current'),
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
+                    color: textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
               ),
             ),
@@ -159,10 +159,34 @@ class _OnScreenCalculatorState extends State<OnScreenCalculator> {
       children: [
         Row(
           children: [
-            key('AC', onTap: _clearAll, bgColor: bg, fg: textSecondary, fontSize: 15),
-            key('±', onTap: _toggleSign, bgColor: bg, fg: textSecondary, fontSize: 15),
-            key('%', onTap: _toPercent, bgColor: bg, fg: textSecondary, fontSize: 15),
-            key('÷', onTap: () => _setOp('÷'), bgColor: accent, fg: Colors.white, bold: true),
+            key(
+              'AC',
+              onTap: _clearAll,
+              bgColor: bg,
+              fg: textSecondary,
+              fontSize: 15,
+            ),
+            key(
+              '±',
+              onTap: _toggleSign,
+              bgColor: bg,
+              fg: textSecondary,
+              fontSize: 15,
+            ),
+            key(
+              '%',
+              onTap: _toPercent,
+              bgColor: bg,
+              fg: textSecondary,
+              fontSize: 15,
+            ),
+            key(
+              '÷',
+              onTap: () => _setOp('÷'),
+              bgColor: accent,
+              fg: Colors.white,
+              bold: true,
+            ),
           ],
         ),
         Row(
@@ -170,7 +194,13 @@ class _OnScreenCalculatorState extends State<OnScreenCalculator> {
             key('7', onTap: () => _digit('7')),
             key('8', onTap: () => _digit('8')),
             key('9', onTap: () => _digit('9')),
-            key('×', onTap: () => _setOp('×'), bgColor: accent, fg: Colors.white, bold: true),
+            key(
+              '×',
+              onTap: () => _setOp('×'),
+              bgColor: accent,
+              fg: Colors.white,
+              bold: true,
+            ),
           ],
         ),
         Row(
@@ -178,7 +208,13 @@ class _OnScreenCalculatorState extends State<OnScreenCalculator> {
             key('4', onTap: () => _digit('4')),
             key('5', onTap: () => _digit('5')),
             key('6', onTap: () => _digit('6')),
-            key('-', onTap: () => _setOp('-'), bgColor: accent, fg: Colors.white, bold: true),
+            key(
+              '-',
+              onTap: () => _setOp('-'),
+              bgColor: accent,
+              fg: Colors.white,
+              bold: true,
+            ),
           ],
         ),
         Row(
@@ -186,14 +222,26 @@ class _OnScreenCalculatorState extends State<OnScreenCalculator> {
             key('1', onTap: () => _digit('1')),
             key('2', onTap: () => _digit('2')),
             key('3', onTap: () => _digit('3')),
-            key('+', onTap: () => _setOp('+'), bgColor: accent, fg: Colors.white, bold: true),
+            key(
+              '+',
+              onTap: () => _setOp('+'),
+              bgColor: accent,
+              fg: Colors.white,
+              bold: true,
+            ),
           ],
         ),
         Row(
           children: [
             key('0', onTap: () => _digit('0')),
             key('.', onTap: () => _digit('.')),
-            key('=', onTap: _equals, bgColor: accent, fg: Colors.white, bold: true),
+            key(
+              '=',
+              onTap: _equals,
+              bgColor: accent,
+              fg: Colors.white,
+              bold: true,
+            ),
           ],
         ),
       ],
@@ -227,7 +275,8 @@ class _OnScreenCalculatorState extends State<OnScreenCalculator> {
       if (_operator != null && !_fresh) {
         final result = _calculate(_previous!, currentValue, _operator!);
         _current = _formatResult(result);
-        _expression = '${_formatOperand(_previous!)} $_operator ${_formatOperand(currentValue)} =';
+        _expression =
+            '${_formatOperand(_previous!)} $_operator ${_formatOperand(currentValue)} =';
         _previous = result;
       } else {
         _previous = currentValue;
@@ -244,7 +293,8 @@ class _OnScreenCalculatorState extends State<OnScreenCalculator> {
 
       final currentValue = double.tryParse(_current) ?? 0;
       final result = _calculate(_previous!, currentValue, _operator!);
-      _expression = '${_formatOperand(_previous!)} $_operator ${_formatOperand(currentValue)} =';
+      _expression =
+          '${_formatOperand(_previous!)} $_operator ${_formatOperand(currentValue)} =';
       _current = _formatResult(result);
       _previous = null;
       _operator = null;

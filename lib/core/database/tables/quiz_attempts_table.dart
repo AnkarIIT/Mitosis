@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 class QuizAttempts extends Table {
   IntColumn get id => integer().autoIncrement()();
+  IntColumn get userId => integer().withDefault(const Constant(0))();
   TextColumn get topicId => text()();
   TextColumn get subject => text()();
   IntColumn get score => integer()();

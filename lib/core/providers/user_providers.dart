@@ -15,6 +15,7 @@ import 'content_providers.dart';
 import 'quiz_providers.dart';
 import 'spaced_providers.dart';
 import 'settings_providers.dart';
+import 'auth_providers.dart';
 
 // ============= USER PROGRESS =============
 class UserProgressState {
@@ -74,9 +75,11 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     _loadFromDatabase();
   }
 
+  int get _userId => _ref.read(authProvider).user?.id ?? 0;
+
   Future<void> _loadFromDatabase() async {
     try {
-      final dbAttempts = await _db.getAllQuizAttempts();
+      final dbAttempts = await _db.getAllQuizAttempts(userId: _userId);
       final attempts = dbAttempts
           .map(
             (a) => QuizAttempt(
@@ -101,7 +104,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
           )
           .toList();
 
-      final dbProgress = await _db.getAllTopicProgress();
+      final dbProgress = await _db.getAllTopicProgress(userId: _userId);
       final progressMap = <String, TopicProgress>{};
       for (var p in dbProgress) {
         progressMap[p.topicId] = TopicProgress(
@@ -201,6 +204,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
           } else {
             await _db.addToErrorBook(
               db.ErrorBookCompanion.insert(
+                userId: Value(_userId),
                 questionId: q.id,
                 addedAt: DateTime.now(),
               ),
@@ -210,6 +214,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
             questionId: q.id,
             card: srByQuestion[q.id],
             isCorrect: isCorrect,
+            userId: _userId,
           );
           await _db.upsertSpacedRepetition(nextCard);
           srTouched = true;
@@ -344,6 +349,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     try {
       await _db.upsertTopicProgress(
         db.TopicProgressEntriesCompanion.insert(
+          userId: _userId,
           topicId: topicId,
           questionsAttempted: Value(newAttempted),
           questionsCorrect: Value(newCorrect),
@@ -376,6 +382,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     try {
       await _db.upsertTopicProgress(
         db.TopicProgressEntriesCompanion.insert(
+          userId: _userId,
           topicId: topicId,
           questionsAttempted: Value(updated.questionsAttempted),
           questionsCorrect: Value(updated.questionsCorrect),

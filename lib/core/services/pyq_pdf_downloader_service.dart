@@ -24,109 +24,127 @@ class PyqPdfDownloaderService {
       isOfficial: true,
     ),
     PdfSource(
-      url: 'https://static.collegedekho.com/media/uploads/2023/05/07/qs-and-ans_neet-2023_code-f1_final.pdf',
+      url:
+          'https://static.collegedekho.com/media/uploads/2023/05/07/qs-and-ans_neet-2023_code-f1_final.pdf',
       year: 2023,
       label: 'NEET 2023 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://static.collegedekho.com/media/uploads/2022/07/18/neetug-2022-examination-qp-_17-07-2022.pdf',
+      url:
+          'https://static.collegedekho.com/media/uploads/2022/07/18/neetug-2022-examination-qp-_17-07-2022.pdf',
       year: 2022,
       label: 'NEET 2022 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://static.collegedekho.com/media/uploads/2024/01/12/neet-2021-question-paper-code-m3.pdf',
+      url:
+          'https://static.collegedekho.com/media/uploads/2024/01/12/neet-2021-question-paper-code-m3.pdf',
       year: 2021,
       label: 'NEET 2021 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2022/02/2022021555.pdf',
+      url:
+          'https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2022/02/2022021555.pdf',
       year: 2020,
       label: 'NEET 2020 Question Paper',
       isOfficial: true,
     ),
     PdfSource(
-      url: 'https://www.nishantbhushan.in/_files/ugd/37999e_f0eb85efd4314e279a10573636799f44.pdf?index=true',
+      url:
+          'https://www.nishantbhushan.in/_files/ugd/37999e_f0eb85efd4314e279a10573636799f44.pdf?index=true',
       year: 2019,
       label: 'NEET 2019 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://static.collegedekho.com/media/uploads/2024/09/11/neet-2018-question-paper-code-aa.pdf',
+      url:
+          'https://static.collegedekho.com/media/uploads/2024/09/11/neet-2018-question-paper-code-aa.pdf',
       year: 2018,
       label: 'NEET 2018 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://static.collegedekho.com/media/uploads/2024/09/12/neet-2017-question-paper-code-a.pdf',
+      url:
+          'https://static.collegedekho.com/media/uploads/2024/09/12/neet-2017-question-paper-code-a.pdf',
       year: 2017,
       label: 'NEET 2017 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://static.collegedekho.com/media/uploads/2024/09/12/neet-2016-question-paper-phase-1-code-c-r-y.pdf',
+      url:
+          'https://static.collegedekho.com/media/uploads/2024/09/12/neet-2016-question-paper-phase-1-code-c-r-y.pdf',
       year: 2016,
       label: 'NEET 2016 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://static.collegedekho.com/media/uploads/2024/09/12/neet-2015-question-paper-code-c-re-exam.pdf',
+      url:
+          'https://static.collegedekho.com/media/uploads/2024/09/12/neet-2015-question-paper-code-c-re-exam.pdf',
       year: 2015,
       label: 'NEET 2015 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2014,
       label: 'AIPMT 2014 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2013,
       label: 'AIPMT 2013 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2012,
       label: 'AIPMT 2012 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2011,
       label: 'AIPMT 2011 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2010,
       label: 'AIPMT 2010 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2009,
       label: 'AIPMT 2009 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2008,
       label: 'AIPMT 2008 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2007,
       label: 'AIPMT 2007 Question Paper',
       isOfficial: false,
     ),
     PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
+      url:
+          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
       year: 2006,
       label: 'AIPMT 2006 Question Paper',
       isOfficial: false,
@@ -176,7 +194,8 @@ class PyqPdfDownloaderService {
         await pdfDir.create(recursive: true);
       }
 
-      final fileName = 'neet_${source.year}_${source.isOfficial ? 'official' : 'aipmt'}.pdf';
+      final fileName =
+          'neet_${source.year}_${source.isOfficial ? 'official' : 'aipmt'}.pdf';
       final filePath = '${pdfDir.path}/$fileName';
       final file = File(filePath);
 
@@ -188,13 +207,15 @@ class PyqPdfDownloaderService {
         );
       }
 
-      final response = await http.get(
-        Uri.parse(source.url),
-        headers: {
-          'User-Agent': 'NEET-Mitos/1.0 (Educational Research)',
-          'Accept': 'application/pdf',
-        },
-      ).timeout(const Duration(seconds: 60));
+      final response = await http
+          .get(
+            Uri.parse(source.url),
+            headers: {
+              'User-Agent': 'NEET-Mitos/1.0 (Educational Research)',
+              'Accept': 'application/pdf',
+            },
+          )
+          .timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         await file.writeAsBytes(response.bodyBytes);
@@ -210,10 +231,7 @@ class PyqPdfDownloaderService {
         error: 'HTTP ${response.statusCode}',
       );
     } catch (e) {
-      return PdfDownloadResult(
-        success: false,
-        error: e.toString(),
-      );
+      return PdfDownloadResult(success: false, error: e.toString());
     }
   }
 
@@ -226,11 +244,13 @@ class PyqPdfDownloaderService {
 
       final files = pdfDir.listSync().whereType<File>().toList();
       return files
-          .map((file) => PdfFileInfo(
-                year: _extractYear(file.path),
-                filePath: file.path,
-                size: file.lengthSync(),
-              ))
+          .map(
+            (file) => PdfFileInfo(
+              year: _extractYear(file.path),
+              filePath: file.path,
+              size: file.lengthSync(),
+            ),
+          )
           .toList();
     } catch (e) {
       debugPrint('Error listing PDFs: $e');
@@ -321,11 +341,7 @@ class PdfDownloadProgress {
 }
 
 class PdfFileInfo {
-  PdfFileInfo({
-    required this.year,
-    required this.filePath,
-    required this.size,
-  });
+  PdfFileInfo({required this.year, required this.filePath, required this.size});
 
   final int year;
   final String filePath;

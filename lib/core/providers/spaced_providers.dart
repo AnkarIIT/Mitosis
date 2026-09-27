@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/question_model.dart';
 import '../models/spaced_repetition_model.dart';
@@ -6,6 +7,7 @@ import '../services/spaced_repetition_service.dart';
 import 'core_providers.dart';
 import 'content_providers.dart';
 import 'quiz_providers.dart';
+import 'auth_providers.dart';
 
 // ============= SPACED REPETITION =============
 final spacedRepetitionCardsProvider =
@@ -51,11 +53,13 @@ class SpacedReviewRecorder {
     required bool isCorrect,
   }) async {
     final dbInstance = _ref.read(databaseProvider);
+    final userId = _ref.read(authProvider).user?.id ?? 0;
     final card = await dbInstance.getSpacedRepetition(questionId);
     final next = SpacedRepetitionService.review(
       questionId: questionId,
       card: card,
       isCorrect: isCorrect,
+      userId: userId,
     );
     await dbInstance.upsertSpacedRepetition(next);
     if (isCorrect) {
@@ -63,6 +67,7 @@ class SpacedReviewRecorder {
     } else {
       await dbInstance.addToErrorBook(
         db.ErrorBookCompanion.insert(
+          userId: Value(userId),
           questionId: questionId,
           addedAt: DateTime.now(),
         ),

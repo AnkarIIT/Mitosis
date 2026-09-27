@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -149,6 +150,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _flagged.addAll(resume.flagged);
       _visited.addAll(resume.visited);
       _violations = resume.violations;
+      _secondsPerQuestion = List<int>.filled(_questions.length, 0);
+      for (final entry in resume.secondsPerQuestion.entries) {
+        if (entry.key >= 0 && entry.key < _secondsPerQuestion.length) {
+          _secondsPerQuestion[entry.key] = entry.value;
+        }
+      }
     } else {
       _attemptId = 'cbt_${DateTime.now().millisecondsSinceEpoch}';
       _seed = DateTime.now().millisecondsSinceEpoch;
@@ -171,7 +178,17 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _sectionStart.add(acc);
       acc += section.length;
     }
-    _secondsPerQuestion = List<int>.filled(_questions.length, 0);
+
+    if (resume != null && rebuilt != null) {
+      _secondsPerQuestion = List<int>.filled(_questions.length, 0);
+      for (final entry in resume.secondsPerQuestion.entries) {
+        if (entry.key >= 0 && entry.key < _secondsPerQuestion.length) {
+          _secondsPerQuestion[entry.key] = entry.value;
+        }
+      }
+    } else {
+      _secondsPerQuestion = List<int>.filled(_questions.length, 0);
+    }
 
     if (resume != null && rebuilt != null) {
       _currentSection = _sectionQuestions.isEmpty
@@ -184,7 +201,10 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _skipEmptySections();
       _currentIndex = _questions.isEmpty ? 0 : _sectionStart[_currentSection];
     }
-    _initSectionDeadline();
+    // Only initialize section deadline if not resuming, or if no deadline was restored
+    if (resume == null || _sectionDeadline == null) {
+      _initSectionDeadline();
+    }
 
     // 0.1: never start the ticker on an empty allocation — build() shows the
     // empty state and _onTick would otherwise index an empty list every second.
@@ -533,6 +553,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       startedAtEpochMs: _startedAt.millisecondsSinceEpoch,
       savedAtEpochMs: DateTime.now().millisecondsSinceEpoch,
       violations: _violations,
+      secondsPerQuestion: Map<int, int>.from(_secondsPerQuestion.asMap()),
     );
     // Fire-and-forget; a failed autosave must never interrupt the test.
     ref.read(examCheckpointServiceProvider).save(cp).catchError((_) {});
@@ -556,7 +577,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   Future<void> _confirmSubmit() async {
     if (_submitting || _submitted) return;
-    _confirmDialogOpen = true;    final confirmed = await showDialog<bool>(
+    _confirmDialogOpen = true;
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Submit Test?'),
@@ -651,8 +673,10 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       final isCorrect = answer != null && answer == q.correctAnswer;
       if (!isCorrect) {
         final dbInstance = ref.read(databaseProvider);
+        final userId = ref.read(authProvider).user?.id ?? 0;
         await dbInstance.addToErrorBook(
           db.ErrorBookCompanion.insert(
+            userId: Value(userId),
             questionId: q.id,
             addedAt: DateTime.now(),
           ),
@@ -883,11 +907,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.gpp_maybe,
-                    size: 14,
-                    color: AppColors.warning,
-                  ),
+                  Icon(Icons.gpp_maybe, size: 14, color: AppColors.warning),
                   const SizedBox(width: 6),
                   Text(
                     _violations == 1

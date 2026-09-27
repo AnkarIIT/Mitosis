@@ -27,6 +27,9 @@ class ExamCheckpoint {
   final int startedAtEpochMs;
   final int savedAtEpochMs;
 
+  /// Per-question timing in seconds (index -> seconds spent).
+  final Map<int, int> secondsPerQuestion;
+
   /// Count of proctoring violations (app switched away / backgrounded) during
   /// the active test. Persisted so they survive a crash or resume.
   final int violations;
@@ -51,6 +54,7 @@ class ExamCheckpoint {
     required this.savedAtEpochMs,
     this.breakDeadlineEpochMs,
     this.sectionDeadlineEpochMs,
+    this.secondsPerQuestion = const {},
     this.violations = 0,
     this.version = kCurrentCheckpointVersion,
   });
@@ -86,6 +90,9 @@ class ExamCheckpoint {
     'startedAtEpochMs': startedAtEpochMs,
     'savedAtEpochMs': savedAtEpochMs,
     'violations': violations,
+    'secondsPerQuestion': secondsPerQuestion.map(
+      (k, v) => MapEntry(k.toString(), v),
+    ),
     'version': version,
   };
 
@@ -109,6 +116,11 @@ class ExamCheckpoint {
     startedAtEpochMs: (json['startedAtEpochMs'] as num).toInt(),
     savedAtEpochMs: (json['savedAtEpochMs'] as num).toInt(),
     violations: (json['violations'] as num?)?.toInt() ?? 0,
+    secondsPerQuestion:
+        (json['secondsPerQuestion'] as Map?)?.map(
+          (k, v) => MapEntry(int.parse(k as String), (v as num).toInt()),
+        ) ??
+        {},
     // Checkpoints saved before the `version` field existed default to v1.
     version: (json['version'] as num?)?.toInt() ?? 1,
   );

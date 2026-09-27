@@ -72,6 +72,7 @@ class FlashcardGenerationService {
   /// Whether a generation backend (proxy or direct key) is available.
   bool get _hasBackend =>
       (_proxy?.isConfigured ?? false) || _directGenerate != null;
+
   /// Sends [prompt] to whichever backend is available: the shared proxy first
   /// (cache + rate limiting), else the user's direct Gemini key.
   Future<String> _generateText(String prompt, String systemPrompt) async {

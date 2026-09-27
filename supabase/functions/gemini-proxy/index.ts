@@ -28,7 +28,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-1.5-flash";
+const MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.0-flash-exp";
 const GEMINI_URL =
   `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 const RATE_LIMIT_PER_HOUR = Number(Deno.env.get("GEMINI_RATE_LIMIT") ?? "30");
@@ -182,17 +182,16 @@ Deno.serve(async (req) => {
     await supabase.from("ai_usage_log").insert({ user_id: identity });
 
     if (response) {
-      await supabase
-        .from("ai_response_cache")
-        .insert({
+      await supabase.from("ai_response_cache").upsert(
+        {
           prompt_hash: hash,
           original_prompt: prompt,
           question_id: questionId,
           response,
           model: MODEL,
-        })
-        .onConflict("prompt_hash")
-        .ignore();
+        },
+        { onConflict: "prompt_hash", ignoreDuplicates: true }
+      );
     }
 
     return json({

@@ -1,5 +1,10 @@
 import 'package:drift/drift.dart';
 
+@TableIndex(
+  name: 'questions_remote_id_unique',
+  columns: {#remoteId},
+  unique: true,
+)
 class Questions extends Table {
   TextColumn get id => text()();
   TextColumn get subject => text()();
@@ -29,4 +34,7 @@ class Questions extends Table {
 
   /// Origin of the question: 'seeded', 'pyq', 'dpp', 'imported'.
   TextColumn get source => text().withDefault(const Constant('seeded'))();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

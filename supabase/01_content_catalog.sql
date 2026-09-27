@@ -23,13 +23,26 @@ CREATE TABLE IF NOT EXISTS public.user_roles (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Helper function to check if current user is admin/educator without recursion
+CREATE OR REPLACE FUNCTION public.is_admin_or_educator()
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.user_roles
+    WHERE user_id = auth.uid() AND role IN ('admin', 'educator')
+  );
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
+
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "user_roles are admin/maintainable" ON public.user_roles
+-- Admins can manage all roles; users can only read their own role
+CREATE POLICY "user_roles admin full access" ON public.user_roles
   FOR ALL
-  USING (auth.uid() IN (
-    SELECT user_id FROM public.user_roles WHERE role = 'admin'
-  ));
+  USING (public.is_admin_or_educator())
+  WITH CHECK (public.is_admin_or_educator());
+
+CREATE POLICY "user_roles self read" ON public.user_roles
+  FOR SELECT
+  USING (user_id = auth.uid());
 
 -- ---------------------------------------------------------------------------
 -- 1. Question catalog
@@ -115,34 +128,14 @@ CREATE POLICY "Public read access for published tests"
 DROP POLICY IF EXISTS "Admin write access for questions" ON public.questions;
 CREATE POLICY "Admin write access for questions"
   ON public.questions FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_roles
-      WHERE user_id = auth.uid() AND role IN ('admin', 'educator')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_roles
-      WHERE user_id = auth.uid() AND role IN ('admin', 'educator')
-    )
-  );
+  USING (public.is_admin_or_educator())
+  WITH CHECK (public.is_admin_or_educator());
 
 DROP POLICY IF EXISTS "Admin write access for tests" ON public.tests;
 CREATE POLICY "Admin write access for tests"
   ON public.tests FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_roles
-      WHERE user_id = auth.uid() AND role IN ('admin', 'educator')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_roles
-      WHERE user_id = auth.uid() AND role IN ('admin', 'educator')
-    )
-  );
+  USING (public.is_admin_or_educator())
+  WITH CHECK (public.is_admin_or_educator());
 
 -- ---------------------------------------------------------------------------
 -- 5. Grants (anon reads public catalog; authenticated reads; admin writes via

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 class TopicProgressEntries extends Table {
+  IntColumn get userId => integer()();
   TextColumn get topicId => text()();
   IntColumn get questionsAttempted =>
       integer().withDefault(const Constant(0))();
@@ -14,5 +15,5 @@ class TopicProgressEntries extends Table {
       dateTime().nullable().clientDefault(() => DateTime.now())();
 
   @override
-  Set<Column> get primaryKey => {topicId};
+  Set<Column> get primaryKey => {userId, topicId};
 }

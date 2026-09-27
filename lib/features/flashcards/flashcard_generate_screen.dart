@@ -432,7 +432,9 @@ class _FlashcardGenerateScreenState
     final chapterId = _selectedChapter?.chapterTitle ?? '';
 
     final companions = _generatedCards.map((card) {
+      final userId = ref.read(authProvider).user?.id ?? 0;
       return FlashcardsCompanion.insert(
+        userId: Value(userId),
         id: uuid.v4(),
         front: card.front,
         back: card.back,

@@ -19,6 +19,7 @@ void main() {
       final attemptedAt = DateTime.now();
       await db.insertQuizAttempt(
         QuizAttemptsCompanion.insert(
+          userId: Value(0),
           topicId: 'phy1',
           subject: 'Physics',
           score: 1,
@@ -31,6 +32,7 @@ void main() {
 
       await db.upsertTopicProgress(
         TopicProgressEntriesCompanion.insert(
+          userId: Value(0),
           topicId: 'phy1',
           lastAttempted: DateTime.now(),
         ),
@@ -38,6 +40,7 @@ void main() {
 
       await db.insertBookmark(
         BookmarksCompanion.insert(
+          userId: Value(0),
           questionId: '101',
           subject: 'Physics',
           topicId: 'phy1',
@@ -58,6 +61,7 @@ void main() {
       final now = DateTime.now();
       await db.insertBookmark(
         BookmarksCompanion.insert(
+          userId: Value(0),
           questionId: '101',
           subject: 'Botany',
           topicId: 'bio1',
@@ -66,6 +70,7 @@ void main() {
       );
       await db.insertBookmark(
         BookmarksCompanion.insert(
+          userId: Value(0),
           questionId: '101',
           subject: 'Botany',
           topicId: 'bio1',
@@ -74,6 +79,7 @@ void main() {
       );
       await db.insertBookmark(
         BookmarksCompanion.insert(
+          userId: Value(0),
           questionId: '202',
           subject: 'Zoology',
           topicId: 'zoo2',
@@ -92,6 +98,7 @@ void main() {
           .into(db.quizAttempts)
           .insert(
             QuizAttemptsCompanion.insert(
+              userId: Value(0),
               topicId: 'bio1',
               subject: 'Botany',
               score: 3,
@@ -105,6 +112,7 @@ void main() {
           .into(db.quizAttempts)
           .insert(
             QuizAttemptsCompanion.insert(
+              userId: Value(0),
               topicId: 'bio1',
               subject: 'Botany',
               score: 4,
@@ -138,6 +146,7 @@ void main() {
     test('topic progress upsert keeps a single row per topic', () async {
       await db.upsertTopicProgress(
         TopicProgressEntriesCompanion.insert(
+          userId: Value(0),
           topicId: 'chem1',
           questionsAttempted: const Value(2),
           questionsCorrect: const Value(1),
@@ -146,6 +155,7 @@ void main() {
       );
       await db.upsertTopicProgress(
         TopicProgressEntriesCompanion.insert(
+          userId: Value(0),
           topicId: 'chem1',
           questionsAttempted: const Value(4),
           questionsCorrect: const Value(3),

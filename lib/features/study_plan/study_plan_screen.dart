@@ -373,11 +373,7 @@ class StudyPlanScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.stars,
-            color: AdaptiveColors.warning(context),
-            size: 40,
-          ),
+          Icon(Icons.stars, color: AdaptiveColors.warning(context), size: 40),
           const SizedBox(height: 12),
           Text(
             message,

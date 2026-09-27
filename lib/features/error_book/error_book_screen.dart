@@ -149,7 +149,10 @@ class ErrorBookScreen extends ConsumerWidget {
         ),
         subtitle: Text(
           '${question.subject} • ${question.chapter}',
-          style: TextStyle(fontSize: 12, color: AdaptiveColors.textSecondary(context)),
+          style: TextStyle(
+            fontSize: 12,
+            color: AdaptiveColors.textSecondary(context),
+          ),
         ),
         children: [
           Padding(

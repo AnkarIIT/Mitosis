@@ -40,15 +40,17 @@ class QuizSessionService {
       timeLimitSeconds: Value(timeLimitSeconds),
       seed: Value(seed),
       currentIndex: Value(currentIndex),
-      selectedAnswers: Value(jsonEncode(
-        selectedAnswers.map((k, v) => MapEntry(k.toString(), v)),
-      )),
-      answerResults: Value(jsonEncode(
-        answerResults.map((k, v) => MapEntry(k.toString(), v)),
-      )),
-      timeSpentPerQuestion: Value(jsonEncode(
-        timeSpentPerQuestion.map((k, v) => MapEntry(k.toString(), v)),
-      )),
+      selectedAnswers: Value(
+        jsonEncode(selectedAnswers.map((k, v) => MapEntry(k.toString(), v))),
+      ),
+      answerResults: Value(
+        jsonEncode(answerResults.map((k, v) => MapEntry(k.toString(), v))),
+      ),
+      timeSpentPerQuestion: Value(
+        jsonEncode(
+          timeSpentPerQuestion.map((k, v) => MapEntry(k.toString(), v)),
+        ),
+      ),
       flaggedQuestions: Value(jsonEncode(flaggedQuestions.toList())),
       visitedQuestions: Value(jsonEncode(visitedQuestions.toList())),
       score: Value(score),
@@ -71,17 +73,24 @@ class QuizSessionService {
     if (session == null) return null;
 
     try {
-      final selectedAnswers = (jsonDecode(session.selectedAnswers) as Map)
-          .map((k, v) => MapEntry(int.parse(k), v as String));
-      final answerResults = (jsonDecode(session.answerResults) as Map)
-          .map((k, v) => MapEntry(int.parse(k), v as bool));
-      final timeSpentPerQuestion = (jsonDecode(session.timeSpentPerQuestion) as Map)
-          .map((k, v) => MapEntry(int.parse(k), v as int));
+      final selectedAnswers = (jsonDecode(session.selectedAnswers) as Map).map(
+        (k, v) => MapEntry(int.parse(k), v as String),
+      );
+      final answerResults = (jsonDecode(session.answerResults) as Map).map(
+        (k, v) => MapEntry(int.parse(k), v as bool),
+      );
+      final timeSpentPerQuestion =
+          (jsonDecode(session.timeSpentPerQuestion) as Map).map(
+            (k, v) => MapEntry(int.parse(k), v as int),
+          );
       final flaggedQuestions = Set<int>.from(
-        (jsonDecode(session.flaggedQuestions) as List).cast<int>());
+        (jsonDecode(session.flaggedQuestions) as List).cast<int>(),
+      );
       final visitedQuestions = Set<int>.from(
-        (jsonDecode(session.visitedQuestions) as List).cast<int>());
-      final questionIds = (jsonDecode(session.questionIds) as List).cast<String>();
+        (jsonDecode(session.visitedQuestions) as List).cast<int>(),
+      );
+      final questionIds = (jsonDecode(session.questionIds) as List)
+          .cast<String>();
 
       List<Question>? questions;
       if (session.questionData != null && session.questionData!.isNotEmpty) {
@@ -120,22 +129,32 @@ class QuizSessionService {
   /// Gets all saved sessions.
   Future<List<QuizSessionData>> getAllSessions() async {
     final sessions = await _db.getAllQuizSessions();
-    return sessions.map((s) => _mapSession(s)).whereType<QuizSessionData>().toList();
+    return sessions
+        .map((s) => _mapSession(s))
+        .whereType<QuizSessionData>()
+        .toList();
   }
 
   QuizSessionData? _mapSession(db.QuizSession session) {
     try {
-      final selectedAnswers = (jsonDecode(session.selectedAnswers) as Map)
-          .map((k, v) => MapEntry(int.parse(k), v as String));
-      final answerResults = (jsonDecode(session.answerResults) as Map)
-          .map((k, v) => MapEntry(int.parse(k), v as bool));
-      final timeSpentPerQuestion = (jsonDecode(session.timeSpentPerQuestion) as Map)
-          .map((k, v) => MapEntry(int.parse(k), v as int));
+      final selectedAnswers = (jsonDecode(session.selectedAnswers) as Map).map(
+        (k, v) => MapEntry(int.parse(k), v as String),
+      );
+      final answerResults = (jsonDecode(session.answerResults) as Map).map(
+        (k, v) => MapEntry(int.parse(k), v as bool),
+      );
+      final timeSpentPerQuestion =
+          (jsonDecode(session.timeSpentPerQuestion) as Map).map(
+            (k, v) => MapEntry(int.parse(k), v as int),
+          );
       final flaggedQuestions = Set<int>.from(
-        (jsonDecode(session.flaggedQuestions) as List).cast<int>());
+        (jsonDecode(session.flaggedQuestions) as List).cast<int>(),
+      );
       final visitedQuestions = Set<int>.from(
-        (jsonDecode(session.visitedQuestions) as List).cast<int>());
-      final questionIds = (jsonDecode(session.questionIds) as List).cast<String>();
+        (jsonDecode(session.visitedQuestions) as List).cast<int>(),
+      );
+      final questionIds = (jsonDecode(session.questionIds) as List)
+          .cast<String>();
 
       List<Question>? questions;
       if (session.questionData != null && session.questionData!.isNotEmpty) {

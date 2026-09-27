@@ -47,7 +47,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Welcome back'), findsOneWidget);
-      expect(find.text('SIGN IN'), findsOneWidget);
+      expect(find.text('Sign in'), findsOneWidget);
       expect(find.text('Continue as Guest'), findsOneWidget);
     });
 

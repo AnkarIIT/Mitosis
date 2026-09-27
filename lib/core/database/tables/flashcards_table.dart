@@ -6,6 +6,7 @@ import 'package:drift/drift.dart';
 /// chapters. The scheduling fields follow the same SM-2 / Leitner hybrid
 /// algorithm used by [SpacedRepetition] for MCQ questions.
 class Flashcards extends Table {
+  IntColumn get userId => integer().withDefault(const Constant(0))();
   TextColumn get id => text()();
   TextColumn get front => text()();
   TextColumn get back => text()();
@@ -32,5 +33,5 @@ class Flashcards extends Table {
       dateTime().nullable().clientDefault(() => DateTime.now())();
 
   @override
-  Set<Column> get primaryKey => {id};
+  Set<Column> get primaryKey => {userId, id};
 }

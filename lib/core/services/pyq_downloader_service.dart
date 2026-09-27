@@ -27,7 +27,8 @@ class PyqDownloaderService {
   /// Public download sources - industry standard NEET PYQ URLs
   static const List<PyqSource> defaultSources = [
     PyqSource(
-      url: 'https://raw.githubusercontent.com/cursed-engineer/NEET-PYQs/main/questions.json',
+      url:
+          'https://raw.githubusercontent.com/cursed-engineer/NEET-PYQs/main/questions.json',
       label: 'NEET PYQs 2015-2024',
       format: 'json',
       reliability: 0.9,
@@ -45,8 +46,9 @@ class PyqDownloaderService {
     int batchSize = 100,
     bool showProgress = true,
   }) async {
-    final progressController = StreamController<DownloadProgress>();
-    
+    final progressController = StreamController<DownloadProgress>.broadcast();
+    downloadProgress = progressController.stream;
+
     try {
       _status.reset();
       int totalInserted = 0;
@@ -57,32 +59,33 @@ class PyqDownloaderService {
         if (_status.isCancelled) break;
 
         try {
-          final result = await _downloadSource(
-            source,
-            batchSize: batchSize,
-          );
-          
+          final result = await _downloadSource(source, batchSize: batchSize);
+
           if (result.success) {
             totalInserted += result.inserted;
             downloadedFiles.add(source.label);
             _status.updateProgress(totalInserted, result.totalFound);
-            
+
             if (showProgress) {
-              progressController.add(DownloadProgress(
-                stage: 'downloading',
-                downloaded: totalInserted,
-                total: result.totalFound,
-                currentSource: source.label,
-              ));
+              progressController.add(
+                DownloadProgress(
+                  stage: 'downloading',
+                  downloaded: totalInserted,
+                  total: result.totalFound,
+                  currentSource: source.label,
+                ),
+              );
             }
           } else {
             totalFailed++;
             if (showProgress) {
-              progressController.add(DownloadProgress(
-                stage: 'error',
-                error: result.error,
-                currentSource: source.label,
-              ));
+              progressController.add(
+                DownloadProgress(
+                  stage: 'error',
+                  error: result.error,
+                  currentSource: source.label,
+                ),
+              );
             }
           }
         } catch (e, s) {
@@ -94,18 +97,22 @@ class PyqDownloaderService {
 
       // Final summary
       if (showProgress) {
-        progressController.add(DownloadProgress(
-          stage: 'complete',
-          downloaded: totalInserted,
-          total: totalInserted,
-          summary: 'Downloaded $totalInserted new questions from ${downloadedFiles.length} sources',
-        ));
+        progressController.add(
+          DownloadProgress(
+            stage: 'complete',
+            downloaded: totalInserted,
+            total: totalInserted,
+            summary:
+                'Downloaded $totalInserted new questions from ${downloadedFiles.length} sources',
+          ),
+        );
       }
 
       _status.completed(totalInserted, totalFailed);
       return totalInserted;
     } finally {
       await progressController.close();
+      downloadProgress = null;
     }
   }
 
@@ -115,13 +122,15 @@ class PyqDownloaderService {
     int batchSize = 100,
   }) async {
     try {
-      final response = await _client.get(
-        Uri.parse(source.url),
-        headers: {
-          'User-Agent': 'NEET-Mitos/1.0 (Educational Research)',
-          'Accept': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 30));
+      final response = await _client
+          .get(
+            Uri.parse(source.url),
+            headers: {
+              'User-Agent': 'NEET-Mitos/1.0 (Educational Research)',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode != 200) {
         return _DownloadSourceResult(
@@ -179,9 +188,11 @@ class PyqDownloaderService {
       // Deduplicate against existing questions
       final existingTexts = await _repository.getExistingQuestionTexts();
       final toInsert = questions
-          .where((q) => !existingTexts.contains(
-            QuestionImporter.normalizeText(q.questionText),
-          ))
+          .where(
+            (q) => !existingTexts.contains(
+              QuestionImporter.normalizeText(q.questionText),
+            ),
+          )
           .toList();
 
       if (toInsert.isEmpty) {
@@ -202,7 +213,9 @@ class PyqDownloaderService {
         await _repository.bulkInsertQuestions(batch);
       }
 
-      debugPrint('✅ Downloaded ${(toInsert.length)} new questions from ${source.label}');
+      debugPrint(
+        '✅ Downloaded ${(toInsert.length)} new questions from ${source.label}',
+      );
 
       return _DownloadSourceResult(
         success: true,
@@ -212,24 +225,22 @@ class PyqDownloaderService {
     } catch (e, s) {
       debugPrint('❌ Download error for ${source.label}: $e');
       debugPrintStack(stackTrace: s);
-      return _DownloadSourceResult(
-        success: false,
-        error: e.toString(),
-      );
+      return _DownloadSourceResult(success: false, error: e.toString());
     }
   }
 
   /// Parse a question from various JSON formats
   Question? _parseQuestion(Map<String, dynamic> json, String sourceLabel) {
     // Extract question text
-    final text = (json['questionText'] ??
-            json['question'] ??
-            json['question_text'] ??
-            json['q'] ??
-            '')
-        .toString()
-        .trim();
-    
+    final text =
+        (json['questionText'] ??
+                json['question'] ??
+                json['question_text'] ??
+                json['q'] ??
+                '')
+            .toString()
+            .trim();
+
     if (text.isEmpty) return null;
 
     // Extract options
@@ -237,27 +248,30 @@ class PyqDownloaderService {
     if (options.length < 2) return null;
 
     // Extract correct answer
-    final correctAnswer = (json['correctAnswer'] ??
-            json['answer'] ??
-            json['correct_answer'] ??
-            json['ans'] ??
-            '')
-        .toString()
-        .trim();
-    
+    final correctAnswer =
+        (json['correctAnswer'] ??
+                json['answer'] ??
+                json['correct_answer'] ??
+                json['ans'] ??
+                '')
+            .toString()
+            .trim();
+
     if (correctAnswer.isEmpty) return null;
 
     // Extract metadata
     final subject = _extractSubject(json, text);
-    final chapter = json['chapter']?.toString().trim() ??
-        _inferChapter(text, subject);
+    final chapter =
+        json['chapter']?.toString().trim() ?? _inferChapter(text, subject);
     final topic = json['topic']?.toString().trim() ?? chapter;
-    final topicId = json['topicId']?.toString().trim() ??
+    final topicId =
+        json['topicId']?.toString().trim() ??
         'topic_${subject}_${topic.replaceAll(' ', '_')}';
     final year = _extractYear(json);
     final difficulty = json['difficulty']?.toString().trim() ?? 'Medium';
     final explanation = json['explanation']?.toString().trim();
-    final ncertRef = json['ncertReference']?.toString().trim() ??
+    final ncertRef =
+        json['ncertReference']?.toString().trim() ??
         json['ncert_reference']?.toString().trim();
     final type = json['type']?.toString().trim() ?? 'MCQ';
     final tags = _parseTags(json);
@@ -292,7 +306,7 @@ class PyqDownloaderService {
           .where((e) => e.isNotEmpty)
           .toList();
     }
-    
+
     if (json['options'] is Map) {
       final options = <String>[];
       final map = json['options'] as Map<String, dynamic>;
@@ -303,7 +317,7 @@ class PyqDownloaderService {
       }
       return options;
     }
-    
+
     // Handle string format: "A. Option1|||B. Option2"
     final optionsStr = json['options']?.toString() ?? '';
     if (optionsStr.contains('|||')) {
@@ -313,7 +327,7 @@ class PyqDownloaderService {
           .where((e) => e.isNotEmpty)
           .toList();
     }
-    
+
     if (optionsStr.startsWith('[')) {
       try {
         return (jsonDecode(optionsStr) as List)
@@ -322,14 +336,14 @@ class PyqDownloaderService {
             .toList();
       } catch (_) {}
     }
-    
+
     return [];
   }
 
   String _extractSubject(Map<String, dynamic> json, String text) {
     final subject = json['subject']?.toString().trim();
     if (subject != null && subject.isNotEmpty) return subject;
-    
+
     // Infer from text
     final lowerText = text.toLowerCase();
     if (lowerText.contains('biology') ||
@@ -348,20 +362,26 @@ class PyqDownloaderService {
 
   String _inferChapter(String text, String subject) {
     final lower = text.toLowerCase();
-    if (lower.contains('cell division') || lower.contains('mitosis')) return 'Cell Biology';
-    if (lower.contains('genetics') || lower.contains('dna') || lower.contains('rna')) return 'Genetics';
+    if (lower.contains('cell division') || lower.contains('mitosis'))
+      return 'Cell Biology';
+    if (lower.contains('genetics') ||
+        lower.contains('dna') ||
+        lower.contains('rna'))
+      return 'Genetics';
     if (lower.contains('chemical bonding')) return 'Chemical Bonding';
-    if (lower.contains('atom') || lower.contains('structure')) return 'Atomic Structure';
+    if (lower.contains('atom') || lower.contains('structure'))
+      return 'Atomic Structure';
     return 'General';
   }
 
   int? _extractYear(Map<String, dynamic> json) {
-    final yearStr = (json['year'] ??
-            json['exam_year'] ??
-            json['examYear'] ??
-            json['date']?.toString())
-        .toString();
-    
+    final yearStr =
+        (json['year'] ??
+                json['exam_year'] ??
+                json['examYear'] ??
+                json['date']?.toString())
+            .toString();
+
     // Try to extract 4-digit year
     final match = RegExp(r'20\d{2}').firstMatch(yearStr);
     return match != null ? int.tryParse(match.group(0)!) : null;

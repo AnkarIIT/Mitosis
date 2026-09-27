@@ -152,7 +152,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'This personalizes your syllabus — Class 11 & 12 students see only '
             'their NCERT chapters, while droppers get the full syllabus.',
             style: TextStyle(
@@ -250,7 +250,10 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
               if (selected)
                 Icon(Icons.check_circle, color: color)
               else
-                Icon(Icons.circle_outlined, color: AdaptiveColors.outline(context)),
+                Icon(
+                  Icons.circle_outlined,
+                  color: AdaptiveColors.outline(context),
+                ),
             ],
           ),
         ),
@@ -273,7 +276,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'We\'ll use this to pace your plan toward the exam.',
             style: TextStyle(
               color: AdaptiveColors.textSecondary(context),
@@ -329,7 +332,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'This sets your daily question target so the plan stays realistic.',
             style: TextStyle(
               color: AdaptiveColors.textSecondary(context),
@@ -385,7 +388,10 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
                             color: AppColors.primary,
                           )
                         else
-                          Icon(Icons.circle_outlined, color: AdaptiveColors.outline(context)),
+                          Icon(
+                            Icons.circle_outlined,
+                            color: AdaptiveColors.outline(context),
+                          ),
                       ],
                     ),
                   ),
@@ -420,7 +426,7 @@ class _BatchOnboardingPageState extends ConsumerState<BatchOnboardingPage> {
       children: [
         TextButton(
           onPressed: _saving ? null : widget.onDone,
-          child: const Text(
+          child: Text(
             'SKIP',
             style: TextStyle(color: AdaptiveColors.textSecondary(context)),
           ),

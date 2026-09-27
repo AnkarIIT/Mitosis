@@ -10,6 +10,7 @@ import 'package:drift/drift.dart';
 )
 class Bookmarks extends Table {
   IntColumn get id => integer().autoIncrement()();
+  IntColumn get userId => integer().withDefault(const Constant(0))();
   TextColumn get questionId => text()();
   TextColumn get subject => text()();
   TextColumn get topicId => text()();

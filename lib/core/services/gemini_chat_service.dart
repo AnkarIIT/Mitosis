@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 import 'gemini_proxy_service.dart';
+import '../config/app_config.dart';
 
 enum ChatMode { general, conceptExplanation, doubtSolving, quizHint }
 
@@ -16,6 +17,9 @@ class GeminiChatService {
   static const _secureStorage = FlutterSecureStorage(
     iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
   );
+
+  /// Current Gemini model to use. Update this when models are deprecated.
+  static const String _defaultModel = 'gemini-2.0-flash-exp';
 
   String? _apiKey;
   GenerativeModel? _model;
@@ -51,7 +55,7 @@ class GeminiChatService {
     }
 
     _model = GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: _defaultModel,
       apiKey: cleanKey,
       systemInstruction: Content.system(_systemPromptFor(mode)),
     );
@@ -145,13 +149,17 @@ class GeminiChatService {
     }
     try {
       final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
+        model: _defaultModel,
         apiKey: key,
         systemInstruction: Content.system(_systemPromptFor(mode)),
       );
       return model
           .generateContent([Content.text(text)])
-          .then((response) => response.text ?? 'Error: unable to get a response from the AI tutor.');
+          .then(
+            (response) =>
+                response.text ??
+                'Error: unable to get a response from the AI tutor.',
+          );
     } catch (e) {
       debugPrint('❌ Direct Gemini call failed: $e');
       return Future.value('Error: unable to get a response from the AI tutor.');
@@ -165,22 +173,25 @@ class GeminiChatService {
   Future<String> generateWithSystemPrompt(String text, String systemPrompt) {
     final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
     if (key == null || key.isEmpty || !key.startsWith('AIzaSy')) {
-      return Future.value('Error: Gemini API Key is not configured. Please add it in Settings.');
+      return Future.value(
+        'Error: Gemini API Key is not configured. Please add it in Settings.',
+      );
     }
     try {
       final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
+        model: _defaultModel,
         apiKey: key,
         systemInstruction: Content.system(systemPrompt),
       );
       return model
           .generateContent([Content.text(text)])
-          .then((response) => response.text ?? 'Error: unable to generate content.');
+          .then(
+            (response) => response.text ?? 'Error: unable to generate content.',
+          );
     } catch (e) {
       return Future.value('Error: unable to generate content.');
     }
   }
-
 
   Future<String> sendMultimodalMessage(String text, List<Part> parts) async {
     if (!isConfigured) {
@@ -190,7 +201,7 @@ class GeminiChatService {
     try {
       final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
       final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
+        model: _defaultModel,
         apiKey: key!,
         systemInstruction: Content.system(
           'You are an expert NEET tutor and OCR specialist. Identify the medical entrance exam (NEET) question from the provided image. '
@@ -255,7 +266,7 @@ Make it practical and achievable for a NEET student.''';
     try {
       final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
       final planModel = GenerativeModel(
-        model: 'gemini-1.5-flash',
+        model: _defaultModel,
         apiKey: key!,
         systemInstruction: Content.system(
           'You are a NEET expert study planner. Create practical, achievable study plans.',
@@ -296,7 +307,7 @@ Make it practical and achievable for a NEET student.''';
     try {
       final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
       final genModel = GenerativeModel(
-        model: 'gemini-1.5-flash',
+        model: _defaultModel,
         apiKey: key!,
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
@@ -350,7 +361,7 @@ Make it practical and achievable for a NEET student.''';
     final result = <Map<String, dynamic>>[];
     for (final item in decoded) {
       if (item is! Map) continue;
-      
+
       final questionText = item['questionText'];
       final correctAnswer = item['correctAnswer'];
       if (questionText is! String || questionText.trim().isEmpty) continue;

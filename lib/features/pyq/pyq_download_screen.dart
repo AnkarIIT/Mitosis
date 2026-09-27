@@ -17,7 +17,10 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
   final Map<String, double> _downloadProgress = {};
 
   final List<String> _subjects = ['All', 'Physics', 'Chemistry', 'Biology'];
-  final List<int> _years = List.generate(19, (i) => 2024 - i); // 2024 down to 2006
+  final List<int> _years = List.generate(
+    19,
+    (i) => 2024 - i,
+  ); // 2024 down to 2006
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +43,10 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
         children: [
           // Header Info Card
           _buildHeaderCard(context, theme),
-          
+
           // Subject Filter
           _buildSubjectFilter(context, theme),
-          
+
           // Year List
           Expanded(child: _buildYearList(context, theme)),
         ],
@@ -161,14 +164,14 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
               selectedColor: theme.colorScheme.primary.withOpacity(0.2),
               checkmarkColor: theme.colorScheme.primary,
               labelStyle: TextStyle(
-                color: isSelected 
-                    ? theme.colorScheme.primary 
+                color: isSelected
+                    ? theme.colorScheme.primary
                     : theme.colorScheme.onSurface.withOpacity(0.7),
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
               side: BorderSide(
-                color: isSelected 
-                    ? theme.colorScheme.primary 
+                color: isSelected
+                    ? theme.colorScheme.primary
                     : theme.colorScheme.outline.withOpacity(0.3),
               ),
             ),
@@ -193,9 +196,7 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(
-              color: theme.colorScheme.outline.withOpacity(0.2),
-            ),
+            side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.2)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -209,12 +210,12 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: isDownloaded 
+                        color: isDownloaded
                             ? AppColors.success.withOpacity(0.1)
                             : theme.colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isDownloaded 
+                          color: isDownloaded
                               ? AppColors.success.withOpacity(0.3)
                               : theme.colorScheme.primary.withOpacity(0.3),
                         ),
@@ -225,7 +226,9 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
-                            color: isDownloaded ? AppColors.success : theme.colorScheme.primary,
+                            color: isDownloaded
+                                ? AppColors.success
+                                : theme.colorScheme.primary,
                           ),
                         ),
                       ),
@@ -245,7 +248,9 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                           Text(
                             _getYearDescription(year),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.6,
+                              ),
                             ),
                           ),
                         ],
@@ -253,7 +258,10 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                     ),
                     if (isDownloaded)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.success.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
@@ -261,7 +269,11 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.check_circle, size: 14, color: AppColors.success),
+                            const Icon(
+                              Icons.check_circle,
+                              size: 14,
+                              color: AppColors.success,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               'Downloaded',
@@ -276,7 +288,7 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                       ),
                   ],
                 ),
-                
+
                 // Download Progress
                 if (isDownloading) ...[
                   const SizedBox(height: 16),
@@ -305,8 +317,12 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                       const SizedBox(height: 8),
                       LinearProgressIndicator(
                         value: progress,
-                        backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
-                        valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
+                        backgroundColor: theme.colorScheme.primary.withOpacity(
+                          0.1,
+                        ),
+                        valueColor: AlwaysStoppedAnimation(
+                          theme.colorScheme.primary,
+                        ),
                         borderRadius: BorderRadius.circular(4),
                         minHeight: 6,
                       ),
@@ -380,7 +396,8 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => _openDownloadedPdf(year, 'chemistry'),
+                          onPressed: () =>
+                              _openDownloadedPdf(year, 'chemistry'),
                           icon: const Icon(Icons.picture_as_pdf, size: 16),
                           label: const Text('Open Chemistry'),
                           style: OutlinedButton.styleFrom(
@@ -443,10 +460,10 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
           });
         }
       }
-      
+
       // Actual download would go here:
       // await _pyqService.downloadPyqPdf(year: year, subject: subject);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

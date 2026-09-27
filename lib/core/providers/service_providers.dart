@@ -14,6 +14,7 @@ import '../services/quiz_session_service.dart';
 import '../services/question_generation_service.dart';
 import '../services/dpp_streak_service.dart';
 import '../services/exam_blueprint_service.dart';
+import '../services/email_service.dart';
 import '../database/question_repository.dart';
 import '../services/auth_service.dart';
 import 'core_providers.dart';
@@ -22,9 +23,16 @@ final biometricServiceProvider = Provider<BiometricService>((ref) {
   return BiometricService();
 });
 
+final emailServiceProvider = Provider<EmailService>((ref) {
+  final service = EmailService();
+  service.loadConfig();
+  return service;
+});
+
 final authServiceProvider = Provider<AuthService>((ref) {
   final database = ref.watch(databaseProvider);
-  return AuthService(database);
+  final emailService = ref.watch(emailServiceProvider);
+  return AuthService(database, emailService);
 });
 
 final googleAuthServiceProvider = Provider<GoogleAuthService>((ref) {
@@ -71,7 +79,9 @@ final quizSessionServiceProvider = Provider<QuizSessionService>((ref) {
   return QuizSessionService(database);
 });
 
-final questionGenerationServiceProvider = Provider<QuestionGenerationService?>((ref) {
+final questionGenerationServiceProvider = Provider<QuestionGenerationService?>((
+  ref,
+) {
   final gemini = ref.watch(geminiServiceProvider);
   return QuestionGenerationService(gemini);
 });

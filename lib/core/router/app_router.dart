@@ -364,14 +364,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           return DppScreen(subject: subject);
         },
       ),
-      GoRoute(
-        path: '/pyq',
-        builder: (_, _) => const PyqDownloadScreen(),
-      ),
-      GoRoute(
-        path: '/test',
-        builder: (_, _) => const TestModuleScreen(),
-      ),
+      GoRoute(path: '/pyq', builder: (_, _) => const PyqDownloadScreen()),
+      GoRoute(path: '/test', builder: (_, _) => const TestModuleScreen()),
     ],
   );
 });

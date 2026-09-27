@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/question_model.dart';
@@ -8,6 +9,7 @@ import '../services/quiz_session_service.dart';
 import 'core_providers.dart';
 import 'content_providers.dart';
 import 'service_providers.dart';
+import 'auth_providers.dart';
 
 // ============= QUIZ STATE =============
 enum QuizMode { practice, exam, revision, speed }
@@ -87,7 +89,8 @@ class QuizState {
   int get remaining => questions.length - selectedAnswers.length;
 
   bool get hasTimeLimit => timeLimitSeconds > 0;
-  int get remainingTime => (timeLimitSeconds - timeElapsedSeconds).clamp(0, timeLimitSeconds);
+  int get remainingTime =>
+      (timeLimitSeconds - timeElapsedSeconds).clamp(0, timeLimitSeconds);
   bool get isTimeUp => hasTimeLimit && remainingTime <= 0;
 }
 
@@ -102,7 +105,8 @@ class QuizNotifier extends StateNotifier<QuizState> {
   String _quizMode = 'practice';
   int _timeLimitSeconds = 0;
 
-  void initializeQuiz(List<Question> questions, {
+  void initializeQuiz(
+    List<Question> questions, {
     int? seed,
     String? sessionId,
     String? topicId,
@@ -363,8 +367,9 @@ final quizProvider = StateNotifierProvider<QuizNotifier, QuizState>((ref) {
 // ============= BOOKMARKS =============
 class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
   final db.AppDatabase _db;
+  final int _userId;
 
-  BookmarksNotifier(this._db) : super(const []) {
+  BookmarksNotifier(this._db, this._userId) : super(const []) {
     loadBookmarks();
   }
 
@@ -389,6 +394,7 @@ class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
       } else {
         await _db.insertBookmark(
           db.BookmarksCompanion.insert(
+            userId: Value(_userId),
             questionId: questionId,
             subject: subject,
             topicId: topicId,
@@ -410,7 +416,9 @@ class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
 final bookmarksProvider =
     StateNotifierProvider<BookmarksNotifier, List<db.Bookmark>>((ref) {
       final database = ref.watch(databaseProvider);
-      return BookmarksNotifier(database);
+      final user = ref.watch(authProvider).user;
+      final userId = user?.id ?? 0;
+      return BookmarksNotifier(database, userId);
     });
 
 // ============= ERROR BOOK =============

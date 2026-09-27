@@ -181,7 +181,9 @@ class TopicDetailScreen extends ConsumerWidget {
                 color: AdaptiveColors.warning(context).withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AdaptiveColors.warning(context).withValues(alpha: 0.22),
+                  color: AdaptiveColors.warning(
+                    context,
+                  ).withValues(alpha: 0.22),
                 ),
               ),
               child: Column(
@@ -483,10 +485,7 @@ class TopicDetailScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Row(
               children: [
-                Icon(
-                  Icons.menu_book,
-                  color: AdaptiveColors.warning(context),
-                ),
+                Icon(Icons.menu_book, color: AdaptiveColors.warning(context)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(

@@ -73,7 +73,11 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                         icon: Icons.schedule,
                       ),
                     ),
-                    Container(height: 40, width: 1, color: AdaptiveColors.divider(context)),
+                    Container(
+                      height: 40,
+                      width: 1,
+                      color: AdaptiveColors.divider(context),
+                    ),
                     Expanded(
                       child: _StatItem(
                         label: 'Total Cards',
@@ -82,7 +86,11 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                         icon: Icons.style,
                       ),
                     ),
-                    Container(height: 40, width: 1, color: AdaptiveColors.divider(context)),
+                    Container(
+                      height: 40,
+                      width: 1,
+                      color: AdaptiveColors.divider(context),
+                    ),
                     Expanded(
                       child: _StatItem(
                         label: 'Mastered',
@@ -271,9 +279,9 @@ class _StatItem extends StatelessWidget {
         ),
         Text(
           label,
-          style: Theme.of(
-            context,
-           ).textTheme.bodySmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: AdaptiveColors.textSecondary(context),
+          ),
         ),
       ],
     );

@@ -23,7 +23,7 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
@@ -33,15 +33,12 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
             SliverAppBar(
               title: const Text(
                 'NEET Prep',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 22,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 22),
               ),
               backgroundColor: theme.colorScheme.surface,
-                  elevation: 0,
-                  floating: true,
-                  snap: true,
+              elevation: 0,
+              floating: true,
+              snap: true,
               actions: [
                 IconButton(
                   icon: const Icon(Icons.notifications_outlined),
@@ -61,7 +58,10 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
             // Student Stats Overview
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: StudentStatsCard(
                   targetScore: 720,
                   currentScore: 680,
@@ -74,7 +74,10 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
             // Quick Action Buttons
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -109,7 +112,8 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                           icon: Icons.flash_on,
                           label: 'Flashcards',
                           color: SubjectColors.physics,
-                          onTap: () => Navigator.pushNamed(context, '/flashcards'),
+                          onTap: () =>
+                              Navigator.pushNamed(context, '/flashcards'),
                         ),
                         QuickActionButton(
                           icon: Icons.search,
@@ -189,7 +193,10 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
             // Topic Progress
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Card(
                   elevation: 2,
                   shape: RoundedRectangleBorder(
@@ -237,7 +244,10 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
             // PYQ Downloads Section
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 child: Card(
                   elevation: 3,
                   shape: RoundedRectangleBorder(
@@ -250,7 +260,11 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.menu_book, size: 20, color: theme.colorScheme.primary),
+                            Icon(
+                              Icons.menu_book,
+                              size: 20,
+                              color: theme.colorScheme.primary,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'NEET Previous Year Papers',
@@ -261,9 +275,11 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        const Text(
+                        Text(
                           'Download and practice from the last 19 years of NEET question papers (2006-2024).',
-                          style: TextStyle(color: AdaptiveColors.textSecondary(context)),
+                          style: TextStyle(
+                            color: AdaptiveColors.textSecondary(context),
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Row(
@@ -272,10 +288,16 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                               child: _buildYearBadge('2024', AppColors.error),
                             ),
                             Expanded(
-                              child: _buildYearBadge('2023', AppColors.biologyAccent),
+                              child: _buildYearBadge(
+                                '2023',
+                                AppColors.biologyAccent,
+                              ),
                             ),
                             Expanded(
-                              child: _buildYearBadge('2022', AppColors.chemistryAccent),
+                              child: _buildYearBadge(
+                                '2022',
+                                AppColors.chemistryAccent,
+                              ),
                             ),
                           ],
                         ),
@@ -288,7 +310,9 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Downloading 19 years of NEET PYQs...'),
+                                  content: Text(
+                                    'Downloading 19 years of NEET PYQs...',
+                                  ),
                                   backgroundColor: AppColors.primary,
                                 ),
                               );
@@ -304,9 +328,7 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
             ),
 
             // Available Space
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 80),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 80)),
           ],
         ),
       ),

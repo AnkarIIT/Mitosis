@@ -14,6 +14,7 @@ import '../services/dpp_engine.dart';
 import '../services/mastery_service.dart';
 import '../services/unified_question_pool_service.dart';
 import 'core_providers.dart';
+import 'auth_providers.dart';
 import '../database/drift_database.dart' as db;
 
 // ============= SUBJECT & CONTENT =============
@@ -190,7 +191,8 @@ final dppEngineProvider = Provider<DppEngine>((ref) {
     database,
     questionRepo.getAllQuestionsFromDb(),
   );
-  return DppEngine(database, questionRepo, history, mastery);
+  final userId = ref.watch(authProvider).user?.id ?? 0;
+  return DppEngine(database, questionRepo, history, mastery, userId: userId);
 });
 
 final todayDppProvider = FutureProvider.family<DppResult?, String>((
@@ -307,13 +309,15 @@ Future<Map<DateTime, double>> _computeWeeklyAccuracy(
 
 // ============= UNIFIED QUESTION POOL =============
 
-final unifiedQuestionPoolServiceProvider = Provider<UnifiedQuestionPoolService>((ref) {
-  final database = ref.watch(databaseProvider);
-  final repo = ref.watch(questionRepositoryProvider);
-  final history = ref.watch(questionHistoryServiceProvider);
-  final mastery = ref.watch(masteryServiceProvider);
-  return UnifiedQuestionPoolService(database, repo, history, mastery);
-});
+final unifiedQuestionPoolServiceProvider = Provider<UnifiedQuestionPoolService>(
+  (ref) {
+    final database = ref.watch(databaseProvider);
+    final repo = ref.watch(questionRepositoryProvider);
+    final history = ref.watch(questionHistoryServiceProvider);
+    final mastery = ref.watch(masteryServiceProvider);
+    return UnifiedQuestionPoolService(database, repo, history, mastery);
+  },
+);
 
 final questionHistoryServiceProvider = Provider<QuestionHistoryService>((ref) {
   final database = ref.watch(databaseProvider);
@@ -327,25 +331,29 @@ final masteryServiceProvider = Provider<MasteryService>((ref) {
 });
 
 // Adaptive quiz questions with mastery-based selection and anti-repetition
-final adaptiveQuizQuestionsProvider = FutureProvider.family<List<Question>, AdaptiveQuizRequest>((ref, request) async {
-  final poolService = ref.watch(unifiedQuestionPoolServiceProvider);
-  final questionRequest = QuestionRequest(
-    subjects: request.subjects,
-    chapterId: request.chapterId,
-    topicId: request.topicId,
-    count: request.count,
-    easyPercent: request.easyPercent,
-    mediumPercent: request.mediumPercent,
-    hardPercent: request.hardPercent,
-    excludeRecent: request.excludeRecent,
-    applyCooldown: request.applyCooldown,
-    biasWeakTopics: request.biasWeakTopics,
-    useChapterWeights: request.useChapterWeights,
-    deduplicateConcepts: request.deduplicateConcepts,
-    subjectWeights: request.subjectWeights,
-  );
-  return poolService.getQuestions(request: questionRequest);
-});
+final adaptiveQuizQuestionsProvider =
+    FutureProvider.family<List<Question>, AdaptiveQuizRequest>((
+      ref,
+      request,
+    ) async {
+      final poolService = ref.watch(unifiedQuestionPoolServiceProvider);
+      final questionRequest = QuestionRequest(
+        subjects: request.subjects,
+        chapterId: request.chapterId,
+        topicId: request.topicId,
+        count: request.count,
+        easyPercent: request.easyPercent,
+        mediumPercent: request.mediumPercent,
+        hardPercent: request.hardPercent,
+        excludeRecent: request.excludeRecent,
+        applyCooldown: request.applyCooldown,
+        biasWeakTopics: request.biasWeakTopics,
+        useChapterWeights: request.useChapterWeights,
+        deduplicateConcepts: request.deduplicateConcepts,
+        subjectWeights: request.subjectWeights,
+      );
+      return poolService.getQuestions(request: questionRequest);
+    });
 
 class AdaptiveQuizRequest {
   final List<String> subjects;

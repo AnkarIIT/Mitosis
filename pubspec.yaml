@@ -69,8 +69,18 @@ flutter:
   uses-material-design: true
   assets:
     - assets/ml/
-    - assets/ncert_books/
+    - assets/ncert_books/biology/Biology_Class_11/
+    - assets/ncert_books/biology/Biology_Class_12/
+    - assets/ncert_books/chemistry/Chemistry_Class_11_Part_1/
+    - assets/ncert_books/chemistry/Chemistry_Class_11_Part_2/
+    - assets/ncert_books/chemistry/Chemistry_Class_12_Part_1/
+    - assets/ncert_books/chemistry/Chemistry_Class_12_Part_2/
+    - assets/ncert_books/physics/Physics_Class_11_Part_1/
+    - assets/ncert_books/physics/Physics_Class_11_Part_2/
+    - assets/ncert_books/physics/Physics_Class_12_Part_1/
+    - assets/ncert_books/physics/Physics_Class_12_Part_2/
     - assets/questions/
+    - .env
   fonts:
     - family: Inter
       fonts:

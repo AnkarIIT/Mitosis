@@ -280,10 +280,10 @@ class ProgressDashboard extends ConsumerWidget {
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                           side: BorderSide(
-                             color: AdaptiveColors.error(context),
-                             width: 0.5,
-                           ),
+                          side: BorderSide(
+                            color: AdaptiveColors.error(context),
+                            width: 0.5,
+                          ),
                         ),
                         child: InkWell(
                           onTap: () {
@@ -319,11 +319,11 @@ class ProgressDashboard extends ConsumerWidget {
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelSmall
-                                           ?.copyWith(
-                                             color: AdaptiveColors.error(
-                                               context,
-                                             ),
-                                           ),
+                                          ?.copyWith(
+                                            color: AdaptiveColors.error(
+                                              context,
+                                            ),
+                                          ),
                                     ),
                                   ],
                                 ),

@@ -232,9 +232,9 @@ class CbtResultScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: AdaptiveColors.textSecondary(context),
+            ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -397,9 +397,9 @@ class CbtResultScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: AdaptiveColors.textSecondary(context),
+            ),
           ),
           const SizedBox(height: 4),
           Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -573,7 +573,9 @@ class CbtResultScreen extends ConsumerWidget {
                                       ? AppColors.success
                                       : (isUserChoice
                                             ? AppColors.error
-                                            : AdaptiveColors.outlineVariant(context)),
+                                            : AdaptiveColors.outlineVariant(
+                                                context,
+                                              )),
                                 ),
                                 child: Center(
                                   child: Text(

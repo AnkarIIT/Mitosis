@@ -376,8 +376,8 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                                       color: isCorrect
                                           ? AdaptiveColors.success(context)
                                           : AdaptiveColors.surfaceContainerHighest(
-                                                context,
-                                              ),
+                                              context,
+                                            ),
                                     ),
                                     child: Center(
                                       child: Text(

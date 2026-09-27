@@ -24,22 +24,39 @@ class ModernSidebar extends ConsumerWidget {
     final authState = ref.watch(authProvider);
     final user = authState.user;
     final progress = ref.watch(userProgressProvider);
-    
+
     // If not mobile and not visible, don't render
     if (!isMobile && !isVisible) {
       return const SizedBox.shrink();
     }
 
     final displayName = user?.fullName ?? user?.username ?? 'Guest';
-    final avatarLetter = displayName.isNotEmpty ? displayName[0].toUpperCase() : 'G';
+    final avatarLetter = displayName.isNotEmpty
+        ? displayName[0].toUpperCase()
+        : 'G';
     final streak = progress.currentStreak;
-    final accuracy = (ref.watch(overallStatsProvider)['accuracy'] as double?) ?? 0.0;
+    final accuracy =
+        (ref.watch(overallStatsProvider)['accuracy'] as double?) ?? 0.0;
 
     if (isMobile) {
-      return _buildMobileSidebar(context, theme, avatarLetter, displayName, streak, accuracy);
+      return _buildMobileSidebar(
+        context,
+        theme,
+        avatarLetter,
+        displayName,
+        streak,
+        accuracy,
+      );
     }
 
-    return _buildDesktopSidebar(context, theme, avatarLetter, displayName, streak, accuracy);
+    return _buildDesktopSidebar(
+      context,
+      theme,
+      avatarLetter,
+      displayName,
+      streak,
+      accuracy,
+    );
   }
 
   Widget _buildDesktopSidebar(
@@ -81,7 +98,14 @@ class ModernSidebar extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  _buildHeader(context, theme, avatarLetter, displayName, streak, accuracy),
+                  _buildHeader(
+                    context,
+                    theme,
+                    avatarLetter,
+                    displayName,
+                    streak,
+                    accuracy,
+                  ),
                   const Divider(height: 1),
                   Expanded(child: _buildMenuItems(context)),
                   _buildFooter(context),
@@ -104,7 +128,14 @@ class ModernSidebar extends ConsumerWidget {
   ) {
     return Column(
       children: [
-        _buildHeader(context, theme, avatarLetter, displayName, streak, accuracy),
+        _buildHeader(
+          context,
+          theme,
+          avatarLetter,
+          displayName,
+          streak,
+          accuracy,
+        ),
         const Divider(height: 1),
         Expanded(child: _buildMenuItems(context)),
         _buildFooter(context),
@@ -179,7 +210,10 @@ class ModernSidebar extends ConsumerWidget {
                   icon: const Icon(Icons.close, size: 20),
                   onPressed: onToggle,
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
                 ),
             ],
           ),
@@ -208,9 +242,15 @@ class ModernSidebar extends ConsumerWidget {
                     Future.microtask(() => context.go('/profile'));
                   },
                   icon: const Icon(Icons.edit_outlined, size: 14),
-                  label: const Text('Edit Profile', style: TextStyle(fontSize: 11)),
+                  label: const Text(
+                    'Edit Profile',
+                    style: TextStyle(fontSize: 11),
+                  ),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
@@ -256,7 +296,8 @@ class ModernSidebar extends ConsumerWidget {
 
   Widget _buildMenuItems(BuildContext context) {
     final router = GoRouter.of(context);
-    final currentLocation = router.routerDelegate.currentConfiguration.uri.toString();
+    final currentLocation = router.routerDelegate.currentConfiguration.uri
+        .toString();
 
     return ListView(
       padding: EdgeInsets.zero,
@@ -416,14 +457,17 @@ class ModernSidebar extends ConsumerWidget {
     required String currentLocation,
   }) {
     final theme = Theme.of(context);
-    final isSelected = currentLocation == location ||
+    final isSelected =
+        currentLocation == location ||
         (location != '/' && currentLocation.startsWith(location));
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       leading: Icon(
         isSelected ? selectedIcon : icon,
-        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+        color: isSelected
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onSurfaceVariant,
         size: 22,
       ),
       title: Text(
@@ -440,7 +484,8 @@ class ModernSidebar extends ConsumerWidget {
         onToggle();
         Future.microtask(() {
           final router = GoRouter.of(context);
-          final currentLoc = router.routerDelegate.currentConfiguration.uri.toString();
+          final currentLoc = router.routerDelegate.currentConfiguration.uri
+              .toString();
           if (currentLoc != location) {
             router.go(location);
           }
@@ -488,22 +533,27 @@ class AboutDialog extends StatelessWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('Version 1.0.0'),
-          SizedBox(height: 8),
+        children: [
+          const Text('Version 1.0.0'),
+          const SizedBox(height: 8),
           Text(
             'Your complete NEET preparation companion',
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
-          SizedBox(height: 16),
-          Text('Features:', style: TextStyle(fontWeight: FontWeight.w600)),
-          SizedBox(height: 4),
-          Text('• AI Tutor for doubt solving'),
-          Text('• 19 years of PYQ papers'),
-          Text('• Mock tests with detailed analysis'),
-          Text('• Flashcards for revision'),
-          Text('• DPP practice'),
-          Text('• PDF viewer for NCERT'),
+          const SizedBox(height: 16),
+          const Text(
+            'Features:',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          const Text('• AI Tutor for doubt solving'),
+          const Text('• 19 years of PYQ papers'),
+          const Text('• Mock tests with detailed analysis'),
+          const Text('• Flashcards for revision'),
+          const Text('• DPP practice'),
+          const Text('• PDF viewer for NCERT'),
         ],
       ),
       actions: [

@@ -12,13 +12,11 @@ final sidebarWidthProvider = Provider<double>((ref) {
 });
 
 /// Current breakpoint provider for responsive design
-final breakpointProvider = StateProvider<Breakpoint>((ref) => Breakpoint.mobile);
+final breakpointProvider = StateProvider<Breakpoint>(
+  (ref) => Breakpoint.mobile,
+);
 
-enum Breakpoint {
-  mobile,
-  tablet,
-  desktop,
-}
+enum Breakpoint { mobile, tablet, desktop }
 
 extension BreakpointX on Breakpoint {
   bool get isMobile => this == Breakpoint.mobile;

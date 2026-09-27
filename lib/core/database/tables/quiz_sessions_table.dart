@@ -4,6 +4,9 @@ class QuizSessions extends Table {
   /// Unique session ID (UUID-like string)
   TextColumn get sessionId => text()();
 
+  /// User ID this session belongs to
+  IntColumn get userId => integer()();
+
   /// Topic ID this quiz is for
   TextColumn get topicId => text()();
 
@@ -59,12 +62,13 @@ class QuizSessions extends Table {
   TextColumn get questionData => text().nullable()();
 
   /// Created timestamp
-  DateTimeColumn get createdAt => dateTime().clientDefault(() => DateTime.now())();
+  DateTimeColumn get createdAt =>
+      dateTime().clientDefault(() => DateTime.now())();
 
   /// Last updated timestamp
   DateTimeColumn get updatedAt =>
       dateTime().nullable().clientDefault(() => DateTime.now())();
 
   @override
-  Set<Column> get primaryKey => {sessionId};
+  Set<Column> get primaryKey => {userId, sessionId};
 }

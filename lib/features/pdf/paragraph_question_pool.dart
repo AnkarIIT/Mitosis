@@ -290,7 +290,9 @@ class _ParagraphQuestionPoolSheetState
                     child: Center(
                       child: Text(
                         'No questions tagged to this chapter yet.',
-                        style: TextStyle(color: AdaptiveColors.textSecondary(context)),
+                        style: TextStyle(
+                          color: AdaptiveColors.textSecondary(context),
+                        ),
                       ),
                     ),
                   )

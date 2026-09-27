@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -216,8 +217,10 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     _scrollToBottom();
 
     // Persist user message
+    final userId = ref.read(authProvider).user?.id ?? 0;
     await db.insertChatMessage(
       ChatsCompanion.insert(
+        userId: Value(userId),
         message: text,
         isUser: true,
         timestamp: userMessage.timestamp,
@@ -249,8 +252,10 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
       _scrollToBottom();
 
       // Persist AI response
+      final userId = ref.read(authProvider).user?.id ?? 0;
       await db.insertChatMessage(
         ChatsCompanion.insert(
+          userId: Value(userId),
           message: responseText,
           isUser: false,
           timestamp: aiMessage.timestamp,

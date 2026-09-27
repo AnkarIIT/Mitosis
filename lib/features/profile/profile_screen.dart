@@ -150,7 +150,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               right: 0,
               child: CircleAvatar(
                 radius: 20,
-                 backgroundColor: AdaptiveColors.surface(context),
+                backgroundColor: AdaptiveColors.surface(context),
                 child: IconButton(
                   icon: const Icon(
                     Icons.edit,
@@ -426,7 +426,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AdaptiveColors.outline(context).withValues(alpha: 0.5)),
+        side: BorderSide(
+          color: AdaptiveColors.outline(context).withValues(alpha: 0.5),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -441,7 +443,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             Text(
               label,
-              style: TextStyle(fontSize: 11, color: AdaptiveColors.textSecondary(context)),
+              style: TextStyle(
+                fontSize: 11,
+                color: AdaptiveColors.textSecondary(context),
+              ),
             ),
           ],
         ),
@@ -455,7 +460,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       color: AdaptiveColors.surface(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AdaptiveColors.outline(context).withValues(alpha: 0.5)),
+        side: BorderSide(
+          color: AdaptiveColors.outline(context).withValues(alpha: 0.5),
+        ),
       ),
       child: ListTile(
         leading: Container(
@@ -507,7 +514,9 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 180, maxWidth: 220),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: locked ? AdaptiveColors.surface(context) : color.withValues(alpha: 0.08),
+        color: locked
+            ? AdaptiveColors.surface(context)
+            : color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: locked
@@ -521,9 +530,8 @@ class _GitHubStyleAchievementTile extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: (locked ? AdaptiveColors.outline(context) : color).withValues(
-                alpha: locked ? 0.1 : 0.15,
-              ),
+              color: (locked ? AdaptiveColors.outline(context) : color)
+                  .withValues(alpha: locked ? 0.1 : 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -583,7 +591,9 @@ class _LockedAchievementChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AdaptiveColors.outline(context).withValues(alpha: 0.4)),
+        border: Border.all(
+          color: AdaptiveColors.outline(context).withValues(alpha: 0.4),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

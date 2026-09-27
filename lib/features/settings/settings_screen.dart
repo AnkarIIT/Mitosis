@@ -378,7 +378,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _showEnable2FADialog() async {
     final authStateLocal = ref.read(authProvider);
-    final emailController = TextEditingController(text: authStateLocal.user?.email ?? '');
+    final emailController = TextEditingController(
+      text: authStateLocal.user?.email ?? '',
+    );
     final codeController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     bool codeSent = false;
@@ -390,7 +392,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text(codeSent ? 'Enter verification code' : 'Enable Two-Factor Authentication'),
+          title: Text(
+            codeSent
+                ? 'Enter verification code'
+                : 'Enable Two-Factor Authentication',
+          ),
           content: Form(
             key: formKey,
             child: Column(
@@ -426,9 +432,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: isLoading
-                  ? null
-                  : () => Navigator.pop(context),
+              onPressed: isLoading ? null : () => Navigator.pop(context),
               child: const Text('CANCEL'),
             ),
             TextButton(
@@ -449,13 +453,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Verification code sent to your email.')),
+                              content: Text(
+                                'Verification code sent to your email.',
+                              ),
+                            ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                                content: Text(
-                                    ref.read(authProvider).error ?? 'Could not enable 2FA.')),
+                              content: Text(
+                                ref.read(authProvider).error ??
+                                    'Could not enable 2FA.',
+                              ),
+                            ),
                           );
                           Navigator.pop(context);
                         }
@@ -474,13 +484,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Two-factor authentication enabled.')),
+                              content: Text(
+                                'Two-factor authentication enabled.',
+                              ),
+                            ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                                content: Text(
-                                    ref.read(authProvider).error ?? 'Invalid or expired code.')),
+                              content: Text(
+                                ref.read(authProvider).error ??
+                                    'Invalid or expired code.',
+                              ),
+                            ),
                           );
                         }
                       }
@@ -541,9 +557,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         final confirmed = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Disable Two-Factor Authentication?'),
+                            title: const Text(
+                              'Disable Two-Factor Authentication?',
+                            ),
                             content: const Text(
-                                'Your account will be less secure without 2FA.'),
+                              'Your account will be less secure without 2FA.',
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
@@ -557,13 +576,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                         );
                         if (confirmed == true) {
-                          await ref
-                              .read(authProvider.notifier)
-                              .disable2FA();
+                          await ref.read(authProvider.notifier).disable2FA();
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text('Two-factor authentication disabled.')),
+                                content: Text(
+                                  'Two-factor authentication disabled.',
+                                ),
+                              ),
                             );
                           }
                         }

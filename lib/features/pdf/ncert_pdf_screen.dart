@@ -131,7 +131,10 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
             Text(
               '${_entry.subject} • ${_entry.classLevel} • '
               'Chapter ${_entry.chapterNumber}',
-              style: TextStyle(fontSize: 11, color: AdaptiveColors.textSecondary(context)),
+              style: TextStyle(
+                fontSize: 11,
+                color: AdaptiveColors.textSecondary(context),
+              ),
             ),
           ],
         ),

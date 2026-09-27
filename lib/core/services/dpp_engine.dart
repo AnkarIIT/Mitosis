@@ -22,7 +22,7 @@ const Map<String, int> _neetChapterWeights = {
   'Biology:Plant Reproduction': 6,
   'Biology:Microbes in Human Welfare': 5,
   'Biology:Biomolecules': 8,
-  
+
   // Physics - High yield (8-10 questions/year)
   'Physics:Mechanics': 10,
   'Physics:Electrodynamics': 9,
@@ -33,7 +33,7 @@ const Map<String, int> _neetChapterWeights = {
   'Physics:SHM': 5,
   'Physics:Semiconductors': 6,
   'Physics:Communication Systems': 4,
-  
+
   // Chemistry - High yield (8-10 questions/year)
   'Chemistry:Chemical Bonding': 10,
   'Chemistry:Coordination Compounds': 8,
@@ -218,6 +218,7 @@ class DppEngine {
   final QuestionHistoryService _history;
   final MasteryService _mastery;
   final Random _random;
+  final int _userId;
 
   DppEngine(
     this._db,
@@ -225,7 +226,9 @@ class DppEngine {
     this._history,
     this._mastery, {
     Random? random,
-  }) : _random = random ?? Random();
+    int userId = 0,
+  }) : _random = random ?? Random(),
+       _userId = userId;
 
   /// Cooldown days per difficulty level.
   static const Map<String, int> _cooldownDays = {
@@ -298,6 +301,7 @@ class DppEngine {
     final dateStr =
         '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
     final base = db.DppSetsCompanion.insert(
+      userId: _userId,
       date: dateStr,
       subject: primarySubject,
       totalQuestions: config.totalQuestions,
@@ -316,6 +320,7 @@ class DppEngine {
     final dppQuestions = selected
         .map(
           (q) => db.DppQuestionsCompanion.insert(
+            userId: _userId,
             dppSetId: Value<int?>(setId),
             questionId: q.id,
             subject: q.subject,
@@ -336,6 +341,7 @@ class DppEngine {
 
     final savedSet = db.DppSet(
       id: setId,
+      userId: _userId,
       date: dateStr,
       subject: primarySubject,
       chapterId: config.chapterId,
@@ -465,7 +471,7 @@ class DppEngine {
           final difficulty = questionDifficulties[qId] ?? 'Medium';
           final normalizedDiff = _normalizeDifficulty(difficulty);
           final cooldownDays = _cooldownDays[normalizedDiff] ?? 3;
-          
+
           if (daysSinceAttempt < cooldownDays) {
             cooldownIds.add(qId);
           }
@@ -487,7 +493,7 @@ class DppEngine {
 
     // Otherwise, use difficulty-based sampling
     final shuffled = List<Question>.from(pool)..shuffle(_random);
-    
+
     // Apply adaptive difficulty if enabled and student is performing well
     int easy = count * config.easyPercent ~/ 100;
     int medium = count * config.mediumPercent ~/ 100;
@@ -521,7 +527,7 @@ class DppEngine {
     final picked = <Question>[];
     final usedConcepts = <String>{};
     final targets = [easy, medium, hard];
-    
+
     for (int i = 0; i < 3; i++) {
       buckets[i].shuffle(_random);
       var taken = 0;
@@ -611,7 +617,7 @@ class DppEngine {
       if (subjectPool.isEmpty) continue;
 
       final shuffled = List<Question>.from(subjectPool)..shuffle(_random);
-      
+
       // Apply adaptive difficulty per subject
       int easy = target * config.easyPercent ~/ 100;
       int medium = target * config.mediumPercent ~/ 100;
@@ -647,7 +653,8 @@ class DppEngine {
         for (final q in buckets[i]) {
           if (taken >= targetsPerDiff[i]) break;
           // Concept deduplication
-          if (config.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+          if (config.deduplicateConcepts &&
+              _hasConceptOverlap(q, usedConcepts)) {
             continue;
           }
           picked.add(q);
@@ -667,7 +674,8 @@ class DppEngine {
         var backfillTaken = 0;
         for (final q in remaining) {
           if (backfillTaken >= needed) break;
-          if (config.deduplicateConcepts && _hasConceptOverlap(q, usedConcepts)) {
+          if (config.deduplicateConcepts &&
+              _hasConceptOverlap(q, usedConcepts)) {
             continue;
           }
           picked.add(q);

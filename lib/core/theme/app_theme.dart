@@ -120,10 +120,7 @@ class AppTheme {
       bodyLarge: GoogleFonts.inter(color: primary, height: 1.5),
       bodyMedium: GoogleFonts.inter(color: primary, height: 1.5),
       bodySmall: GoogleFonts.inter(color: subtle, height: 1.45),
-      labelLarge: GoogleFonts.inter(
-        color: subtle,
-        fontWeight: FontWeight.w600,
-      ),
+      labelLarge: GoogleFonts.inter(color: subtle, fontWeight: FontWeight.w600),
       labelMedium: GoogleFonts.inter(
         color: subtle,
         fontWeight: FontWeight.w500,
@@ -302,11 +299,7 @@ class AppTheme {
           ),
         ),
       ),
-      dividerTheme: DividerThemeData(
-        color: divider,
-        thickness: 1,
-        space: 24,
-      ),
+      dividerTheme: DividerThemeData(color: divider, thickness: 1, space: 24),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? AppColors.surfaceMutedDark : AppColors.surfaceWarm,
@@ -392,10 +385,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        contentTextStyle: GoogleFonts.inter(
-          fontSize: 14,
-          color: Colors.white,
-        ),
+        contentTextStyle: GoogleFonts.inter(fontSize: 14, color: Colors.white),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: card,
@@ -424,9 +414,7 @@ class AppTheme {
         }),
         checkColor: WidgetStatePropertyAll(scheme.onPrimary),
         side: BorderSide(color: scheme.outline, width: 1.5),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {

@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import '../database/drift_database.dart' as db;
 
 /// SM-2 / Leitner hybrid scheduler for MCQ retention.
@@ -29,12 +30,14 @@ class SpacedRepetitionService {
     required String questionId,
     required db.SpacedRepetitionData? card,
     required bool isCorrect,
+    required int userId,
     DateTime? now,
   }) {
     final t = now ?? DateTime.now();
     final base =
         card ??
         db.SpacedRepetitionData(
+          userId: userId,
           questionId: questionId,
           box: 0,
           easeFactor: initialEaseFactor,
@@ -71,6 +74,7 @@ class SpacedRepetitionService {
     }
 
     return db.SpacedRepetitionData(
+      userId: userId,
       questionId: questionId,
       box: box,
       easeFactor: easeFactor,

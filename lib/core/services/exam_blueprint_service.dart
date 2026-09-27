@@ -67,7 +67,7 @@ class ExamBlueprintService {
     List<String> sectionSubjects,
   ) {
     final actualCounts = <String, int>{};
-    
+
     for (int i = 0; i < sectionQuestions.length; i++) {
       final subject = sectionSubjects[i];
       for (final q in sectionQuestions[i]) {
@@ -79,12 +79,12 @@ class ExamBlueprintService {
     for (final subjectEntry in _neetBlueprint.entries) {
       final subject = subjectEntry.key;
       final blueprint = subjectEntry.value;
-      
+
       for (final chapterEntry in blueprint.entries) {
         final chapter = chapterEntry.key;
         final expected = chapterEntry.value;
         final actual = actualCounts[chapter] ?? 0;
-        
+
         if (actual != expected) {
           mismatches[chapter] = (expected, actual);
         }
@@ -105,45 +105,53 @@ class ExamBlueprintService {
     Set<String>? excludedIds,
   }) async {
     final sections = <List<Question>>[];
-    
+
     // Physics sections
     if (physicsCount > 0) {
-      sections.add(await _selectForSubject(
-        poolService,
-        'Physics',
-        physicsCount,
-        excludedIds,
-      ));
+      sections.add(
+        await _selectForSubject(
+          poolService,
+          'Physics',
+          physicsCount,
+          excludedIds,
+        ),
+      );
     }
-    
+
     // Chemistry sections
     if (chemistryCount > 0) {
-      sections.add(await _selectForSubject(
-        poolService,
-        'Chemistry',
-        chemistryCount,
-        excludedIds,
-      ));
+      sections.add(
+        await _selectForSubject(
+          poolService,
+          'Chemistry',
+          chemistryCount,
+          excludedIds,
+        ),
+      );
     }
-    
+
     // Botany sections
     if (botanyCount > 0) {
-      sections.add(await _selectForSubject(
-        poolService,
-        'Botany',
-        botanyCount,
-        excludedIds,
-      ));
+      sections.add(
+        await _selectForSubject(
+          poolService,
+          'Botany',
+          botanyCount,
+          excludedIds,
+        ),
+      );
     }
-    
+
     // Zoology sections
     if (zoologyCount > 0) {
-      sections.add(await _selectForSubject(
-        poolService,
-        'Zoology',
-        zoologyCount,
-        excludedIds,
-      ));
+      sections.add(
+        await _selectForSubject(
+          poolService,
+          'Zoology',
+          zoologyCount,
+          excludedIds,
+        ),
+      );
     }
 
     return sections;
@@ -158,16 +166,15 @@ class ExamBlueprintService {
     final blueprint = _neetBlueprint[subject];
     if (blueprint == null) {
       // Fallback to simple selection
-      return poolService.getQuestions(request: QuestionRequest(
-        subjects: [subject],
-        count: count,
-      ));
+      return poolService.getQuestions(
+        request: QuestionRequest(subjects: [subject], count: count),
+      );
     }
 
     // Calculate target per chapter based on blueprint proportions
     final totalBlueprint = blueprint.values.fold(0, (a, b) => a + b);
     final targets = <String, int>{};
-    
+
     for (final entry in blueprint.entries) {
       final proportion = entry.value / totalBlueprint;
       targets[entry.key] = (count * proportion).round();
@@ -191,13 +198,15 @@ class ExamBlueprintService {
       final target = entry.value;
       if (target <= 0) continue;
 
-      final questions = await poolService.getQuestions(request: QuestionRequest(
-        subjects: [subject],
-        chapterId: chapter,
-        count: target + 5, // Get extra for filtering
-        excludeRecent: true,
-        applyCooldown: true,
-      ));
+      final questions = await poolService.getQuestions(
+        request: QuestionRequest(
+          subjects: [subject],
+          chapterId: chapter,
+          count: target + 5, // Get extra for filtering
+          excludeRecent: true,
+          applyCooldown: true,
+        ),
+      );
 
       for (final q in questions) {
         if (selected.length >= count) break;
@@ -210,13 +219,15 @@ class ExamBlueprintService {
 
     // Backfill if short
     if (selected.length < count) {
-      final remaining = await poolService.getQuestions(request: QuestionRequest(
-        subjects: [subject],
-        count: count - selected.length + 10,
-        excludeRecent: true,
-        applyCooldown: true,
-      ));
-      
+      final remaining = await poolService.getQuestions(
+        request: QuestionRequest(
+          subjects: [subject],
+          count: count - selected.length + 10,
+          excludeRecent: true,
+          applyCooldown: true,
+        ),
+      );
+
       for (final q in remaining) {
         if (selected.length >= count) break;
         if (usedIds.contains(q.id)) continue;

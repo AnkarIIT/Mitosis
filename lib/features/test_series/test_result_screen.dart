@@ -371,8 +371,7 @@ class TestResultScreen extends ConsumerWidget {
       icon = Icons.stars;
       color = AdaptiveColors.success(context);
     } else if (accuracy >= 60) {
-      message =
-          'Good performance! Focus on the weak areas to improve further.';
+      message = 'Good performance! Focus on the weak areas to improve further.';
       icon = Icons.thumb_up;
       color = AdaptiveColors.primary(context);
     } else if (accuracy >= 40) {
@@ -380,8 +379,7 @@ class TestResultScreen extends ConsumerWidget {
       icon = Icons.school;
       color = AdaptiveColors.warning(context);
     } else {
-      message =
-          'This topic needs urgent attention. Revisit the fundamentals.';
+      message = 'This topic needs urgent attention. Revisit the fundamentals.';
       icon = Icons.warning;
       color = AdaptiveColors.error(context);
     }

@@ -83,11 +83,9 @@ class BookmarksDashboard extends ConsumerWidget {
             const SizedBox(height: 12),
             Text(
               'Questions you bookmark during quizzes will appear here for fast revision.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(
-                    color: AdaptiveColors.textSecondary(context),
-                  ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AdaptiveColors.textSecondary(context),
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -147,7 +145,7 @@ class BookmarksDashboard extends ConsumerWidget {
                               ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           'Tap questions below to reveal formulas, core concepts, and NCERT links.',
                           style: TextStyle(
                             color: AppColors.textLight.withValues(alpha: 0.8),
@@ -261,11 +259,15 @@ class BookmarksDashboard extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: isCorrect
                               ? AppColors.primary.withValues(alpha: 0.15)
-                              : AdaptiveColors.outlineVariant(context).withValues(alpha: 0.35),
+                              : AdaptiveColors.outlineVariant(
+                                  context,
+                                ).withValues(alpha: 0.35),
                           border: Border.all(
                             color: isCorrect
                                 ? AppColors.primary.withValues(alpha: 0.5)
-                                : AdaptiveColors.outline(context).withValues(alpha: 0.4),
+                                : AdaptiveColors.outline(
+                                    context,
+                                  ).withValues(alpha: 0.4),
                             width: 1,
                           ),
                           borderRadius: BorderRadius.circular(8),

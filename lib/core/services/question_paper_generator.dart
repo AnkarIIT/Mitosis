@@ -168,10 +168,12 @@ class QuestionPaperGenerator {
 
       if (filteredRemaining.isEmpty) break;
 
-      final question = filteredRemaining[_random.nextInt(filteredRemaining.length)];
+      final question =
+          filteredRemaining[_random.nextInt(filteredRemaining.length)];
       selected.add(question);
       usedIds.add(question.id);
-      chapterCounts[question.chapter] = (chapterCounts[question.chapter] ?? 0) + 1;
+      chapterCounts[question.chapter] =
+          (chapterCounts[question.chapter] ?? 0) + 1;
     }
 
     // Guard: never return more than the requested count.
@@ -208,7 +210,8 @@ class QuestionPaperGenerator {
       selected.add(question);
       usedIds.add(question.id);
       if (chapterCounts != null) {
-        chapterCounts[question.chapter] = (chapterCounts[question.chapter] ?? 0) + 1;
+        chapterCounts[question.chapter] =
+            (chapterCounts[question.chapter] ?? 0) + 1;
       }
       available.remove(question);
     }

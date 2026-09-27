@@ -62,7 +62,8 @@ class _TestModuleScreenState extends ConsumerState<TestModuleScreen>
           // 1. Mock Tests (Exam Engine)
           Consumer(
             builder: (context, ref, _) {
-              final allQuestions = ref.watch(allQuestionsProvider).valueOrNull ?? [];
+              final allQuestions =
+                  ref.watch(allQuestionsProvider).valueOrNull ?? [];
               final pool = ExamEngineService.validatePool(allQuestions);
               final config = ExamConfig.neet();
               if (pool.isEmpty) {
@@ -86,13 +87,13 @@ class _TestModuleScreenState extends ConsumerState<TestModuleScreen>
               return CbtTestScreen(config: config, questionPool: pool);
             },
           ),
-          
+
           // 2. DPP (Daily Practice Problems)
           const DppNeetScreen(),
-          
+
           // 3. PYQ Papers (via Test Series / PDF Picker)
           const QuestionPaperSelector(),
-          
+
           // 4. AI-Powered Practice
           _aiPracticeTab(context),
         ],
@@ -186,12 +187,10 @@ class _PracticeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: theme.colorScheme.primary.withOpacity(0.1),

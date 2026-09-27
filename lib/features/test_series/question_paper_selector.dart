@@ -151,7 +151,9 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         border: Border.all(
-          color: isSelected ? AppColors.primary : AdaptiveColors.outline(context),
+          color: isSelected
+              ? AppColors.primary
+              : AdaptiveColors.outline(context),
           width: isSelected ? 2 : 1,
         ),
         borderRadius: BorderRadius.circular(12),
@@ -172,7 +174,9 @@ class _QuestionPaperSelectorState extends ConsumerState<QuestionPaperSelector> {
                   isSelected
                       ? Icons.radio_button_checked
                       : Icons.radio_button_unchecked,
-                  color: isSelected ? AppColors.primary : AdaptiveColors.textSecondary(context),
+                  color: isSelected
+                      ? AppColors.primary
+                      : AdaptiveColors.textSecondary(context),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

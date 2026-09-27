@@ -593,9 +593,9 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
           Text(
             'A timed computer-based test with free navigation, +4/-1 '
             'marking, and instant analytics.',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AdaptiveColors.textSecondary(context)),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AdaptiveColors.textSecondary(context),
+            ),
           ),
           const SizedBox(height: 20),
           Text(
@@ -652,6 +652,9 @@ class _CbtPracticeSheetState extends ConsumerState<_CbtPracticeSheet> {
       durationMinutes: _durationMinutes,
     );
     context.pop();
-    context.push('/cbt/instructions', extra: {'config': config, 'questionPool': pool});
+    context.push(
+      '/cbt/instructions',
+      extra: {'config': config, 'questionPool': pool},
+    );
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/database/drift_database.dart' as db;
 import '../../core/providers/core_providers.dart';
+import '../../core/providers/auth_providers.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/services/result_export_service.dart';
@@ -202,8 +203,10 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
         final answer = _attempt.answersByIndex[i];
         final isCorrect = answer != null && answer == q.correctAnswer;
         if (!isCorrect) {
+          final userId = ref.read(authProvider).user?.id ?? 0;
           await database.addToErrorBook(
             db.ErrorBookCompanion.insert(
+              userId: Value(userId),
               questionId: q.id,
               addedAt: DateTime.now(),
             ),
@@ -317,7 +320,7 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
             LinearProgressIndicator(
               value: (_currentQuestionIndex + 1) / _questions.length,
               minHeight: 6,
-                  backgroundColor: AdaptiveColors.outlineVariant(context),
+              backgroundColor: AdaptiveColors.outlineVariant(context),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -385,7 +388,9 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
                                     shape: BoxShape.circle,
                                     color: isSelected
                                         ? AppColors.primary
-                                        : AdaptiveColors.outlineVariant(context),
+                                        : AdaptiveColors.outlineVariant(
+                                            context,
+                                          ),
                                   ),
                                   child: Center(
                                     child: Text(
@@ -618,7 +623,7 @@ class _DppReviewSheet extends StatelessWidget {
                 LinearProgressIndicator(
                   value: total > 0 ? correct / total : 0,
                   minHeight: 8,
-              backgroundColor: AdaptiveColors.outlineVariant(context),
+                  backgroundColor: AdaptiveColors.outlineVariant(context),
                   valueColor: const AlwaysStoppedAnimation(AppColors.success),
                 ),
                 const SizedBox(height: 4),
@@ -696,7 +701,9 @@ class _DppReviewSheet extends StatelessWidget {
                                               ? AppColors.success
                                               : (isUserChoice
                                                     ? AppColors.error
-                                                    : AdaptiveColors.outlineVariant(context)),
+                                                    : AdaptiveColors.outlineVariant(
+                                                        context,
+                                                      )),
                                         ),
                                         child: Center(
                                           child: Text(

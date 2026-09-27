@@ -31,4 +31,8 @@ class Users extends Table {
   TextColumn get twoFactorCode => text().nullable()();
   DateTimeColumn get twoFactorExpiresAt => dateTime().nullable()();
   TextColumn get supabaseId => text().nullable()();
+
+  // Account lockout / brute-force protection
+  IntColumn get failedLoginAttempts => integer().withDefault(const Constant(0))();
+  DateTimeColumn get lockedUntil => dateTime().nullable()();
 }

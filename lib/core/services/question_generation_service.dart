@@ -22,22 +22,37 @@ class QuestionGenerationService {
     final cacheKey = '$subject:${chapterId ?? ''}:${topicId ?? ''}:$count';
     if (_cache.containsKey(cacheKey)) {
       final cached = _cache[cacheKey]!;
-      final filtered = cached.where((q) => !excludedIds.contains(q.id)).toList();
+      final filtered = cached
+          .where((q) => !excludedIds.contains(q.id))
+          .toList();
       if (filtered.length >= count) return filtered.take(count).toList();
     }
 
     final prompt = _buildPrompt(subject, chapterId, topicId, count);
     final response = await _gemini.sendMessage(prompt);
-    final questions = _parseResponse(response, subject, chapterId, topicId, excludedIds);
+    final questions = _parseResponse(
+      response,
+      subject,
+      chapterId,
+      topicId,
+      excludedIds,
+    );
 
     // Cache for reuse
     _cache[cacheKey] = questions;
     return questions.take(count).toList();
   }
 
-  String _buildPrompt(String subject, String? chapterId, String? topicId, int count) {
+  String _buildPrompt(
+    String subject,
+    String? chapterId,
+    String? topicId,
+    int count,
+  ) {
     final buffer = StringBuffer();
-    buffer.writeln('You are an expert NEET question setter. Generate $count accurate, NCERT-based MCQ questions.');
+    buffer.writeln(
+      'You are an expert NEET question setter. Generate $count accurate, NCERT-based MCQ questions.',
+    );
     buffer.writeln('Subject: $subject');
     if (chapterId != null) buffer.writeln('Chapter: $chapterId');
     if (topicId != null) buffer.writeln('Topic: $topicId');
@@ -50,14 +65,20 @@ class QuestionGenerationService {
     buffer.writeln('- Difficulty distribution: 30% Easy, 50% Medium, 20% Hard');
     buffer.writeln('- Include relevant tags for concept identification');
     buffer.writeln('');
-    buffer.writeln('Return ONLY a valid JSON array. No extra text, no markdown.');
+    buffer.writeln(
+      'Return ONLY a valid JSON array. No extra text, no markdown.',
+    );
     buffer.writeln('Format:');
     buffer.writeln('[');
     buffer.writeln('  {');
     buffer.writeln('    "questionText": "Question text here",');
-    buffer.writeln('    "options": ["Option A", "Option B", "Option C", "Option D"],');
+    buffer.writeln(
+      '    "options": ["Option A", "Option B", "Option C", "Option D"],',
+    );
     buffer.writeln('    "correctAnswer": "Option A",');
-    buffer.writeln('    "explanation": "Detailed explanation referencing NCERT chapter/section",');
+    buffer.writeln(
+      '    "explanation": "Detailed explanation referencing NCERT chapter/section",',
+    );
     buffer.writeln('    "difficulty": "Easy|Medium|Hard",');
     buffer.writeln('    "tags": ["concept1", "concept2"]');
     buffer.writeln('  }');
@@ -84,8 +105,9 @@ class QuestionGenerationService {
       final questions = <Question>[];
       for (int i = 0; i < data.length; i++) {
         final item = data[i] as Map<String, dynamic>;
-        final id = 'gen_${subject.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}_$i';
-        
+        final id =
+            'gen_${subject.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}_$i';
+
         if (excludedIds.contains(id)) continue;
 
         final options = (item['options'] as List?)?.cast<String>() ?? [];
@@ -94,23 +116,25 @@ class QuestionGenerationService {
         final correctAnswer = item['correctAnswer'] as String? ?? '';
         if (!options.contains(correctAnswer)) continue;
 
-        questions.add(Question(
-          id: id,
-          subject: subject,
-          chapter: item['chapter'] as String? ?? chapterId ?? '',
-          topic: item['topic'] as String? ?? topicId ?? '',
-          topicId: item['topicId'] as String? ?? topicId ?? '',
-          questionText: item['questionText'] as String? ?? '',
-          options: options,
-          correctAnswer: correctAnswer,
-          explanation: item['explanation'] as String? ?? '',
-          ncertReference: item['ncertReference'] as String?,
-          year: DateTime.now().year,
-          difficulty: item['difficulty'] as String? ?? 'Medium',
-          tags: (item['tags'] as List?)?.cast<String>() ?? [],
-          imageUrl: null,
-          type: 'MCQ',
-        ));
+        questions.add(
+          Question(
+            id: id,
+            subject: subject,
+            chapter: item['chapter'] as String? ?? chapterId ?? '',
+            topic: item['topic'] as String? ?? topicId ?? '',
+            topicId: item['topicId'] as String? ?? topicId ?? '',
+            questionText: item['questionText'] as String? ?? '',
+            options: options,
+            correctAnswer: correctAnswer,
+            explanation: item['explanation'] as String? ?? '',
+            ncertReference: item['ncertReference'] as String?,
+            year: DateTime.now().year,
+            difficulty: item['difficulty'] as String? ?? 'Medium',
+            tags: (item['tags'] as List?)?.cast<String>() ?? [],
+            imageUrl: null,
+            type: 'MCQ',
+          ),
+        );
       }
       return questions;
     } catch (e) {

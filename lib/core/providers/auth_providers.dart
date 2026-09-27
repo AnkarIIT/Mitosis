@@ -323,8 +323,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return (success: false, message: 'No account is signed in.');
       }
 
-      await _db.clearUserData(user.id);
-      await _authService.deleteCloudAccount(user.id);
+      final supabaseId = user.supabaseId;
+      await _db.clearAllUserData(user.id);
+      if (supabaseId != null && supabaseId.isNotEmpty) {
+        await _authService.deleteCloudAccountBySupabaseId(supabaseId);
+      }
       await _authService.logout();
       state = AuthState(status: AuthStatus.unauthenticated);
       return (success: true, message: 'Account deleted');
