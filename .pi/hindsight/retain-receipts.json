@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "receipts": [
+    {
+      "createdAt": "2026-08-28T19:35:19.319Z",
+      "bankId": "pi-project-neet-mitos-69306e9d7904",
+      "documentId": "pi-explicit:c24405cba74aee52:e81b27eb0621567a",
+      "queueJobId": "9cc50547-3ddd-4cdb-abd9-b120d3aa501a",
+      "updateMode": "replace",
+      "source": "tool",
+      "context": "Phase 1 implementation progress for NEET Mitos exam/DPP/quiz engine",
+      "tags": [
+        "source:pi",
+        "harness:pi",
+        "project:github-com-ankariit-mitosis",
+        "repo:neet-mitos-69306e9d7904",
+        "session:c24405cba74aee52",
+        "neet-mitos",
+        "phase1",
+        "dpp",
+        "exam-engine",
+        "completed"
+      ]
+    }
+  ]
+}

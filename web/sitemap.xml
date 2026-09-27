@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  NEET Mitos - sitemap.xml placeholder
+
+  TODO: Replace the host with the real public web domain once published, and
+  list the actual app routes. Since NEET Mitos is an offline-first mobile app,
+  this sitemap is only needed if a public SEO web surface is deployed.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://neetmitos.app/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

@@ -1,0 +1,73 @@
+# NEET Mitos
+
+A free, offline-first NEET preparation app for Android (and web PWA shell) built with Flutter.
+
+NEET Mitos helps you practice for the NEET-UG exam with Daily Practice Papers (DPPs), topic-wise mock tests, full-length CBT mocks, flashcards, an AI tutor, and a personalized daily study plan across Biology, Chemistry, and Physics.
+
+## Features
+
+- **Offline-first**: quizzes, DPPs, exams, and flashcards work 100% offline using a local Drift (SQLite) database.
+- **Full-length NEET mocks**: NTA-compliant 180-question / 180-minute simulation with per-section timing, optional Section-B, and checkpoint/resume.
+- **Daily Practice Papers**: difficulty-normalized, weak-topic-biased sampling with deterministic daily seeding.
+- **Adaptive quiz engine**: option shuffling, visited/flagged palette, hint system, and short-answer AI evaluation.
+- **Spaced repetition**: SM-2 based flashcards and error-book review.
+- **AI tutor**: 3-tier LLM (local explanations → cached AI → live AI) with a Gemini proxy.
+- **Cloud sign-in (optional)**: Supabase email/password and Google OAuth when `SUPABASE_URL` / `SUPABASE_ANON_KEY` are configured; otherwise guests can continue locally.
+- **Biometric lock**: optional device-biometric app lock with device-credential fallback.
+
+## Getting Started
+
+Prerequisites: [Flutter SDK](https://docs.flutter.dev/get-started/install) (stable, 3.x), Android SDK.
+
+```bash
+# Install dependencies
+flutter pub get
+
+# Run the app (choose a device)
+flutter run
+
+# Run the app on a connected Android phone
+flutter run -d <device-id>
+```
+
+### Configuration
+
+Copy `.env.example` to `.env` (or use `--dart-define`) to enable optional cloud features:
+
+| Variable | Purpose |
+|----------|---------|
+| `SUPABASE_URL` | Supabase project URL (enables cloud auth / Google sign-in) |
+| `SUPABASE_ANON_KEY` | Supabase anon key |
+| `GOOGLE_SERVER_CLIENT_ID` | Google OAuth web client ID for Android Google sign-in |
+
+Without credentials the app is fully usable locally (register with email/password or continue as guest).
+
+## Builds
+
+```bash
+# Debug APK
+flutter build apk --debug
+
+# Release APK (split by ABI)
+flutter build apk --release --split-per-abi
+
+# Web PWA shell
+flutter build web
+```
+
+## Testing & Quality
+
+```bash
+dart analyze lib test      # expects 0 errors
+flutter test               # 151 tests, all passing
+dart format --set-if-changed .
+```
+
+## Repository
+
+- GitHub: [AnkarIIT/Mitosis](https://github.com/AnkarIIT/Mitosis)
+- Package name: `com.neetmitos.app`
+
+## License
+
+ISC
