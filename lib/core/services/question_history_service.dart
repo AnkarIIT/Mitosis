@@ -3,14 +3,15 @@ import '../database/drift_database.dart' as db;
 
 class QuestionHistoryService {
   final db.AppDatabase _db;
+  final int userId;
 
-  QuestionHistoryService(this._db);
+  QuestionHistoryService(this._db, {this.userId = -1});
 
   /// Returns distinct question IDs seen in ALL attempt history,
   /// optionally filtered by [subject].
   /// This replaces the old last-20-attempts check with full history.
   Future<Set<String>> getRecentSeenQuestionIds({String? subject}) async {
-    final attempts = await _db.getAllQuizAttempts();
+    final attempts = await _db.getAllQuizAttempts(userId: userId);
     final ids = <String>{};
     for (final attempt in attempts) {
       if (subject != null && attempt.subject != subject) continue;
@@ -29,7 +30,7 @@ class QuestionHistoryService {
   /// Returns question IDs that are currently in cooldown period based on difficulty.
   /// Easy: 1 day, Medium: 3 days, Hard: 7 days since last attempt.
   Future<Set<String>> getCooldownQuestionIds({String? subject}) async {
-    final attempts = await _db.getAllQuizAttempts();
+    final attempts = await _db.getAllQuizAttempts(userId: userId);
     final cooldownIds = <String>{};
     final now = DateTime.now();
 
