@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../../core/models/question_model.dart';
 import '../../core/providers/providers.dart';
@@ -8,6 +9,8 @@ import '../../core/services/ncert_book_catalog.dart';
 import '../../core/services/pdf_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/database/drift_database.dart' show ResourceProgressCompanion;
+import '../../core/providers/current_user_provider.dart';
 import 'paragraph_question_pool.dart';
 
 class NcertPdfScreen extends ConsumerStatefulWidget {
@@ -27,22 +30,67 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
   bool _loaded = false;
   int _currentPage = 1;
   String? _scanningChapter;
+  int? _savedPage;
 
-  NcertBookEntry get _entry {
+  NcertBookEntry? get _resolvedEntry {
     final entry = NcertBookCatalog.entryByChapterKey(widget.entryId);
     if (entry != null) return entry;
-    // Fallback: find by exact asset path across the full catalog.
-    final asset = widget.entryId;
-    return NcertBookCatalog.allEntries.firstWhere(
-      (e) => e.assetPath == asset,
-      orElse: () => NcertBookCatalog.allEntries.first,
-    );
+    return NcertBookCatalog.allEntries
+        .where((e) => e.assetPath == widget.entryId)
+        .firstOrNull;
   }
+
+  NcertBookEntry get _entry => _resolvedEntry!;
 
   @override
   void initState() {
     super.initState();
     _bookChapters = NcertBookCatalog.chaptersOfBook(_entry);
+    _restoreProgress();
+  }
+
+  Future<void> _restoreProgress() async {
+    final userId = ref.read(currentLocalUserIdProvider);
+    if (userId == null) return;
+    final progress = await ref
+        .read(databaseProvider)
+        .getResourceProgressFor(_entry.assetPath, userId: userId);
+    if (!mounted || progress?.lastPage == null) return;
+    final lastPage = progress!.lastPage!;
+    setState(() => _savedPage = lastPage);
+    if (_loaded) _controller.jumpToPage(lastPage);
+  }
+
+  Future<void> _savePage(int page) async {
+    final userId = ref.read(currentLocalUserIdProvider);
+    if (userId == null) return;
+    final existing = await ref
+        .read(databaseProvider)
+        .getResourceProgressFor(_entry.assetPath, userId: userId);
+    await ref
+        .read(databaseProvider)
+        .upsertResourceProgress(
+          ResourceProgressCompanion.insert(
+            userId: userId,
+            resourceId: _entry.assetPath,
+            chapterId: Value(_chapterIdForEntry()),
+            lastPage: Value(page),
+            progressPercent: Value(0),
+            isBookmarked: Value(existing?.isBookmarked ?? false),
+            lastOpenedAt: Value(DateTime.now()),
+          ),
+        );
+  }
+
+  String? _chapterIdForEntry() {
+    for (final subject in ref.read(subjectsProvider)) {
+      for (final chapter in subject.chapters) {
+        if (NcertBookCatalog.entryFor(chapter)?.assetPath == _entry.assetPath) {
+          return chapter.id;
+        }
+      }
+    }
+    return null;
   }
 
   @override
@@ -101,13 +149,26 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
       _jumpToChapterStart();
       return;
     }
-    context.go(
-      '/pdf?entryId=${Uri.encodeComponent(entry.chapterTitle.replaceAll(" ", "_").toLowerCase())}',
-    );
+    context.go('/pdf?entryId=${Uri.encodeComponent(entry.assetPath)}');
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_resolvedEntry == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Resource unavailable')),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text(
+              'This NCERT resource is not available. Return to the resource '
+              'library and choose another chapter.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
     final allQuestions = ref.watch(allQuestionsProvider).valueOrNull ?? [];
     final chapterQuestions = _questionsForChapter(allQuestions);
 
@@ -237,11 +298,15 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
               onDocumentLoaded: (details) {
                 setState(() {
                   _loaded = true;
-                  _currentPage = 1;
+                  _currentPage = _savedPage ?? 1;
                 });
+                if (_savedPage != null) {
+                  _controller.jumpToPage(_savedPage!);
+                }
               },
               onPageChanged: (details) {
                 setState(() => _currentPage = details.newPageNumber);
+                _savePage(details.newPageNumber);
               },
             ),
           ),
