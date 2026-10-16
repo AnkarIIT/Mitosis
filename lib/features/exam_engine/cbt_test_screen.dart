@@ -978,7 +978,17 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               duration: const Duration(seconds: 5),
             ),
           );
-          // DO NOT clear checkpoint — keep it for retry on next launch
+          // DO NOT clear checkpoint — keep it for retry on next launch.
+          // But the screen MUST be un-wedged: `_submitting` gates the app bar
+          // (the Submit button is replaced by a spinner), and `_locked` blocks
+          // answering, advancing and re-confirming. Leaving both set produced a
+          // screen that looked alive but could never be submitted again — and
+          // the only escape was the exit dialog, which *destroys* the very
+          // checkpoint this comment says to preserve.
+          setState(() {
+            _submitting = false;
+            _submitted = false;
+          });
           return;
         } else {
           await Future.delayed(Duration(milliseconds: 100 * attemptNum));
