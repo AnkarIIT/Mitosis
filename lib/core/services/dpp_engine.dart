@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import '../database/drift_database.dart' as db;
 import '../database/question_repository.dart';
 import '../models/question_model.dart';
+import '../models/learning_recommendation.dart';
 import '../services/question_history_service.dart';
 import '../services/mastery_service.dart';
 
@@ -127,6 +128,30 @@ class DppConfig {
     );
   }
 
+  factory DppConfig.fromRecommendation(
+    LearningRecommendation recommendation, {
+    int totalQuestions = 15,
+    int durationMinutes = 15,
+  }) {
+    final isSpeedDrill =
+        recommendation.primaryAction == LearningActionType.speedDrill;
+    final isRevision =
+        recommendation.primaryAction == LearningActionType.revise;
+    return DppConfig(
+      subjects: [recommendation.subject],
+      chapterId: recommendation.chapterId,
+      topicId: recommendation.topicId,
+      totalQuestions: totalQuestions,
+      durationMinutes: durationMinutes,
+      easyPercent: isSpeedDrill ? 45 : (isRevision ? 40 : 30),
+      mediumPercent: isSpeedDrill ? 45 : 45,
+      hardPercent: isSpeedDrill ? 10 : 15,
+      includeWeakTopics: true,
+      adaptiveDifficulty: true,
+      recentAccuracy: recommendation.mastery / 100,
+    );
+  }
+
   /// NEET 2025 pattern multi-subject DPP factory.
   /// Creates a balanced paper: Physics 45, Chemistry 45, Botany 45, Zoology 45.
   factory DppConfig.neetPattern({
@@ -181,11 +206,15 @@ class DppResult {
   final db.DppSet set;
   final List<Question> questions;
   final Map<String, List<Question>> questionsBySubject;
+  final int requestedQuestions;
+
+  bool get isShortage => questions.length < requestedQuestions;
 
   DppResult({
     required this.set,
     required this.questions,
     required this.questionsBySubject,
+    required this.requestedQuestions,
   });
 }
 
@@ -226,7 +255,7 @@ class DppEngine {
     this._history,
     this._mastery, {
     Random? random,
-    int userId = 0,
+    int userId = -1,
   }) : _random = random ?? Random(),
        _userId = userId;
 
@@ -261,7 +290,7 @@ class DppEngine {
     bool forceRefresh = false,
   }) async {
     final primarySubject = config.subjects.first;
-    final existing = await _db.getTodayDppSet(primarySubject);
+    final existing = await _db.getTodayDppSet(primarySubject, userId: _userId);
     if (existing != null && !forceRefresh) {
       final savedQuestions = await _db.getDppQuestions(existing.id);
       if (savedQuestions.isNotEmpty) {
@@ -288,6 +317,7 @@ class DppEngine {
           set: existing,
           questions: questions,
           questionsBySubject: _groupBySubject(questions),
+          requestedQuestions: config.totalQuestions,
         );
       }
     }
@@ -304,7 +334,7 @@ class DppEngine {
       userId: _userId,
       date: dateStr,
       subject: primarySubject,
-      totalQuestions: config.totalQuestions,
+      totalQuestions: selected.length,
       durationMinutes: Value(config.durationMinutes),
     );
     final companion = base.copyWith(
@@ -346,7 +376,7 @@ class DppEngine {
       subject: primarySubject,
       chapterId: config.chapterId,
       topicId: config.topicId,
-      totalQuestions: config.totalQuestions,
+      totalQuestions: selected.length,
       durationMinutes: config.durationMinutes,
       correctCount: 0,
       incorrectCount: 0,
@@ -361,6 +391,7 @@ class DppEngine {
       set: savedSet,
       questions: selected,
       questionsBySubject: _groupBySubject(selected),
+      requestedQuestions: config.totalQuestions,
     );
   }
 
@@ -369,7 +400,16 @@ class DppEngine {
     Set<String> excludedIds,
   ) async {
     final all = await _questionRepo.getAllQuestionsFromDb();
-    var pool = all.where((q) => config.subjects.contains(q.subject)).toList();
+    var pool = all.where((q) {
+      if (config.subjects.contains(q.subject)) return true;
+      final subject = q.subject.toLowerCase();
+      return config.subjects.any(
+        (requested) =>
+            (requested.toLowerCase() == 'botany' ||
+                requested.toLowerCase() == 'zoology') &&
+            subject == 'biology',
+      );
+    }).toList();
 
     // Exclude recently seen questions (full history).
     if (excludedIds.isNotEmpty) {
@@ -427,13 +467,26 @@ class DppEngine {
   }
 
   /// Applies NEET chapter frequency weights to boost high-yield chapters.
+  /// NEET yield weight for a question, 1 when the chapter is not in the table.
+  ///
+  /// The table is keyed `"Subject:Chapter"` so a chapter name that exists in
+  /// two subjects (Biomolecules is in both Biology and Chemistry) can carry
+  /// different weights. The lookup used to pass the bare `q.chapter` alone,
+  /// which never matched any key and silently degraded every question to
+  /// weight 1 — making chapter weighting a complete no-op.
+  int _chapterWeight(Question q) {
+    final qualified = _neetChapterWeights['${q.subject}:${q.chapter}'];
+    if (qualified != null) return qualified;
+    // Fall back to a bare chapter key for any entry added without a subject.
+    return _neetChapterWeights[q.chapter] ?? 1;
+  }
+
   /// Questions from high-yield chapters get duplicated in the pool to increase
   /// their selection probability proportionally.
   List<Question> _applyChapterWeights(List<Question> pool) {
     final weightedPool = <Question>[];
     for (final q in pool) {
-      // Key is just chapter name (matching _neetChapterWeights map keys)
-      final weight = _neetChapterWeights[q.chapter] ?? 1;
+      final weight = _chapterWeight(q);
       // Add the question multiple times based on weight (capped at 3x for performance)
       final copies = weight.clamp(1, 3);
       for (int i = 0; i < copies; i++) {
@@ -446,7 +499,7 @@ class DppEngine {
   /// Gets question IDs that are in cooldown period based on their difficulty.
   /// Easy: 1 day, Medium: 3 days, Hard: 7 days since last attempt.
   Future<Set<String>> _getCooldownQuestionIds(List<String> subjects) async {
-    final attempts = await _db.getAllQuizAttempts();
+    final attempts = await _db.getAllQuizAttempts(userId: _userId);
     final cooldownIds = <String>{};
     final now = DateTime.now();
 
@@ -587,7 +640,12 @@ class DppEngine {
 
     // Group pool by subject
     for (final subject in config.subjects) {
-      subjectPools[subject] = pool.where((q) => q.subject == subject).toList();
+      subjectPools[subject] = pool.where((q) {
+        if (q.subject == subject) return true;
+        final requested = subject.toLowerCase();
+        return (requested == 'botany' || requested == 'zoology') &&
+            q.subject.toLowerCase() == 'biology';
+      }).toList();
       subjectPickedCount[subject] = 0;
     }
 
@@ -660,6 +718,7 @@ class DppEngine {
           picked.add(q);
           _addQuestionConcepts(q, usedConcepts);
           taken++;
+          subjectPickedCount[subject] = (subjectPickedCount[subject] ?? 0) + 1;
         }
       }
 
