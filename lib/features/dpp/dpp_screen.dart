@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/content_providers.dart';
+import '../../core/providers/user_providers.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/services/dpp_engine.dart';
+import '../../core/utils/answer_normalizer.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
@@ -49,6 +51,17 @@ class _DppScreenState extends ConsumerState<DppScreen> {
 
       if (result.questions.isNotEmpty) {
         setState(() => _currentResult = result);
+        if (result.isShortage) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Only ${result.questions.length} of ${result.requestedQuestions} '
+                'questions are available. This paper is shorter than requested.',
+              ),
+              backgroundColor: AppColors.warning,
+            ),
+          );
+        }
         await _startDpp(result, config);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -100,6 +113,18 @@ class _DppScreenState extends ConsumerState<DppScreen> {
             tooltip: 'Generate DPP',
             onSelected: (config) => _generateDpp(config),
             itemBuilder: (context) => [
+              if (ref.read(learningRecommendationsProvider).isNotEmpty)
+                PopupMenuItem(
+                  value: DppConfig.fromRecommendation(
+                    ref.read(learningRecommendationsProvider).first,
+                  ),
+                  child: const ListTile(
+                    leading: Icon(Icons.auto_awesome),
+                    title: Text('Recommended Focus DPP'),
+                    subtitle: Text('Based on your weakest topic'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
               PopupMenuItem(
                 value: DppConfig.single(subject: widget.subject),
                 child: const ListTile(
@@ -125,16 +150,7 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                   widget.subject == 'Chemistry' ||
                   widget.subject == 'Biology')
                 PopupMenuItem(
-                  value: DppConfig.mixed(
-                    subjects: const ['Physics', 'Chemistry', 'Biology'],
-                    weights: const {
-                      'Physics': 45,
-                      'Chemistry': 45,
-                      'Biology': 90,
-                    },
-                    totalQuestions: 180,
-                    durationMinutes: 180,
-                  ),
+                  value: DppConfig.neetPattern(),
                   child: const ListTile(
                     leading: Icon(Icons.science_rounded),
                     title: Text('NEET Pattern (180 Q, 180 min)'),
@@ -204,7 +220,7 @@ class _DppScreenState extends ConsumerState<DppScreen> {
     final isCompleted = dppSet.isCompleted;
     final duration = dppSet.durationMinutes ?? 20;
 
-    final subjectBreakdown = _calculateSubjectBreakdown(result);
+    final subjectBreakdown = _calculateSubjectBreakdown();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -363,7 +379,10 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                           ...q.options.asMap().entries.map((entry) {
                             final idx = entry.key;
                             final option = entry.value;
-                            final isCorrect = idx.toString() == q.correctAnswer;
+                            final isCorrect = AnswerNormalizer.isCorrect(
+                              option,
+                              q,
+                            );
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Row(
@@ -449,16 +468,10 @@ class _DppScreenState extends ConsumerState<DppScreen> {
     );
   }
 
-  Map<String, Map<String, int>> _calculateSubjectBreakdown(DppResult result) {
-    final breakdown = <String, Map<String, int>>{};
-    for (final q in result.questions) {
-      breakdown.putIfAbsent(
-        q.subject,
-        () => {'total': 0, 'correct': 0, 'incorrect': 0, 'unattempted': 0},
-      );
-      breakdown[q.subject]!['total'] = breakdown[q.subject]!['total']! + 1;
-    }
-    return breakdown;
+  Map<String, Map<String, int>> _calculateSubjectBreakdown() {
+    // Per-question answers are owned by DppAttemptScreen and are not part of
+    // DppResult. Do not render a fabricated 0-correct breakdown.
+    return const {};
   }
 
   Color _subjectColor(String subject) {
