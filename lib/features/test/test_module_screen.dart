@@ -65,8 +65,8 @@ class _TestModuleScreenState extends ConsumerState<TestModuleScreen>
               final allQuestions =
                   ref.watch(allQuestionsProvider).valueOrNull ?? [];
               final pool = ExamEngineService.validatePool(allQuestions);
-              final config = ExamConfig.neet();
-              if (pool.isEmpty) {
+              final config = ExamConfig.neet2024();
+              if (!ExamEngineService.hasSufficientPool(pool, config)) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
