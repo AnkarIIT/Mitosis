@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/providers/providers.dart';
 import '../../core/models/question_model.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/utils/answer_normalizer.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 
@@ -27,9 +28,20 @@ class BookmarksDashboard extends ConsumerWidget {
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Text(
-              'Unable to load bookmarked questions right now.',
-              textAlign: TextAlign.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Unable to load bookmarked questions right now.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () => ref.invalidate(allQuestionsProvider),
+                  icon: const Icon(Icons.refresh_rounded, size: 20),
+                  label: const Text('Retry'),
+                ),
+              ],
             ),
           ),
         ),
@@ -63,13 +75,13 @@ class BookmarksDashboard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AdaptiveColors.primary(context).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.bookmark_border_outlined,
                 size: 64,
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
               ),
             ),
             const SizedBox(height: 24),
@@ -87,6 +99,15 @@ class BookmarksDashboard extends ConsumerWidget {
                 color: AdaptiveColors.textSecondary(context),
               ),
               textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => context.push('/learn'),
+                icon: const Icon(Icons.school_outlined, size: 20),
+                label: const Text('Browse topics'),
+              ),
             ),
           ],
         ),
@@ -114,11 +135,8 @@ class BookmarksDashboard extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primary.withValues(alpha: 0.9),
-                    AppColors.primary.withValues(alpha: 0.7),
-                  ],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0B3538), Color(0xFF0E5B54)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -126,11 +144,7 @@ class BookmarksDashboard extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.auto_awesome,
-                    color: AppColors.textLight,
-                    size: 32,
-                  ),
+                  const Icon(Icons.auto_awesome, color: Colors.white, size: 32),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -140,7 +154,7 @@ class BookmarksDashboard extends ConsumerWidget {
                           '${questions.length} Questions Saved',
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(
-                                color: AppColors.textLight,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
@@ -148,7 +162,7 @@ class BookmarksDashboard extends ConsumerWidget {
                         Text(
                           'Tap questions below to reveal formulas, core concepts, and NCERT links.',
                           style: TextStyle(
-                            color: AppColors.textLight.withValues(alpha: 0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 12,
                           ),
                         ),
@@ -197,7 +211,7 @@ class BookmarksDashboard extends ConsumerWidget {
         child: Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
-            leading: _getSubjectBadge(question.subject),
+            leading: _getSubjectBadge(context, question.subject),
             title: Text(
               question.questionText,
               style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
@@ -213,7 +227,10 @@ class BookmarksDashboard extends ConsumerWidget {
               ),
             ),
             trailing: IconButton(
-              icon: const Icon(Icons.delete_sweep, color: AppColors.primary),
+              icon: Icon(
+                Icons.delete_sweep,
+                color: AdaptiveColors.primary(context),
+              ),
               tooltip: 'Delete bookmark',
               onPressed: () {
                 ref
@@ -248,7 +265,10 @@ class BookmarksDashboard extends ConsumerWidget {
                     ),
                     const SizedBox(height: 6),
                     ...question.options.map((option) {
-                      final isCorrect = option == question.correctAnswer;
+                      final isCorrect = AnswerNormalizer.isCorrect(
+                        option,
+                        question,
+                      );
                       return Container(
                         width: double.infinity,
                         margin: const EdgeInsets.only(bottom: 6),
@@ -258,13 +278,17 @@ class BookmarksDashboard extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isCorrect
-                              ? AppColors.primary.withValues(alpha: 0.15)
+                              ? AdaptiveColors.primary(
+                                  context,
+                                ).withValues(alpha: 0.15)
                               : AdaptiveColors.outlineVariant(
                                   context,
                                 ).withValues(alpha: 0.35),
                           border: Border.all(
                             color: isCorrect
-                                ? AppColors.primary.withValues(alpha: 0.5)
+                                ? AdaptiveColors.primary(
+                                    context,
+                                  ).withValues(alpha: 0.5)
                                 : AdaptiveColors.outline(
                                     context,
                                   ).withValues(alpha: 0.4),
@@ -280,7 +304,7 @@ class BookmarksDashboard extends ConsumerWidget {
                                   : Icons.circle_outlined,
                               size: 16,
                               color: isCorrect
-                                  ? AppColors.primary
+                                  ? AdaptiveColors.primary(context)
                                   : AdaptiveColors.textSecondary(context),
                             ),
                             const SizedBox(width: 8),
@@ -289,7 +313,7 @@ class BookmarksDashboard extends ConsumerWidget {
                                 option,
                                 style: TextStyle(
                                   color: isCorrect
-                                      ? AppColors.primary
+                                      ? AdaptiveColors.primary(context)
                                       : AdaptiveColors.textPrimary(context),
                                   fontSize: 13,
                                 ),
@@ -306,27 +330,31 @@ class BookmarksDashboard extends ConsumerWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.08),
+                        color: AdaptiveColors.primary(
+                          context,
+                        ).withValues(alpha: 0.08),
                         border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.25),
+                          color: AdaptiveColors.primary(
+                            context,
+                          ).withValues(alpha: 0.25),
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
                               Icon(
                                 Icons.lightbulb_outline,
-                                color: AppColors.primary,
+                                color: AdaptiveColors.primary(context),
                                 size: 18,
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
                                 'Revision Explanation',
                                 style: TextStyle(
-                                  color: AppColors.primary,
+                                  color: AdaptiveColors.primary(context),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),
@@ -341,10 +369,10 @@ class BookmarksDashboard extends ConsumerWidget {
                           if (question.ncertReference != null) ...[
                             const SizedBox(height: 8),
                             Text(
-                              '📖 Reference: ${question.ncertReference}',
-                              style: const TextStyle(
+                              'Reference: ${question.ncertReference}',
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.primary,
+                                color: AdaptiveColors.primary(context),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -363,7 +391,7 @@ class BookmarksDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _getSubjectBadge(String subject) {
+  Widget _getSubjectBadge(BuildContext context, String subject) {
     Color color;
     IconData icon;
 
@@ -381,7 +409,7 @@ class BookmarksDashboard extends ConsumerWidget {
         icon = Icons.bolt;
         break;
       default:
-        color = AppColors.primary;
+        color = AdaptiveColors.primary(context);
         icon = Icons.book;
     }
 
