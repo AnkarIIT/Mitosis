@@ -32,7 +32,7 @@ void main() {
 
       await db.upsertTopicProgress(
         TopicProgressEntriesCompanion.insert(
-          userId: Value(0),
+          userId: 0,
           topicId: 'phy1',
           lastAttempted: DateTime.now(),
         ),
@@ -40,7 +40,7 @@ void main() {
 
       await db.insertBookmark(
         BookmarksCompanion.insert(
-          userId: Value(0),
+          userId: 0,
           questionId: '101',
           subject: 'Physics',
           topicId: 'phy1',
@@ -48,9 +48,9 @@ void main() {
         ),
       );
 
-      final attempts = await db.getAllQuizAttempts();
-      final progress = await db.getAllTopicProgress();
-      final bookmarks = await db.getAllBookmarks();
+      final attempts = await db.getAllQuizAttempts(userId: 0);
+      final progress = await db.getAllTopicProgress(userId: 0);
+      final bookmarks = await db.getAllBookmarks(userId: 0);
 
       expect(attempts.single.updatedAt, isNotNull);
       expect(progress.single.updatedAt, isNotNull);
@@ -61,7 +61,7 @@ void main() {
       final now = DateTime.now();
       await db.insertBookmark(
         BookmarksCompanion.insert(
-          userId: Value(0),
+          userId: 0,
           questionId: '101',
           subject: 'Botany',
           topicId: 'bio1',
@@ -70,7 +70,7 @@ void main() {
       );
       await db.insertBookmark(
         BookmarksCompanion.insert(
-          userId: Value(0),
+          userId: 0,
           questionId: '101',
           subject: 'Botany',
           topicId: 'bio1',
@@ -79,7 +79,7 @@ void main() {
       );
       await db.insertBookmark(
         BookmarksCompanion.insert(
-          userId: Value(0),
+          userId: 0,
           questionId: '202',
           subject: 'Zoology',
           topicId: 'zoo2',
@@ -87,7 +87,7 @@ void main() {
         ),
       );
 
-      final rows = await db.getAllBookmarks();
+      final rows = await db.getAllBookmarks(userId: 0);
       expect(rows.length, 2);
       expect(rows.map((b) => b.questionId).toSet(), {'101', '202'});
     });
@@ -138,7 +138,7 @@ void main() {
         ),
       );
 
-      final rows = await db.getAllQuizAttempts();
+      final rows = await db.getAllQuizAttempts(userId: 0);
       expect(rows.length, 2);
       expect(rows.every((r) => r.score == 5), isTrue);
     });
@@ -146,7 +146,7 @@ void main() {
     test('topic progress upsert keeps a single row per topic', () async {
       await db.upsertTopicProgress(
         TopicProgressEntriesCompanion.insert(
-          userId: Value(0),
+          userId: 0,
           topicId: 'chem1',
           questionsAttempted: const Value(2),
           questionsCorrect: const Value(1),
@@ -155,7 +155,7 @@ void main() {
       );
       await db.upsertTopicProgress(
         TopicProgressEntriesCompanion.insert(
-          userId: Value(0),
+          userId: 0,
           topicId: 'chem1',
           questionsAttempted: const Value(4),
           questionsCorrect: const Value(3),
@@ -163,7 +163,7 @@ void main() {
         ),
       );
 
-      final rows = await db.getAllTopicProgress();
+      final rows = await db.getAllTopicProgress(userId: 0);
       expect(rows.length, 1);
       expect(rows.single.questionsAttempted, 4);
       expect(rows.single.questionsCorrect, 3);
