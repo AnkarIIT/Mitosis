@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
-import '../../core/theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../../core/utils/rank_predictor.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/models/learning_recommendation.dart';
+import '../../core/theme/tokens.dart';
 
 class ProgressDashboard extends ConsumerWidget {
   const ProgressDashboard({super.key});
@@ -19,9 +20,10 @@ class ProgressDashboard extends ConsumerWidget {
     final weakTopics = ref.watch(weakTopicsProvider);
     final dailyGoal = ref.watch(dailyGoalProvider);
     final mockStats = ref.watch(mockTestStatsProvider);
+    final recommendations = ref.watch(learningRecommendationsProvider);
 
     return Scaffold(
-      backgroundColor: AdaptiveColors.surfaceWarm(context),
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
         title: const Text('Your Progress'),
         backgroundColor: Colors.transparent,
@@ -33,27 +35,32 @@ class ProgressDashboard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Daily Goal
+            // Headline first: estimated score + predicted rank, then the
+            // daily goal ring, then what to do next.
+            _buildRankPredictor(
+              context,
+              stats['accuracy'] as double,
+              mockStats,
+            ),
+            const SizedBox(height: 24),
             _buildDailyGoal(context, dailyGoal),
             const SizedBox(height: 24),
 
-            // Overall Stats Card
+            // Overall Stats Card (fixed deep-teal: readable in both modes)
             Card(
-              elevation: 4,
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadius.xlAll,
+                side: BorderSide(color: AdaptiveColors.outlineVariant(context)),
               ),
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      AdaptiveColors.primary(context).withValues(alpha: 0.9),
-                      AdaptiveColors.primary(context).withValues(alpha: 0.7),
-                    ],
+                    colors: [Color(0xFF0B3538), Color(0xFF0E5B54)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.xlAll,
                 ),
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -61,7 +68,7 @@ class ProgressDashboard extends ConsumerWidget {
                     Text(
                       'Overall Performance',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AdaptiveColors.onPrimary(context),
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -80,11 +87,11 @@ class ProgressDashboard extends ConsumerWidget {
                                 child: CircularProgressIndicator(
                                   value: (stats['accuracy'] as double) / 100,
                                   strokeWidth: 12,
-                                  backgroundColor: AdaptiveColors.onPrimary(
-                                    context,
-                                  ).withValues(alpha: 0.2),
-                                  valueColor: AlwaysStoppedAnimation(
-                                    AdaptiveColors.onPrimary(context),
+                                  backgroundColor: Colors.white.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  valueColor: const AlwaysStoppedAnimation(
+                                    Colors.white,
                                   ),
                                 ),
                               ),
@@ -97,9 +104,7 @@ class ProgressDashboard extends ConsumerWidget {
                                         .textTheme
                                         .headlineMedium
                                         ?.copyWith(
-                                          color: AdaptiveColors.onPrimary(
-                                            context,
-                                          ),
+                                          color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -109,9 +114,9 @@ class ProgressDashboard extends ConsumerWidget {
                                         .textTheme
                                         .labelSmall
                                         ?.copyWith(
-                                          color: AdaptiveColors.onPrimary(
-                                            context,
-                                          ).withValues(alpha: 0.8),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
                                         ),
                                   ),
                                 ],
@@ -145,13 +150,58 @@ class ProgressDashboard extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // Rank Predictor Card
-            _buildRankPredictor(
-              context,
-              stats['accuracy'] as double,
-              mockStats,
-            ),
-            const SizedBox(height: 32),
+            if (recommendations.isNotEmpty) ...[
+              Text(
+                'Next best actions',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              ...recommendations.map(
+                (recommendation) => Card(
+                  elevation: 0,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: AdaptiveColors.primary(
+                        context,
+                      ).withValues(alpha: 0.12),
+                      child: Icon(
+                        recommendation.mastery < 50
+                            ? Icons.menu_book
+                            : Icons.bolt,
+                        color: AdaptiveColors.primary(context),
+                      ),
+                    ),
+                    title: Text(recommendation.topicName),
+                    subtitle: Text(
+                      '${recommendation.subject} • '
+                      '${recommendation.mastery.toStringAsFixed(0)}% mastery\n'
+                      '${recommendation.diagnosis}',
+                    ),
+                    isThreeLine: true,
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      if (recommendation.primaryAction ==
+                          LearningActionType.revise) {
+                        context.push(
+                          '/resources/notes?chapterId='
+                          '${Uri.encodeComponent(recommendation.chapterId)}',
+                        );
+                        return;
+                      }
+                      context.push(
+                        '/quiz?topicId=${Uri.encodeComponent(recommendation.topicId)}'
+                        '&topicName=${Uri.encodeComponent(recommendation.topicName)}'
+                        '&subject=${Uri.encodeComponent(recommendation.subject)}',
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+            ],
 
             // Recent Quizzes Chart
             Text(
@@ -565,24 +615,23 @@ class ProgressDashboard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.analytics_outlined,
+              Icon(
+                Icons.analytics_outlined,
+                color: AdaptiveColors.primary(context),
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'NEET Rank Predictor',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
                     color: AdaptiveColors.primary(context),
-                    size: 20,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'NEET Rank Predictor',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AdaptiveColors.primary(context),
-                    ),
-                  ),
-                ],
+                ),
               ),
               if (hasMock)
                 Container(
@@ -591,14 +640,16 @@ class ProgressDashboard extends ConsumerWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.1),
+                    color: AdaptiveColors.success(
+                      context,
+                    ).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Based on Mocks',
                     style: TextStyle(
                       fontSize: 10,
-                      color: AppColors.success,
+                      color: AdaptiveColors.success(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -609,38 +660,48 @@ class ProgressDashboard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    hasMock ? 'Highest Mock Score' : 'Estimated Score',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                  Text(
-                    '$estimatedScore / 720',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      hasMock ? 'Highest Mock Score' : 'Estimated Score',
+                      style: Theme.of(context).textTheme.labelSmall,
                     ),
-                  ),
-                ],
+                    Text(
+                      '$estimatedScore / 720',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Predicted AIR',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                  Text(
-                    '~${predictedRank.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: AppColors.primary,
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Predicted AIR',
+                      style: Theme.of(context).textTheme.labelSmall,
                     ),
-                  ),
-                ],
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '~${predictedRank.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: AdaptiveColors.primary(context),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -648,24 +709,42 @@ class ProgressDashboard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Current Percentile: $percentile',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  color: AdaptiveColors.textSecondary(context),
+              Flexible(
+                child: Text(
+                  'Current Percentile: $percentile',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                    color: AdaptiveColors.textSecondary(context),
+                  ),
                 ),
               ),
               if (!hasMock)
-                Text(
-                  '*Based on topic accuracy',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: AdaptiveColors.textSecondary(context),
+                Flexible(
+                  child: Text(
+                    'Rough estimate from topic accuracy',
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AdaptiveColors.textSecondary(context),
+                    ),
                   ),
                 ),
             ],
           ),
+          if (!hasMock) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => context.push('/test-series'),
+                icon: const Icon(Icons.quiz_outlined, size: 18),
+                label: const Text('Take a mock test for a real prediction'),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -683,6 +762,8 @@ class _StatItem extends StatelessWidget {
     required this.icon,
   });
 
+  // Rendered on the fixed deep-teal headline card: constant white keeps
+  // contrast identical in light and dark mode.
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -690,12 +771,12 @@ class _StatItem extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: AdaptiveColors.onPrimary(context), size: 20),
+            Icon(icon, color: Colors.white, size: 20),
             const SizedBox(width: 8),
             Text(
               value,
-              style: TextStyle(
-                color: AdaptiveColors.onPrimary(context),
+              style: const TextStyle(
+                color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -705,7 +786,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: AdaptiveColors.onPrimary(context).withValues(alpha: 0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 12,
           ),
         ),
