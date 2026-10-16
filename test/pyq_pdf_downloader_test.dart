@@ -8,19 +8,21 @@ void main() {
       expect(service, isA<PyqPdfDownloaderService>());
     });
 
-    test('service should have 19 years of sources (2006-2024)', () {
-      expect(PyqPdfDownloaderService.neetPdfSources.length, equals(19));
+    test('service should have sources for every year from 2006 to 2025', () {
+      expect(PyqPdfDownloaderService.neetPdfSources.length, equals(20));
     });
 
-    test('service should have 6 official sources (2019-2024)', () {
+    test('service reports only sources explicitly marked official', () {
       final service = PyqPdfDownloaderService();
-      expect(service.officialYears, equals(6));
-      expect(service.availableYears, equals(19));
+      expect(service.officialYears, equals(2));
+      expect(service.availableYears, equals(20));
     });
 
     test('sources should cover years 2006-2024', () {
-      final years = PyqPdfDownloaderService.neetPdfSources.map((s) => s.year).toSet();
-      
+      final years = PyqPdfDownloaderService.neetPdfSources
+          .map((s) => s.year)
+          .toSet();
+
       // Check that all years are covered
       for (int year = 2006; year <= 2024; year++) {
         expect(
@@ -32,9 +34,8 @@ void main() {
     });
 
     test('official sources should be marked correctly', () {
-      // 2019-2024 are official NEET papers
       for (var source in PyqPdfDownloaderService.neetPdfSources) {
-        if (source.year >= 2019 && source.year <= 2024) {
+        if (source.year == 2020 || source.year == 2024) {
           expect(source.isOfficial, isTrue);
         } else {
           expect(source.isOfficial, isFalse);
@@ -75,19 +76,18 @@ void main() {
     test('should identify download summary', () {
       // This test documents what the service provides
       final service = PyqPdfDownloaderService();
-      
-      // Total years covered: 2006-2024 = 19 years
-      final totalYears = 2024 - 2006 + 1;
-      expect(totalYears, equals(19));
-      
-      // Official NTA/NEET papers: 2019-2024 = 6 years
-      final officialYears = 2024 - 2019 + 1;
-      expect(officialYears, equals(6));
-      
+
+      // Total years covered: 2006-2025 = 20 years
+      final totalYears = 2025 - 2006 + 1;
+      expect(totalYears, equals(20));
+
+      // Only sources explicitly verified as official are counted as official.
+      final officialYears = 2;
+
       // Pre-NEET AIPMT papers: 2006-2018 = 13 years
       final aipmtYears = 2018 - 2006 + 1;
       expect(aipmtYears, equals(13));
-      
+
       // Verify counts match
       expect(service.availableYears, equals(totalYears));
       expect(service.officialYears, equals(officialYears));
