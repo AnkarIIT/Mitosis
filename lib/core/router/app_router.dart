@@ -8,10 +8,12 @@ import '../../features/auth/auth_screen.dart';
 
 import '../../features/auth/terms_screen.dart';
 import '../../features/auth/privacy_policy_screen.dart';
+import '../../features/auth/help_support_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/home/home_shell_screen.dart';
 import '../../features/home/home_content/home_tab.dart';
-// import '../../features/home/home_content/subjects_tab.dart'; // Replaced with Flashcards
+import '../../features/home/home_content/learn_hub_screen.dart';
+import '../../features/home/home_content/practice_hub_screen.dart';
 import '../../features/home/home_content/review_tab.dart';
 import '../../features/home/home_content/progress_tab.dart';
 import '../../features/home/home_content/profile_tab.dart';
@@ -28,6 +30,7 @@ import '../../features/exam_engine/cbt_instructions_screen.dart';
 import '../../core/services/exam_engine_service.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/services/exam_checkpoint_service.dart';
+import '../../core/services/onboarding_completion_service.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/models/question_model.dart';
 import '../../core/models/user_progress_model.dart';
@@ -41,6 +44,8 @@ import '../../features/chatbot/chatbot_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/settings/import_questions_screen.dart';
 import '../../features/pdf/ncert_pdf_screen.dart';
+import '../../features/resources/resources_screen.dart';
+import '../../features/resources/chapter_notes_screen.dart';
 import '../../features/bookmarks/bookmarks_dashboard.dart';
 import '../../features/study_modules/allen_study_module_screen.dart';
 import '../../features/dpp/dpp_screen.dart';
@@ -48,15 +53,18 @@ import '../../features/dpp/dpp_attempt_screen.dart';
 import '../../features/dpp/dpp_neet_screen.dart';
 import '../../features/pyq/pyq_download_screen.dart';
 import '../../features/test/test_module_screen.dart';
+import '../../features/chapter/chapter_landing_screen.dart';
+import '../../features/chapter/lesson_screen.dart';
+import '../../features/chapter/chapter_quiz_screen.dart';
 
-const _publicRoutes = {'/auth', '/terms', '/privacy', '/loading'};
+const _publicRoutes = {'/auth', '/terms', '/privacy', '/help'};
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
   return GoRouter(
     initialLocation: '/',
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final path = state.matchedLocation;
       final isAuthenticated = authState.status == AuthStatus.authenticated;
       final isLoading = authState.status == AuthStatus.loading;
@@ -66,20 +74,28 @@ final routerProvider = Provider<GoRouter>((ref) {
         return null;
       }
 
-      if (path == '/onboarding') {
-        if (!isAuthenticated) return '/auth';
-        return null;
+      if (isLoading) return path == '/loading' ? null : '/loading';
+      if (!isAuthenticated) return '/auth';
+
+      final user = authState.user;
+      final hasSavedStudySetup =
+          user != null &&
+          user.batch != null &&
+          user.targetYear != null &&
+          user.dailyCommitmentMinutes != null;
+      final onboardingComplete =
+          hasSavedStudySetup ||
+          await OnboardingCompletionService.isComplete(
+            userId: user?.id,
+            isGuest: authState.isGuest,
+          );
+
+      if (path == '/loading') {
+        return onboardingComplete ? '/' : '/onboarding';
       }
-
-      if (isLoading) return '/loading';
-
-      if (isAuthenticated) {
-        final onboardingComplete = ref.read(onboardingCompleteProvider);
-        if (!onboardingComplete) return '/onboarding';
-        return null;
-      }
-
-      return '/auth';
+      if (path == '/onboarding') return onboardingComplete ? '/' : null;
+      if (!onboardingComplete) return '/onboarding';
+      return null;
     },
     routes: [
       GoRoute(
@@ -122,19 +138,32 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/auth', builder: (_, _) => const AuthScreen()),
       GoRoute(path: '/terms', builder: (_, _) => const TermsScreen()),
       GoRoute(path: '/privacy', builder: (_, _) => const PrivacyPolicyScreen()),
+      // Public, like /terms and /privacy: a signed-out user may need to read
+      // how to get help before they can sign in.
+      GoRoute(path: '/help', builder: (_, _) => const HelpSupportScreen()),
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
 
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => HomeShellScreen(navigationShell: shell),
         branches: [
+          // Today · Learn · Practice · Review · Progress. Profile lives
+          // outside the tabs (avatar/settings entry point).
           StatefulShellBranch(
             routes: [GoRoute(path: '/', builder: (_, _) => const HomeTab())],
           ),
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/flashcards',
-                builder: (_, _) => const FlashcardDashboardScreen(),
+                path: '/learn',
+                builder: (_, _) => const LearnHubScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/practice',
+                builder: (_, _) => const PracticeHubScreen(),
               ),
             ],
           ),
@@ -151,13 +180,15 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(path: '/profile', builder: (_, _) => const ProfileTab()),
-            ],
-          ),
         ],
       ),
+      // Reachable from Learn hub / deep links (not a bottom tab).
+      GoRoute(
+        path: '/flashcards',
+        builder: (_, _) => const FlashcardDashboardScreen(),
+      ),
+      // Profile is reachable via the Today header avatar and settings.
+      GoRoute(path: '/profile', builder: (_, _) => const ProfileTab()),
 
       GoRoute(
         path: '/subjects/:subjectId',
@@ -187,15 +218,37 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/quiz',
         builder: (_, state) {
-          final topicId = state.uri.queryParameters['topicId'] ?? '';
-          final topicName = state.uri.queryParameters['topicName'] ?? '';
-          final subject = state.uri.queryParameters['subject'] ?? '';
-          final testType = state.uri.queryParameters['testType'];
+          // The Error Book retest passes its questions via extra; topic
+          // flows keep using query parameters. Previously extra was
+          // silently dropped, so retests opened an empty quiz.
+          final extra = state.extra as Map<String, dynamic>?;
+          final rawQuestions = extra?['questions'];
+          final extraQuestions = rawQuestions is List
+              ? rawQuestions.whereType<Question>().toList()
+              : null;
+          final topicId =
+              (extra?['topicId'] as String?) ??
+              state.uri.queryParameters['topicId'] ??
+              '';
+          final topicName =
+              (extra?['topicName'] as String?) ??
+              state.uri.queryParameters['topicName'] ??
+              '';
+          final subject =
+              (extra?['subject'] as String?) ??
+              state.uri.queryParameters['subject'] ??
+              '';
+          final testType =
+              (extra?['testType'] as String?) ??
+              state.uri.queryParameters['testType'];
           return EnhancedQuizScreen(
+            questions: extraQuestions,
             topicId: topicId,
             topicName: topicName,
             subject: subject,
             testType: testType,
+            marksPerCorrect: 4,
+            marksPerWrong: -1,
           );
         },
       ),
@@ -219,6 +272,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const QuestionPaperSelector(),
       ),
       GoRoute(path: '/pdf-picker', builder: (_, _) => const PdfPickerScreen()),
+      GoRoute(path: '/resources', builder: (_, _) => const ResourcesScreen()),
+      GoRoute(
+        path: '/resources/notes',
+        builder: (_, state) => ChapterNotesScreen(
+          chapterId: state.uri.queryParameters['chapterId'] ?? '',
+        ),
+      ),
       GoRoute(
         path: '/pdf',
         builder: (_, state) {
@@ -230,7 +290,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/cbt/instructions',
         builder: (_, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
-          final config = extra['config'] as ExamConfig? ?? ExamConfig.neet();
+          final config =
+              extra['config'] as ExamConfig? ?? ExamConfig.neet2024();
           final questionPool = extra['questionPool'] as List<Question>? ?? [];
           return CbtInstructionsScreen(
             config: config,
@@ -242,7 +303,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/cbt',
         builder: (_, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
-          final config = extra['config'] as ExamConfig? ?? ExamConfig.neet();
+          final config =
+              extra['config'] as ExamConfig? ?? ExamConfig.neet2024();
           final questionPool = extra['questionPool'] as List<Question>? ?? [];
           final resumeFrom = extra['resumeCheckpoint'] as ExamCheckpoint?;
           return CbtTestScreen(
@@ -279,7 +341,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/cbt/replay',
         builder: (_, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
-          final config = extra['config'] as ExamConfig? ?? ExamConfig.neet();
+          final config =
+              extra['config'] as ExamConfig? ?? ExamConfig.neet2024();
           final questionPool = extra['questionPool'] as List<Question>? ?? [];
           return CbtTestScreen(config: config, questionPool: questionPool);
         },
@@ -332,6 +395,42 @@ final routerProvider = Provider<GoRouter>((ref) {
             chapterName: chapterName,
             topicId: topicId,
           );
+        },
+      ),
+      GoRoute(
+        path: '/study-modules/chapter',
+        builder: (_, state) {
+          final subjectId = state.uri.queryParameters['subjectId'] ?? '';
+          final chapterName = state.uri.queryParameters['chapterName'] ?? '';
+          final topicId = state.uri.queryParameters['topicId'] ?? '';
+          return AllenChapterDetailScreen(
+            subjectId: subjectId,
+            chapterName: chapterName,
+            topicId: topicId,
+          );
+        },
+      ),
+      // Chapter module routes
+      GoRoute(
+        path: '/chapter/:chapterId',
+        builder: (_, state) {
+          final chapterId = state.pathParameters['chapterId']!;
+          return ChapterLandingScreen(chapterId: chapterId);
+        },
+      ),
+      GoRoute(
+        path: '/chapter/:chapterId/lesson/:lessonId',
+        builder: (_, state) {
+          final chapterId = state.pathParameters['chapterId']!;
+          final lessonId = state.pathParameters['lessonId']!;
+          return LessonScreen(chapterId: chapterId, lessonId: lessonId);
+        },
+      ),
+      GoRoute(
+        path: '/chapter/:chapterId/quiz',
+        builder: (_, state) {
+          final chapterId = state.pathParameters['chapterId']!;
+          return ChapterQuizScreen(chapterId: chapterId);
         },
       ),
       GoRoute(
