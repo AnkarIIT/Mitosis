@@ -25,7 +25,12 @@ class ChapterService {
         'Know about fundamental forces in nature',
       ],
       estimatedMinutes: 30,
-      pdfEntryId: 'physics_class11_ch1',
+      // Must be a path that NcertBookCatalog can actually resolve, and is
+      // passed to the '/pdf' route as ?entryId=. The old value
+      // ('physics_class11_ch1') matched neither a catalog key nor an asset
+      // path, so every NCERT button on the lesson screen failed to open.
+      pdfEntryId:
+          'assets/ncert_books/physics/Physics_Class_11_Part_1/keph101.pdf',
       lessons: [
         Lesson(
           id: 'phy_ch1_l1',
@@ -160,9 +165,16 @@ Your smartphone uses:
             'Weak nuclear',
             'Strong nuclear',
           ],
-          correctAnswer: 'Strong nuclear',
+          // The WEAK nuclear force has the shortest range (~10⁻¹⁸ m); the
+          // strong force acts over ~10⁻¹⁵ m. The previous answer key said
+          // 'Strong nuclear', marking a student who answered correctly as
+          // wrong — and the explanation taught the wrong fact.
+          correctAnswer: 'Weak nuclear',
           explanation:
-              'Strong nuclear force acts only within atomic nucleus (~10⁻¹⁵ m).',
+              'The weak nuclear force has the shortest range (~10⁻¹⁸ m). '
+              'The strong nuclear force acts within the nucleus (~10⁻¹⁵ m), '
+              'and electromagnetic and gravitational forces are effectively '
+              'unbounded.',
         ),
       ],
     ),
