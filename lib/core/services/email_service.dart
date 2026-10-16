@@ -123,6 +123,20 @@ class EmailService {
   /// templates rather than accepting raw HTML: a raw-HTML parameter would make
   /// it far too easy to interpolate untrusted text into a security email, which
   /// is exactly the injection bug this class previously had.
+  /// Whether a request for [template] should carry the session JWT.
+  ///
+  /// Password reset is requested while SIGNED OUT — there is no session to
+  /// present, and `send-email` returns 401 without one. The function allows
+  /// exactly that one template unauthenticated (and ignores caller-supplied
+  /// username/purpose for it). Every other template must authenticate.
+  ///
+  /// Exposed so the rule can be tested without a live Supabase project; the
+  /// original bug was that no such branch existed at all and every send 401'd.
+  static bool shouldAuthenticate(EmailTemplate template, String? token) {
+    if (template == EmailTemplate.passwordReset) return false;
+    return token != null && token.isNotEmpty;
+  }
+
   Future<EmailSendResult> send({
     required String to,
     required EmailTemplate template,
@@ -143,6 +157,7 @@ class EmailService {
       return EmailSendResult.fail('Invalid email address.');
     }
     final token = _accessToken();
+    final attachAuth = shouldAuthenticate(template, token);
     try {
       final response = await _client
           .post(
@@ -154,7 +169,7 @@ class EmailService {
               // is an unauthenticated open relay.
               if (AppConfig.supabaseAnonKey.isNotEmpty)
                 'apikey': AppConfig.supabaseAnonKey,
-              if (token != null) 'Authorization': 'Bearer $token',
+              if (attachAuth && token != null) 'Authorization': 'Bearer $token',
             },
             body: jsonEncode({
               // Only a template *name* crosses the wire. The function owns the
