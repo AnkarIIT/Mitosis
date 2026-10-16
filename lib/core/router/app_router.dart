@@ -397,19 +397,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
-        path: '/study-modules/chapter',
-        builder: (_, state) {
-          final subjectId = state.uri.queryParameters['subjectId'] ?? '';
-          final chapterName = state.uri.queryParameters['chapterName'] ?? '';
-          final topicId = state.uri.queryParameters['topicId'] ?? '';
-          return AllenChapterDetailScreen(
-            subjectId: subjectId,
-            chapterName: chapterName,
-            topicId: topicId,
-          );
-        },
-      ),
       // Chapter module routes
       GoRoute(
         path: '/chapter/:chapterId',
