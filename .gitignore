@@ -34,6 +34,22 @@ migrate_working_dir/
 /android/build/
 /coverage/
 
+# Node
+# 708 dependency files were committed in 343d74d before this rule existed.
+node_modules/
+npm-debug.log*
+
+# Agent scratch directories.
+# .manus/ was committed and contained scraped snapshots of an AUTHENTICATED
+# Google Cloud Console session — including a captured titusXsrfToken — plus the
+# owner's email address and project identifiers. It has been purged from git
+# history; never commit it again.
+.manus/
+.work/
+
+# Build artifacts, symbolication, obfuscation
+/build/
+
 # Symbolication related
 app.*.symbols
 
