@@ -31,12 +31,13 @@ class AuthState {
 
   AuthState copyWith({
     db.User? user,
+    bool clearUser = false,
     AuthStatus? status,
     String? error,
     bool? isGuest,
   }) {
     return AuthState(
-      user: user ?? this.user,
+      user: clearUser ? null : (user ?? this.user),
       status: status ?? this.status,
       error: error,
       isGuest: isGuest ?? this.isGuest,
@@ -68,14 +69,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(
       status: AuthStatus.unauthenticated,
       isGuest: false,
-      user: null,
+      clearUser: true,
     );
   }
 
   Future<void> continueAsGuest() async {
     state = state.copyWith(
       status: AuthStatus.authenticated,
-      user: null,
+      clearUser: true,
       isGuest: true,
       error: null,
     );
@@ -316,24 +317,64 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState(status: AuthStatus.unauthenticated);
   }
 
+  /// Permanently deletes the account.
+  ///
+  /// Ordering is deliberate and load-bearing:
+  ///   1. Cloud account is deleted **best-effort** — its failure is reported,
+  ///      never fatal.
+  ///   2. Local data is wiped **unconditionally**.
+  ///   3. Both cloud *and* Google sessions are signed out.
+  ///
+  /// ## Why local wipe must not depend on the cloud call
+  /// The previous implementation let a cloud failure throw out of the `try`,
+  /// which aborted the method *before* `clearAllUserData()`. A user with a
+  /// `supabaseId` but no valid cloud session — an ordinary state after a token
+  /// expiry — could never delete their own study data. That is a data-retention
+  /// defect, not a UX inconvenience.
+  ///
+  /// ## Why Google sign-out is required
+  /// Only `_authService.logout()` was called. The Google provider keeps its own
+  /// credential, so the next launch silently re-authenticated the user into the
+  /// account they had just deleted.
   Future<({bool success, String message})> deleteAccount() async {
-    try {
-      final user = state.user;
-      if (user == null) {
-        return (success: false, message: 'No account is signed in.');
-      }
-
-      final supabaseId = user.supabaseId;
-      await _db.clearAllUserData(user.id);
-      if (supabaseId != null && supabaseId.isNotEmpty) {
-        await _authService.deleteCloudAccountBySupabaseId(supabaseId);
-      }
-      await _authService.logout();
-      state = AuthState(status: AuthStatus.unauthenticated);
-      return (success: true, message: 'Account deleted');
-    } catch (e) {
-      return (success: false, message: 'Could not delete account: $e');
+    final user = state.user;
+    if (user == null) {
+      return (success: false, message: 'No account is signed in.');
     }
+
+    // ── 1. Cloud deletion, best-effort ──────────────────────────────────
+    String? cloudWarning;
+    final supabaseId = user.supabaseId;
+    if (supabaseId != null && supabaseId.isNotEmpty) {
+      final result = await _authService.deleteCloudAccountBySupabaseId(
+        supabaseId,
+      );
+      if (!result.success) cloudWarning = result.message;
+    }
+
+    // ── 2. Local wipe, unconditional ────────────────────────────────────
+    // Runs even when the cloud call failed, and is allowed to surface its own
+    // failure — if the wipe itself errors the user must not be told the account
+    // is gone.
+    try {
+      await _db.clearAllUserData(user.id);
+    } catch (error) {
+      return (success: false, message: 'Could not remove local data: $error');
+    }
+
+    // ── 3. Sign out of every provider ───────────────────────────────────
+    await _authService.logout();
+    // Google holds an independent credential; skipping this re-authenticates
+    // the deleted account on next launch.
+    try {
+      await _googleAuthService.signOut();
+    } catch (_) {
+      // Non-fatal: the local session is already gone.
+    }
+
+    state = AuthState(status: AuthStatus.unauthenticated);
+
+    return (success: true, message: cloudWarning ?? 'Account deleted');
   }
 }
 
