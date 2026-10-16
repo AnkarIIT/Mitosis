@@ -23,7 +23,12 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
   int _currentIndex = 0;
   final Map<int, String> _answers = {};
   bool _submitted = false;
-  bool _showExplanation = false;
+
+  /// True while stepping through the submitted paper. `_showExplanation` is
+  /// meaningless outside review: before submit the student has not earned the
+  /// explanation, and after it everything is shown regardless.
+  bool _reviewing = false;
+  bool get _showExplanation => _submitted && _reviewing;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +65,8 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
                 onPressed: () => _showExitDialog(context),
               ),
         actions: [
-          if (!_submitted)
+          // Shown during review too, so the student can see where they are.
+          if (!_submitted || _reviewing)
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: Center(
@@ -92,7 +98,7 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: _submitted
+      bottomNavigationBar: (_submitted && !_reviewing)
           ? _buildResultBar(context)
           : _buildBottomNav(quiz.length),
     );
@@ -291,10 +297,7 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
               icon: const Icon(Icons.arrow_back_rounded),
               label: const Text('Previous'),
               onPressed: _currentIndex > 0
-                  ? () => setState(() {
-                      _showExplanation = false;
-                      _currentIndex--;
-                    })
+                  ? () => setState(() => _currentIndex--)
                   : null,
             ),
           ),
@@ -303,28 +306,35 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
           Expanded(
             child: ElevatedButton.icon(
               icon: Icon(
-                _currentIndex == totalQuestions - 1
+                _currentIndex == totalQuestions - 1 && !_submitted
                     ? Icons.check_rounded
                     : Icons.arrow_forward_rounded,
               ),
               label: Text(
-                _currentIndex == totalQuestions - 1 ? 'Submit' : 'Next',
+                _reviewing
+                    ? 'Next'
+                    : (_currentIndex == totalQuestions - 1 ? 'Submit' : 'Next'),
               ),
-              onPressed: _answers.containsKey(_currentIndex)
-                  ? () async {
-                      if (_currentIndex == totalQuestions - 1) {
-                        setState(() => _submitted = true);
-                        // Nothing recorded the score anywhere, so a completed
-                        // chapter never showed progress or completion.
-                        await _recordSummaryScore();
-                      } else {
-                        setState(() {
-                          _showExplanation = false;
-                          _currentIndex++;
-                        });
+              onPressed: _reviewing
+                  // Review mode: walk the submitted paper freely, no gating on
+                  // whether the question was answered.
+                  ? () => setState(() {
+                      if (_currentIndex < totalQuestions - 1) {
+                        _currentIndex++;
                       }
-                    }
-                  : null,
+                    })
+                  : (_answers.containsKey(_currentIndex)
+                        ? () async {
+                            if (_currentIndex == totalQuestions - 1) {
+                              setState(() => _submitted = true);
+                              // Nothing recorded the score anywhere, so a
+                              // completed chapter never showed progress.
+                              await _recordSummaryScore();
+                            } else {
+                              setState(() => _currentIndex++);
+                            }
+                          }
+                        : null),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -406,13 +416,35 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          // Without this the explanations were unreachable: after submit the
+          // body rendered only the LAST question, so a student could not see
+          // why any other answer was wrong.
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
+              icon: const Icon(Icons.fact_check_outlined),
+              label: const Text('Review Answers'),
+              onPressed: () => setState(() {
+                _reviewing = true;
+                _currentIndex = 0;
+              }),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
               icon: const Icon(Icons.replay_rounded),
               label: const Text('Retake Quiz'),
               onPressed: () => setState(() {
                 _submitted = false;
+                _reviewing = false;
                 _answers.clear();
                 _currentIndex = 0;
               }),
@@ -430,7 +462,8 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
             child: OutlinedButton.icon(
               icon: const Icon(Icons.arrow_back_rounded),
               label: const Text('Back to Chapter'),
-              onPressed: () => context.go('/chapter/${widget.chapterId}'),
+              onPressed: () =>
+                  context.pushReplacement('/chapter/${widget.chapterId}'),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
