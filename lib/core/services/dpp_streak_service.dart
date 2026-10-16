@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import '../database/drift_database.dart' as db;
 
 /// Service for tracking DPP streaks and analytics.
@@ -158,15 +157,12 @@ class DppStreakService {
         }
 
         if (prevDate != null) {
-          final diff = date.difference(prevDate).inDays;
           // Track streaks
         }
         prevDate = date;
       } else {
         // For non-completed sets, still track date for streak calculation
         if (prevDate != null) {
-          final date = DateTime.parse(set.date);
-          final diff = date.difference(prevDate).inDays;
           // Track streaks
         }
         prevDate = DateTime.parse(set.date);
