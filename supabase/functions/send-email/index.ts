@@ -33,8 +33,20 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 //  supabase secrets set ALLOWED_ORIGINS=https://your.app,http://localhost:3000
 //
 //  ## Deploy
-//  supabase functions deploy send-email
-//  (JWT verification stays ON — that is what scopes sending to a session.)
+//  supabase functions deploy send-email --no-verify-jwt
+//
+//  `--no-verify-jwt` is REQUIRED, not optional. The password-reset path is
+//  requested while signed out, so it carries no Authorization header; with
+//  gateway JWT verification ON (the default) the request is rejected 401
+//  *before this handler runs*, and reset mail silently never sends — which is
+//  the exact failure this handler was changed to fix.
+//
+//  Disabling gateway verification does NOT open the function: every path here
+//  still authenticates in-handler. A token is resolved with `getUser(token)`
+//  and the recipient must equal that account's own verified address. The one
+//  exception is `password_reset`, constrained to a six-digit code with
+//  server-fixed body text and bounded by per-recipient and per-IP ceilings.
+//  See the auth block below for the exact conditions.
 // =============================================================================
 
 const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ?? "")
