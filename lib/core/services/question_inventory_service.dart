@@ -87,7 +87,21 @@ class QuestionInventoryService {
     required String mockName,
     required Map<String, int> requirements,
   }) async {
-    final available = await getSubjectCounts();
+    final raw = await getSubjectCounts();
+    // Questions are stored under a canonical subject name in which Biology
+    // covers botany and zoology (see QuestionImporter._canonicalSubject and
+    // the bundled neet_sample_*.json, which only ever says "Biology").
+    // The requirements below are expressed in NEET's four-section vocabulary,
+    // so `available['Botany']` and `available['Zoology']` were ALWAYS 0 — every
+    // NEET 2024 mock reported a permanent 50+50 shortage and could never be
+    // "ready", however full the bank was.
+    final available = <String, int>{...raw};
+    final biology = raw['Biology'] ?? 0;
+    if (biology > 0) {
+      available['Botany'] = biology;
+      available['Zoology'] = biology;
+    }
+
     final shortages = <String, int>{};
     bool isReady = true;
 
