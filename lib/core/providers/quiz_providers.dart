@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/question_model.dart';
@@ -10,6 +9,8 @@ import 'core_providers.dart';
 import 'content_providers.dart';
 import 'service_providers.dart';
 import 'auth_providers.dart';
+import 'current_user_provider.dart';
+import '../utils/answer_normalizer.dart';
 
 // ============= QUIZ STATE =============
 enum QuizMode { practice, exam, revision, speed }
@@ -250,11 +251,22 @@ class QuizNotifier extends StateNotifier<QuizState> {
 
   Future<void> saveAndComplete() async {
     _autoSaveTimer?.cancel();
+    _autoSaveTimer = null;
     await _saveSession();
     if (_currentSessionId != null) {
       await _sessionService.deleteSession(_currentSessionId!);
       _currentSessionId = null;
     }
+  }
+
+  @override
+  void dispose() {
+    // The autosave timer was previously only cancelled by saveAndComplete, so
+    // popping the quiz screen without finishing left a live 10s Timer holding
+    // this StateNotifier (and its provider) alive indefinitely.
+    _autoSaveTimer?.cancel();
+    _autoSaveTimer = null;
+    super.dispose();
   }
 
   void selectAnswer(
@@ -267,7 +279,8 @@ class QuizNotifier extends StateNotifier<QuizState> {
     if (questionIndex < 0 || questionIndex >= state.questions.length) return;
 
     final question = state.questions[questionIndex];
-    final markedCorrect = isCorrect ?? (answer == question.correctAnswer);
+    final markedCorrect =
+        isCorrect ?? AnswerNormalizer.isCorrect(answer, question);
 
     int score = state.score;
     int incorrectCount = state.incorrectCount;
@@ -375,7 +388,7 @@ class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
 
   Future<void> loadBookmarks() async {
     try {
-      final list = await _db.getAllBookmarks();
+      final list = await _db.getAllBookmarks(userId: _userId);
       state = list;
     } catch (e) {
       debugPrint('❌ Error loading bookmarks: $e');
@@ -390,11 +403,11 @@ class BookmarksNotifier extends StateNotifier<List<db.Bookmark>> {
     final exists = state.any((b) => b.questionId == questionId);
     try {
       if (exists) {
-        await _db.removeBookmark(questionId);
+        await _db.removeBookmark(questionId, userId: _userId);
       } else {
         await _db.insertBookmark(
           db.BookmarksCompanion.insert(
-            userId: Value(_userId),
+            userId: _userId,
             questionId: questionId,
             subject: subject,
             topicId: topicId,
@@ -417,14 +430,16 @@ final bookmarksProvider =
     StateNotifierProvider<BookmarksNotifier, List<db.Bookmark>>((ref) {
       final database = ref.watch(databaseProvider);
       final user = ref.watch(authProvider).user;
-      final userId = user?.id ?? 0;
+      final userId = user?.id ?? guestOwnerId;
       return BookmarksNotifier(database, userId);
     });
 
 // ============= ERROR BOOK =============
 final errorBookProvider = FutureProvider<List<Question>>((ref) async {
   final dbInstance = ref.watch(databaseProvider);
-  final entries = await dbInstance.getErrorBookEntries();
+  final ownerId = ref.watch(currentLocalUserIdProvider);
+  if (ownerId == null) return const [];
+  final entries = await dbInstance.getErrorBookEntries(userId: ownerId);
   final allQuestions = await ref.watch(allQuestionsProvider.future);
   final List<Question> errorQuestions = [];
   for (var entry in entries) {
