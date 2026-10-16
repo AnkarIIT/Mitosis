@@ -7,7 +7,6 @@ import './widgets/topic_progress_bar.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/tokens.dart';
-import '../../core/services/pyq_pdf_downloader_service.dart';
 
 /// Modern, student-focused home screen with quick actions and progress tracking
 class ModernHomeScreen extends ConsumerStatefulWidget {
@@ -18,8 +17,6 @@ class ModernHomeScreen extends ConsumerStatefulWidget {
 }
 
 class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
-  final PyqPdfDownloaderService _pyqService = PyqPdfDownloaderService();
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
