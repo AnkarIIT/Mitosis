@@ -28,19 +28,14 @@ class HomeShellScreen extends ConsumerWidget {
               Expanded(child: navigationShell),
             ],
           ),
-          if (isDesktop)
+          if (isDesktop && sidebarVisible)
             Positioned(
               top: 0,
               right: 0,
-              child: Visible(
-                visible: sidebarVisible,
-                maintainState: true,
-                child: ModernSidebar(
-                  isVisible: sidebarVisible,
-                  onToggle: () =>
-                      ref.read(sidebarVisibilityProvider.notifier).state =
-                          false,
-                ),
+              child: ModernSidebar(
+                isVisible: sidebarVisible,
+                onToggle: () =>
+                    ref.read(sidebarVisibilityProvider.notifier).state = false,
               ),
             ),
         ],
@@ -92,46 +87,58 @@ class _ModernBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = AdaptiveColors.isDark(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AdaptiveColors.cardBackground(context),
-        border: Border(
-          top: BorderSide(color: AdaptiveColors.outlineVariant(context)),
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.fromLTRB(14, 8, 14, 10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AdaptiveColors.cardBackground(context),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: AdaptiveColors.outlineVariant(
+              context,
+            ).withValues(alpha: 0.7),
+          ),
+          boxShadow: AppShadows.raised(isDark),
         ),
-        boxShadow: AppShadows.nav(isDark),
-      ),
-      child: NavigationBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        selectedIndex: currentIndex,
-        onDestinationSelected: onTap,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
-            label: 'Home',
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: NavigationBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            height: 72,
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            selectedIndex: currentIndex,
+            onDestinationSelected: onTap,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home_rounded),
+                label: 'Today',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.school_outlined),
+                selectedIcon: Icon(Icons.school_rounded),
+                label: 'Learn',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.edit_note_outlined),
+                selectedIcon: Icon(Icons.edit_note_rounded),
+                label: 'Practice',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.replay_outlined),
+                selectedIcon: Icon(Icons.replay_rounded),
+                label: 'Review',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.insights_outlined),
+                selectedIcon: Icon(Icons.insights_rounded),
+                label: 'Progress',
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.fact_check_outlined),
-            selectedIcon: Icon(Icons.fact_check_rounded),
-            label: 'Tests',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.menu_book_outlined),
-            selectedIcon: Icon(Icons.menu_book_rounded),
-            label: 'PYQ',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.style_outlined),
-            selectedIcon: Icon(Icons.style_rounded),
-            label: 'Flashcards',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded),
-            label: 'Profile',
-          ),
-        ],
+        ),
       ),
     );
   }
