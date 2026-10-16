@@ -351,22 +351,6 @@ class NcertBookCatalog {
       13,
       'Organisms and Populations',
     );
-    add(
-      'Biology',
-      'Class 12',
-      'Biology_Class_12',
-      'lebo114.pdf',
-      14,
-      'Ecosystem',
-    );
-    add(
-      'Biology',
-      'Class 12',
-      'Biology_Class_12',
-      'lebo115.pdf',
-      15,
-      'Biodiversity and Conservation',
-    );
 
     // ---- Chemistry Class 11 ----
     add(
@@ -420,14 +404,6 @@ class NcertBookCatalog {
     add(
       'Chemistry',
       'Class 11',
-      'Chemistry_Class_11_Part_1',
-      'kech107.pdf',
-      7,
-      'Equilibrium',
-    );
-    add(
-      'Chemistry',
-      'Class 11',
       'Chemistry_Class_11_Part_2',
       'kech201.pdf',
       8,
@@ -448,38 +424,6 @@ class NcertBookCatalog {
       'kech203.pdf',
       10,
       'The s-Block Elements',
-    );
-    add(
-      'Chemistry',
-      'Class 11',
-      'Chemistry_Class_11_Part_2',
-      'kech204.pdf',
-      11,
-      'The p-Block Elements',
-    );
-    add(
-      'Chemistry',
-      'Class 11',
-      'Chemistry_Class_11_Part_2',
-      'kech205.pdf',
-      12,
-      'Organic Chemistry - Some Basic Principles and Techniques',
-    );
-    add(
-      'Chemistry',
-      'Class 11',
-      'Chemistry_Class_11_Part_2',
-      'kech206.pdf',
-      13,
-      'Hydrocarbons',
-    );
-    add(
-      'Chemistry',
-      'Class 11',
-      'Chemistry_Class_11_Part_2',
-      'kech207.pdf',
-      14,
-      'Environmental Chemistry',
     );
 
     // ---- Chemistry Class 12 ----
@@ -526,22 +470,6 @@ class NcertBookCatalog {
     add(
       'Chemistry',
       'Class 12',
-      'Chemistry_Class_12_Part_1',
-      'lech106.pdf',
-      6,
-      'General Principles and Processes of Isolation of Elements',
-    );
-    add(
-      'Chemistry',
-      'Class 12',
-      'Chemistry_Class_12_Part_1',
-      'lech107.pdf',
-      7,
-      'The p-Block Elements',
-    );
-    add(
-      'Chemistry',
-      'Class 12',
       'Chemistry_Class_12_Part_2',
       'lech201.pdf',
       8,
@@ -578,22 +506,6 @@ class NcertBookCatalog {
       'lech205.pdf',
       12,
       'Aldehydes, Ketones and Carboxylic Acids',
-    );
-    add(
-      'Chemistry',
-      'Class 12',
-      'Chemistry_Class_12_Part_2',
-      'lech206.pdf',
-      13,
-      'Amines',
-    );
-    add(
-      'Chemistry',
-      'Class 12',
-      'Chemistry_Class_12_Part_2',
-      'lech207.pdf',
-      14,
-      'Biomolecules',
     );
 
     // ---- Physics Class 11 ----
@@ -814,14 +726,6 @@ class NcertBookCatalog {
       'leph206.pdf',
       13,
       'Nuclei',
-    );
-    add(
-      'Physics',
-      'Class 12',
-      'Physics_Class_12_Part_2',
-      'leph207.pdf',
-      14,
-      'Semiconductor Electronics: Materials, Devices and Simple Circuits',
     );
 
     return list;
