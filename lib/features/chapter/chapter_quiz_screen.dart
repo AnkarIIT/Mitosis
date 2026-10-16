@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/models/chapter_model.dart';
+import '../../core/providers/current_user_provider.dart';
+import '../../core/providers/providers.dart';
 import '../../core/services/chapter_service.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -121,7 +123,11 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
         final option = currentQuestion.options[i];
         final letter = String.fromCharCode(65 + i);
         final isSelected = _answers[_currentIndex] == letter;
-        final isCorrect = letter == currentQuestion.correctAnswer;
+        // QuickCheck.correctAnswer is the OPTION TEXT (chapter_service.dart
+        // stores e.g. 'Nature'), not a letter or an index. Comparing it to
+        // `letter` made this permanently false, so the green highlight never
+        // rendered and every quiz scored 0%.
+        final isCorrect = option == currentQuestion.correctAnswer;
         final showResult = _submitted || _showExplanation;
 
         Color bgColor;
@@ -305,9 +311,12 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
                 _currentIndex == totalQuestions - 1 ? 'Submit' : 'Next',
               ),
               onPressed: _answers.containsKey(_currentIndex)
-                  ? () {
+                  ? () async {
                       if (_currentIndex == totalQuestions - 1) {
                         setState(() => _submitted = true);
+                        // Nothing recorded the score anywhere, so a completed
+                        // chapter never showed progress or completion.
+                        await _recordSummaryScore();
                       } else {
                         setState(() {
                           _showExplanation = false;
@@ -334,7 +343,14 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
     final quiz = chapter!.summaryQuiz;
     int correct = 0;
     for (int i = 0; i < quiz.length; i++) {
-      if (_answers[i] == quiz[i].correctAnswer) correct++;
+      // _answers stores the LETTER; correctAnswer is the option TEXT. Compare
+      // the option the letter points at, or the score is always 0. See the
+      // matching fix in _buildOptions.
+      final letter = _answers[i];
+      if (letter == null || letter.isEmpty) continue;
+      final idx = letter.codeUnitAt(0) - 'A'.codeUnitAt(0);
+      if (idx < 0 || idx >= quiz[i].options.length) continue;
+      if (quiz[i].options[idx] == quiz[i].correctAnswer) correct++;
     }
     final accuracy = quiz.isEmpty ? 0.0 : (correct / quiz.length) * 100;
     final passed = accuracy >= 70;
@@ -427,6 +443,33 @@ class _ChapterQuizScreenState extends ConsumerState<ChapterQuizScreen> {
         ],
       ),
     );
+  }
+
+  /// Persists the summary-quiz score so the chapter landing screen can show
+  /// progress and completion. Never throws — a scoring failure must not strand
+  /// the student on the result screen.
+  Future<void> _recordSummaryScore() async {
+    try {
+      final chapter = ChapterService.getChapter(widget.chapterId);
+      final quiz = chapter?.summaryQuiz ?? const <QuickCheck>[];
+      if (quiz.isEmpty) return;
+      var correct = 0;
+      for (var i = 0; i < quiz.length; i++) {
+        final letter = _answers[i];
+        if (letter == null || letter.isEmpty) continue;
+        final idx = letter.codeUnitAt(0) - 'A'.codeUnitAt(0);
+        if (idx < 0 || idx >= quiz[i].options.length) continue;
+        if (quiz[i].options[idx] == quiz[i].correctAnswer) correct++;
+      }
+      final accuracy = (correct / quiz.length) * 100;
+      final userId = ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
+      await ref
+          .read(databaseProvider)
+          .recordSummaryQuizScore(widget.chapterId, userId, accuracy.round());
+      ref.invalidate(chapterProgressProvider(widget.chapterId));
+    } catch (e) {
+      debugPrint('chapter: failed to record summary quiz score: $e');
+    }
   }
 
   Future<void> _showExitDialog(BuildContext context) async {
