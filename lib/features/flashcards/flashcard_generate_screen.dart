@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/database/drift_database.dart' show FlashcardsCompanion;
 import '../../core/providers/providers.dart';
+import '../../core/providers/current_user_provider.dart';
 import '../../core/services/ncert_book_catalog.dart';
 import '../../core/services/flashcard_generation_service.dart';
 import '../../core/theme/app_colors.dart';
@@ -265,7 +266,7 @@ class _FlashcardGenerateScreenState
                           ).animate().scale(
                             begin: Offset.zero,
                             end: const Offset(1, 1),
-                            curve: Curves.elasticOut,
+                            curve: Curves.easeOutCubic,
                             duration: AppDuration.slow,
                           ),
                           const SizedBox(width: 8),
@@ -432,7 +433,7 @@ class _FlashcardGenerateScreenState
     final chapterId = _selectedChapter?.chapterTitle ?? '';
 
     final companions = _generatedCards.map((card) {
-      final userId = ref.read(authProvider).user?.id ?? 0;
+      final userId = ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
       return FlashcardsCompanion.insert(
         userId: Value(userId),
         id: uuid.v4(),
@@ -489,7 +490,8 @@ class _FlashcardGenerateScreenState
         delayBetweenBatchesMs: 1200,
       );
 
-      // Use streaming variant for progress updates.
+      // Use streaming variant for progress updates AND final cards.
+      var finalCards = <GeneratedFlashcard>[];
       await for (final progress in service.generateFromChapter(
         subject: _selectedSubject!,
         chapterTitle: _selectedChapter!.chapterTitle,
@@ -505,20 +507,14 @@ class _FlashcardGenerateScreenState
           _total = progress.total;
           _lastError = progress.lastError;
         });
+        if (progress.hasCards) {
+          finalCards = progress.cards!;
+        }
       }
 
       if (!mounted) return;
 
-      // Streaming yields progress, not cards. Collect final cards via sync path.
       if (_lastError == null) {
-        final finalCards = await service.generate(
-          subject: _selectedSubject!,
-          chapterTitle: _selectedChapter!.chapterTitle,
-          chapterNumber: _selectedChapter!.chapterNumber,
-          classLevel: _selectedClassLevel!,
-          count: _quantity,
-          assetPathOverride: _selectedChapter!.assetPath,
-        );
         setState(() {
           _isGenerating = false;
           _generatedCards = finalCards;
