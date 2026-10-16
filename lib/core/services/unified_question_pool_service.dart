@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import '../database/drift_database.dart' as db;
 import '../database/question_repository.dart';
 import '../models/question_model.dart';
 import '../services/question_history_service.dart';
@@ -57,7 +56,6 @@ const Map<String, int> _neetChapterWeights = {
 /// Unified question pool service shared by Exam, Quiz, and DPP engines.
 /// Provides centralized question selection, filtering, anti-repetition, and AI generation.
 class UnifiedQuestionPoolService {
-  final db.AppDatabase _db;
   final QuestionRepository _questionRepo;
   final QuestionHistoryService _history;
   final MasteryService _mastery;
@@ -65,7 +63,6 @@ class UnifiedQuestionPoolService {
   final Random _random;
 
   UnifiedQuestionPoolService(
-    this._db,
     this._questionRepo,
     this._history,
     this._mastery, {
@@ -91,7 +88,7 @@ class UnifiedQuestionPoolService {
         request.chapterId,
         request.topicId,
         needed,
-        excludedIds: selected.map((q) => q.id).toSet(),
+        excludeTexts: selected.map((q) => q.questionText).toSet(),
       );
       selected.addAll(aiQuestions);
     }
@@ -209,7 +206,17 @@ class UnifiedQuestionPoolService {
   ) {
     final easyTarget = request.count * request.easyPercent ~/ 100;
     final mediumTarget = request.count * request.mediumPercent ~/ 100;
-    final hardTarget = request.count - easyTarget - mediumTarget;
+    // hardPercent was declared and set by callers but never read here.
+    //
+    // The target is the LARGER of the explicit percentage and the arithmetic
+    // remainder. Taking the percentage alone silently broke the invariant that
+    // the three targets sum to `count`: the recommendation path emits
+    // 30/45/15 (=90) for 100 questions, so the missing 10% fell to the
+    // difficulty-blind backfill instead of to Hard, where it used to go.
+    final hardTarget = max(
+      request.count * request.hardPercent ~/ 100,
+      request.count - easyTarget - mediumTarget,
+    );
 
     final buckets = <List<Question>>[
       pool.where((q) => _normalizeDifficulty(q.difficulty) == 'Easy').toList(),
@@ -368,14 +375,14 @@ class UnifiedQuestionPoolService {
     String? chapterId,
     String? topicId,
     int count, {
-    Set<String>? excludedIds,
+    Set<String>? excludeTexts,
   }) async {
     if (_gemini == null) return [];
 
     try {
       final prompt = _buildAiPrompt(subject, chapterId, topicId, count);
-      final response = await _gemini!.sendMessage(prompt);
-      return _parseAiQuestions(response, subject, excludedIds ?? {});
+      final response = await _gemini.sendMessage(prompt);
+      return _parseAiQuestions(response, subject, excludeTexts ?? const {});
     } catch (e) {
       return [];
     }
@@ -412,16 +419,84 @@ class UnifiedQuestionPoolService {
     return context.toString();
   }
 
+  /// Parses the model's JSON array into [Question]s.
+  ///
+  /// This was an empty stub returning `[]`, which silently made
+  /// `enableAiBackfill` a no-op. Anything unparseable or ungradable is dropped
+  /// rather than surfaced, because a question whose `correctAnswer` matches no
+  /// option would be marked wrong for every student who answered it.
+  /// [excludeTexts] holds the question bodies already on the paper, so the
+  /// model cannot simply regurgitate one back as "new".
   List<Question> _parseAiQuestions(
     String response,
     String subject,
-    Set<String> excludedIds,
+    Set<String> excludeTexts,
   ) {
-    // Parse JSON array from AI response
-    // This is a simplified parser - in production, use a robust JSON parser
+    // The model is asked for a bare array, but routinely wraps it in a ```json
+    // fence or adds a sentence of prose. Parse only the outermost array.
+    final start = response.indexOf('[');
+    final end = response.lastIndexOf(']');
+    if (start == -1 || end <= start) return [];
+
+    final List<dynamic> decoded;
+    try {
+      decoded = jsonDecode(response.substring(start, end + 1)) as List<dynamic>;
+    } catch (_) {
+      return [];
+    }
+
     final questions = <Question>[];
-    // Implementation would parse the JSON and create Question objects
-    // with gen_ prefixed IDs to distinguish AI-generated questions
+    var index = 0;
+    for (final entry in decoded) {
+      if (entry is! Map) continue;
+
+      final text = (entry['questionText'] ?? '').toString().trim();
+      final rawOptions = entry['options'];
+      if (text.isEmpty || rawOptions is! List) continue;
+      if (excludeTexts.contains(text.trim())) continue;
+
+      final options = rawOptions
+          .map((o) => o.toString().trim())
+          .where((o) => o.isNotEmpty)
+          .toList();
+      if (options.length < 2) continue;
+
+      final correctAnswer = (entry['correctAnswer'] ?? '').toString().trim();
+      if (correctAnswer.isEmpty) continue;
+      final grades = options.any(
+        (o) => o.toLowerCase() == correctAnswer.toLowerCase(),
+      );
+      if (!grades) continue;
+
+      final rawTags = entry['tags'];
+      final tags = rawTags is List
+          ? rawTags
+                .map((t) => t.toString().trim().toLowerCase())
+                .where((t) => t.isNotEmpty)
+                .toList()
+          : <String>[];
+
+      questions.add(
+        Question(
+          id: 'gen_${DateTime.now().microsecondsSinceEpoch}_$index',
+          subject: subject,
+          chapter: (entry['chapter'] ?? subject).toString().trim(),
+          topic: (entry['topic'] ?? subject).toString().trim(),
+          topicId: (entry['topicId'] ?? 'ai_generated').toString().trim(),
+          questionText: text,
+          options: options,
+          correctAnswer: correctAnswer,
+          explanation: (entry['explanation'] ?? '').toString().trim(),
+          difficulty: _normalizeDifficulty(
+            (entry['difficulty'] ?? 'Medium').toString(),
+          ),
+          tags: tags,
+          type: 'mcq',
+        ),
+      );
+      index++;
+    }
+
     return questions;
   }
 
@@ -440,33 +515,11 @@ class UnifiedQuestionPoolService {
 
   /// Gets question IDs in cooldown period based on difficulty.
   Future<Set<String>> _getCooldownQuestionIds(List<String> subjects) async {
-    final attempts = await _db.getAllQuizAttempts();
     final cooldownIds = <String>{};
-    final now = DateTime.now();
-
-    for (final attempt in attempts) {
-      if (!subjects.contains(attempt.subject)) continue;
-      final raw = attempt.questionIds;
-      if (raw == null || raw.isEmpty) continue;
-      try {
-        final list = (jsonDecode(raw) as List).cast<String>();
-        final daysSinceAttempt = now.difference(attempt.attemptedAt).inDays;
-
-        for (final qId in list) {
-          // Get question difficulty from database
-          final question = await _questionRepo.getQuestionById(qId);
-          if (question == null) continue;
-
-          final difficulty = _normalizeDifficulty(question.difficulty);
-          final cooldownDays = _cooldownDays[difficulty] ?? 3;
-
-          if (daysSinceAttempt < cooldownDays) {
-            cooldownIds.add(qId);
-          }
-        }
-      } on FormatException {
-        // ignore malformed JSON
-      }
+    for (final subject in subjects) {
+      cooldownIds.addAll(
+        await _history.getCooldownQuestionIds(subject: subject),
+      );
     }
     return cooldownIds;
   }
@@ -474,17 +527,12 @@ class UnifiedQuestionPoolService {
   static String _normalizeDifficulty(String difficulty) {
     final d = difficulty.trim().toLowerCase();
     if (d == 'easy' || d == 'simple') return 'Easy';
-    if (d == 'medium' || d == 'moderate' || d == 'avg' || d == 'average')
+    if (d == 'medium' || d == 'moderate' || d == 'avg' || d == 'average') {
       return 'Medium';
+    }
     if (d == 'hard' || d == 'difficult' || d == 'tough') return 'Hard';
     return 'Medium';
   }
-
-  static const Map<String, int> _cooldownDays = {
-    'Easy': 1,
-    'Medium': 3,
-    'Hard': 7,
-  };
 
   bool _hasConceptOverlap(Question q, Set<String> usedConcepts) {
     final questionConcepts = q.tags.map((t) => t.toLowerCase()).toSet();
