@@ -67,20 +67,22 @@ enum EmailPurpose {
 /// No mail-provider credential ever reaches the device. The Edge Function holds
 /// it in a Supabase secret and is the only thing that talks to the provider.
 ///
-/// ## Known limitation: signed-out callers
+/// ## Signed-out callers
 ///
-/// `send-email` authenticates every request with the caller's Supabase JWT and
-/// binds the recipient to that account's own verified address. Password reset
-/// is requested *while signed out*, so there is no session to present and the
-/// function answers 401. Reset codes are still generated and stored locally in
-/// Drift (see `AuthService.sendPasswordReset`) and the user-facing flow is
-/// deliberately non-committal, so nothing is corrupted — but the email simply
-/// does not go out.
+/// `send-email` authenticates with the caller's Supabase JWT and binds the
+/// recipient to that account's own verified address — with exactly one
+/// exception. Password reset is requested *while signed out*, so there is no
+/// session to present; [shouldAuthenticate] therefore drops the token for that
+/// single template, and the function accepts it without a JWT.
 ///
-/// Closing that needs a server-side reset endpoint that mints its own code
-/// (unauthenticated, fixed templates, per-email and per-IP ceilings, never
-/// revealing whether an account exists). That is a deliberate design decision,
-/// not a patch, and has not been made here.
+/// The unauthenticated path is deliberately narrow: `password_reset` only, a
+/// six-digit code required, and the server replaces `username`/`purpose` with
+/// fixed text so a caller cannot author the body of a branded mail. Abuse is
+/// bounded by per-recipient *and* per-IP ceilings.
+///
+/// Deployment note: the function must be deployed with `--no-verify-jwt`, or
+/// the Supabase gateway rejects the JWT-less request before the handler runs
+/// and reset silently stops working.
 class EmailService {
   /// Bounded so a hung endpoint cannot wedge the OTP/resend button forever.
   static const Duration _timeout = Duration(seconds: 15);
@@ -117,12 +119,6 @@ class EmailService {
     return '$base/functions/v1/send-email';
   }
 
-  /// Sends a transactional email.
-  ///
-  /// [to] must be a single address. [template] selects one of the built-in
-  /// templates rather than accepting raw HTML: a raw-HTML parameter would make
-  /// it far too easy to interpolate untrusted text into a security email, which
-  /// is exactly the injection bug this class previously had.
   /// Whether a request for [template] should carry the session JWT.
   ///
   /// Password reset is requested while SIGNED OUT — there is no session to
@@ -137,6 +133,12 @@ class EmailService {
     return token != null && token.isNotEmpty;
   }
 
+  /// Sends a transactional email.
+  ///
+  /// [to] must be a single address. [template] selects one of the built-in
+  /// templates rather than accepting raw HTML: a raw-HTML parameter would make
+  /// it far too easy to interpolate untrusted text into a security email, which
+  /// is exactly the injection bug this class previously had.
   Future<EmailSendResult> send({
     required String to,
     required EmailTemplate template,
