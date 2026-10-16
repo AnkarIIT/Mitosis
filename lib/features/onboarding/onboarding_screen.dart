@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
+import '../../core/services/onboarding_completion_service.dart';
 
 import 'batch_onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +21,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   final TextEditingController _apiKeyController = TextEditingController();
+  bool _isSaving = false;
+  String? _saveError;
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
@@ -76,70 +80,86 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             },
           ),
           Positioned(
-            bottom: 40,
+            bottom: 28,
             left: 20,
             right: 20,
             // The batch triage page renders its own back/skip/next controls.
             child: _currentPage == _pages.length
                 ? const SizedBox.shrink()
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (_currentPage < _pages.length)
-                        TextButton(
-                          onPressed: () {
-                            _pageController.animateToPage(
-                              _pages.length + 1,
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                          child: Text(
-                            'SKIP',
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w600,
+                : Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AdaptiveColors.surface(context),
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                      border: Border.all(
+                        color: AdaptiveColors.outlineVariant(context),
+                      ),
+                      boxShadow: AppShadows.raised(
+                        AdaptiveColors.isDark(context),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (_currentPage < _pages.length)
+                          TextButton(
+                            onPressed: () {
+                              _pageController.animateToPage(
+                                _pages.length,
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            child: Text(
+                              'SKIP',
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                        )
-                      else
-                        const SizedBox(width: 60),
+                          )
+                        else
+                          const SizedBox(width: 60),
 
-                      Row(
-                        children: List.generate(
-                          _pages.length + 2,
-                          (index) => Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: _currentPage == index ? 24 : 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: _currentPage == index
-                                  ? AppColors.primary
-                                  : AdaptiveColors.outline(context),
-                              borderRadius: BorderRadius.circular(4),
+                        Row(
+                          children: List.generate(
+                            _pages.length + 2,
+                            (index) => Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: _currentPage == index ? 24 : 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: _currentPage == index
+                                    ? AppColors.primary
+                                    : AdaptiveColors.outline(context),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                      if (_currentPage < _pages.length)
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_forward,
-                            color: AppColors.primary,
-                          ),
-                          onPressed: () {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                        )
-                      else
-                        const SizedBox(width: 60),
-                    ],
+                        if (_currentPage < _pages.length)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_forward,
+                              color: AppColors.primary,
+                            ),
+                            onPressed: () {
+                              _pageController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                          )
+                        else
+                          const SizedBox(width: 60),
+                      ],
+                    ),
                   ),
           ),
         ],
@@ -149,27 +169,89 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Widget _buildIntroPage(OnboardingPage page) {
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: const EdgeInsets.fromLTRB(28, 32, 28, 118),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(page.icon, size: 100, color: page.color),
-          const SizedBox(height: 40),
+          Container(
+            width: 210,
+            height: 210,
+            decoration: BoxDecoration(
+              color: page.color.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(64),
+              border: Border.all(color: page.color.withValues(alpha: 0.14)),
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 156,
+                  height: 156,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: page.color.withValues(alpha: 0.14),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 106,
+                  height: 106,
+                  decoration: BoxDecoration(
+                    color: AdaptiveColors.surface(context),
+                    shape: BoxShape.circle,
+                    boxShadow: AppShadows.raised(
+                      AdaptiveColors.isDark(context),
+                    ),
+                  ),
+                  child: Icon(page.icon, size: 52, color: page.color),
+                ),
+                Positioned(
+                  top: 30,
+                  right: 35,
+                  child: _onboardingDot(page.color, 11),
+                ),
+                Positioned(
+                  bottom: 33,
+                  left: 28,
+                  child: _onboardingDot(page.color.withValues(alpha: 0.55), 8),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 34),
           Text(
             page.title,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.35,
+            ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           Text(
             page.description,
             style: TextStyle(
-              fontSize: 16,
-              height: 1.5,
+              fontSize: 15,
+              height: 1.55,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _onboardingDot(Color color, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(color: color.withValues(alpha: 0.25), blurRadius: 10),
         ],
       ),
     );
@@ -188,12 +270,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
           const SizedBox(height: 24),
           const Text(
-            'Final Setup',
+            'Optional AI Tutor',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           Text(
-            'To enable the AI Tutor, enter your free Gemini API Key (you can also do this later in settings).',
+            'Your study plan is ready. Adding a Gemini API key is optional; you can skip this and add it later in Settings.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -203,38 +285,78 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           const SizedBox(height: 32),
           TextField(
             controller: _apiKeyController,
+            enabled: !_isSaving,
             decoration: InputDecoration(
-              hintText: 'Enter Gemini API Key',
-              prefixIcon: const Icon(Icons.vpn_key),
+              labelText: 'Gemini API key (optional)',
+              hintText: 'Paste your API key',
+              prefixIcon: const Icon(Icons.key_rounded),
               filled: true,
-              fillColor: AdaptiveColors.surface(context),
-              border: OutlineInputBorder(
+              fillColor: AdaptiveColors.surfaceWarm(context),
+            ),
+          ),
+          if (_saveError != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.error.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.error.withValues(alpha: 0.35),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _saveError!,
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.4,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: () {
-              // Open link to get API key
-            },
-            child: const Text(
-              'How to get a free key?',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 12,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
+          ],
           const SizedBox(height: 40),
           SizedBox(
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: _completeOnboarding,
-              child: const Text('GET STARTED'),
+              onPressed: _isSaving ? null : _completeOnboarding,
+              child: _isSaving
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    )
+                  : const Text('START STUDYING'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: _isSaving ? null : _completeOnboarding,
+            child: Text(
+              _isSaving ? 'Saving…' : 'Skip for now',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -243,17 +365,44 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _completeOnboarding() async {
-    final key = _apiKeyController.text.trim();
-    if (key.isNotEmpty) {
-      await ref.read(geminiServiceProvider).saveApiKey(key);
+    if (_isSaving) return;
+    setState(() {
+      _isSaving = true;
+      _saveError = null;
+    });
+    try {
+      // The optional AI key must never block first study start: save it
+      // best-effort and continue even if it fails.
+      final key = _apiKeyController.text.trim();
+      if (key.isNotEmpty) {
+        try {
+          await ref.read(geminiServiceProvider).saveApiKey(key);
+        } catch (e) {
+          debugPrint('Optional API key save failed (non-blocking): $e');
+        }
+      }
+
+      final authState = ref.read(authProvider);
+      await OnboardingCompletionService.markComplete(
+        userId: authState.user?.id,
+        isGuest: authState.isGuest,
+      );
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboarding_complete', true);
+      ref.read(onboardingCompleteProvider.notifier).state = true;
+
+      if (!mounted) return;
+      context.go('/');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _saveError =
+            'Could not save your setup (${e.toString().split('\n').first}). Check your connection and tap START STUDYING to retry — your study plan is safe.';
+      });
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_complete', true);
-    ref.read(onboardingCompleteProvider.notifier).state = true;
-
-    if (!mounted) return;
-    context.go('/');
   }
 }
 
