@@ -12,8 +12,9 @@ import '../models/question_model.dart';
 class MasteryService {
   final db.AppDatabase _db;
   final Future<List<Question>> _questionBankFuture;
+  final int userId;
 
-  MasteryService(this._db, this._questionBankFuture);
+  MasteryService(this._db, this._questionBankFuture, {this.userId = -1});
 
   Future<List<Question>> get _bank async => _questionBankFuture;
 
@@ -21,7 +22,7 @@ class MasteryService {
     final result = <String, double>{};
 
     // 1. Topic progress accuracy (0–100).
-    final allProgress = await _db.getAllTopicProgress();
+    final allProgress = await _db.getAllTopicProgress(userId: userId);
     for (final entry in allProgress) {
       final accuracy = entry.questionsAttempted > 0
           ? entry.questionsCorrect / entry.questionsAttempted
@@ -29,17 +30,27 @@ class MasteryService {
       result[entry.topicId] = (accuracy * 100).clamp(0.0, 100.0);
     }
 
-    // 2. Downgrade topics with spaced-repetition cards in early boxes.
-    final cards = await _db.getSpacedRepetitionCards();
+    final questionTopics = <String, String>{};
+    final questions = await _bank;
+    for (final question in questions) {
+      questionTopics[question.id] = question.topicId;
+    }
+
+    // 2. Downgrade the topic owning questions with early review cards.
+    //    Applied ONCE per topic. The loop iterates one row per CARD, so
+    //    multiplying inside it compounded to 0.7^N — a topic with 10 early
+    //    cards collapsed to ~2% mastery after a single review round.
+    final cards = await _db.getSpacedRepetitionCards(userId: userId);
+    final downgraded = <String>{};
     for (final card in cards) {
-      if (card.box <= 2) {
-        final current = result[card.questionId] ?? 50.0;
-        result[card.questionId] = (current * 0.7).clamp(0.0, 100.0);
-      }
+      if (card.box > 2) continue;
+      final topicId = questionTopics[card.questionId];
+      if (topicId == null || !downgraded.add(topicId)) continue;
+      final current = result[topicId] ?? 50.0;
+      result[topicId] = (current * 0.7).clamp(0.0, 100.0);
     }
 
     // 3. Ensure every topic in the question bank has at least a neutral score.
-    final questions = await _bank;
     for (final q in questions) {
       result.putIfAbsent(q.topicId, () => 50.0);
     }
