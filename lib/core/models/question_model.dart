@@ -94,4 +94,14 @@ class Question {
     }
     return raw.split('|||').where((e) => e.isNotEmpty).toList();
   }
+
+  /// JSON-serializable map for checkpoint persistence. Uses the same field
+  /// names as [toMap] so a checkpoint can be round-tripped without a separate
+  /// codec.
+  Map<String, dynamic> toJson() => toMap();
+
+  /// Rebuilds a question from its checkpoint JSON form. Delegates to
+  /// [fromMap] so there is a single deserialization path.
+  factory Question.fromJson(Map<String, dynamic> json) =>
+      Question.fromMap(json);
 }
