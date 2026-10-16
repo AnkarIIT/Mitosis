@@ -7,13 +7,18 @@ import '../services/spaced_repetition_service.dart';
 import 'core_providers.dart';
 import 'content_providers.dart';
 import 'quiz_providers.dart';
-import 'auth_providers.dart';
+
+import 'current_user_provider.dart';
 
 // ============= SPACED REPETITION =============
 final spacedRepetitionCardsProvider =
-    FutureProvider<List<db.SpacedRepetitionData>>(
-      (ref) => ref.watch(databaseProvider).getSpacedRepetitionCards(),
-    );
+    FutureProvider<List<db.SpacedRepetitionData>>((ref) {
+      final owner = ref.watch(currentLocalUserIdProvider);
+      if (owner == null) return Future.value(const <db.SpacedRepetitionData>[]);
+      return ref
+          .watch(databaseProvider)
+          .getSpacedRepetitionCards(userId: owner);
+    });
 
 final spacedRepetitionSummaryProvider = FutureProvider<SpacedRepetitionSummary>(
   (ref) async {
@@ -30,7 +35,12 @@ final spacedRepetitionSummaryProvider = FutureProvider<SpacedRepetitionSummary>(
 
 final dueCardsProvider = FutureProvider<List<Question>>((ref) async {
   final dbInstance = ref.watch(databaseProvider);
-  final due = await dbInstance.getDueSpacedRepetition(DateTime.now());
+  final owner = ref.watch(currentLocalUserIdProvider);
+  if (owner == null) return const [];
+  final due = await dbInstance.getDueSpacedRepetition(
+    DateTime.now(),
+    userId: owner,
+  );
   if (due.isEmpty) return const [];
   final allQuestions = await ref.watch(allQuestionsProvider.future);
   final byId = {for (final q in allQuestions) q.id: q};
@@ -53,8 +63,11 @@ class SpacedReviewRecorder {
     required bool isCorrect,
   }) async {
     final dbInstance = _ref.read(databaseProvider);
-    final userId = _ref.read(authProvider).user?.id ?? 0;
-    final card = await dbInstance.getSpacedRepetition(questionId);
+    final userId = _ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
+    final card = await dbInstance.getSpacedRepetition(
+      questionId,
+      userId: userId,
+    );
     final next = SpacedRepetitionService.review(
       questionId: questionId,
       card: card,
@@ -62,8 +75,29 @@ class SpacedReviewRecorder {
       userId: userId,
     );
     await dbInstance.upsertSpacedRepetition(next);
+    final questions = await _ref.read(allQuestionsProvider.future);
+    Question? reviewedQuestion;
+    for (final question in questions) {
+      if (question.id == questionId) {
+        reviewedQuestion = question;
+        break;
+      }
+    }
+    if (reviewedQuestion != null &&
+        const [3, 7, 14].contains(next.intervalDays)) {
+      await dbInstance.recordRetentionReview(
+        db.RetentionReviewsCompanion.insert(
+          userId: Value(userId),
+          topicId: reviewedQuestion.topicId,
+          intervalDays: next.intervalDays,
+          dueAt: next.dueAt,
+          checkedAt: DateTime.now(),
+          accuracy: Value(isCorrect ? 100 : 0),
+        ),
+      );
+    }
     if (isCorrect) {
-      await dbInstance.removeFromErrorBook(questionId);
+      await dbInstance.removeFromErrorBook(questionId, userId: userId);
     } else {
       await dbInstance.addToErrorBook(
         db.ErrorBookCompanion.insert(
