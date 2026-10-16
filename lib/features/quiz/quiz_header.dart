@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/question_model.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/utils/answer_normalizer.dart';
 
 /// Header widget for quiz screen showing topic name, timer, and progress
 class QuizHeader extends ConsumerWidget {
@@ -99,32 +99,53 @@ class QuizQuestionCounter extends ConsumerWidget {
 class QuizScoreIndicator extends ConsumerWidget {
   final String? selectedAnswer;
   final String? correctAnswer;
+  final int marksPerCorrect;
+  final int marksPerWrong;
 
   const QuizScoreIndicator({
     super.key,
     required this.selectedAnswer,
     required this.correctAnswer,
+    this.marksPerCorrect = 4,
+    this.marksPerWrong = -1,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (selectedAnswer == null) return const SizedBox.shrink();
 
-    final isCorrect = selectedAnswer == correctAnswer;
+    final isCorrect = AnswerNormalizer.isCorrect(
+      selectedAnswer!,
+      Question(
+        id: '',
+        subject: '',
+        chapter: '',
+        topic: '',
+        topicId: '',
+        questionText: '',
+        options: [],
+        correctAnswer: correctAnswer!,
+        difficulty: '',
+        tags: [],
+        type: 'mcq',
+      ),
+    );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isCorrect
-            ? AppColors.success.withValues(alpha: 0.1)
-            : AppColors.error.withValues(alpha: 0.1),
+            ? AdaptiveColors.success(context).withValues(alpha: 0.1)
+            : AdaptiveColors.error(context).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        isCorrect ? '+4 NEET' : '-1 NEET',
+        isCorrect ? '+$marksPerCorrect' : '$marksPerWrong',
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
-          color: isCorrect ? AppColors.success : AppColors.error,
+          color: isCorrect
+              ? AdaptiveColors.success(context)
+              : AdaptiveColors.error(context),
         ),
       ),
     );
