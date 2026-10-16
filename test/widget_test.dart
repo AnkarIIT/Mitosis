@@ -6,6 +6,7 @@ import 'package:neet_mitos/core/database/drift_database.dart';
 import 'package:neet_mitos/core/models/question_model.dart' as model;
 import 'package:neet_mitos/core/models/subject_model.dart';
 import 'package:neet_mitos/core/providers/providers.dart';
+import 'package:neet_mitos/core/services/question_inventory_service.dart';
 import 'package:neet_mitos/core/services/connectivity_service.dart';
 import 'package:neet_mitos/features/settings/settings_screen.dart';
 import 'package:neet_mitos/features/profile/profile_screen.dart';
@@ -59,6 +60,25 @@ GoRouter _testRouter({required Widget child}) {
 void main() {
   ConnectivityService.instance.setSkipNetworkCheck(true);
 
+  /// The home screen renders an indeterminate CircularProgressIndicator while
+  /// `neet2024ReadinessProvider` is pending, and that provider queries the real
+  /// database Ã¢â‚¬â€ which never resolves under `flutter test`. An indeterminate
+  /// spinner animates forever, so `pumpAndSettle` timed out on every home test.
+  /// Supplying a resolved result is the fix; the assertions below are unchanged.
+  List<Override> _homeOverrides() => [
+    authProvider.overrideWith((ref) => _FakeAuthNotifier()),
+    onboardingCompleteProvider.overrideWith((ref) => true),
+    neet2024ReadinessProvider.overrideWith(
+      (ref) async => const MockInventoryResult(
+        mockName: 'NEET 2024 Mock',
+        requirements: {'Physics': 180},
+        available: {'Physics': 180},
+        shortages: {},
+        isReady: true,
+      ),
+    ),
+  ];
+
   test('AppDatabase returns a single shared instance', () {
     final first = AppDatabase();
     final second = AppDatabase();
@@ -67,17 +87,11 @@ void main() {
   });
 
   testWidgets('Home screen smoke test', (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+    SharedPreferences.setMockInitialValues({'onboarding_complete_guest': true});
 
     await tester.binding.setSurfaceSize(const Size(420, 900));
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          authProvider.overrideWith((ref) => _FakeAuthNotifier()),
-          onboardingCompleteProvider.overrideWith((ref) => true),
-        ],
-        child: const MyApp(),
-      ),
+      ProviderScope(overrides: _homeOverrides(), child: const MyApp()),
     );
     await tester.pumpAndSettle();
 
@@ -100,17 +114,11 @@ void main() {
   testWidgets('Home screen shows ongoing progress section', (
     WidgetTester tester,
   ) async {
-    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+    SharedPreferences.setMockInitialValues({'onboarding_complete_guest': true});
 
     await tester.binding.setSurfaceSize(const Size(420, 900));
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          authProvider.overrideWith((ref) => _FakeAuthNotifier()),
-          onboardingCompleteProvider.overrideWith((ref) => true),
-        ],
-        child: const MyApp(),
-      ),
+      ProviderScope(overrides: _homeOverrides(), child: const MyApp()),
     );
     await tester.pumpAndSettle();
 
@@ -120,14 +128,13 @@ void main() {
   testWidgets('Weak Topics quick action opens the progress dashboard', (
     WidgetTester tester,
   ) async {
-    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+    SharedPreferences.setMockInitialValues({'onboarding_complete_guest': true});
 
     await tester.binding.setSurfaceSize(const Size(420, 900));
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          authProvider.overrideWith((ref) => _FakeAuthNotifier()),
-          onboardingCompleteProvider.overrideWith((ref) => true),
+          ..._homeOverrides(),
           weakTopicsProvider.overrideWith(
             (ref) => [
               Topic(
@@ -287,7 +294,8 @@ void main() {
 
 class _FakeAuthNotifier extends StateNotifier<AuthState>
     implements AuthNotifier {
-  _FakeAuthNotifier() : super(AuthState(status: AuthStatus.authenticated));
+  _FakeAuthNotifier()
+    : super(AuthState(status: AuthStatus.authenticated, isGuest: true));
 
   @override
   Future<void> checkAuth() async {}
