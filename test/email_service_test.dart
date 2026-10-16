@@ -17,6 +17,62 @@ import 'package:neet_mitos/core/services/email_service.dart';
 /// The service now sends a template *name* to a derived endpoint, so HTML is
 /// owned by the server and user text cannot reach a security email unescaped.
 void main() {
+  group('auth policy', () {
+    // Regression: `EmailService` originally sent only the `apikey` header and
+    // no Authorization at all, so `send-email` — which requires
+    // `Authorization: Bearer <jwt>` — rejected EVERY call with 401. Password
+    // reset and 2FA mail never left the device. This locks the rule that fixes
+    // it without needing a live Supabase project.
+    test('password reset never sends a session token', () {
+      expect(
+        EmailService.shouldAuthenticate(EmailTemplate.passwordReset, 'jwt'),
+        isFalse,
+      );
+      expect(
+        EmailService.shouldAuthenticate(EmailTemplate.passwordReset, null),
+        isFalse,
+      );
+    });
+
+    test('every other template authenticates when a token exists', () {
+      for (final template in EmailTemplate.values) {
+        if (template == EmailTemplate.passwordReset) continue;
+        expect(
+          EmailService.shouldAuthenticate(template, 'jwt'),
+          isTrue,
+          reason: '${template.wireName} must authenticate',
+        );
+      }
+    });
+
+    test('no template sends a token when there is no session', () {
+      for (final template in EmailTemplate.values) {
+        expect(
+          EmailService.shouldAuthenticate(template, null),
+          isFalse,
+          reason: '${template.wireName} cannot invent a token',
+        );
+        expect(
+          EmailService.shouldAuthenticate(template, ''),
+          isFalse,
+          reason: '${template.wireName} treated an empty token as valid',
+        );
+      }
+    });
+
+    test('password reset is the only unauthenticated template', () {
+      final unauthenticated = EmailTemplate.values
+          .where((t) => !EmailService.shouldAuthenticate(t, 'jwt'))
+          .toList();
+      expect(
+        unauthenticated,
+        [EmailTemplate.passwordReset],
+        reason:
+            'widening the unauthenticated set turns this into an open relay',
+      );
+    });
+  });
+
   group('escapeHtml', () {
     test('escapes every HTML-significant character', () {
       expect(
