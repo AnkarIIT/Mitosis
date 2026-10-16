@@ -9,8 +9,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import '../../core/providers/providers.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/database/drift_database.dart';
+import '../../core/providers/current_user_provider.dart';
 
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
@@ -217,7 +217,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     _scrollToBottom();
 
     // Persist user message
-    final userId = ref.read(authProvider).user?.id ?? 0;
+    final userId = ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
     await db.insertChatMessage(
       ChatsCompanion.insert(
         userId: Value(userId),
@@ -252,7 +252,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
       _scrollToBottom();
 
       // Persist AI response
-      final userId = ref.read(authProvider).user?.id ?? 0;
+      final userId = ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
       await db.insertChatMessage(
         ChatsCompanion.insert(
           userId: Value(userId),
@@ -319,9 +319,12 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Watched (not just read) so the setup banner appears/disappears the
+    // moment a key is saved or removed — no dialog-chasing on every tap.
+    final isConfigured = ref.watch(geminiServiceProvider).isConfigured;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AI Doubt Solver 🤖'),
+        title: const Text('AI Doubt Solver'),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),
@@ -371,12 +374,9 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
-                return _buildMessageBubble(message).animate().fade().scaleXY(
-                  begin: 0.8,
-                  end: 1.0,
-                  curve: Curves.easeOutBack,
-                  duration: 300.ms,
-                );
+                // Fade only: the old easeOutBack scale replayed on every
+                // rebuild and felt jittery in long threads.
+                return _buildMessageBubble(message).animate().fade();
               },
             ),
           ),
@@ -421,6 +421,50 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
 
           if (_messages.length <= 1) _buildSuggestedPrompts(),
 
+          // Persistent setup path when unconfigured: tapping chips or send
+          // otherwise only ever opens a dialog that dumps you back here.
+          if (!isConfigured)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: AdaptiveColors.primary(
+                    context,
+                  ).withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AdaptiveColors.primary(
+                      context,
+                    ).withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.key_rounded,
+                      size: 18,
+                      color: AdaptiveColors.primary(context),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'AI Tutor needs a free Gemini API key to answer.',
+                        style: TextStyle(fontSize: 12, height: 1.4),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => context.push('/settings'),
+                      child: const Text('SET UP'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           _buildInputArea(),
         ],
       ),
@@ -432,6 +476,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     final String displayText = isError
         ? message.text.substring(11)
         : message.text;
+    final scheme = Theme.of(context).colorScheme;
 
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -445,13 +490,13 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
           color: message.isUser
               ? AdaptiveColors.primary(context)
               : (isError
-                    ? AppColors.errorLight
+                    ? scheme.errorContainer
                     : AdaptiveColors.surfaceContainerHighest(context)),
           borderRadius: BorderRadius.circular(16).copyWith(
             bottomRight: message.isUser ? const Radius.circular(0) : null,
             bottomLeft: !message.isUser ? const Radius.circular(0) : null,
           ),
-          border: isError ? Border.all(color: AppColors.error) : null,
+          border: isError ? Border.all(color: scheme.error) : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +521,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                   color: message.isUser
                       ? AdaptiveColors.onPrimary(context)
                       : (isError
-                            ? AppColors.error
+                            ? scheme.onErrorContainer
                             : AdaptiveColors.textPrimary(context)),
                 ),
               ),
@@ -615,19 +660,17 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
             ),
             const SizedBox(width: 12),
             CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AdaptiveColors.primary(context),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.send,
-                      color: AdaptiveColors.onPrimary(context),
-                    ),
-                    onPressed: () => _sendMessage(_messageController.text),
-                  ),
-                )
-                .animate(target: _isLoading ? 0 : 1)
-                .scaleXY(end: 1.1)
-                .shake(hz: 4, curve: Curves.easeInOutCubic),
+              radius: 24,
+              backgroundColor: AdaptiveColors.primary(context),
+              child: IconButton(
+                icon: Icon(
+                  Icons.send,
+                  color: AdaptiveColors.onPrimary(context),
+                ),
+                tooltip: 'Send',
+                onPressed: () => _sendMessage(_messageController.text),
+              ),
+            ),
           ],
         ),
       ),
