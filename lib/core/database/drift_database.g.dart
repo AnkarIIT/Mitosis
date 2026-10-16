@@ -3930,8 +3930,7 @@ class $BookmarksTable extends Bookmarks
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _questionIdMeta = const VerificationMeta(
     'questionId',
@@ -4019,6 +4018,8 @@ class $BookmarksTable extends Bookmarks
         _userIdMeta,
         userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
       );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
     }
     if (data.containsKey('question_id')) {
       context.handle(
@@ -4271,13 +4272,14 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
   });
   BookmarksCompanion.insert({
     this.id = const Value.absent(),
-    this.userId = const Value.absent(),
+    required int userId,
     required String questionId,
     required String subject,
     required String topicId,
     required DateTime bookmarkedAt,
     this.updatedAt = const Value.absent(),
-  }) : questionId = Value(questionId),
+  }) : userId = Value(userId),
+       questionId = Value(questionId),
        subject = Value(subject),
        topicId = Value(topicId),
        bookmarkedAt = Value(bookmarkedAt);
@@ -5397,6 +5399,73 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _twoFactorAttemptsMeta = const VerificationMeta(
+    'twoFactorAttempts',
+  );
+  @override
+  late final GeneratedColumn<int> twoFactorAttempts = GeneratedColumn<int>(
+    'two_factor_attempts',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _twoFactorLockedUntilMeta =
+      const VerificationMeta('twoFactorLockedUntil');
+  @override
+  late final GeneratedColumn<DateTime> twoFactorLockedUntil =
+      GeneratedColumn<DateTime>(
+        'two_factor_locked_until',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _twoFactorLastSentAtMeta =
+      const VerificationMeta('twoFactorLastSentAt');
+  @override
+  late final GeneratedColumn<DateTime> twoFactorLastSentAt =
+      GeneratedColumn<DateTime>(
+        'two_factor_last_sent_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _passwordResetAttemptsMeta =
+      const VerificationMeta('passwordResetAttempts');
+  @override
+  late final GeneratedColumn<int> passwordResetAttempts = GeneratedColumn<int>(
+    'password_reset_attempts',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _passwordResetLockedUntilMeta =
+      const VerificationMeta('passwordResetLockedUntil');
+  @override
+  late final GeneratedColumn<DateTime> passwordResetLockedUntil =
+      GeneratedColumn<DateTime>(
+        'password_reset_locked_until',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _passwordResetLastSentAtMeta =
+      const VerificationMeta('passwordResetLastSentAt');
+  @override
+  late final GeneratedColumn<DateTime> passwordResetLastSentAt =
+      GeneratedColumn<DateTime>(
+        'password_reset_last_sent_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5423,6 +5492,12 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     supabaseId,
     failedLoginAttempts,
     lockedUntil,
+    twoFactorAttempts,
+    twoFactorLockedUntil,
+    twoFactorLastSentAt,
+    passwordResetAttempts,
+    passwordResetLockedUntil,
+    passwordResetLastSentAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5618,6 +5693,60 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         ),
       );
     }
+    if (data.containsKey('two_factor_attempts')) {
+      context.handle(
+        _twoFactorAttemptsMeta,
+        twoFactorAttempts.isAcceptableOrUnknown(
+          data['two_factor_attempts']!,
+          _twoFactorAttemptsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('two_factor_locked_until')) {
+      context.handle(
+        _twoFactorLockedUntilMeta,
+        twoFactorLockedUntil.isAcceptableOrUnknown(
+          data['two_factor_locked_until']!,
+          _twoFactorLockedUntilMeta,
+        ),
+      );
+    }
+    if (data.containsKey('two_factor_last_sent_at')) {
+      context.handle(
+        _twoFactorLastSentAtMeta,
+        twoFactorLastSentAt.isAcceptableOrUnknown(
+          data['two_factor_last_sent_at']!,
+          _twoFactorLastSentAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('password_reset_attempts')) {
+      context.handle(
+        _passwordResetAttemptsMeta,
+        passwordResetAttempts.isAcceptableOrUnknown(
+          data['password_reset_attempts']!,
+          _passwordResetAttemptsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('password_reset_locked_until')) {
+      context.handle(
+        _passwordResetLockedUntilMeta,
+        passwordResetLockedUntil.isAcceptableOrUnknown(
+          data['password_reset_locked_until']!,
+          _passwordResetLockedUntilMeta,
+        ),
+      );
+    }
+    if (data.containsKey('password_reset_last_sent_at')) {
+      context.handle(
+        _passwordResetLastSentAtMeta,
+        passwordResetLastSentAt.isAcceptableOrUnknown(
+          data['password_reset_last_sent_at']!,
+          _passwordResetLastSentAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -5723,6 +5852,30 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}locked_until'],
       ),
+      twoFactorAttempts: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}two_factor_attempts'],
+      )!,
+      twoFactorLockedUntil: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}two_factor_locked_until'],
+      ),
+      twoFactorLastSentAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}two_factor_last_sent_at'],
+      ),
+      passwordResetAttempts: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}password_reset_attempts'],
+      )!,
+      passwordResetLockedUntil: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}password_reset_locked_until'],
+      ),
+      passwordResetLastSentAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}password_reset_last_sent_at'],
+      ),
     );
   }
 
@@ -5757,6 +5910,12 @@ class User extends DataClass implements Insertable<User> {
   final String? supabaseId;
   final int failedLoginAttempts;
   final DateTime? lockedUntil;
+  final int twoFactorAttempts;
+  final DateTime? twoFactorLockedUntil;
+  final DateTime? twoFactorLastSentAt;
+  final int passwordResetAttempts;
+  final DateTime? passwordResetLockedUntil;
+  final DateTime? passwordResetLastSentAt;
   const User({
     required this.id,
     this.email,
@@ -5782,6 +5941,12 @@ class User extends DataClass implements Insertable<User> {
     this.supabaseId,
     required this.failedLoginAttempts,
     this.lockedUntil,
+    required this.twoFactorAttempts,
+    this.twoFactorLockedUntil,
+    this.twoFactorLastSentAt,
+    required this.passwordResetAttempts,
+    this.passwordResetLockedUntil,
+    this.passwordResetLastSentAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5842,6 +6007,24 @@ class User extends DataClass implements Insertable<User> {
     if (!nullToAbsent || lockedUntil != null) {
       map['locked_until'] = Variable<DateTime>(lockedUntil);
     }
+    map['two_factor_attempts'] = Variable<int>(twoFactorAttempts);
+    if (!nullToAbsent || twoFactorLockedUntil != null) {
+      map['two_factor_locked_until'] = Variable<DateTime>(twoFactorLockedUntil);
+    }
+    if (!nullToAbsent || twoFactorLastSentAt != null) {
+      map['two_factor_last_sent_at'] = Variable<DateTime>(twoFactorLastSentAt);
+    }
+    map['password_reset_attempts'] = Variable<int>(passwordResetAttempts);
+    if (!nullToAbsent || passwordResetLockedUntil != null) {
+      map['password_reset_locked_until'] = Variable<DateTime>(
+        passwordResetLockedUntil,
+      );
+    }
+    if (!nullToAbsent || passwordResetLastSentAt != null) {
+      map['password_reset_last_sent_at'] = Variable<DateTime>(
+        passwordResetLastSentAt,
+      );
+    }
     return map;
   }
 
@@ -5901,6 +6084,20 @@ class User extends DataClass implements Insertable<User> {
       lockedUntil: lockedUntil == null && nullToAbsent
           ? const Value.absent()
           : Value(lockedUntil),
+      twoFactorAttempts: Value(twoFactorAttempts),
+      twoFactorLockedUntil: twoFactorLockedUntil == null && nullToAbsent
+          ? const Value.absent()
+          : Value(twoFactorLockedUntil),
+      twoFactorLastSentAt: twoFactorLastSentAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(twoFactorLastSentAt),
+      passwordResetAttempts: Value(passwordResetAttempts),
+      passwordResetLockedUntil: passwordResetLockedUntil == null && nullToAbsent
+          ? const Value.absent()
+          : Value(passwordResetLockedUntil),
+      passwordResetLastSentAt: passwordResetLastSentAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(passwordResetLastSentAt),
     );
   }
 
@@ -5946,6 +6143,22 @@ class User extends DataClass implements Insertable<User> {
         json['failedLoginAttempts'],
       ),
       lockedUntil: serializer.fromJson<DateTime?>(json['lockedUntil']),
+      twoFactorAttempts: serializer.fromJson<int>(json['twoFactorAttempts']),
+      twoFactorLockedUntil: serializer.fromJson<DateTime?>(
+        json['twoFactorLockedUntil'],
+      ),
+      twoFactorLastSentAt: serializer.fromJson<DateTime?>(
+        json['twoFactorLastSentAt'],
+      ),
+      passwordResetAttempts: serializer.fromJson<int>(
+        json['passwordResetAttempts'],
+      ),
+      passwordResetLockedUntil: serializer.fromJson<DateTime?>(
+        json['passwordResetLockedUntil'],
+      ),
+      passwordResetLastSentAt: serializer.fromJson<DateTime?>(
+        json['passwordResetLastSentAt'],
+      ),
     );
   }
   @override
@@ -5978,6 +6191,18 @@ class User extends DataClass implements Insertable<User> {
       'supabaseId': serializer.toJson<String?>(supabaseId),
       'failedLoginAttempts': serializer.toJson<int>(failedLoginAttempts),
       'lockedUntil': serializer.toJson<DateTime?>(lockedUntil),
+      'twoFactorAttempts': serializer.toJson<int>(twoFactorAttempts),
+      'twoFactorLockedUntil': serializer.toJson<DateTime?>(
+        twoFactorLockedUntil,
+      ),
+      'twoFactorLastSentAt': serializer.toJson<DateTime?>(twoFactorLastSentAt),
+      'passwordResetAttempts': serializer.toJson<int>(passwordResetAttempts),
+      'passwordResetLockedUntil': serializer.toJson<DateTime?>(
+        passwordResetLockedUntil,
+      ),
+      'passwordResetLastSentAt': serializer.toJson<DateTime?>(
+        passwordResetLastSentAt,
+      ),
     };
   }
 
@@ -6006,6 +6231,12 @@ class User extends DataClass implements Insertable<User> {
     Value<String?> supabaseId = const Value.absent(),
     int? failedLoginAttempts,
     Value<DateTime?> lockedUntil = const Value.absent(),
+    int? twoFactorAttempts,
+    Value<DateTime?> twoFactorLockedUntil = const Value.absent(),
+    Value<DateTime?> twoFactorLastSentAt = const Value.absent(),
+    int? passwordResetAttempts,
+    Value<DateTime?> passwordResetLockedUntil = const Value.absent(),
+    Value<DateTime?> passwordResetLastSentAt = const Value.absent(),
   }) => User(
     id: id ?? this.id,
     email: email.present ? email.value : this.email,
@@ -6043,6 +6274,20 @@ class User extends DataClass implements Insertable<User> {
     supabaseId: supabaseId.present ? supabaseId.value : this.supabaseId,
     failedLoginAttempts: failedLoginAttempts ?? this.failedLoginAttempts,
     lockedUntil: lockedUntil.present ? lockedUntil.value : this.lockedUntil,
+    twoFactorAttempts: twoFactorAttempts ?? this.twoFactorAttempts,
+    twoFactorLockedUntil: twoFactorLockedUntil.present
+        ? twoFactorLockedUntil.value
+        : this.twoFactorLockedUntil,
+    twoFactorLastSentAt: twoFactorLastSentAt.present
+        ? twoFactorLastSentAt.value
+        : this.twoFactorLastSentAt,
+    passwordResetAttempts: passwordResetAttempts ?? this.passwordResetAttempts,
+    passwordResetLockedUntil: passwordResetLockedUntil.present
+        ? passwordResetLockedUntil.value
+        : this.passwordResetLockedUntil,
+    passwordResetLastSentAt: passwordResetLastSentAt.present
+        ? passwordResetLastSentAt.value
+        : this.passwordResetLastSentAt,
   );
   User copyWithCompanion(UsersCompanion data) {
     return User(
@@ -6100,6 +6345,24 @@ class User extends DataClass implements Insertable<User> {
       lockedUntil: data.lockedUntil.present
           ? data.lockedUntil.value
           : this.lockedUntil,
+      twoFactorAttempts: data.twoFactorAttempts.present
+          ? data.twoFactorAttempts.value
+          : this.twoFactorAttempts,
+      twoFactorLockedUntil: data.twoFactorLockedUntil.present
+          ? data.twoFactorLockedUntil.value
+          : this.twoFactorLockedUntil,
+      twoFactorLastSentAt: data.twoFactorLastSentAt.present
+          ? data.twoFactorLastSentAt.value
+          : this.twoFactorLastSentAt,
+      passwordResetAttempts: data.passwordResetAttempts.present
+          ? data.passwordResetAttempts.value
+          : this.passwordResetAttempts,
+      passwordResetLockedUntil: data.passwordResetLockedUntil.present
+          ? data.passwordResetLockedUntil.value
+          : this.passwordResetLockedUntil,
+      passwordResetLastSentAt: data.passwordResetLastSentAt.present
+          ? data.passwordResetLastSentAt.value
+          : this.passwordResetLastSentAt,
     );
   }
 
@@ -6129,7 +6392,13 @@ class User extends DataClass implements Insertable<User> {
           ..write('twoFactorExpiresAt: $twoFactorExpiresAt, ')
           ..write('supabaseId: $supabaseId, ')
           ..write('failedLoginAttempts: $failedLoginAttempts, ')
-          ..write('lockedUntil: $lockedUntil')
+          ..write('lockedUntil: $lockedUntil, ')
+          ..write('twoFactorAttempts: $twoFactorAttempts, ')
+          ..write('twoFactorLockedUntil: $twoFactorLockedUntil, ')
+          ..write('twoFactorLastSentAt: $twoFactorLastSentAt, ')
+          ..write('passwordResetAttempts: $passwordResetAttempts, ')
+          ..write('passwordResetLockedUntil: $passwordResetLockedUntil, ')
+          ..write('passwordResetLastSentAt: $passwordResetLastSentAt')
           ..write(')'))
         .toString();
   }
@@ -6160,6 +6429,12 @@ class User extends DataClass implements Insertable<User> {
     supabaseId,
     failedLoginAttempts,
     lockedUntil,
+    twoFactorAttempts,
+    twoFactorLockedUntil,
+    twoFactorLastSentAt,
+    passwordResetAttempts,
+    passwordResetLockedUntil,
+    passwordResetLastSentAt,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -6188,7 +6463,13 @@ class User extends DataClass implements Insertable<User> {
           other.twoFactorExpiresAt == this.twoFactorExpiresAt &&
           other.supabaseId == this.supabaseId &&
           other.failedLoginAttempts == this.failedLoginAttempts &&
-          other.lockedUntil == this.lockedUntil);
+          other.lockedUntil == this.lockedUntil &&
+          other.twoFactorAttempts == this.twoFactorAttempts &&
+          other.twoFactorLockedUntil == this.twoFactorLockedUntil &&
+          other.twoFactorLastSentAt == this.twoFactorLastSentAt &&
+          other.passwordResetAttempts == this.passwordResetAttempts &&
+          other.passwordResetLockedUntil == this.passwordResetLockedUntil &&
+          other.passwordResetLastSentAt == this.passwordResetLastSentAt);
 }
 
 class UsersCompanion extends UpdateCompanion<User> {
@@ -6216,6 +6497,12 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<String?> supabaseId;
   final Value<int> failedLoginAttempts;
   final Value<DateTime?> lockedUntil;
+  final Value<int> twoFactorAttempts;
+  final Value<DateTime?> twoFactorLockedUntil;
+  final Value<DateTime?> twoFactorLastSentAt;
+  final Value<int> passwordResetAttempts;
+  final Value<DateTime?> passwordResetLockedUntil;
+  final Value<DateTime?> passwordResetLastSentAt;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.email = const Value.absent(),
@@ -6241,6 +6528,12 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.supabaseId = const Value.absent(),
     this.failedLoginAttempts = const Value.absent(),
     this.lockedUntil = const Value.absent(),
+    this.twoFactorAttempts = const Value.absent(),
+    this.twoFactorLockedUntil = const Value.absent(),
+    this.twoFactorLastSentAt = const Value.absent(),
+    this.passwordResetAttempts = const Value.absent(),
+    this.passwordResetLockedUntil = const Value.absent(),
+    this.passwordResetLastSentAt = const Value.absent(),
   });
   UsersCompanion.insert({
     this.id = const Value.absent(),
@@ -6267,6 +6560,12 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.supabaseId = const Value.absent(),
     this.failedLoginAttempts = const Value.absent(),
     this.lockedUntil = const Value.absent(),
+    this.twoFactorAttempts = const Value.absent(),
+    this.twoFactorLockedUntil = const Value.absent(),
+    this.twoFactorLastSentAt = const Value.absent(),
+    this.passwordResetAttempts = const Value.absent(),
+    this.passwordResetLockedUntil = const Value.absent(),
+    this.passwordResetLastSentAt = const Value.absent(),
   }) : username = Value(username);
   static Insertable<User> custom({
     Expression<int>? id,
@@ -6293,6 +6592,12 @@ class UsersCompanion extends UpdateCompanion<User> {
     Expression<String>? supabaseId,
     Expression<int>? failedLoginAttempts,
     Expression<DateTime>? lockedUntil,
+    Expression<int>? twoFactorAttempts,
+    Expression<DateTime>? twoFactorLockedUntil,
+    Expression<DateTime>? twoFactorLastSentAt,
+    Expression<int>? passwordResetAttempts,
+    Expression<DateTime>? passwordResetLockedUntil,
+    Expression<DateTime>? passwordResetLastSentAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -6324,6 +6629,17 @@ class UsersCompanion extends UpdateCompanion<User> {
       if (failedLoginAttempts != null)
         'failed_login_attempts': failedLoginAttempts,
       if (lockedUntil != null) 'locked_until': lockedUntil,
+      if (twoFactorAttempts != null) 'two_factor_attempts': twoFactorAttempts,
+      if (twoFactorLockedUntil != null)
+        'two_factor_locked_until': twoFactorLockedUntil,
+      if (twoFactorLastSentAt != null)
+        'two_factor_last_sent_at': twoFactorLastSentAt,
+      if (passwordResetAttempts != null)
+        'password_reset_attempts': passwordResetAttempts,
+      if (passwordResetLockedUntil != null)
+        'password_reset_locked_until': passwordResetLockedUntil,
+      if (passwordResetLastSentAt != null)
+        'password_reset_last_sent_at': passwordResetLastSentAt,
     });
   }
 
@@ -6352,6 +6668,12 @@ class UsersCompanion extends UpdateCompanion<User> {
     Value<String?>? supabaseId,
     Value<int>? failedLoginAttempts,
     Value<DateTime?>? lockedUntil,
+    Value<int>? twoFactorAttempts,
+    Value<DateTime?>? twoFactorLockedUntil,
+    Value<DateTime?>? twoFactorLastSentAt,
+    Value<int>? passwordResetAttempts,
+    Value<DateTime?>? passwordResetLockedUntil,
+    Value<DateTime?>? passwordResetLastSentAt,
   }) {
     return UsersCompanion(
       id: id ?? this.id,
@@ -6380,6 +6702,15 @@ class UsersCompanion extends UpdateCompanion<User> {
       supabaseId: supabaseId ?? this.supabaseId,
       failedLoginAttempts: failedLoginAttempts ?? this.failedLoginAttempts,
       lockedUntil: lockedUntil ?? this.lockedUntil,
+      twoFactorAttempts: twoFactorAttempts ?? this.twoFactorAttempts,
+      twoFactorLockedUntil: twoFactorLockedUntil ?? this.twoFactorLockedUntil,
+      twoFactorLastSentAt: twoFactorLastSentAt ?? this.twoFactorLastSentAt,
+      passwordResetAttempts:
+          passwordResetAttempts ?? this.passwordResetAttempts,
+      passwordResetLockedUntil:
+          passwordResetLockedUntil ?? this.passwordResetLockedUntil,
+      passwordResetLastSentAt:
+          passwordResetLastSentAt ?? this.passwordResetLastSentAt,
     );
   }
 
@@ -6464,6 +6795,34 @@ class UsersCompanion extends UpdateCompanion<User> {
     if (lockedUntil.present) {
       map['locked_until'] = Variable<DateTime>(lockedUntil.value);
     }
+    if (twoFactorAttempts.present) {
+      map['two_factor_attempts'] = Variable<int>(twoFactorAttempts.value);
+    }
+    if (twoFactorLockedUntil.present) {
+      map['two_factor_locked_until'] = Variable<DateTime>(
+        twoFactorLockedUntil.value,
+      );
+    }
+    if (twoFactorLastSentAt.present) {
+      map['two_factor_last_sent_at'] = Variable<DateTime>(
+        twoFactorLastSentAt.value,
+      );
+    }
+    if (passwordResetAttempts.present) {
+      map['password_reset_attempts'] = Variable<int>(
+        passwordResetAttempts.value,
+      );
+    }
+    if (passwordResetLockedUntil.present) {
+      map['password_reset_locked_until'] = Variable<DateTime>(
+        passwordResetLockedUntil.value,
+      );
+    }
+    if (passwordResetLastSentAt.present) {
+      map['password_reset_last_sent_at'] = Variable<DateTime>(
+        passwordResetLastSentAt.value,
+      );
+    }
     return map;
   }
 
@@ -6493,7 +6852,13 @@ class UsersCompanion extends UpdateCompanion<User> {
           ..write('twoFactorExpiresAt: $twoFactorExpiresAt, ')
           ..write('supabaseId: $supabaseId, ')
           ..write('failedLoginAttempts: $failedLoginAttempts, ')
-          ..write('lockedUntil: $lockedUntil')
+          ..write('lockedUntil: $lockedUntil, ')
+          ..write('twoFactorAttempts: $twoFactorAttempts, ')
+          ..write('twoFactorLockedUntil: $twoFactorLockedUntil, ')
+          ..write('twoFactorLastSentAt: $twoFactorLastSentAt, ')
+          ..write('passwordResetAttempts: $passwordResetAttempts, ')
+          ..write('passwordResetLockedUntil: $passwordResetLockedUntil, ')
+          ..write('passwordResetLastSentAt: $passwordResetLastSentAt')
           ..write(')'))
         .toString();
   }
@@ -7574,8 +7939,19 @@ class $SyncWatermarksTable extends SyncWatermarks
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _cursorIdMeta = const VerificationMeta(
+    'cursorId',
+  );
   @override
-  List<GeneratedColumn> get $columns => [remoteTable, lastSyncedAt];
+  late final GeneratedColumn<String> cursorId = GeneratedColumn<String>(
+    'cursor_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [remoteTable, lastSyncedAt, cursorId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -7610,6 +7986,12 @@ class $SyncWatermarksTable extends SyncWatermarks
     } else if (isInserting) {
       context.missing(_lastSyncedAtMeta);
     }
+    if (data.containsKey('cursor_id')) {
+      context.handle(
+        _cursorIdMeta,
+        cursorId.isAcceptableOrUnknown(data['cursor_id']!, _cursorIdMeta),
+      );
+    }
     return context;
   }
 
@@ -7627,6 +8009,10 @@ class $SyncWatermarksTable extends SyncWatermarks
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_synced_at'],
       )!,
+      cursorId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cursor_id'],
+      ),
     );
   }
 
@@ -7639,12 +8025,25 @@ class $SyncWatermarksTable extends SyncWatermarks
 class SyncWatermark extends DataClass implements Insertable<SyncWatermark> {
   final String remoteTable;
   final DateTime lastSyncedAt;
-  const SyncWatermark({required this.remoteTable, required this.lastSyncedAt});
+
+  /// Remote-id component of the delta cursor — the last row's `id` for the
+  /// table. Null on rows written by older builds, which are treated as a
+  /// timestamp-only cursor (safe: the first run after upgrade re-reads the
+  /// boundary rows).
+  final String? cursorId;
+  const SyncWatermark({
+    required this.remoteTable,
+    required this.lastSyncedAt,
+    this.cursorId,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['remote_table'] = Variable<String>(remoteTable);
     map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    if (!nullToAbsent || cursorId != null) {
+      map['cursor_id'] = Variable<String>(cursorId);
+    }
     return map;
   }
 
@@ -7652,6 +8051,9 @@ class SyncWatermark extends DataClass implements Insertable<SyncWatermark> {
     return SyncWatermarksCompanion(
       remoteTable: Value(remoteTable),
       lastSyncedAt: Value(lastSyncedAt),
+      cursorId: cursorId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cursorId),
     );
   }
 
@@ -7663,6 +8065,7 @@ class SyncWatermark extends DataClass implements Insertable<SyncWatermark> {
     return SyncWatermark(
       remoteTable: serializer.fromJson<String>(json['remoteTable']),
       lastSyncedAt: serializer.fromJson<DateTime>(json['lastSyncedAt']),
+      cursorId: serializer.fromJson<String?>(json['cursorId']),
     );
   }
   @override
@@ -7671,14 +8074,19 @@ class SyncWatermark extends DataClass implements Insertable<SyncWatermark> {
     return <String, dynamic>{
       'remoteTable': serializer.toJson<String>(remoteTable),
       'lastSyncedAt': serializer.toJson<DateTime>(lastSyncedAt),
+      'cursorId': serializer.toJson<String?>(cursorId),
     };
   }
 
-  SyncWatermark copyWith({String? remoteTable, DateTime? lastSyncedAt}) =>
-      SyncWatermark(
-        remoteTable: remoteTable ?? this.remoteTable,
-        lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
-      );
+  SyncWatermark copyWith({
+    String? remoteTable,
+    DateTime? lastSyncedAt,
+    Value<String?> cursorId = const Value.absent(),
+  }) => SyncWatermark(
+    remoteTable: remoteTable ?? this.remoteTable,
+    lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+    cursorId: cursorId.present ? cursorId.value : this.cursorId,
+  );
   SyncWatermark copyWithCompanion(SyncWatermarksCompanion data) {
     return SyncWatermark(
       remoteTable: data.remoteTable.present
@@ -7687,6 +8095,7 @@ class SyncWatermark extends DataClass implements Insertable<SyncWatermark> {
       lastSyncedAt: data.lastSyncedAt.present
           ? data.lastSyncedAt.value
           : this.lastSyncedAt,
+      cursorId: data.cursorId.present ? data.cursorId.value : this.cursorId,
     );
   }
 
@@ -7694,44 +8103,51 @@ class SyncWatermark extends DataClass implements Insertable<SyncWatermark> {
   String toString() {
     return (StringBuffer('SyncWatermark(')
           ..write('remoteTable: $remoteTable, ')
-          ..write('lastSyncedAt: $lastSyncedAt')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('cursorId: $cursorId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(remoteTable, lastSyncedAt);
+  int get hashCode => Object.hash(remoteTable, lastSyncedAt, cursorId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is SyncWatermark &&
           other.remoteTable == this.remoteTable &&
-          other.lastSyncedAt == this.lastSyncedAt);
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.cursorId == this.cursorId);
 }
 
 class SyncWatermarksCompanion extends UpdateCompanion<SyncWatermark> {
   final Value<String> remoteTable;
   final Value<DateTime> lastSyncedAt;
+  final Value<String?> cursorId;
   final Value<int> rowid;
   const SyncWatermarksCompanion({
     this.remoteTable = const Value.absent(),
     this.lastSyncedAt = const Value.absent(),
+    this.cursorId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SyncWatermarksCompanion.insert({
     required String remoteTable,
     required DateTime lastSyncedAt,
+    this.cursorId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : remoteTable = Value(remoteTable),
        lastSyncedAt = Value(lastSyncedAt);
   static Insertable<SyncWatermark> custom({
     Expression<String>? remoteTable,
     Expression<DateTime>? lastSyncedAt,
+    Expression<String>? cursorId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (remoteTable != null) 'remote_table': remoteTable,
       if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (cursorId != null) 'cursor_id': cursorId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -7739,11 +8155,13 @@ class SyncWatermarksCompanion extends UpdateCompanion<SyncWatermark> {
   SyncWatermarksCompanion copyWith({
     Value<String>? remoteTable,
     Value<DateTime>? lastSyncedAt,
+    Value<String?>? cursorId,
     Value<int>? rowid,
   }) {
     return SyncWatermarksCompanion(
       remoteTable: remoteTable ?? this.remoteTable,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      cursorId: cursorId ?? this.cursorId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -7757,6 +8175,9 @@ class SyncWatermarksCompanion extends UpdateCompanion<SyncWatermark> {
     if (lastSyncedAt.present) {
       map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
     }
+    if (cursorId.present) {
+      map['cursor_id'] = Variable<String>(cursorId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -7768,6 +8189,7 @@ class SyncWatermarksCompanion extends UpdateCompanion<SyncWatermark> {
     return (StringBuffer('SyncWatermarksCompanion(')
           ..write('remoteTable: $remoteTable, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('cursorId: $cursorId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -11204,6 +11626,2473 @@ class DppQuestionsCompanion extends UpdateCompanion<DppQuestion> {
   }
 }
 
+class $ResourceProgressTable extends ResourceProgress
+    with TableInfo<$ResourceProgressTable, ResourceProgressData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ResourceProgressTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _resourceIdMeta = const VerificationMeta(
+    'resourceId',
+  );
+  @override
+  late final GeneratedColumn<String> resourceId = GeneratedColumn<String>(
+    'resource_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterIdMeta = const VerificationMeta(
+    'chapterId',
+  );
+  @override
+  late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
+    'chapter_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastPageMeta = const VerificationMeta(
+    'lastPage',
+  );
+  @override
+  late final GeneratedColumn<int> lastPage = GeneratedColumn<int>(
+    'last_page',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _progressPercentMeta = const VerificationMeta(
+    'progressPercent',
+  );
+  @override
+  late final GeneratedColumn<int> progressPercent = GeneratedColumn<int>(
+    'progress_percent',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isBookmarkedMeta = const VerificationMeta(
+    'isBookmarked',
+  );
+  @override
+  late final GeneratedColumn<bool> isBookmarked = GeneratedColumn<bool>(
+    'is_bookmarked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_bookmarked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _lastOpenedAtMeta = const VerificationMeta(
+    'lastOpenedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastOpenedAt = GeneratedColumn<DateTime>(
+    'last_opened_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    resourceId,
+    chapterId,
+    lastPage,
+    progressPercent,
+    isBookmarked,
+    lastOpenedAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'resource_progress';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ResourceProgressData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('resource_id')) {
+      context.handle(
+        _resourceIdMeta,
+        resourceId.isAcceptableOrUnknown(data['resource_id']!, _resourceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_resourceIdMeta);
+    }
+    if (data.containsKey('chapter_id')) {
+      context.handle(
+        _chapterIdMeta,
+        chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta),
+      );
+    }
+    if (data.containsKey('last_page')) {
+      context.handle(
+        _lastPageMeta,
+        lastPage.isAcceptableOrUnknown(data['last_page']!, _lastPageMeta),
+      );
+    }
+    if (data.containsKey('progress_percent')) {
+      context.handle(
+        _progressPercentMeta,
+        progressPercent.isAcceptableOrUnknown(
+          data['progress_percent']!,
+          _progressPercentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_bookmarked')) {
+      context.handle(
+        _isBookmarkedMeta,
+        isBookmarked.isAcceptableOrUnknown(
+          data['is_bookmarked']!,
+          _isBookmarkedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_opened_at')) {
+      context.handle(
+        _lastOpenedAtMeta,
+        lastOpenedAt.isAcceptableOrUnknown(
+          data['last_opened_at']!,
+          _lastOpenedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ResourceProgressData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ResourceProgressData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      resourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}resource_id'],
+      )!,
+      chapterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chapter_id'],
+      ),
+      lastPage: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_page'],
+      ),
+      progressPercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}progress_percent'],
+      )!,
+      isBookmarked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_bookmarked'],
+      )!,
+      lastOpenedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_opened_at'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ResourceProgressTable createAlias(String alias) {
+    return $ResourceProgressTable(attachedDatabase, alias);
+  }
+}
+
+class ResourceProgressData extends DataClass
+    implements Insertable<ResourceProgressData> {
+  final int id;
+  final int userId;
+  final String resourceId;
+  final String? chapterId;
+  final int? lastPage;
+  final int progressPercent;
+  final bool isBookmarked;
+  final DateTime? lastOpenedAt;
+  final DateTime updatedAt;
+  const ResourceProgressData({
+    required this.id,
+    required this.userId,
+    required this.resourceId,
+    this.chapterId,
+    this.lastPage,
+    required this.progressPercent,
+    required this.isBookmarked,
+    this.lastOpenedAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['user_id'] = Variable<int>(userId);
+    map['resource_id'] = Variable<String>(resourceId);
+    if (!nullToAbsent || chapterId != null) {
+      map['chapter_id'] = Variable<String>(chapterId);
+    }
+    if (!nullToAbsent || lastPage != null) {
+      map['last_page'] = Variable<int>(lastPage);
+    }
+    map['progress_percent'] = Variable<int>(progressPercent);
+    map['is_bookmarked'] = Variable<bool>(isBookmarked);
+    if (!nullToAbsent || lastOpenedAt != null) {
+      map['last_opened_at'] = Variable<DateTime>(lastOpenedAt);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ResourceProgressCompanion toCompanion(bool nullToAbsent) {
+    return ResourceProgressCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      resourceId: Value(resourceId),
+      chapterId: chapterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapterId),
+      lastPage: lastPage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastPage),
+      progressPercent: Value(progressPercent),
+      isBookmarked: Value(isBookmarked),
+      lastOpenedAt: lastOpenedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastOpenedAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ResourceProgressData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ResourceProgressData(
+      id: serializer.fromJson<int>(json['id']),
+      userId: serializer.fromJson<int>(json['userId']),
+      resourceId: serializer.fromJson<String>(json['resourceId']),
+      chapterId: serializer.fromJson<String?>(json['chapterId']),
+      lastPage: serializer.fromJson<int?>(json['lastPage']),
+      progressPercent: serializer.fromJson<int>(json['progressPercent']),
+      isBookmarked: serializer.fromJson<bool>(json['isBookmarked']),
+      lastOpenedAt: serializer.fromJson<DateTime?>(json['lastOpenedAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'userId': serializer.toJson<int>(userId),
+      'resourceId': serializer.toJson<String>(resourceId),
+      'chapterId': serializer.toJson<String?>(chapterId),
+      'lastPage': serializer.toJson<int?>(lastPage),
+      'progressPercent': serializer.toJson<int>(progressPercent),
+      'isBookmarked': serializer.toJson<bool>(isBookmarked),
+      'lastOpenedAt': serializer.toJson<DateTime?>(lastOpenedAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ResourceProgressData copyWith({
+    int? id,
+    int? userId,
+    String? resourceId,
+    Value<String?> chapterId = const Value.absent(),
+    Value<int?> lastPage = const Value.absent(),
+    int? progressPercent,
+    bool? isBookmarked,
+    Value<DateTime?> lastOpenedAt = const Value.absent(),
+    DateTime? updatedAt,
+  }) => ResourceProgressData(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    resourceId: resourceId ?? this.resourceId,
+    chapterId: chapterId.present ? chapterId.value : this.chapterId,
+    lastPage: lastPage.present ? lastPage.value : this.lastPage,
+    progressPercent: progressPercent ?? this.progressPercent,
+    isBookmarked: isBookmarked ?? this.isBookmarked,
+    lastOpenedAt: lastOpenedAt.present ? lastOpenedAt.value : this.lastOpenedAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ResourceProgressData copyWithCompanion(ResourceProgressCompanion data) {
+    return ResourceProgressData(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      resourceId: data.resourceId.present
+          ? data.resourceId.value
+          : this.resourceId,
+      chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
+      lastPage: data.lastPage.present ? data.lastPage.value : this.lastPage,
+      progressPercent: data.progressPercent.present
+          ? data.progressPercent.value
+          : this.progressPercent,
+      isBookmarked: data.isBookmarked.present
+          ? data.isBookmarked.value
+          : this.isBookmarked,
+      lastOpenedAt: data.lastOpenedAt.present
+          ? data.lastOpenedAt.value
+          : this.lastOpenedAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ResourceProgressData(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('resourceId: $resourceId, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('lastPage: $lastPage, ')
+          ..write('progressPercent: $progressPercent, ')
+          ..write('isBookmarked: $isBookmarked, ')
+          ..write('lastOpenedAt: $lastOpenedAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    userId,
+    resourceId,
+    chapterId,
+    lastPage,
+    progressPercent,
+    isBookmarked,
+    lastOpenedAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ResourceProgressData &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.resourceId == this.resourceId &&
+          other.chapterId == this.chapterId &&
+          other.lastPage == this.lastPage &&
+          other.progressPercent == this.progressPercent &&
+          other.isBookmarked == this.isBookmarked &&
+          other.lastOpenedAt == this.lastOpenedAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ResourceProgressCompanion extends UpdateCompanion<ResourceProgressData> {
+  final Value<int> id;
+  final Value<int> userId;
+  final Value<String> resourceId;
+  final Value<String?> chapterId;
+  final Value<int?> lastPage;
+  final Value<int> progressPercent;
+  final Value<bool> isBookmarked;
+  final Value<DateTime?> lastOpenedAt;
+  final Value<DateTime> updatedAt;
+  const ResourceProgressCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.resourceId = const Value.absent(),
+    this.chapterId = const Value.absent(),
+    this.lastPage = const Value.absent(),
+    this.progressPercent = const Value.absent(),
+    this.isBookmarked = const Value.absent(),
+    this.lastOpenedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  ResourceProgressCompanion.insert({
+    this.id = const Value.absent(),
+    required int userId,
+    required String resourceId,
+    this.chapterId = const Value.absent(),
+    this.lastPage = const Value.absent(),
+    this.progressPercent = const Value.absent(),
+    this.isBookmarked = const Value.absent(),
+    this.lastOpenedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : userId = Value(userId),
+       resourceId = Value(resourceId);
+  static Insertable<ResourceProgressData> custom({
+    Expression<int>? id,
+    Expression<int>? userId,
+    Expression<String>? resourceId,
+    Expression<String>? chapterId,
+    Expression<int>? lastPage,
+    Expression<int>? progressPercent,
+    Expression<bool>? isBookmarked,
+    Expression<DateTime>? lastOpenedAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (resourceId != null) 'resource_id': resourceId,
+      if (chapterId != null) 'chapter_id': chapterId,
+      if (lastPage != null) 'last_page': lastPage,
+      if (progressPercent != null) 'progress_percent': progressPercent,
+      if (isBookmarked != null) 'is_bookmarked': isBookmarked,
+      if (lastOpenedAt != null) 'last_opened_at': lastOpenedAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  ResourceProgressCompanion copyWith({
+    Value<int>? id,
+    Value<int>? userId,
+    Value<String>? resourceId,
+    Value<String?>? chapterId,
+    Value<int?>? lastPage,
+    Value<int>? progressPercent,
+    Value<bool>? isBookmarked,
+    Value<DateTime?>? lastOpenedAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return ResourceProgressCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      resourceId: resourceId ?? this.resourceId,
+      chapterId: chapterId ?? this.chapterId,
+      lastPage: lastPage ?? this.lastPage,
+      progressPercent: progressPercent ?? this.progressPercent,
+      isBookmarked: isBookmarked ?? this.isBookmarked,
+      lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (resourceId.present) {
+      map['resource_id'] = Variable<String>(resourceId.value);
+    }
+    if (chapterId.present) {
+      map['chapter_id'] = Variable<String>(chapterId.value);
+    }
+    if (lastPage.present) {
+      map['last_page'] = Variable<int>(lastPage.value);
+    }
+    if (progressPercent.present) {
+      map['progress_percent'] = Variable<int>(progressPercent.value);
+    }
+    if (isBookmarked.present) {
+      map['is_bookmarked'] = Variable<bool>(isBookmarked.value);
+    }
+    if (lastOpenedAt.present) {
+      map['last_opened_at'] = Variable<DateTime>(lastOpenedAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ResourceProgressCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('resourceId: $resourceId, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('lastPage: $lastPage, ')
+          ..write('progressPercent: $progressPercent, ')
+          ..write('isBookmarked: $isBookmarked, ')
+          ..write('lastOpenedAt: $lastOpenedAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MistakeEventsTable extends MistakeEvents
+    with TableInfo<$MistakeEventsTable, MistakeEvent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MistakeEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(-1),
+  );
+  static const VerificationMeta _attemptIdMeta = const VerificationMeta(
+    'attemptId',
+  );
+  @override
+  late final GeneratedColumn<int> attemptId = GeneratedColumn<int>(
+    'attempt_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _questionIdMeta = const VerificationMeta(
+    'questionId',
+  );
+  @override
+  late final GeneratedColumn<String> questionId = GeneratedColumn<String>(
+    'question_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _topicIdMeta = const VerificationMeta(
+    'topicId',
+  );
+  @override
+  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
+    'topic_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mistakeTypeMeta = const VerificationMeta(
+    'mistakeType',
+  );
+  @override
+  late final GeneratedColumn<String> mistakeType = GeneratedColumn<String>(
+    'mistake_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timeSecondsMeta = const VerificationMeta(
+    'timeSeconds',
+  );
+  @override
+  late final GeneratedColumn<double> timeSeconds = GeneratedColumn<double>(
+    'time_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    attemptId,
+    questionId,
+    topicId,
+    mistakeType,
+    timeSeconds,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mistake_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MistakeEvent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    }
+    if (data.containsKey('attempt_id')) {
+      context.handle(
+        _attemptIdMeta,
+        attemptId.isAcceptableOrUnknown(data['attempt_id']!, _attemptIdMeta),
+      );
+    }
+    if (data.containsKey('question_id')) {
+      context.handle(
+        _questionIdMeta,
+        questionId.isAcceptableOrUnknown(data['question_id']!, _questionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_questionIdMeta);
+    }
+    if (data.containsKey('topic_id')) {
+      context.handle(
+        _topicIdMeta,
+        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_topicIdMeta);
+    }
+    if (data.containsKey('mistake_type')) {
+      context.handle(
+        _mistakeTypeMeta,
+        mistakeType.isAcceptableOrUnknown(
+          data['mistake_type']!,
+          _mistakeTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_mistakeTypeMeta);
+    }
+    if (data.containsKey('time_seconds')) {
+      context.handle(
+        _timeSecondsMeta,
+        timeSeconds.isAcceptableOrUnknown(
+          data['time_seconds']!,
+          _timeSecondsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_timeSecondsMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MistakeEvent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MistakeEvent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      attemptId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}attempt_id'],
+      ),
+      questionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_id'],
+      )!,
+      topicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic_id'],
+      )!,
+      mistakeType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mistake_type'],
+      )!,
+      timeSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}time_seconds'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MistakeEventsTable createAlias(String alias) {
+    return $MistakeEventsTable(attachedDatabase, alias);
+  }
+}
+
+class MistakeEvent extends DataClass implements Insertable<MistakeEvent> {
+  final int id;
+  final int userId;
+  final int? attemptId;
+  final String questionId;
+  final String topicId;
+  final String mistakeType;
+  final double timeSeconds;
+  final DateTime createdAt;
+  const MistakeEvent({
+    required this.id,
+    required this.userId,
+    this.attemptId,
+    required this.questionId,
+    required this.topicId,
+    required this.mistakeType,
+    required this.timeSeconds,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['user_id'] = Variable<int>(userId);
+    if (!nullToAbsent || attemptId != null) {
+      map['attempt_id'] = Variable<int>(attemptId);
+    }
+    map['question_id'] = Variable<String>(questionId);
+    map['topic_id'] = Variable<String>(topicId);
+    map['mistake_type'] = Variable<String>(mistakeType);
+    map['time_seconds'] = Variable<double>(timeSeconds);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  MistakeEventsCompanion toCompanion(bool nullToAbsent) {
+    return MistakeEventsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      attemptId: attemptId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(attemptId),
+      questionId: Value(questionId),
+      topicId: Value(topicId),
+      mistakeType: Value(mistakeType),
+      timeSeconds: Value(timeSeconds),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory MistakeEvent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MistakeEvent(
+      id: serializer.fromJson<int>(json['id']),
+      userId: serializer.fromJson<int>(json['userId']),
+      attemptId: serializer.fromJson<int?>(json['attemptId']),
+      questionId: serializer.fromJson<String>(json['questionId']),
+      topicId: serializer.fromJson<String>(json['topicId']),
+      mistakeType: serializer.fromJson<String>(json['mistakeType']),
+      timeSeconds: serializer.fromJson<double>(json['timeSeconds']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'userId': serializer.toJson<int>(userId),
+      'attemptId': serializer.toJson<int?>(attemptId),
+      'questionId': serializer.toJson<String>(questionId),
+      'topicId': serializer.toJson<String>(topicId),
+      'mistakeType': serializer.toJson<String>(mistakeType),
+      'timeSeconds': serializer.toJson<double>(timeSeconds),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  MistakeEvent copyWith({
+    int? id,
+    int? userId,
+    Value<int?> attemptId = const Value.absent(),
+    String? questionId,
+    String? topicId,
+    String? mistakeType,
+    double? timeSeconds,
+    DateTime? createdAt,
+  }) => MistakeEvent(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    attemptId: attemptId.present ? attemptId.value : this.attemptId,
+    questionId: questionId ?? this.questionId,
+    topicId: topicId ?? this.topicId,
+    mistakeType: mistakeType ?? this.mistakeType,
+    timeSeconds: timeSeconds ?? this.timeSeconds,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  MistakeEvent copyWithCompanion(MistakeEventsCompanion data) {
+    return MistakeEvent(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      attemptId: data.attemptId.present ? data.attemptId.value : this.attemptId,
+      questionId: data.questionId.present
+          ? data.questionId.value
+          : this.questionId,
+      topicId: data.topicId.present ? data.topicId.value : this.topicId,
+      mistakeType: data.mistakeType.present
+          ? data.mistakeType.value
+          : this.mistakeType,
+      timeSeconds: data.timeSeconds.present
+          ? data.timeSeconds.value
+          : this.timeSeconds,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MistakeEvent(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('attemptId: $attemptId, ')
+          ..write('questionId: $questionId, ')
+          ..write('topicId: $topicId, ')
+          ..write('mistakeType: $mistakeType, ')
+          ..write('timeSeconds: $timeSeconds, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    userId,
+    attemptId,
+    questionId,
+    topicId,
+    mistakeType,
+    timeSeconds,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MistakeEvent &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.attemptId == this.attemptId &&
+          other.questionId == this.questionId &&
+          other.topicId == this.topicId &&
+          other.mistakeType == this.mistakeType &&
+          other.timeSeconds == this.timeSeconds &&
+          other.createdAt == this.createdAt);
+}
+
+class MistakeEventsCompanion extends UpdateCompanion<MistakeEvent> {
+  final Value<int> id;
+  final Value<int> userId;
+  final Value<int?> attemptId;
+  final Value<String> questionId;
+  final Value<String> topicId;
+  final Value<String> mistakeType;
+  final Value<double> timeSeconds;
+  final Value<DateTime> createdAt;
+  const MistakeEventsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.attemptId = const Value.absent(),
+    this.questionId = const Value.absent(),
+    this.topicId = const Value.absent(),
+    this.mistakeType = const Value.absent(),
+    this.timeSeconds = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  MistakeEventsCompanion.insert({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.attemptId = const Value.absent(),
+    required String questionId,
+    required String topicId,
+    required String mistakeType,
+    required double timeSeconds,
+    required DateTime createdAt,
+  }) : questionId = Value(questionId),
+       topicId = Value(topicId),
+       mistakeType = Value(mistakeType),
+       timeSeconds = Value(timeSeconds),
+       createdAt = Value(createdAt);
+  static Insertable<MistakeEvent> custom({
+    Expression<int>? id,
+    Expression<int>? userId,
+    Expression<int>? attemptId,
+    Expression<String>? questionId,
+    Expression<String>? topicId,
+    Expression<String>? mistakeType,
+    Expression<double>? timeSeconds,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (attemptId != null) 'attempt_id': attemptId,
+      if (questionId != null) 'question_id': questionId,
+      if (topicId != null) 'topic_id': topicId,
+      if (mistakeType != null) 'mistake_type': mistakeType,
+      if (timeSeconds != null) 'time_seconds': timeSeconds,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  MistakeEventsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? userId,
+    Value<int?>? attemptId,
+    Value<String>? questionId,
+    Value<String>? topicId,
+    Value<String>? mistakeType,
+    Value<double>? timeSeconds,
+    Value<DateTime>? createdAt,
+  }) {
+    return MistakeEventsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      attemptId: attemptId ?? this.attemptId,
+      questionId: questionId ?? this.questionId,
+      topicId: topicId ?? this.topicId,
+      mistakeType: mistakeType ?? this.mistakeType,
+      timeSeconds: timeSeconds ?? this.timeSeconds,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (attemptId.present) {
+      map['attempt_id'] = Variable<int>(attemptId.value);
+    }
+    if (questionId.present) {
+      map['question_id'] = Variable<String>(questionId.value);
+    }
+    if (topicId.present) {
+      map['topic_id'] = Variable<String>(topicId.value);
+    }
+    if (mistakeType.present) {
+      map['mistake_type'] = Variable<String>(mistakeType.value);
+    }
+    if (timeSeconds.present) {
+      map['time_seconds'] = Variable<double>(timeSeconds.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MistakeEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('attemptId: $attemptId, ')
+          ..write('questionId: $questionId, ')
+          ..write('topicId: $topicId, ')
+          ..write('mistakeType: $mistakeType, ')
+          ..write('timeSeconds: $timeSeconds, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RetentionReviewsTable extends RetentionReviews
+    with TableInfo<$RetentionReviewsTable, RetentionReview> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RetentionReviewsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(-1),
+  );
+  static const VerificationMeta _topicIdMeta = const VerificationMeta(
+    'topicId',
+  );
+  @override
+  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
+    'topic_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _intervalDaysMeta = const VerificationMeta(
+    'intervalDays',
+  );
+  @override
+  late final GeneratedColumn<int> intervalDays = GeneratedColumn<int>(
+    'interval_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dueAtMeta = const VerificationMeta('dueAt');
+  @override
+  late final GeneratedColumn<DateTime> dueAt = GeneratedColumn<DateTime>(
+    'due_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _checkedAtMeta = const VerificationMeta(
+    'checkedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> checkedAt = GeneratedColumn<DateTime>(
+    'checked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accuracyMeta = const VerificationMeta(
+    'accuracy',
+  );
+  @override
+  late final GeneratedColumn<double> accuracy = GeneratedColumn<double>(
+    'accuracy',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    topicId,
+    intervalDays,
+    dueAt,
+    checkedAt,
+    accuracy,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'retention_reviews';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RetentionReview> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    }
+    if (data.containsKey('topic_id')) {
+      context.handle(
+        _topicIdMeta,
+        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_topicIdMeta);
+    }
+    if (data.containsKey('interval_days')) {
+      context.handle(
+        _intervalDaysMeta,
+        intervalDays.isAcceptableOrUnknown(
+          data['interval_days']!,
+          _intervalDaysMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_intervalDaysMeta);
+    }
+    if (data.containsKey('due_at')) {
+      context.handle(
+        _dueAtMeta,
+        dueAt.isAcceptableOrUnknown(data['due_at']!, _dueAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dueAtMeta);
+    }
+    if (data.containsKey('checked_at')) {
+      context.handle(
+        _checkedAtMeta,
+        checkedAt.isAcceptableOrUnknown(data['checked_at']!, _checkedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_checkedAtMeta);
+    }
+    if (data.containsKey('accuracy')) {
+      context.handle(
+        _accuracyMeta,
+        accuracy.isAcceptableOrUnknown(data['accuracy']!, _accuracyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RetentionReview map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RetentionReview(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      topicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic_id'],
+      )!,
+      intervalDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}interval_days'],
+      )!,
+      dueAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}due_at'],
+      )!,
+      checkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}checked_at'],
+      )!,
+      accuracy: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}accuracy'],
+      ),
+    );
+  }
+
+  @override
+  $RetentionReviewsTable createAlias(String alias) {
+    return $RetentionReviewsTable(attachedDatabase, alias);
+  }
+}
+
+class RetentionReview extends DataClass implements Insertable<RetentionReview> {
+  final int id;
+  final int userId;
+  final String topicId;
+  final int intervalDays;
+  final DateTime dueAt;
+  final DateTime checkedAt;
+  final double? accuracy;
+  const RetentionReview({
+    required this.id,
+    required this.userId,
+    required this.topicId,
+    required this.intervalDays,
+    required this.dueAt,
+    required this.checkedAt,
+    this.accuracy,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['user_id'] = Variable<int>(userId);
+    map['topic_id'] = Variable<String>(topicId);
+    map['interval_days'] = Variable<int>(intervalDays);
+    map['due_at'] = Variable<DateTime>(dueAt);
+    map['checked_at'] = Variable<DateTime>(checkedAt);
+    if (!nullToAbsent || accuracy != null) {
+      map['accuracy'] = Variable<double>(accuracy);
+    }
+    return map;
+  }
+
+  RetentionReviewsCompanion toCompanion(bool nullToAbsent) {
+    return RetentionReviewsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      topicId: Value(topicId),
+      intervalDays: Value(intervalDays),
+      dueAt: Value(dueAt),
+      checkedAt: Value(checkedAt),
+      accuracy: accuracy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accuracy),
+    );
+  }
+
+  factory RetentionReview.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RetentionReview(
+      id: serializer.fromJson<int>(json['id']),
+      userId: serializer.fromJson<int>(json['userId']),
+      topicId: serializer.fromJson<String>(json['topicId']),
+      intervalDays: serializer.fromJson<int>(json['intervalDays']),
+      dueAt: serializer.fromJson<DateTime>(json['dueAt']),
+      checkedAt: serializer.fromJson<DateTime>(json['checkedAt']),
+      accuracy: serializer.fromJson<double?>(json['accuracy']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'userId': serializer.toJson<int>(userId),
+      'topicId': serializer.toJson<String>(topicId),
+      'intervalDays': serializer.toJson<int>(intervalDays),
+      'dueAt': serializer.toJson<DateTime>(dueAt),
+      'checkedAt': serializer.toJson<DateTime>(checkedAt),
+      'accuracy': serializer.toJson<double?>(accuracy),
+    };
+  }
+
+  RetentionReview copyWith({
+    int? id,
+    int? userId,
+    String? topicId,
+    int? intervalDays,
+    DateTime? dueAt,
+    DateTime? checkedAt,
+    Value<double?> accuracy = const Value.absent(),
+  }) => RetentionReview(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    topicId: topicId ?? this.topicId,
+    intervalDays: intervalDays ?? this.intervalDays,
+    dueAt: dueAt ?? this.dueAt,
+    checkedAt: checkedAt ?? this.checkedAt,
+    accuracy: accuracy.present ? accuracy.value : this.accuracy,
+  );
+  RetentionReview copyWithCompanion(RetentionReviewsCompanion data) {
+    return RetentionReview(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      topicId: data.topicId.present ? data.topicId.value : this.topicId,
+      intervalDays: data.intervalDays.present
+          ? data.intervalDays.value
+          : this.intervalDays,
+      dueAt: data.dueAt.present ? data.dueAt.value : this.dueAt,
+      checkedAt: data.checkedAt.present ? data.checkedAt.value : this.checkedAt,
+      accuracy: data.accuracy.present ? data.accuracy.value : this.accuracy,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RetentionReview(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('topicId: $topicId, ')
+          ..write('intervalDays: $intervalDays, ')
+          ..write('dueAt: $dueAt, ')
+          ..write('checkedAt: $checkedAt, ')
+          ..write('accuracy: $accuracy')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    userId,
+    topicId,
+    intervalDays,
+    dueAt,
+    checkedAt,
+    accuracy,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RetentionReview &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.topicId == this.topicId &&
+          other.intervalDays == this.intervalDays &&
+          other.dueAt == this.dueAt &&
+          other.checkedAt == this.checkedAt &&
+          other.accuracy == this.accuracy);
+}
+
+class RetentionReviewsCompanion extends UpdateCompanion<RetentionReview> {
+  final Value<int> id;
+  final Value<int> userId;
+  final Value<String> topicId;
+  final Value<int> intervalDays;
+  final Value<DateTime> dueAt;
+  final Value<DateTime> checkedAt;
+  final Value<double?> accuracy;
+  const RetentionReviewsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.topicId = const Value.absent(),
+    this.intervalDays = const Value.absent(),
+    this.dueAt = const Value.absent(),
+    this.checkedAt = const Value.absent(),
+    this.accuracy = const Value.absent(),
+  });
+  RetentionReviewsCompanion.insert({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    required String topicId,
+    required int intervalDays,
+    required DateTime dueAt,
+    required DateTime checkedAt,
+    this.accuracy = const Value.absent(),
+  }) : topicId = Value(topicId),
+       intervalDays = Value(intervalDays),
+       dueAt = Value(dueAt),
+       checkedAt = Value(checkedAt);
+  static Insertable<RetentionReview> custom({
+    Expression<int>? id,
+    Expression<int>? userId,
+    Expression<String>? topicId,
+    Expression<int>? intervalDays,
+    Expression<DateTime>? dueAt,
+    Expression<DateTime>? checkedAt,
+    Expression<double>? accuracy,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (topicId != null) 'topic_id': topicId,
+      if (intervalDays != null) 'interval_days': intervalDays,
+      if (dueAt != null) 'due_at': dueAt,
+      if (checkedAt != null) 'checked_at': checkedAt,
+      if (accuracy != null) 'accuracy': accuracy,
+    });
+  }
+
+  RetentionReviewsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? userId,
+    Value<String>? topicId,
+    Value<int>? intervalDays,
+    Value<DateTime>? dueAt,
+    Value<DateTime>? checkedAt,
+    Value<double?>? accuracy,
+  }) {
+    return RetentionReviewsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      topicId: topicId ?? this.topicId,
+      intervalDays: intervalDays ?? this.intervalDays,
+      dueAt: dueAt ?? this.dueAt,
+      checkedAt: checkedAt ?? this.checkedAt,
+      accuracy: accuracy ?? this.accuracy,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (topicId.present) {
+      map['topic_id'] = Variable<String>(topicId.value);
+    }
+    if (intervalDays.present) {
+      map['interval_days'] = Variable<int>(intervalDays.value);
+    }
+    if (dueAt.present) {
+      map['due_at'] = Variable<DateTime>(dueAt.value);
+    }
+    if (checkedAt.present) {
+      map['checked_at'] = Variable<DateTime>(checkedAt.value);
+    }
+    if (accuracy.present) {
+      map['accuracy'] = Variable<double>(accuracy.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RetentionReviewsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('topicId: $topicId, ')
+          ..write('intervalDays: $intervalDays, ')
+          ..write('dueAt: $dueAt, ')
+          ..write('checkedAt: $checkedAt, ')
+          ..write('accuracy: $accuracy')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ConsentRecordsTable extends ConsentRecords
+    with TableInfo<$ConsentRecordsTable, ConsentRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ConsentRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES users (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _documentMeta = const VerificationMeta(
+    'document',
+  );
+  @override
+  late final GeneratedColumn<String> document = GeneratedColumn<String>(
+    'document',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<String> version = GeneratedColumn<String>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _acceptedAtMeta = const VerificationMeta(
+    'acceptedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> acceptedAt = GeneratedColumn<DateTime>(
+    'accepted_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [userId, document, version, acceptedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'consent_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ConsentRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('document')) {
+      context.handle(
+        _documentMeta,
+        document.isAcceptableOrUnknown(data['document']!, _documentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_documentMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    if (data.containsKey('accepted_at')) {
+      context.handle(
+        _acceptedAtMeta,
+        acceptedAt.isAcceptableOrUnknown(data['accepted_at']!, _acceptedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_acceptedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {userId, document, version};
+  @override
+  ConsentRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ConsentRecord(
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      document: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}document'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}version'],
+      )!,
+      acceptedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}accepted_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ConsentRecordsTable createAlias(String alias) {
+    return $ConsentRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class ConsentRecord extends DataClass implements Insertable<ConsentRecord> {
+  final int userId;
+
+  /// Which document: `terms`, `privacy`, or `ai_processing`.
+  final String document;
+
+  /// The version string shown to the user, e.g. `2026-08`.
+  final String version;
+  final DateTime acceptedAt;
+  const ConsentRecord({
+    required this.userId,
+    required this.document,
+    required this.version,
+    required this.acceptedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['user_id'] = Variable<int>(userId);
+    map['document'] = Variable<String>(document);
+    map['version'] = Variable<String>(version);
+    map['accepted_at'] = Variable<DateTime>(acceptedAt);
+    return map;
+  }
+
+  ConsentRecordsCompanion toCompanion(bool nullToAbsent) {
+    return ConsentRecordsCompanion(
+      userId: Value(userId),
+      document: Value(document),
+      version: Value(version),
+      acceptedAt: Value(acceptedAt),
+    );
+  }
+
+  factory ConsentRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ConsentRecord(
+      userId: serializer.fromJson<int>(json['userId']),
+      document: serializer.fromJson<String>(json['document']),
+      version: serializer.fromJson<String>(json['version']),
+      acceptedAt: serializer.fromJson<DateTime>(json['acceptedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'userId': serializer.toJson<int>(userId),
+      'document': serializer.toJson<String>(document),
+      'version': serializer.toJson<String>(version),
+      'acceptedAt': serializer.toJson<DateTime>(acceptedAt),
+    };
+  }
+
+  ConsentRecord copyWith({
+    int? userId,
+    String? document,
+    String? version,
+    DateTime? acceptedAt,
+  }) => ConsentRecord(
+    userId: userId ?? this.userId,
+    document: document ?? this.document,
+    version: version ?? this.version,
+    acceptedAt: acceptedAt ?? this.acceptedAt,
+  );
+  ConsentRecord copyWithCompanion(ConsentRecordsCompanion data) {
+    return ConsentRecord(
+      userId: data.userId.present ? data.userId.value : this.userId,
+      document: data.document.present ? data.document.value : this.document,
+      version: data.version.present ? data.version.value : this.version,
+      acceptedAt: data.acceptedAt.present
+          ? data.acceptedAt.value
+          : this.acceptedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ConsentRecord(')
+          ..write('userId: $userId, ')
+          ..write('document: $document, ')
+          ..write('version: $version, ')
+          ..write('acceptedAt: $acceptedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(userId, document, version, acceptedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ConsentRecord &&
+          other.userId == this.userId &&
+          other.document == this.document &&
+          other.version == this.version &&
+          other.acceptedAt == this.acceptedAt);
+}
+
+class ConsentRecordsCompanion extends UpdateCompanion<ConsentRecord> {
+  final Value<int> userId;
+  final Value<String> document;
+  final Value<String> version;
+  final Value<DateTime> acceptedAt;
+  final Value<int> rowid;
+  const ConsentRecordsCompanion({
+    this.userId = const Value.absent(),
+    this.document = const Value.absent(),
+    this.version = const Value.absent(),
+    this.acceptedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ConsentRecordsCompanion.insert({
+    required int userId,
+    required String document,
+    required String version,
+    required DateTime acceptedAt,
+    this.rowid = const Value.absent(),
+  }) : userId = Value(userId),
+       document = Value(document),
+       version = Value(version),
+       acceptedAt = Value(acceptedAt);
+  static Insertable<ConsentRecord> custom({
+    Expression<int>? userId,
+    Expression<String>? document,
+    Expression<String>? version,
+    Expression<DateTime>? acceptedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (userId != null) 'user_id': userId,
+      if (document != null) 'document': document,
+      if (version != null) 'version': version,
+      if (acceptedAt != null) 'accepted_at': acceptedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ConsentRecordsCompanion copyWith({
+    Value<int>? userId,
+    Value<String>? document,
+    Value<String>? version,
+    Value<DateTime>? acceptedAt,
+    Value<int>? rowid,
+  }) {
+    return ConsentRecordsCompanion(
+      userId: userId ?? this.userId,
+      document: document ?? this.document,
+      version: version ?? this.version,
+      acceptedAt: acceptedAt ?? this.acceptedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (document.present) {
+      map['document'] = Variable<String>(document.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<String>(version.value);
+    }
+    if (acceptedAt.present) {
+      map['accepted_at'] = Variable<DateTime>(acceptedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ConsentRecordsCompanion(')
+          ..write('userId: $userId, ')
+          ..write('document: $document, ')
+          ..write('version: $version, ')
+          ..write('acceptedAt: $acceptedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ChapterProgressTableTable extends ChapterProgressTable
+    with TableInfo<$ChapterProgressTableTable, ChapterProgressTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChapterProgressTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _chapterIdMeta = const VerificationMeta(
+    'chapterId',
+  );
+  @override
+  late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
+    'chapter_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currentLessonIdMeta = const VerificationMeta(
+    'currentLessonId',
+  );
+  @override
+  late final GeneratedColumn<String> currentLessonId = GeneratedColumn<String>(
+    'current_lesson_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _completedLessonIdsMeta =
+      const VerificationMeta('completedLessonIds');
+  @override
+  late final GeneratedColumn<String> completedLessonIds =
+      GeneratedColumn<String>(
+        'completed_lesson_ids',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _quickCheckScoresMeta = const VerificationMeta(
+    'quickCheckScores',
+  );
+  @override
+  late final GeneratedColumn<String> quickCheckScores = GeneratedColumn<String>(
+    'quick_check_scores',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  static const VerificationMeta _summaryQuizScoreMeta = const VerificationMeta(
+    'summaryQuizScore',
+  );
+  @override
+  late final GeneratedColumn<int> summaryQuizScore = GeneratedColumn<int>(
+    'summary_quiz_score',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(-1),
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastAccessedAtMeta = const VerificationMeta(
+    'lastAccessedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastAccessedAt =
+      GeneratedColumn<DateTime>(
+        'last_accessed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
+    'completed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    chapterId,
+    userId,
+    currentLessonId,
+    completedLessonIds,
+    quickCheckScores,
+    summaryQuizScore,
+    startedAt,
+    lastAccessedAt,
+    completedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chapter_progress_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ChapterProgressTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('chapter_id')) {
+      context.handle(
+        _chapterIdMeta,
+        chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chapterIdMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('current_lesson_id')) {
+      context.handle(
+        _currentLessonIdMeta,
+        currentLessonId.isAcceptableOrUnknown(
+          data['current_lesson_id']!,
+          _currentLessonIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('completed_lesson_ids')) {
+      context.handle(
+        _completedLessonIdsMeta,
+        completedLessonIds.isAcceptableOrUnknown(
+          data['completed_lesson_ids']!,
+          _completedLessonIdsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('quick_check_scores')) {
+      context.handle(
+        _quickCheckScoresMeta,
+        quickCheckScores.isAcceptableOrUnknown(
+          data['quick_check_scores']!,
+          _quickCheckScoresMeta,
+        ),
+      );
+    }
+    if (data.containsKey('summary_quiz_score')) {
+      context.handle(
+        _summaryQuizScoreMeta,
+        summaryQuizScore.isAcceptableOrUnknown(
+          data['summary_quiz_score']!,
+          _summaryQuizScoreMeta,
+        ),
+      );
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('last_accessed_at')) {
+      context.handle(
+        _lastAccessedAtMeta,
+        lastAccessedAt.isAcceptableOrUnknown(
+          data['last_accessed_at']!,
+          _lastAccessedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lastAccessedAtMeta);
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {chapterId, userId};
+  @override
+  ChapterProgressTableData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChapterProgressTableData(
+      chapterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chapter_id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      currentLessonId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}current_lesson_id'],
+      )!,
+      completedLessonIds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}completed_lesson_ids'],
+      )!,
+      quickCheckScores: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}quick_check_scores'],
+      )!,
+      summaryQuizScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}summary_quiz_score'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}started_at'],
+      )!,
+      lastAccessedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_accessed_at'],
+      )!,
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}completed_at'],
+      ),
+    );
+  }
+
+  @override
+  $ChapterProgressTableTable createAlias(String alias) {
+    return $ChapterProgressTableTable(attachedDatabase, alias);
+  }
+}
+
+class ChapterProgressTableData extends DataClass
+    implements Insertable<ChapterProgressTableData> {
+  /// The chapter ID (references Chapter.id).
+  final String chapterId;
+
+  /// The user ID (references Users.id).
+  final int userId;
+
+  /// The current lesson the user is on.
+  final String currentLessonId;
+
+  /// JSON array of completed lesson IDs.
+  final String completedLessonIds;
+
+  /// JSON map of lessonId -> quick check score (0-100).
+  final String quickCheckScores;
+
+  /// Summary quiz score (0-100), -1 if not taken.
+  final int summaryQuizScore;
+
+  /// When the user first started this chapter.
+  final DateTime startedAt;
+
+  /// Last time the user accessed this chapter.
+  final DateTime lastAccessedAt;
+
+  /// When the chapter was completed (null if not completed).
+  final DateTime? completedAt;
+  const ChapterProgressTableData({
+    required this.chapterId,
+    required this.userId,
+    required this.currentLessonId,
+    required this.completedLessonIds,
+    required this.quickCheckScores,
+    required this.summaryQuizScore,
+    required this.startedAt,
+    required this.lastAccessedAt,
+    this.completedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['chapter_id'] = Variable<String>(chapterId);
+    map['user_id'] = Variable<int>(userId);
+    map['current_lesson_id'] = Variable<String>(currentLessonId);
+    map['completed_lesson_ids'] = Variable<String>(completedLessonIds);
+    map['quick_check_scores'] = Variable<String>(quickCheckScores);
+    map['summary_quiz_score'] = Variable<int>(summaryQuizScore);
+    map['started_at'] = Variable<DateTime>(startedAt);
+    map['last_accessed_at'] = Variable<DateTime>(lastAccessedAt);
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<DateTime>(completedAt);
+    }
+    return map;
+  }
+
+  ChapterProgressTableCompanion toCompanion(bool nullToAbsent) {
+    return ChapterProgressTableCompanion(
+      chapterId: Value(chapterId),
+      userId: Value(userId),
+      currentLessonId: Value(currentLessonId),
+      completedLessonIds: Value(completedLessonIds),
+      quickCheckScores: Value(quickCheckScores),
+      summaryQuizScore: Value(summaryQuizScore),
+      startedAt: Value(startedAt),
+      lastAccessedAt: Value(lastAccessedAt),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+    );
+  }
+
+  factory ChapterProgressTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChapterProgressTableData(
+      chapterId: serializer.fromJson<String>(json['chapterId']),
+      userId: serializer.fromJson<int>(json['userId']),
+      currentLessonId: serializer.fromJson<String>(json['currentLessonId']),
+      completedLessonIds: serializer.fromJson<String>(
+        json['completedLessonIds'],
+      ),
+      quickCheckScores: serializer.fromJson<String>(json['quickCheckScores']),
+      summaryQuizScore: serializer.fromJson<int>(json['summaryQuizScore']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      lastAccessedAt: serializer.fromJson<DateTime>(json['lastAccessedAt']),
+      completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'chapterId': serializer.toJson<String>(chapterId),
+      'userId': serializer.toJson<int>(userId),
+      'currentLessonId': serializer.toJson<String>(currentLessonId),
+      'completedLessonIds': serializer.toJson<String>(completedLessonIds),
+      'quickCheckScores': serializer.toJson<String>(quickCheckScores),
+      'summaryQuizScore': serializer.toJson<int>(summaryQuizScore),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'lastAccessedAt': serializer.toJson<DateTime>(lastAccessedAt),
+      'completedAt': serializer.toJson<DateTime?>(completedAt),
+    };
+  }
+
+  ChapterProgressTableData copyWith({
+    String? chapterId,
+    int? userId,
+    String? currentLessonId,
+    String? completedLessonIds,
+    String? quickCheckScores,
+    int? summaryQuizScore,
+    DateTime? startedAt,
+    DateTime? lastAccessedAt,
+    Value<DateTime?> completedAt = const Value.absent(),
+  }) => ChapterProgressTableData(
+    chapterId: chapterId ?? this.chapterId,
+    userId: userId ?? this.userId,
+    currentLessonId: currentLessonId ?? this.currentLessonId,
+    completedLessonIds: completedLessonIds ?? this.completedLessonIds,
+    quickCheckScores: quickCheckScores ?? this.quickCheckScores,
+    summaryQuizScore: summaryQuizScore ?? this.summaryQuizScore,
+    startedAt: startedAt ?? this.startedAt,
+    lastAccessedAt: lastAccessedAt ?? this.lastAccessedAt,
+    completedAt: completedAt.present ? completedAt.value : this.completedAt,
+  );
+  ChapterProgressTableData copyWithCompanion(
+    ChapterProgressTableCompanion data,
+  ) {
+    return ChapterProgressTableData(
+      chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      currentLessonId: data.currentLessonId.present
+          ? data.currentLessonId.value
+          : this.currentLessonId,
+      completedLessonIds: data.completedLessonIds.present
+          ? data.completedLessonIds.value
+          : this.completedLessonIds,
+      quickCheckScores: data.quickCheckScores.present
+          ? data.quickCheckScores.value
+          : this.quickCheckScores,
+      summaryQuizScore: data.summaryQuizScore.present
+          ? data.summaryQuizScore.value
+          : this.summaryQuizScore,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      lastAccessedAt: data.lastAccessedAt.present
+          ? data.lastAccessedAt.value
+          : this.lastAccessedAt,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChapterProgressTableData(')
+          ..write('chapterId: $chapterId, ')
+          ..write('userId: $userId, ')
+          ..write('currentLessonId: $currentLessonId, ')
+          ..write('completedLessonIds: $completedLessonIds, ')
+          ..write('quickCheckScores: $quickCheckScores, ')
+          ..write('summaryQuizScore: $summaryQuizScore, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('lastAccessedAt: $lastAccessedAt, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    chapterId,
+    userId,
+    currentLessonId,
+    completedLessonIds,
+    quickCheckScores,
+    summaryQuizScore,
+    startedAt,
+    lastAccessedAt,
+    completedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChapterProgressTableData &&
+          other.chapterId == this.chapterId &&
+          other.userId == this.userId &&
+          other.currentLessonId == this.currentLessonId &&
+          other.completedLessonIds == this.completedLessonIds &&
+          other.quickCheckScores == this.quickCheckScores &&
+          other.summaryQuizScore == this.summaryQuizScore &&
+          other.startedAt == this.startedAt &&
+          other.lastAccessedAt == this.lastAccessedAt &&
+          other.completedAt == this.completedAt);
+}
+
+class ChapterProgressTableCompanion
+    extends UpdateCompanion<ChapterProgressTableData> {
+  final Value<String> chapterId;
+  final Value<int> userId;
+  final Value<String> currentLessonId;
+  final Value<String> completedLessonIds;
+  final Value<String> quickCheckScores;
+  final Value<int> summaryQuizScore;
+  final Value<DateTime> startedAt;
+  final Value<DateTime> lastAccessedAt;
+  final Value<DateTime?> completedAt;
+  final Value<int> rowid;
+  const ChapterProgressTableCompanion({
+    this.chapterId = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.currentLessonId = const Value.absent(),
+    this.completedLessonIds = const Value.absent(),
+    this.quickCheckScores = const Value.absent(),
+    this.summaryQuizScore = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.lastAccessedAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ChapterProgressTableCompanion.insert({
+    required String chapterId,
+    required int userId,
+    this.currentLessonId = const Value.absent(),
+    this.completedLessonIds = const Value.absent(),
+    this.quickCheckScores = const Value.absent(),
+    this.summaryQuizScore = const Value.absent(),
+    required DateTime startedAt,
+    required DateTime lastAccessedAt,
+    this.completedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : chapterId = Value(chapterId),
+       userId = Value(userId),
+       startedAt = Value(startedAt),
+       lastAccessedAt = Value(lastAccessedAt);
+  static Insertable<ChapterProgressTableData> custom({
+    Expression<String>? chapterId,
+    Expression<int>? userId,
+    Expression<String>? currentLessonId,
+    Expression<String>? completedLessonIds,
+    Expression<String>? quickCheckScores,
+    Expression<int>? summaryQuizScore,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? lastAccessedAt,
+    Expression<DateTime>? completedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (chapterId != null) 'chapter_id': chapterId,
+      if (userId != null) 'user_id': userId,
+      if (currentLessonId != null) 'current_lesson_id': currentLessonId,
+      if (completedLessonIds != null)
+        'completed_lesson_ids': completedLessonIds,
+      if (quickCheckScores != null) 'quick_check_scores': quickCheckScores,
+      if (summaryQuizScore != null) 'summary_quiz_score': summaryQuizScore,
+      if (startedAt != null) 'started_at': startedAt,
+      if (lastAccessedAt != null) 'last_accessed_at': lastAccessedAt,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ChapterProgressTableCompanion copyWith({
+    Value<String>? chapterId,
+    Value<int>? userId,
+    Value<String>? currentLessonId,
+    Value<String>? completedLessonIds,
+    Value<String>? quickCheckScores,
+    Value<int>? summaryQuizScore,
+    Value<DateTime>? startedAt,
+    Value<DateTime>? lastAccessedAt,
+    Value<DateTime?>? completedAt,
+    Value<int>? rowid,
+  }) {
+    return ChapterProgressTableCompanion(
+      chapterId: chapterId ?? this.chapterId,
+      userId: userId ?? this.userId,
+      currentLessonId: currentLessonId ?? this.currentLessonId,
+      completedLessonIds: completedLessonIds ?? this.completedLessonIds,
+      quickCheckScores: quickCheckScores ?? this.quickCheckScores,
+      summaryQuizScore: summaryQuizScore ?? this.summaryQuizScore,
+      startedAt: startedAt ?? this.startedAt,
+      lastAccessedAt: lastAccessedAt ?? this.lastAccessedAt,
+      completedAt: completedAt ?? this.completedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (chapterId.present) {
+      map['chapter_id'] = Variable<String>(chapterId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (currentLessonId.present) {
+      map['current_lesson_id'] = Variable<String>(currentLessonId.value);
+    }
+    if (completedLessonIds.present) {
+      map['completed_lesson_ids'] = Variable<String>(completedLessonIds.value);
+    }
+    if (quickCheckScores.present) {
+      map['quick_check_scores'] = Variable<String>(quickCheckScores.value);
+    }
+    if (summaryQuizScore.present) {
+      map['summary_quiz_score'] = Variable<int>(summaryQuizScore.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (lastAccessedAt.present) {
+      map['last_accessed_at'] = Variable<DateTime>(lastAccessedAt.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<DateTime>(completedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChapterProgressTableCompanion(')
+          ..write('chapterId: $chapterId, ')
+          ..write('userId: $userId, ')
+          ..write('currentLessonId: $currentLessonId, ')
+          ..write('completedLessonIds: $completedLessonIds, ')
+          ..write('quickCheckScores: $quickCheckScores, ')
+          ..write('summaryQuizScore: $summaryQuizScore, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('lastAccessedAt: $lastAccessedAt, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -11225,13 +14114,27 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FlashcardsTable flashcards = $FlashcardsTable(this);
   late final $DppSetsTable dppSets = $DppSetsTable(this);
   late final $DppQuestionsTable dppQuestions = $DppQuestionsTable(this);
+  late final $ResourceProgressTable resourceProgress = $ResourceProgressTable(
+    this,
+  );
+  late final $MistakeEventsTable mistakeEvents = $MistakeEventsTable(this);
+  late final $RetentionReviewsTable retentionReviews = $RetentionReviewsTable(
+    this,
+  );
+  late final $ConsentRecordsTable consentRecords = $ConsentRecordsTable(this);
+  late final $ChapterProgressTableTable chapterProgressTable =
+      $ChapterProgressTableTable(this);
   late final Index questionsRemoteIdUnique = Index(
     'questions_remote_id_unique',
     'CREATE UNIQUE INDEX questions_remote_id_unique ON questions (remote_id)',
   );
-  late final Index bookmarksQuestionIdUnique = Index(
-    'bookmarks_question_id_unique',
-    'CREATE UNIQUE INDEX bookmarks_question_id_unique ON bookmarks (question_id)',
+  late final Index bookmarksUserQuestionUnique = Index(
+    'bookmarks_user_question_unique',
+    'CREATE UNIQUE INDEX bookmarks_user_question_unique ON bookmarks (user_id, question_id)',
+  );
+  late final Index resourceProgressUserResourceUnique = Index(
+    'resource_progress_user_resource_unique',
+    'CREATE UNIQUE INDEX resource_progress_user_resource_unique ON resource_progress (user_id, resource_id)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -11253,9 +14156,25 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     flashcards,
     dppSets,
     dppQuestions,
+    resourceProgress,
+    mistakeEvents,
+    retentionReviews,
+    consentRecords,
+    chapterProgressTable,
     questionsRemoteIdUnique,
-    bookmarksQuestionIdUnique,
+    bookmarksUserQuestionUnique,
+    resourceProgressUserResourceUnique,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('consent_records', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$QuestionsTableCreateCompanionBuilder =
@@ -13018,7 +15937,7 @@ typedef $$TopicProgressEntriesTableProcessedTableManager =
 typedef $$BookmarksTableCreateCompanionBuilder =
     BookmarksCompanion Function({
       Value<int> id,
-      Value<int> userId,
+      required int userId,
       required String questionId,
       required String subject,
       required String topicId,
@@ -13208,7 +16127,7 @@ class $$BookmarksTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int> userId = const Value.absent(),
+                required int userId,
                 required String questionId,
                 required String subject,
                 required String topicId,
@@ -13674,6 +16593,12 @@ typedef $$UsersTableCreateCompanionBuilder =
       Value<String?> supabaseId,
       Value<int> failedLoginAttempts,
       Value<DateTime?> lockedUntil,
+      Value<int> twoFactorAttempts,
+      Value<DateTime?> twoFactorLockedUntil,
+      Value<DateTime?> twoFactorLastSentAt,
+      Value<int> passwordResetAttempts,
+      Value<DateTime?> passwordResetLockedUntil,
+      Value<DateTime?> passwordResetLastSentAt,
     });
 typedef $$UsersTableUpdateCompanionBuilder =
     UsersCompanion Function({
@@ -13701,7 +16626,36 @@ typedef $$UsersTableUpdateCompanionBuilder =
       Value<String?> supabaseId,
       Value<int> failedLoginAttempts,
       Value<DateTime?> lockedUntil,
+      Value<int> twoFactorAttempts,
+      Value<DateTime?> twoFactorLockedUntil,
+      Value<DateTime?> twoFactorLastSentAt,
+      Value<int> passwordResetAttempts,
+      Value<DateTime?> passwordResetLockedUntil,
+      Value<DateTime?> passwordResetLastSentAt,
     });
+
+final class $$UsersTableReferences
+    extends BaseReferences<_$AppDatabase, $UsersTable, User> {
+  $$UsersTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ConsentRecordsTable, List<ConsentRecord>>
+  _consentRecordsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.consentRecords,
+    aliasName: 'users__id__consent_records__user_id',
+  );
+
+  $$ConsentRecordsTableProcessedTableManager get consentRecordsRefs {
+    final manager = $$ConsentRecordsTableTableManager(
+      $_db,
+      $_db.consentRecords,
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_consentRecordsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
   $$UsersTableFilterComposer({
@@ -13830,6 +16784,61 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
     column: $table.lockedUntil,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<int> get twoFactorAttempts => $composableBuilder(
+    column: $table.twoFactorAttempts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get twoFactorLockedUntil => $composableBuilder(
+    column: $table.twoFactorLockedUntil,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get twoFactorLastSentAt => $composableBuilder(
+    column: $table.twoFactorLastSentAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get passwordResetAttempts => $composableBuilder(
+    column: $table.passwordResetAttempts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get passwordResetLockedUntil => $composableBuilder(
+    column: $table.passwordResetLockedUntil,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get passwordResetLastSentAt => $composableBuilder(
+    column: $table.passwordResetLastSentAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> consentRecordsRefs(
+    Expression<bool> Function($$ConsentRecordsTableFilterComposer f) f,
+  ) {
+    final $$ConsentRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.consentRecords,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ConsentRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.consentRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$UsersTableOrderingComposer
@@ -13960,6 +16969,36 @@ class $$UsersTableOrderingComposer
     column: $table.lockedUntil,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get twoFactorAttempts => $composableBuilder(
+    column: $table.twoFactorAttempts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get twoFactorLockedUntil => $composableBuilder(
+    column: $table.twoFactorLockedUntil,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get twoFactorLastSentAt => $composableBuilder(
+    column: $table.twoFactorLastSentAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get passwordResetAttempts => $composableBuilder(
+    column: $table.passwordResetAttempts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get passwordResetLockedUntil => $composableBuilder(
+    column: $table.passwordResetLockedUntil,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get passwordResetLastSentAt => $composableBuilder(
+    column: $table.passwordResetLastSentAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UsersTableAnnotationComposer
@@ -14072,6 +17111,61 @@ class $$UsersTableAnnotationComposer
     column: $table.lockedUntil,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get twoFactorAttempts => $composableBuilder(
+    column: $table.twoFactorAttempts,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get twoFactorLockedUntil => $composableBuilder(
+    column: $table.twoFactorLockedUntil,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get twoFactorLastSentAt => $composableBuilder(
+    column: $table.twoFactorLastSentAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get passwordResetAttempts => $composableBuilder(
+    column: $table.passwordResetAttempts,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get passwordResetLockedUntil => $composableBuilder(
+    column: $table.passwordResetLockedUntil,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get passwordResetLastSentAt => $composableBuilder(
+    column: $table.passwordResetLastSentAt,
+    builder: (column) => column,
+  );
+
+  Expression<T> consentRecordsRefs<T extends Object>(
+    Expression<T> Function($$ConsentRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$ConsentRecordsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.consentRecords,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ConsentRecordsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.consentRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$UsersTableTableManager
@@ -14085,9 +17179,9 @@ class $$UsersTableTableManager
           $$UsersTableAnnotationComposer,
           $$UsersTableCreateCompanionBuilder,
           $$UsersTableUpdateCompanionBuilder,
-          (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
+          (User, $$UsersTableReferences),
           User,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool consentRecordsRefs})
         > {
   $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
     : super(
@@ -14126,6 +17220,13 @@ class $$UsersTableTableManager
                 Value<String?> supabaseId = const Value.absent(),
                 Value<int> failedLoginAttempts = const Value.absent(),
                 Value<DateTime?> lockedUntil = const Value.absent(),
+                Value<int> twoFactorAttempts = const Value.absent(),
+                Value<DateTime?> twoFactorLockedUntil = const Value.absent(),
+                Value<DateTime?> twoFactorLastSentAt = const Value.absent(),
+                Value<int> passwordResetAttempts = const Value.absent(),
+                Value<DateTime?> passwordResetLockedUntil =
+                    const Value.absent(),
+                Value<DateTime?> passwordResetLastSentAt = const Value.absent(),
               }) => UsersCompanion(
                 id: id,
                 email: email,
@@ -14151,6 +17252,12 @@ class $$UsersTableTableManager
                 supabaseId: supabaseId,
                 failedLoginAttempts: failedLoginAttempts,
                 lockedUntil: lockedUntil,
+                twoFactorAttempts: twoFactorAttempts,
+                twoFactorLockedUntil: twoFactorLockedUntil,
+                twoFactorLastSentAt: twoFactorLastSentAt,
+                passwordResetAttempts: passwordResetAttempts,
+                passwordResetLockedUntil: passwordResetLockedUntil,
+                passwordResetLastSentAt: passwordResetLastSentAt,
               ),
           createCompanionCallback:
               ({
@@ -14178,6 +17285,13 @@ class $$UsersTableTableManager
                 Value<String?> supabaseId = const Value.absent(),
                 Value<int> failedLoginAttempts = const Value.absent(),
                 Value<DateTime?> lockedUntil = const Value.absent(),
+                Value<int> twoFactorAttempts = const Value.absent(),
+                Value<DateTime?> twoFactorLockedUntil = const Value.absent(),
+                Value<DateTime?> twoFactorLastSentAt = const Value.absent(),
+                Value<int> passwordResetAttempts = const Value.absent(),
+                Value<DateTime?> passwordResetLockedUntil =
+                    const Value.absent(),
+                Value<DateTime?> passwordResetLastSentAt = const Value.absent(),
               }) => UsersCompanion.insert(
                 id: id,
                 email: email,
@@ -14203,11 +17317,46 @@ class $$UsersTableTableManager
                 supabaseId: supabaseId,
                 failedLoginAttempts: failedLoginAttempts,
                 lockedUntil: lockedUntil,
+                twoFactorAttempts: twoFactorAttempts,
+                twoFactorLockedUntil: twoFactorLockedUntil,
+                twoFactorLastSentAt: twoFactorLastSentAt,
+                passwordResetAttempts: passwordResetAttempts,
+                passwordResetLockedUntil: passwordResetLockedUntil,
+                passwordResetLastSentAt: passwordResetLastSentAt,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) =>
+                    (e.readTable(table), $$UsersTableReferences(db, table, e)),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({consentRecordsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (consentRecordsRefs) db.consentRecords,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (consentRecordsRefs)
+                    await $_getPrefetchedData<User, $UsersTable, ConsentRecord>(
+                      currentTable: table,
+                      referencedTable: $$UsersTableReferences
+                          ._consentRecordsRefsTable(db),
+                      managerFromTypedResult: (p0) => $$UsersTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).consentRecordsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.userId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -14222,9 +17371,9 @@ typedef $$UsersTableProcessedTableManager =
       $$UsersTableAnnotationComposer,
       $$UsersTableCreateCompanionBuilder,
       $$UsersTableUpdateCompanionBuilder,
-      (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
+      (User, $$UsersTableReferences),
       User,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool consentRecordsRefs})
     >;
 typedef $$ErrorBookTableCreateCompanionBuilder =
     ErrorBookCompanion Function({
@@ -14756,12 +17905,14 @@ typedef $$SyncWatermarksTableCreateCompanionBuilder =
     SyncWatermarksCompanion Function({
       required String remoteTable,
       required DateTime lastSyncedAt,
+      Value<String?> cursorId,
       Value<int> rowid,
     });
 typedef $$SyncWatermarksTableUpdateCompanionBuilder =
     SyncWatermarksCompanion Function({
       Value<String> remoteTable,
       Value<DateTime> lastSyncedAt,
+      Value<String?> cursorId,
       Value<int> rowid,
     });
 
@@ -14781,6 +17932,11 @@ class $$SyncWatermarksTableFilterComposer
 
   ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
     column: $table.lastSyncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cursorId => $composableBuilder(
+    column: $table.cursorId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -14803,6 +17959,11 @@ class $$SyncWatermarksTableOrderingComposer
     column: $table.lastSyncedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get cursorId => $composableBuilder(
+    column: $table.cursorId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SyncWatermarksTableAnnotationComposer
@@ -14823,6 +17984,9 @@ class $$SyncWatermarksTableAnnotationComposer
     column: $table.lastSyncedAt,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get cursorId =>
+      $composableBuilder(column: $table.cursorId, builder: (column) => column);
 }
 
 class $$SyncWatermarksTableTableManager
@@ -14860,20 +18024,24 @@ class $$SyncWatermarksTableTableManager
               ({
                 Value<String> remoteTable = const Value.absent(),
                 Value<DateTime> lastSyncedAt = const Value.absent(),
+                Value<String?> cursorId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SyncWatermarksCompanion(
                 remoteTable: remoteTable,
                 lastSyncedAt: lastSyncedAt,
+                cursorId: cursorId,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String remoteTable,
                 required DateTime lastSyncedAt,
+                Value<String?> cursorId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SyncWatermarksCompanion.insert(
                 remoteTable: remoteTable,
                 lastSyncedAt: lastSyncedAt,
+                cursorId: cursorId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -16500,6 +19668,1402 @@ typedef $$DppQuestionsTableProcessedTableManager =
       DppQuestion,
       PrefetchHooks Function()
     >;
+typedef $$ResourceProgressTableCreateCompanionBuilder =
+    ResourceProgressCompanion Function({
+      Value<int> id,
+      required int userId,
+      required String resourceId,
+      Value<String?> chapterId,
+      Value<int?> lastPage,
+      Value<int> progressPercent,
+      Value<bool> isBookmarked,
+      Value<DateTime?> lastOpenedAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$ResourceProgressTableUpdateCompanionBuilder =
+    ResourceProgressCompanion Function({
+      Value<int> id,
+      Value<int> userId,
+      Value<String> resourceId,
+      Value<String?> chapterId,
+      Value<int?> lastPage,
+      Value<int> progressPercent,
+      Value<bool> isBookmarked,
+      Value<DateTime?> lastOpenedAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$ResourceProgressTableFilterComposer
+    extends Composer<_$AppDatabase, $ResourceProgressTable> {
+  $$ResourceProgressTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get resourceId => $composableBuilder(
+    column: $table.resourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chapterId => $composableBuilder(
+    column: $table.chapterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastPage => $composableBuilder(
+    column: $table.lastPage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get progressPercent => $composableBuilder(
+    column: $table.progressPercent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isBookmarked => $composableBuilder(
+    column: $table.isBookmarked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastOpenedAt => $composableBuilder(
+    column: $table.lastOpenedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ResourceProgressTableOrderingComposer
+    extends Composer<_$AppDatabase, $ResourceProgressTable> {
+  $$ResourceProgressTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get resourceId => $composableBuilder(
+    column: $table.resourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chapterId => $composableBuilder(
+    column: $table.chapterId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastPage => $composableBuilder(
+    column: $table.lastPage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get progressPercent => $composableBuilder(
+    column: $table.progressPercent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isBookmarked => $composableBuilder(
+    column: $table.isBookmarked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastOpenedAt => $composableBuilder(
+    column: $table.lastOpenedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ResourceProgressTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ResourceProgressTable> {
+  $$ResourceProgressTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get resourceId => $composableBuilder(
+    column: $table.resourceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get chapterId =>
+      $composableBuilder(column: $table.chapterId, builder: (column) => column);
+
+  GeneratedColumn<int> get lastPage =>
+      $composableBuilder(column: $table.lastPage, builder: (column) => column);
+
+  GeneratedColumn<int> get progressPercent => $composableBuilder(
+    column: $table.progressPercent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isBookmarked => $composableBuilder(
+    column: $table.isBookmarked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastOpenedAt => $composableBuilder(
+    column: $table.lastOpenedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$ResourceProgressTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ResourceProgressTable,
+          ResourceProgressData,
+          $$ResourceProgressTableFilterComposer,
+          $$ResourceProgressTableOrderingComposer,
+          $$ResourceProgressTableAnnotationComposer,
+          $$ResourceProgressTableCreateCompanionBuilder,
+          $$ResourceProgressTableUpdateCompanionBuilder,
+          (
+            ResourceProgressData,
+            BaseReferences<
+              _$AppDatabase,
+              $ResourceProgressTable,
+              ResourceProgressData
+            >,
+          ),
+          ResourceProgressData,
+          PrefetchHooks Function()
+        > {
+  $$ResourceProgressTableTableManager(
+    _$AppDatabase db,
+    $ResourceProgressTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ResourceProgressTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ResourceProgressTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ResourceProgressTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<String> resourceId = const Value.absent(),
+                Value<String?> chapterId = const Value.absent(),
+                Value<int?> lastPage = const Value.absent(),
+                Value<int> progressPercent = const Value.absent(),
+                Value<bool> isBookmarked = const Value.absent(),
+                Value<DateTime?> lastOpenedAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ResourceProgressCompanion(
+                id: id,
+                userId: userId,
+                resourceId: resourceId,
+                chapterId: chapterId,
+                lastPage: lastPage,
+                progressPercent: progressPercent,
+                isBookmarked: isBookmarked,
+                lastOpenedAt: lastOpenedAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int userId,
+                required String resourceId,
+                Value<String?> chapterId = const Value.absent(),
+                Value<int?> lastPage = const Value.absent(),
+                Value<int> progressPercent = const Value.absent(),
+                Value<bool> isBookmarked = const Value.absent(),
+                Value<DateTime?> lastOpenedAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ResourceProgressCompanion.insert(
+                id: id,
+                userId: userId,
+                resourceId: resourceId,
+                chapterId: chapterId,
+                lastPage: lastPage,
+                progressPercent: progressPercent,
+                isBookmarked: isBookmarked,
+                lastOpenedAt: lastOpenedAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ResourceProgressTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ResourceProgressTable,
+      ResourceProgressData,
+      $$ResourceProgressTableFilterComposer,
+      $$ResourceProgressTableOrderingComposer,
+      $$ResourceProgressTableAnnotationComposer,
+      $$ResourceProgressTableCreateCompanionBuilder,
+      $$ResourceProgressTableUpdateCompanionBuilder,
+      (
+        ResourceProgressData,
+        BaseReferences<
+          _$AppDatabase,
+          $ResourceProgressTable,
+          ResourceProgressData
+        >,
+      ),
+      ResourceProgressData,
+      PrefetchHooks Function()
+    >;
+typedef $$MistakeEventsTableCreateCompanionBuilder =
+    MistakeEventsCompanion Function({
+      Value<int> id,
+      Value<int> userId,
+      Value<int?> attemptId,
+      required String questionId,
+      required String topicId,
+      required String mistakeType,
+      required double timeSeconds,
+      required DateTime createdAt,
+    });
+typedef $$MistakeEventsTableUpdateCompanionBuilder =
+    MistakeEventsCompanion Function({
+      Value<int> id,
+      Value<int> userId,
+      Value<int?> attemptId,
+      Value<String> questionId,
+      Value<String> topicId,
+      Value<String> mistakeType,
+      Value<double> timeSeconds,
+      Value<DateTime> createdAt,
+    });
+
+class $$MistakeEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $MistakeEventsTable> {
+  $$MistakeEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get attemptId => $composableBuilder(
+    column: $table.attemptId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mistakeType => $composableBuilder(
+    column: $table.mistakeType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get timeSeconds => $composableBuilder(
+    column: $table.timeSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MistakeEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MistakeEventsTable> {
+  $$MistakeEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get attemptId => $composableBuilder(
+    column: $table.attemptId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mistakeType => $composableBuilder(
+    column: $table.mistakeType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get timeSeconds => $composableBuilder(
+    column: $table.timeSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MistakeEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MistakeEventsTable> {
+  $$MistakeEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<int> get attemptId =>
+      $composableBuilder(column: $table.attemptId, builder: (column) => column);
+
+  GeneratedColumn<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get topicId =>
+      $composableBuilder(column: $table.topicId, builder: (column) => column);
+
+  GeneratedColumn<String> get mistakeType => $composableBuilder(
+    column: $table.mistakeType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get timeSeconds => $composableBuilder(
+    column: $table.timeSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$MistakeEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MistakeEventsTable,
+          MistakeEvent,
+          $$MistakeEventsTableFilterComposer,
+          $$MistakeEventsTableOrderingComposer,
+          $$MistakeEventsTableAnnotationComposer,
+          $$MistakeEventsTableCreateCompanionBuilder,
+          $$MistakeEventsTableUpdateCompanionBuilder,
+          (
+            MistakeEvent,
+            BaseReferences<_$AppDatabase, $MistakeEventsTable, MistakeEvent>,
+          ),
+          MistakeEvent,
+          PrefetchHooks Function()
+        > {
+  $$MistakeEventsTableTableManager(_$AppDatabase db, $MistakeEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MistakeEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MistakeEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MistakeEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<int?> attemptId = const Value.absent(),
+                Value<String> questionId = const Value.absent(),
+                Value<String> topicId = const Value.absent(),
+                Value<String> mistakeType = const Value.absent(),
+                Value<double> timeSeconds = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MistakeEventsCompanion(
+                id: id,
+                userId: userId,
+                attemptId: attemptId,
+                questionId: questionId,
+                topicId: topicId,
+                mistakeType: mistakeType,
+                timeSeconds: timeSeconds,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<int?> attemptId = const Value.absent(),
+                required String questionId,
+                required String topicId,
+                required String mistakeType,
+                required double timeSeconds,
+                required DateTime createdAt,
+              }) => MistakeEventsCompanion.insert(
+                id: id,
+                userId: userId,
+                attemptId: attemptId,
+                questionId: questionId,
+                topicId: topicId,
+                mistakeType: mistakeType,
+                timeSeconds: timeSeconds,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MistakeEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MistakeEventsTable,
+      MistakeEvent,
+      $$MistakeEventsTableFilterComposer,
+      $$MistakeEventsTableOrderingComposer,
+      $$MistakeEventsTableAnnotationComposer,
+      $$MistakeEventsTableCreateCompanionBuilder,
+      $$MistakeEventsTableUpdateCompanionBuilder,
+      (
+        MistakeEvent,
+        BaseReferences<_$AppDatabase, $MistakeEventsTable, MistakeEvent>,
+      ),
+      MistakeEvent,
+      PrefetchHooks Function()
+    >;
+typedef $$RetentionReviewsTableCreateCompanionBuilder =
+    RetentionReviewsCompanion Function({
+      Value<int> id,
+      Value<int> userId,
+      required String topicId,
+      required int intervalDays,
+      required DateTime dueAt,
+      required DateTime checkedAt,
+      Value<double?> accuracy,
+    });
+typedef $$RetentionReviewsTableUpdateCompanionBuilder =
+    RetentionReviewsCompanion Function({
+      Value<int> id,
+      Value<int> userId,
+      Value<String> topicId,
+      Value<int> intervalDays,
+      Value<DateTime> dueAt,
+      Value<DateTime> checkedAt,
+      Value<double?> accuracy,
+    });
+
+class $$RetentionReviewsTableFilterComposer
+    extends Composer<_$AppDatabase, $RetentionReviewsTable> {
+  $$RetentionReviewsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dueAt => $composableBuilder(
+    column: $table.dueAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get checkedAt => $composableBuilder(
+    column: $table.checkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get accuracy => $composableBuilder(
+    column: $table.accuracy,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RetentionReviewsTableOrderingComposer
+    extends Composer<_$AppDatabase, $RetentionReviewsTable> {
+  $$RetentionReviewsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dueAt => $composableBuilder(
+    column: $table.dueAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get checkedAt => $composableBuilder(
+    column: $table.checkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get accuracy => $composableBuilder(
+    column: $table.accuracy,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RetentionReviewsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RetentionReviewsTable> {
+  $$RetentionReviewsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get topicId =>
+      $composableBuilder(column: $table.topicId, builder: (column) => column);
+
+  GeneratedColumn<int> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dueAt =>
+      $composableBuilder(column: $table.dueAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get checkedAt =>
+      $composableBuilder(column: $table.checkedAt, builder: (column) => column);
+
+  GeneratedColumn<double> get accuracy =>
+      $composableBuilder(column: $table.accuracy, builder: (column) => column);
+}
+
+class $$RetentionReviewsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RetentionReviewsTable,
+          RetentionReview,
+          $$RetentionReviewsTableFilterComposer,
+          $$RetentionReviewsTableOrderingComposer,
+          $$RetentionReviewsTableAnnotationComposer,
+          $$RetentionReviewsTableCreateCompanionBuilder,
+          $$RetentionReviewsTableUpdateCompanionBuilder,
+          (
+            RetentionReview,
+            BaseReferences<
+              _$AppDatabase,
+              $RetentionReviewsTable,
+              RetentionReview
+            >,
+          ),
+          RetentionReview,
+          PrefetchHooks Function()
+        > {
+  $$RetentionReviewsTableTableManager(
+    _$AppDatabase db,
+    $RetentionReviewsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RetentionReviewsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RetentionReviewsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RetentionReviewsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<String> topicId = const Value.absent(),
+                Value<int> intervalDays = const Value.absent(),
+                Value<DateTime> dueAt = const Value.absent(),
+                Value<DateTime> checkedAt = const Value.absent(),
+                Value<double?> accuracy = const Value.absent(),
+              }) => RetentionReviewsCompanion(
+                id: id,
+                userId: userId,
+                topicId: topicId,
+                intervalDays: intervalDays,
+                dueAt: dueAt,
+                checkedAt: checkedAt,
+                accuracy: accuracy,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                required String topicId,
+                required int intervalDays,
+                required DateTime dueAt,
+                required DateTime checkedAt,
+                Value<double?> accuracy = const Value.absent(),
+              }) => RetentionReviewsCompanion.insert(
+                id: id,
+                userId: userId,
+                topicId: topicId,
+                intervalDays: intervalDays,
+                dueAt: dueAt,
+                checkedAt: checkedAt,
+                accuracy: accuracy,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RetentionReviewsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RetentionReviewsTable,
+      RetentionReview,
+      $$RetentionReviewsTableFilterComposer,
+      $$RetentionReviewsTableOrderingComposer,
+      $$RetentionReviewsTableAnnotationComposer,
+      $$RetentionReviewsTableCreateCompanionBuilder,
+      $$RetentionReviewsTableUpdateCompanionBuilder,
+      (
+        RetentionReview,
+        BaseReferences<_$AppDatabase, $RetentionReviewsTable, RetentionReview>,
+      ),
+      RetentionReview,
+      PrefetchHooks Function()
+    >;
+typedef $$ConsentRecordsTableCreateCompanionBuilder =
+    ConsentRecordsCompanion Function({
+      required int userId,
+      required String document,
+      required String version,
+      required DateTime acceptedAt,
+      Value<int> rowid,
+    });
+typedef $$ConsentRecordsTableUpdateCompanionBuilder =
+    ConsentRecordsCompanion Function({
+      Value<int> userId,
+      Value<String> document,
+      Value<String> version,
+      Value<DateTime> acceptedAt,
+      Value<int> rowid,
+    });
+
+final class $$ConsentRecordsTableReferences
+    extends BaseReferences<_$AppDatabase, $ConsentRecordsTable, ConsentRecord> {
+  $$ConsentRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $UsersTable _userIdTable(_$AppDatabase db) =>
+      db.users.createAlias('consent_records__user_id__users__id');
+
+  $$UsersTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<int>('user_id')!;
+
+    final manager = $$UsersTableTableManager(
+      $_db,
+      $_db.users,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ConsentRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $ConsentRecordsTable> {
+  $$ConsentRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get document => $composableBuilder(
+    column: $table.document,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get acceptedAt => $composableBuilder(
+    column: $table.acceptedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UsersTableFilterComposer get userId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableFilterComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ConsentRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ConsentRecordsTable> {
+  $$ConsentRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get document => $composableBuilder(
+    column: $table.document,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get acceptedAt => $composableBuilder(
+    column: $table.acceptedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UsersTableOrderingComposer get userId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ConsentRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ConsentRecordsTable> {
+  $$ConsentRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get document =>
+      $composableBuilder(column: $table.document, builder: (column) => column);
+
+  GeneratedColumn<String> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get acceptedAt => $composableBuilder(
+    column: $table.acceptedAt,
+    builder: (column) => column,
+  );
+
+  $$UsersTableAnnotationComposer get userId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ConsentRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ConsentRecordsTable,
+          ConsentRecord,
+          $$ConsentRecordsTableFilterComposer,
+          $$ConsentRecordsTableOrderingComposer,
+          $$ConsentRecordsTableAnnotationComposer,
+          $$ConsentRecordsTableCreateCompanionBuilder,
+          $$ConsentRecordsTableUpdateCompanionBuilder,
+          (ConsentRecord, $$ConsentRecordsTableReferences),
+          ConsentRecord,
+          PrefetchHooks Function({bool userId})
+        > {
+  $$ConsentRecordsTableTableManager(
+    _$AppDatabase db,
+    $ConsentRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ConsentRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ConsentRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ConsentRecordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> userId = const Value.absent(),
+                Value<String> document = const Value.absent(),
+                Value<String> version = const Value.absent(),
+                Value<DateTime> acceptedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ConsentRecordsCompanion(
+                userId: userId,
+                document: document,
+                version: version,
+                acceptedAt: acceptedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int userId,
+                required String document,
+                required String version,
+                required DateTime acceptedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ConsentRecordsCompanion.insert(
+                userId: userId,
+                document: document,
+                version: version,
+                acceptedAt: acceptedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ConsentRecordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (userId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.userId,
+                                referencedTable: $$ConsentRecordsTableReferences
+                                    ._userIdTable(db),
+                                referencedColumn:
+                                    $$ConsentRecordsTableReferences
+                                        ._userIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ConsentRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ConsentRecordsTable,
+      ConsentRecord,
+      $$ConsentRecordsTableFilterComposer,
+      $$ConsentRecordsTableOrderingComposer,
+      $$ConsentRecordsTableAnnotationComposer,
+      $$ConsentRecordsTableCreateCompanionBuilder,
+      $$ConsentRecordsTableUpdateCompanionBuilder,
+      (ConsentRecord, $$ConsentRecordsTableReferences),
+      ConsentRecord,
+      PrefetchHooks Function({bool userId})
+    >;
+typedef $$ChapterProgressTableTableCreateCompanionBuilder =
+    ChapterProgressTableCompanion Function({
+      required String chapterId,
+      required int userId,
+      Value<String> currentLessonId,
+      Value<String> completedLessonIds,
+      Value<String> quickCheckScores,
+      Value<int> summaryQuizScore,
+      required DateTime startedAt,
+      required DateTime lastAccessedAt,
+      Value<DateTime?> completedAt,
+      Value<int> rowid,
+    });
+typedef $$ChapterProgressTableTableUpdateCompanionBuilder =
+    ChapterProgressTableCompanion Function({
+      Value<String> chapterId,
+      Value<int> userId,
+      Value<String> currentLessonId,
+      Value<String> completedLessonIds,
+      Value<String> quickCheckScores,
+      Value<int> summaryQuizScore,
+      Value<DateTime> startedAt,
+      Value<DateTime> lastAccessedAt,
+      Value<DateTime?> completedAt,
+      Value<int> rowid,
+    });
+
+class $$ChapterProgressTableTableFilterComposer
+    extends Composer<_$AppDatabase, $ChapterProgressTableTable> {
+  $$ChapterProgressTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get chapterId => $composableBuilder(
+    column: $table.chapterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currentLessonId => $composableBuilder(
+    column: $table.currentLessonId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get completedLessonIds => $composableBuilder(
+    column: $table.completedLessonIds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get quickCheckScores => $composableBuilder(
+    column: $table.quickCheckScores,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get summaryQuizScore => $composableBuilder(
+    column: $table.summaryQuizScore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastAccessedAt => $composableBuilder(
+    column: $table.lastAccessedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ChapterProgressTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChapterProgressTableTable> {
+  $$ChapterProgressTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get chapterId => $composableBuilder(
+    column: $table.chapterId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currentLessonId => $composableBuilder(
+    column: $table.currentLessonId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get completedLessonIds => $composableBuilder(
+    column: $table.completedLessonIds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get quickCheckScores => $composableBuilder(
+    column: $table.quickCheckScores,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get summaryQuizScore => $composableBuilder(
+    column: $table.summaryQuizScore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastAccessedAt => $composableBuilder(
+    column: $table.lastAccessedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ChapterProgressTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChapterProgressTableTable> {
+  $$ChapterProgressTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get chapterId =>
+      $composableBuilder(column: $table.chapterId, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get currentLessonId => $composableBuilder(
+    column: $table.currentLessonId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get completedLessonIds => $composableBuilder(
+    column: $table.completedLessonIds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get quickCheckScores => $composableBuilder(
+    column: $table.quickCheckScores,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get summaryQuizScore => $composableBuilder(
+    column: $table.summaryQuizScore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastAccessedAt => $composableBuilder(
+    column: $table.lastAccessedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$ChapterProgressTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ChapterProgressTableTable,
+          ChapterProgressTableData,
+          $$ChapterProgressTableTableFilterComposer,
+          $$ChapterProgressTableTableOrderingComposer,
+          $$ChapterProgressTableTableAnnotationComposer,
+          $$ChapterProgressTableTableCreateCompanionBuilder,
+          $$ChapterProgressTableTableUpdateCompanionBuilder,
+          (
+            ChapterProgressTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $ChapterProgressTableTable,
+              ChapterProgressTableData
+            >,
+          ),
+          ChapterProgressTableData,
+          PrefetchHooks Function()
+        > {
+  $$ChapterProgressTableTableTableManager(
+    _$AppDatabase db,
+    $ChapterProgressTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ChapterProgressTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChapterProgressTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ChapterProgressTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> chapterId = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<String> currentLessonId = const Value.absent(),
+                Value<String> completedLessonIds = const Value.absent(),
+                Value<String> quickCheckScores = const Value.absent(),
+                Value<int> summaryQuizScore = const Value.absent(),
+                Value<DateTime> startedAt = const Value.absent(),
+                Value<DateTime> lastAccessedAt = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ChapterProgressTableCompanion(
+                chapterId: chapterId,
+                userId: userId,
+                currentLessonId: currentLessonId,
+                completedLessonIds: completedLessonIds,
+                quickCheckScores: quickCheckScores,
+                summaryQuizScore: summaryQuizScore,
+                startedAt: startedAt,
+                lastAccessedAt: lastAccessedAt,
+                completedAt: completedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String chapterId,
+                required int userId,
+                Value<String> currentLessonId = const Value.absent(),
+                Value<String> completedLessonIds = const Value.absent(),
+                Value<String> quickCheckScores = const Value.absent(),
+                Value<int> summaryQuizScore = const Value.absent(),
+                required DateTime startedAt,
+                required DateTime lastAccessedAt,
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ChapterProgressTableCompanion.insert(
+                chapterId: chapterId,
+                userId: userId,
+                currentLessonId: currentLessonId,
+                completedLessonIds: completedLessonIds,
+                quickCheckScores: quickCheckScores,
+                summaryQuizScore: summaryQuizScore,
+                startedAt: startedAt,
+                lastAccessedAt: lastAccessedAt,
+                completedAt: completedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ChapterProgressTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ChapterProgressTableTable,
+      ChapterProgressTableData,
+      $$ChapterProgressTableTableFilterComposer,
+      $$ChapterProgressTableTableOrderingComposer,
+      $$ChapterProgressTableTableAnnotationComposer,
+      $$ChapterProgressTableTableCreateCompanionBuilder,
+      $$ChapterProgressTableTableUpdateCompanionBuilder,
+      (
+        ChapterProgressTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $ChapterProgressTableTable,
+          ChapterProgressTableData
+        >,
+      ),
+      ChapterProgressTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -16534,4 +21098,14 @@ class $AppDatabaseManager {
       $$DppSetsTableTableManager(_db, _db.dppSets);
   $$DppQuestionsTableTableManager get dppQuestions =>
       $$DppQuestionsTableTableManager(_db, _db.dppQuestions);
+  $$ResourceProgressTableTableManager get resourceProgress =>
+      $$ResourceProgressTableTableManager(_db, _db.resourceProgress);
+  $$MistakeEventsTableTableManager get mistakeEvents =>
+      $$MistakeEventsTableTableManager(_db, _db.mistakeEvents);
+  $$RetentionReviewsTableTableManager get retentionReviews =>
+      $$RetentionReviewsTableTableManager(_db, _db.retentionReviews);
+  $$ConsentRecordsTableTableManager get consentRecords =>
+      $$ConsentRecordsTableTableManager(_db, _db.consentRecords);
+  $$ChapterProgressTableTableTableManager get chapterProgressTable =>
+      $$ChapterProgressTableTableTableManager(_db, _db.chapterProgressTable);
 }
