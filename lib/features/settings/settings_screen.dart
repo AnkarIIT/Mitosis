@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/providers.dart';
-import '../../core/theme/app_colors.dart';
 
 import '../../core/services/biometric_service.dart';
 
@@ -41,13 +40,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final enabled = await service.areRemindersEnabled();
     final timeStr = await service.getReminderTime();
     final parts = timeStr.split(':');
-
+    final hour = parts.isNotEmpty ? int.tryParse(parts[0]) : null;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) : null;
+    if (!mounted) return;
     setState(() {
       _remindersEnabled = enabled;
-      _reminderTime = TimeOfDay(
-        hour: int.parse(parts[0]),
-        minute: int.parse(parts[1]),
-      );
+      if (hour != null &&
+          minute != null &&
+          hour >= 0 &&
+          hour < 24 &&
+          minute >= 0 &&
+          minute < 60) {
+        _reminderTime = TimeOfDay(hour: hour, minute: minute);
+      }
     });
   }
 
@@ -132,10 +137,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          icon: const Icon(
+          icon: Icon(
             Icons.fingerprint,
             size: 32,
-            color: AppColors.primary,
+            color: AdaptiveColors.primary(context),
           ),
           title: const Text('Enable Biometric Lock?'),
           content: const Text(
@@ -184,13 +189,44 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _saveApiKey() async {
     final key = _apiKeyController.text.trim();
-    if (key.isNotEmpty) {
-      await ref.read(geminiServiceProvider).saveApiKey(key);
+    if (key.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('API Key saved securely!')),
+          const SnackBar(content: Text('Enter your API key first.')),
         );
       }
+      return;
+    }
+    await ref.read(geminiServiceProvider).saveApiKey(key);
+    if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('API Key saved securely!')));
+    }
+  }
+
+  Future<void> _confirmSignOut() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign Out?'),
+        content: const Text(
+          'Your local progress stays on this device. You can sign back in anytime.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(false),
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () => context.pop(true),
+            child: const Text('SIGN OUT'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await ref.read(authProvider.notifier).logout();
     }
   }
 
@@ -234,32 +270,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  /// Opens the published Privacy Policy.
+  ///
+  /// Previously this showed a self-declared placeholder dialog that directly
+  /// contradicted the shipped policy: it claimed "We do not collect, sell, or
+  /// share any personal data" while the app emails OTP codes off-device, and it
+  /// labelled itself "a placeholder policy" even though a full twelve-section
+  /// policy existed at /privacy — reachable only from the signup checkbox. The
+  /// About section wired this method, so the real policy was unreachable from
+  /// Settings and the contradictory copy was what shipped.
   void _showPrivacyPolicy() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: const Icon(Icons.policy_outlined, size: 32),
-        title: const Text('Privacy Policy'),
-        content: const SingleChildScrollView(
-          child: Text(
-            'NEET Mitos respects your privacy.\n\n'
-            '• All quiz data, flashcards, and progress are stored locally on your device.\n'
-            '• We do not collect, sell, or share any personal data.\n'
-            '• No analytics or tracking tools are used.\n'
-            '• AI features (when enabled) send chapter text to Google Gemini for flashcard generation only.\n'
-            '• Authentication is handled by Supabase when cloud features are enabled.\n\n'
-            'This is a placeholder policy. A full legal policy will be published before the app\'s public release.',
-            style: TextStyle(fontSize: 13, height: 1.5),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('CLOSE'),
-          ),
-        ],
-      ),
-    );
+    context.push('/privacy');
+  }
+
+  void _showTerms() {
+    context.push('/terms');
+  }
+
+  void _showHelp() {
+    context.push('/help');
   }
 
   void _showResetConfirmation() {
@@ -285,7 +314,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SnackBar(content: Text('Progress has been reset.')),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(
+              foregroundColor: AdaptiveColors.error(context),
+            ),
             child: const Text('RESET'),
           ),
         ],
@@ -325,7 +356,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 );
               }
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(
+              foregroundColor: AdaptiveColors.error(context),
+            ),
             child: const Text('DELETE PERMANENTLY'),
           ),
         ],
@@ -352,16 +385,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         messenger.showSnackBar(
           SnackBar(
             content: Text('Successfully downloaded $count NEET PYQ questions!'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AdaptiveColors.success(context),
           ),
         );
       } else {
         messenger.showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            content: const Text(
               'No new questions downloaded. Sources may be unavailable.',
             ),
-            backgroundColor: AppColors.warning,
+            backgroundColor: AdaptiveColors.warning(context),
           ),
         );
       }
@@ -370,7 +403,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       messenger.showSnackBar(
         SnackBar(
           content: Text('Download failed: $e'),
-          backgroundColor: AppColors.error,
+          backgroundColor: AdaptiveColors.error(context),
         ),
       );
     }
@@ -406,6 +439,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   TextFormField(
                     controller: emailController,
                     enabled: false,
+                    autofillHints: const [AutofillHints.email],
                     decoration: const InputDecoration(
                       labelText: 'Email',
                       prefixIcon: Icon(Icons.email_outlined),
@@ -415,10 +449,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   TextFormField(
                     controller: codeController,
                     keyboardType: TextInputType.number,
+                    autofillHints: const [AutofillHints.oneTimeCode],
                     maxLength: 6,
                     decoration: const InputDecoration(
                       labelText: 'Verification Code',
                       prefixIcon: Icon(Icons.pin_outlined),
+                      helperText: 'Check your email for the 6-digit code',
                     ),
                     validator: (value) {
                       if (value == null || value.trim().length != 6) {
@@ -529,8 +565,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _buildSettingsCard([
             ListTile(
               leading: CircleAvatar(
-                backgroundColor: AdaptiveColors.primary(context),
-                child: Icon(Icons.person, color: Colors.white),
+                backgroundColor: AdaptiveColors.primaryContainer(context),
+                child: Icon(
+                  Icons.person,
+                  color: AdaptiveColors.primary(context),
+                ),
               ),
               title: Text(authState.user?.username ?? 'Guest User'),
               subtitle: Text(
@@ -677,12 +716,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 8),
                   TextField(
                     controller: _apiKeyController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Gemini API Key',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.key),
+                      helperText: 'Stored securely on this device only',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.key),
                     ),
                     obscureText: true,
+                    enableSuggestions: false,
+                    autocorrect: false,
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
@@ -701,9 +743,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _buildSectionHeader('Data Management'),
           _buildSettingsCard([
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.backup_outlined,
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
               ),
               title: const Text('Backup Data'),
               subtitle: const Text('Export your quiz history and progress'),
@@ -711,9 +753,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.restore_outlined,
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
               ),
               title: const Text('Restore Data'),
               subtitle: const Text('Import a previously exported backup'),
@@ -721,9 +763,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.upload_file_outlined,
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
               ),
               title: const Text('Import Questions'),
               subtitle: const Text('Bulk-load questions from JSON or CSV'),
@@ -733,9 +775,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.download_outlined,
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
               ),
               title: const Text('Download NEET PYQs'),
               subtitle: const Text(
@@ -745,9 +787,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.delete_sweep_outlined,
-                color: AppColors.error,
+                color: AdaptiveColors.error(context),
               ),
               title: const Text('Clear All Progress'),
               subtitle: const Text('Reset quiz scores and history'),
@@ -756,9 +798,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             if (authState.user != null) ...[
               const Divider(height: 1),
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.person_remove_outlined,
-                  color: AppColors.error,
+                  color: AdaptiveColors.error(context),
                 ),
                 title: const Text('Delete Account'),
                 subtitle: const Text('Permanently remove all your data'),
@@ -772,9 +814,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 color: AdaptiveColors.textSecondary(context),
               ),
               title: const Text('Sign Out'),
-              onTap: () {
-                ref.read(authProvider.notifier).logout();
-              },
+              onTap: _confirmSignOut,
             ),
           ]),
           const SizedBox(height: 24),
@@ -786,10 +826,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               title: Text('NEET Mitos'),
               subtitle: Text('Version 1.0.0'),
             ),
+            // Help comes first: two flows in the app previously told users to
+            // "contact support" while no such screen or channel existed.
+            ListTile(
+              leading: const Icon(Icons.help_outline),
+              title: const Text('Help & Support'),
+              subtitle: const Text('Answers, contact details, troubleshooting'),
+              onTap: _showHelp,
+            ),
             ListTile(
               leading: const Icon(Icons.policy_outlined),
               title: const Text('Privacy Policy'),
+              subtitle: const Text('What we collect, and your rights'),
               onTap: _showPrivacyPolicy,
+            ),
+            // Terms had no route out of Settings at all — only the signup
+            // checkbox linked them.
+            ListTile(
+              leading: const Icon(Icons.gavel_outlined),
+              title: const Text('Terms of Service'),
+              onTap: _showTerms,
             ),
             ListTile(
               leading: const Icon(Icons.description_outlined),
