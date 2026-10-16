@@ -147,7 +147,26 @@ class Chapter {
   int get totalEstimatedMinutes =>
       estimatedMinutes + lessons.fold(0, (sum, l) => sum + l.estimatedMinutes);
 
-  Lesson? get firstLesson => lessons.isNotEmpty ? lessons.first : null;
+  /// The lesson a student should start on.
+  ///
+  /// `firstLesson` used to be a hardcoded `lessons.first` with no callers, so
+  /// it ignored any recorded progress and would have re-served lesson 1 to a
+  /// student who had already finished it. Progress lives on [ChapterProgress],
+  /// not on the chapter, so it is passed in.
+  Lesson? firstLessonToResume([ChapterProgress? progress]) {
+    if (lessons.isEmpty) return null;
+    if (progress != null) {
+      final resume = lessons
+          .where((l) => l.id == progress.currentLessonId)
+          .firstOrNull;
+      if (resume != null) return resume;
+      final next = lessons
+          .where((l) => !progress.completedLessonIds.contains(l.id))
+          .firstOrNull;
+      if (next != null) return next;
+    }
+    return lessons.first;
+  }
 
   Lesson? getNextLesson(String lessonId) {
     final idx = lessons.indexWhere((l) => l.id == lessonId);
@@ -221,10 +240,17 @@ class ChapterProgress {
   final DateTime? completedAt;
 
   bool get isCompleted => completedAt != null;
-  double get progressFraction {
-    if (completedLessonIds.isEmpty) return 0.0;
-    // We don't know total lessons here; caller should provide
-    return 0.0;
+
+  /// Fraction of a chapter completed.
+  ///
+  /// The total lesson count is not a property of progress — it belongs to the
+  /// chapter — so it must be supplied. The previous zero-argument getter
+  /// returned a hardcoded 0.0 no matter what had been completed, which is a
+  /// lie to any caller that trusted it. It has no callers today; deleting it
+  /// was the alternative, but the intent is useful so it is made correct here.
+  double progressFraction(int totalLessons) {
+    if (totalLessons <= 0) return 0.0;
+    return (completedLessonIds.length / totalLessons).clamp(0.0, 1.0);
   }
 
   ChapterProgress copyWith({
@@ -237,6 +263,13 @@ class ChapterProgress {
     DateTime? startedAt,
     DateTime? lastAccessedAt,
     DateTime? completedAt,
+
+    /// Explicitly sets [completedAt] to null.
+    ///
+    /// `copyWith(completedAt: null)` cannot express "clear it" because null
+    /// means "unchanged", so a chapter could never be un-completed. This flag
+    /// disambiguates.
+    bool clearCompletedAt = false,
   }) => ChapterProgress(
     chapterId: chapterId ?? this.chapterId,
     userId: userId ?? this.userId,
@@ -246,7 +279,7 @@ class ChapterProgress {
     summaryQuizScore: summaryQuizScore ?? this.summaryQuizScore,
     startedAt: startedAt ?? this.startedAt,
     lastAccessedAt: lastAccessedAt ?? this.lastAccessedAt,
-    completedAt: completedAt ?? this.completedAt,
+    completedAt: clearCompletedAt ? null : (completedAt ?? this.completedAt),
   );
 
   Map<String, dynamic> toMap() => {
