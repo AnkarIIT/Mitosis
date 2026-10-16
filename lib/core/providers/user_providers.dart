@@ -6,16 +6,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/question_model.dart';
 import '../models/subject_model.dart';
 import '../models/user_progress_model.dart';
+import '../models/learning_recommendation.dart';
+import '../models/study_plan.dart';
+import '../services/study_plan_service.dart';
 import '../database/drift_database.dart' as db;
 import '../services/exam_engine_service.dart';
 import '../services/mark_booster_service.dart';
+import '../services/learning_recommendation_service.dart';
 import '../services/spaced_repetition_service.dart';
+import '../services/mistake_classifier.dart';
 import 'core_providers.dart';
 import 'content_providers.dart';
 import 'quiz_providers.dart';
 import 'spaced_providers.dart';
 import 'settings_providers.dart';
-import 'auth_providers.dart';
+
+import 'current_user_provider.dart';
 
 // ============= USER PROGRESS =============
 class UserProgressState {
@@ -75,7 +81,7 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     _loadFromDatabase();
   }
 
-  int get _userId => _ref.read(authProvider).user?.id ?? 0;
+  int get _userId => _ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
 
   Future<void> _loadFromDatabase() async {
     try {
@@ -120,9 +126,8 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
       int currentStreak = 0;
       DateTime? lastActivityDate;
       try {
-        final dbUsers = await _db.select(_db.users).get();
-        if (dbUsers.isNotEmpty) {
-          final user = dbUsers.first;
+        final user = await _db.getUserById(_userId);
+        if (user != null) {
           currentStreak = user.currentStreak;
           lastActivityDate = user.lastActivityDate;
         }
@@ -190,23 +195,45 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
           ),
         );
 
-        final existingCards = await _db.getSpacedRepetitionCards();
+        const mistakeClassifier = MistakeClassifier();
+        final averageTime = sourceQuestions.isEmpty
+            ? 0.0
+            : attempt.timeSpentSeconds / sourceQuestions.length;
+        final existingCards = await _db.getSpacedRepetitionCards(
+          userId: _userId,
+        );
         final srByQuestion = {
           for (final card in existingCards) card.questionId: card,
         };
         for (int i = 0; i < sourceQuestions.length; i++) {
           final q = sourceQuestions[i];
-          final answer = sourceAnswers[i];
+          final answer = i < sourceAnswers.length ? sourceAnswers[i] : null;
           if (answer == null) continue;
           final isCorrect = ExamEngineService.isAnswerCorrect(answer, q);
           if (isCorrect) {
-            await _db.removeFromErrorBook(q.id);
+            await _db.removeFromErrorBook(q.id, userId: _userId);
           } else {
             await _db.addToErrorBook(
               db.ErrorBookCompanion.insert(
                 userId: Value(_userId),
                 questionId: q.id,
                 addedAt: DateTime.now(),
+              ),
+            );
+            final diagnosis = mistakeClassifier.classify(
+              question: q,
+              selectedAnswer: answer,
+              timeSeconds: averageTime,
+            );
+            await _db.recordMistakeEvent(
+              db.MistakeEventsCompanion.insert(
+                userId: Value(_userId),
+                attemptId: Value(id),
+                questionId: q.id,
+                topicId: q.topicId.isEmpty ? attempt.topicId : q.topicId,
+                mistakeType: diagnosis.type.name,
+                timeSeconds: averageTime,
+                createdAt: DateTime.now(),
               ),
             );
           }
@@ -272,9 +299,9 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
     state = state.copyWith(currentStreak: newStreak, lastActivityDate: now);
 
     try {
-      final dbUsers = await _db.select(_db.users).get();
-      if (dbUsers.isNotEmpty) {
-        final userId = dbUsers.first.id;
+      final user = await _db.getUserById(_userId);
+      if (user != null) {
+        final userId = user.id;
         await (_db.update(_db.users)..where((t) => t.id.equals(userId))).write(
           db.UsersCompanion(
             currentStreak: Value(newStreak),
@@ -405,7 +432,9 @@ class UserProgressNotifier extends StateNotifier<UserProgressState> {
   }
 
   Future<void> clearAllProgress() async {
-    await _db.clearAllProgress();
+    final userId = _ref.read(currentLocalUserIdProvider);
+    if (userId == null) return;
+    await _db.clearAllProgress(userId: userId);
     state = UserProgressState(isLoaded: true);
   }
 }
@@ -498,6 +527,22 @@ final weakTopicsProvider = Provider<List<Topic>>((ref) {
     }
   }
   return weakTopics;
+});
+
+final learningRecommendationsProvider = Provider<List<LearningRecommendation>>((
+  ref,
+) {
+  final progress = ref.watch(userProgressProvider);
+  return LearningRecommendationService().build(
+    subjects: ref.watch(subjectsProvider),
+    progress: progress.topicProgress,
+    attempts: progress.quizAttempts,
+  );
+});
+
+final dailyStudyPlanProvider = Provider<DailyStudyPlan>((ref) {
+  final recommendations = ref.watch(learningRecommendationsProvider);
+  return StudyPlanService().build(recommendations: recommendations);
 });
 
 // ============= DAILY GOAL =============
