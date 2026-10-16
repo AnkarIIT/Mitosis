@@ -97,12 +97,21 @@ class _DppScreenState extends ConsumerState<DppScreen> {
   @override
   Widget build(BuildContext context) {
     final subjects = ref.watch(subjectsProvider);
+    // `widget.subject` arrives in two shapes depending on the caller: a
+    // Subject.id ('phys') from the home tab, and a display name ('Physics')
+    // from chapter notes. Resolve to the Subject, then use its canonical NAME
+    // everywhere below — the DPP engine matches questions on that string
+    // exactly, so passing an id here silently produced an empty pool and a
+    // "not enough questions" message for every paper.
     final subject = subjects.firstWhere(
-      (s) => s.id == widget.subject,
+      (s) =>
+          s.id.toLowerCase() == widget.subject.toLowerCase() ||
+          s.name.toLowerCase() == widget.subject.toLowerCase(),
       orElse: () => subjects.isNotEmpty
           ? subjects.first
           : Subject(id: '', name: 'Unknown', icon: '📝', chapters: const []),
     );
+    final subjectName = subject.name;
 
     return Scaffold(
       appBar: AppBar(
@@ -126,7 +135,7 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                   ),
                 ),
               PopupMenuItem(
-                value: DppConfig.single(subject: widget.subject),
+                value: DppConfig.single(subject: subjectName),
                 child: const ListTile(
                   leading: Icon(Icons.assignment_rounded),
                   title: Text('Single Subject (20 Q, 20 min)'),
@@ -135,8 +144,8 @@ class _DppScreenState extends ConsumerState<DppScreen> {
               ),
               PopupMenuItem(
                 value: DppConfig.mixed(
-                  subjects: [widget.subject],
-                  weights: {widget.subject: 100},
+                  subjects: [subjectName],
+                  weights: {subjectName: 100},
                   totalQuestions: 40,
                   durationMinutes: 40,
                 ),
@@ -146,9 +155,9 @@ class _DppScreenState extends ConsumerState<DppScreen> {
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
-              if (widget.subject == 'Physics' ||
-                  widget.subject == 'Chemistry' ||
-                  widget.subject == 'Biology')
+              if (subjectName == 'Physics' ||
+                  subjectName == 'Chemistry' ||
+                  subjectName == 'Biology')
                 PopupMenuItem(
                   value: DppConfig.neetPattern(),
                   child: const ListTile(
