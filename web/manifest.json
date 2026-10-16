@@ -1,13 +1,13 @@
 {
     "name": "NEET Mitos - NEET Preparation App",
     "short_name": "NEET Mitos",
-    "start_url": ".",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#0B1E3D",
     "theme_color": "#0B1E3D",
     "description": "Free offline-first NEET preparation app. Practice DPPs, mock tests, full-length mocks and build daily study plans for Biology, Chemistry and Physics.",
     "orientation": "portrait-primary",
-    "prefer_related_applications": true,
+    "prefer_related_applications": false,
     "related_applications": [
         {
             "platform": "play",
