@@ -5,7 +5,7 @@ import '../services/biometric_service.dart';
 import '../services/notification_service.dart';
 import '../models/batch_model.dart';
 import '../services/gemini_proxy_service.dart';
-import '../services/gemini_chat_service.dart';
+
 import '../services/google_auth_service.dart';
 import '../services/batch_service.dart';
 import '../services/exam_checkpoint_service.dart';
@@ -18,14 +18,19 @@ import '../services/email_service.dart';
 import '../database/question_repository.dart';
 import '../services/auth_service.dart';
 import 'core_providers.dart';
+import 'current_user_provider.dart';
 
 final biometricServiceProvider = Provider<BiometricService>((ref) {
   return BiometricService();
 });
 
+// Configuration is derived from the compile-time SUPABASE_URL, so there is
+// nothing to load asynchronously. The previous `loadConfig()` call was removed
+// with the SharedPreferences backend URL it used to read — that URL was never
+// written by any screen, which is why mail could never actually be delivered.
 final emailServiceProvider = Provider<EmailService>((ref) {
   final service = EmailService();
-  service.loadConfig();
+  ref.onDispose(service.dispose);
   return service;
 });
 
@@ -56,7 +61,10 @@ final batchServiceProvider = StateNotifierProvider<BatchService, UserBatch?>((
 });
 
 final examCheckpointServiceProvider = Provider<ExamCheckpointService>((ref) {
-  return ExamCheckpointService();
+  // Scoped per user so one account's in-progress mock is never surfaced to
+  // the next account to sign in on this device.
+  final userId = ref.watch(currentLocalUserIdProvider) ?? guestOwnerId;
+  return ExamCheckpointService(userId: userId);
 });
 
 /// Presence + payload of an in-progress CBT attempt, backing the "Resume Mock
