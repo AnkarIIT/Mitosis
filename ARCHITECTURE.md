@@ -142,14 +142,14 @@ accuracy = correct / (correct + incorrect) × 100
 
 ## 4. Data Layer
 
-### 4.1 Drift Schema (v25)
+### 4.1 Drift Schema (v34)
 
 | Table | Purpose | Key Columns |
 |-------|---------|-------------|
 | `questions` | Local question bank | `id`, `subject`, `topicId`, `remoteId`, `updatedAt`, `isActive`, `source` |
 | `quiz_attempts` | Practice history | `topicId`, `subject`, `score`, `incorrectCount`, `selectedAnswers`, `questionIds`, `seed`, `updatedAt` |
 | `topic_progress` | Mastery tracking | `topicId`, `questionsAttempted`, `questionsCorrect`, `averageTimeSeconds`, `isCompleted` |
-| `bookmarks` | User bookmarks | `questionId` (unique), `subject`, `topicId`, `bookmarkedAt` |
+| `bookmarks` | User bookmarks | `(userId, questionId)` unique, `subject`, `topicId`, `bookmarkedAt` |
 | `spaced_repetition` | SM-2 scheduler | `questionId`, `box`, `easeFactor`, `intervalDays`, `dueAt` |
 | `flashcards` | AI/manual cards | `front`, `back`, `subject`, `box`, `dueAt`, `isGenerated` |
 | `dpp_sets` | Daily papers | `date`, `subject`, `totalQuestions`, `durationMinutes` |
@@ -177,11 +177,11 @@ accuracy = correct / (correct + incorrect) × 100
 |-------|----------------|
 | **Auth** | Local email/password (PBKDF2) + optional Supabase Auth (Google OAuth, email/password) when configured; guest mode otherwise |
 | **Secrets** | `.env` in `.gitignore`; Supabase keys via `flutter_dotenv`; Edge function secrets via `supabase secrets set` |
-| **Password Hashing** | PBKDF2-HMAC-SHA256 (10k iterations, 16-byte salt) with legacy SHA-256 migration |
+| **Password Hashing** | Two implementations: user passwords use PBKDF2-HMAC-SHA256 (600k iterations, 16-byte salt, format `pbkdf2-sha256$...`); OTP/reset codes use PBKDF2-HMAC-SHA256 (10k iterations, format `pbkdf2:...`) with legacy SHA-256 migration support |
 | **Biometric** | `local_auth` with `FlutterSecureStorage` for enabled flag |
 | **Network** | `network_security_config.xml` with cert pinning (Supabase, Resend) |
 | **Rate Limiting** | Client-side (auth attempts) + Server-side (AI proxy 30/hr) |
-| **Data Sync** | Timestamp-first conflict resolution; `updatedAt` on all mutable tables |
+| **Data Sync** | User-scoped schema and local watermarks; two-way cloud sync remains disabled pending cursor-based production implementation |
 | **RLS** | All user tables: `user_id = auth.uid()`; Catalog: public read active only |
 
 ---
@@ -208,15 +208,14 @@ flutter run --profile    # Performance profiling, no asserts
 flutter build apk --release --split-per-abi  # Production
 ```
 
-### CI/CD (GitHub Actions — recommended, not yet committed)
+### CI/CD (GitHub Actions)
 ```yaml
-# .github/workflows/ci.yml
-- flutter analyze
+# .github/workflows/ci.yml (committed)
+- flutter analyze --no-fatal-infos
 - flutter test --coverage
-- genhtml coverage/lcov.info -o coverage/html
-- flutter build apk --release
-- flutter build web
-- upload artifact
+- dart format --set-exit-if-changed lib test
+- flutter build apk --debug
+- flutter build web --release
 ```
 
 ### Versioning
@@ -263,13 +262,13 @@ flutter build apk --release --split-per-abi  # Production
 | Flag | Default | Description |
 |------|---------|-------------|
 | `enableCloudAuth` | `isCloudAuthConfigured` | Supabase Auth (email/password, Google OAuth) when credentials present |
-| `enableCloudSync` | `false` | User data sync (attempts, progress, bookmarks) |
-| `enableAiProxy` | `false` | AI tutor via edge function |
+| `enableCloudSync` | `false` | Reserved for the unreleased user-data sync rollout |
+| `enableAiProxy` | `false` | Reserved for the unreleased, rate-limited AI edge function |
 | `googleSignInAvailable` | `isCloudAuthConfigured` | Google OAuth button |
 
 ---
 
-## 11. Migration Checklist (v25 → v26+)
+## 11. Migration Checklist (v34 → v35+)
 
 - [ ] Add `lastSyncedAt` to `dpp_sets` / `dpp_questions` for DPP sync
 - [ ] Add `deviceId` to `users` for multi-device conflict detection
@@ -306,4 +305,4 @@ dart format --set-exit-if-changed .
 
 ---
 
-*Generated: 2026-08-30 | NEET Mitos v1.0.0+1*
+*Updated: 2026-10-02 | NEET Mitos v1.0.0+1 | Controlled beta*
