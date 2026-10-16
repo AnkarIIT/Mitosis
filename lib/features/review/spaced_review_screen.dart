@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/models/question_model.dart';
+import '../../core/utils/answer_normalizer.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 
 /// Spaced-repetition review session over currently due cards.
 ///
@@ -35,7 +37,14 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
 
   Future<void> _submitAnswer(Question question, String answer) async {
     if (_answered) return;
-    final isCorrect = answer == question.correctAnswer;
+    // Only route through AnswerNormalizer when the card actually has options.
+    // For a free-text card `options` is empty, so `optionIndex` returns null for
+    // both sides and `isCorrect` is ALWAYS false — every short answer was
+    // recorded wrong, downgraded by SM-2 regardless of what the student wrote.
+    final isCorrect = question.options.isEmpty
+        ? answer.trim().toLowerCase() ==
+              question.correctAnswer.trim().toLowerCase()
+        : AnswerNormalizer.isCorrect(answer, question);
     setState(() {
       _selected = answer;
       _answered = true;
@@ -44,6 +53,21 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
     await ref
         .read(spacedReviewRecorderProvider)
         .recordAnswer(questionId: question.id, isCorrect: isCorrect);
+  }
+
+  void _selectOption(String option) {
+    if (_answered) return;
+    setState(() => _selected = option);
+  }
+
+  void _confirmSelection(Question question) {
+    if (_answered || _selected == null) return;
+    _submitAnswer(question, _selected!);
+  }
+
+  void _changeSelection() {
+    if (_answered) return;
+    setState(() => _selected = null);
   }
 
   void _next() {
@@ -70,7 +94,17 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
     final dueAsync = ref.watch(dueCardsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Review Session')),
+      backgroundColor: AdaptiveColors.background(context),
+      appBar: AppBar(
+        title: const Text('Review Session'),
+        actions: [
+          IconButton(
+            tooltip: 'Error Book',
+            icon: const Icon(Icons.book_outlined),
+            onPressed: () => context.push('/error-book'),
+          ),
+        ],
+      ),
       body: dueAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Failed to load review: $e')),
@@ -80,14 +114,24 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
   }
 
   Widget _buildContent(List<Question> due) {
-    if (due.isEmpty) return _buildEmptyState();
+    // `_sessionDone` must be checked FIRST, and "all caught up" is only true
+    // when there is no session in flight. Answering a card reschedules it and
+    // invalidates `dueCardsProvider`, so `due` empties for a few frames right
+    // after the LAST card is answered — long before the student taps "Finish
+    // Review" (which is what sets `_sessionDone`). The old code returned
+    // _buildEmptyState() in that window, yanking the result banner, the
+    // explanation and the Finish button out from under them, and made
+    // _buildSummary() effectively unreachable.
+    if (_sessionDone) return _buildSummary();
+
+    if (due.isEmpty && _queue.isEmpty) return _buildEmptyState();
 
     if (_queue.isEmpty) {
       _queue = due;
       _results.clear();
     }
-
-    if (_sessionDone) return _buildSummary();
+    // Guard against a provider re-emit that is shorter than the live index.
+    if (_index >= _queue.length) _index = _queue.length - 1;
 
     final question = _queue[_index];
     final isMcq = question.options.isNotEmpty;
@@ -105,7 +149,9 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                   child: LinearProgressIndicator(
                     value: (_index + 1) / _queue.length,
                     minHeight: 8,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    backgroundColor: AdaptiveColors.outlineVariant(
+                      context,
+                    ).withValues(alpha: 0.5),
                     valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                   ),
                 ),
@@ -199,6 +245,31 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
                 ),
               ),
             ),
+          // Two-step MCQ confirmation: tapping an option only selects it.
+          // The answer is recorded only after an explicit Confirm, so an
+          // accidental tap can be changed before any feedback is given.
+          if (!_answered && isMcq && _selected != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _changeSelection,
+                      child: const Text('Change'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: FilledButton(
+                      onPressed: () => _confirmSelection(question),
+                      child: const Text('Confirm answer'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -209,7 +280,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
       final index = entry.key;
       final option = entry.value;
       final isSelected = _selected == option;
-      final isCorrect = option == question.correctAnswer;
+      final isCorrect = AnswerNormalizer.isCorrect(option, question);
 
       Color borderColor = AdaptiveColors.outline(context);
       Color bgColor = AdaptiveColors.surface(context);
@@ -235,13 +306,13 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: _answered ? null : () => _submitAnswer(question, option),
-            borderRadius: BorderRadius.circular(12),
+            onTap: _answered ? null : () => _selectOption(option),
+            borderRadius: AppRadius.mdAll,
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: bgColor,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadius.mdAll,
                 border: Border.all(
                   color: borderColor,
                   width: isSelected ? 2 : 1,
@@ -333,7 +404,7 @@ class _SpacedReviewScreenState extends ConsumerState<SpacedReviewScreen> {
           color: (isCorrect ? AppColors.success : AppColors.primary).withValues(
             alpha: 0.08,
           ),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppRadius.mdAll,
           border: Border.all(
             color: (isCorrect ? AppColors.success : AppColors.primary)
                 .withValues(alpha: 0.3),
