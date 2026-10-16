@@ -195,18 +195,31 @@ function renderHtml(
 </body></html>`;
 }
 
-/** Best-effort caller IP, used to rate-limit the unauthenticated reset path.
+/** Best-effort caller identity, used to rate-limit the unauthenticated reset
+ *  path.
  *
- *  The anon identity for password reset is keyed on this. It is deliberately
- *  weak — a caller can rotate proxies — so it is only ever a *second* ceiling
- *  alongside the per-recipient limit, never the only one. */
+ *  Deliberately NOT a trust-the-proxy design. Whether Supabase's gateway
+ *  appends to or replaces `x-forwarded-for` cannot be verified from this repo,
+ *  so the value is derived from the WHOLE chain plus `x-real-ip` rather than
+ *  from a single hop: a caller who sets the header still has to match a value
+ *  the gateway controls the position of, and any tampering changes the bucket.
+ *
+ *  This remains a SPEED BUMP, not a security control. The binding ceiling is
+ *  per-recipient (RATE_LIMIT_PER_RECIPIENT), which cannot be spoofed at all —
+ *  an attacker rotating IPs still cannot exceed it for any one mailbox. */
 function clientIp(req: Request): string {
+  const parts: string[] = [];
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) {
-    const hops = fwd.split(",").map((h) => h.trim()).filter(Boolean);
-    if (hops.length > 0) return hops[hops.length - 1];
+    for (const hop of fwd.split(",")) {
+      const h = hop.trim();
+      if (h) parts.push(h);
+    }
   }
-  return req.headers.get("x-real-ip")?.trim() || "unknown";
+  const real = req.headers.get("x-real-ip")?.trim();
+  if (real) parts.push(real);
+  if (parts.length === 0) return "unknown";
+  return parts.join("|");
 }
 
 /** Strips characters that let a caller forge extra lines or a fake URL in the
