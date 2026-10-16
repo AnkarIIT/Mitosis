@@ -42,7 +42,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
 
     // Subtitle is derived from ExamConfig so it never drifts from the actual
     // pattern. (Exact NEET numbers live in ExamConfig — verify vs NTA bulletin.)
-    final neetCfg = ExamConfig.neet();
+    final neetCfg = ExamConfig.neet2024();
     final neetSubtitle =
         '${neetCfg.totalQuestionSlots} Questions • '
         '${neetCfg.totalDurationSeconds ~/ 60} Minutes • '
@@ -264,7 +264,8 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
 
   void _startNeetMock(BuildContext context, List<Question> allQuestions) {
     final pool = ExamEngineService.validatePool(allQuestions);
-    if (pool.isEmpty) {
+    final config = ExamConfig.neet();
+    if (!ExamEngineService.hasSufficientPool(pool, config)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -278,7 +279,7 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
 
     context.push(
       '/cbt/instructions',
-      extra: {'config': ExamConfig.neet(), 'questionPool': pool},
+      extra: {'config': config, 'questionPool': pool},
     );
   }
 
