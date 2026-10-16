@@ -1,226 +1,76 @@
-# Design System Master File
+# NEET Mitos — Premium Mobile Design System
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
-> If that file exists, its rules **override** this Master file.
-> If not, strictly follow the rules below.
+> This file is the visual source of truth for the Flutter app. Keep authentication, onboarding, dashboard, and feature screens within the same calm, premium study-product language.
 
----
+## Product feel
 
-**Project:** NEET Mitos
-**Generated:** 2026-09-24 11:54:58
-**Category:** Flashcard & Study Tool
-**Design Dials:** Variance 4/10 (Balanced / Modern) | Motion 5/10 (Standard) | Density 5/10 (Standard)
+- **Mood:** focused, reassuring, capable, premium — never institutional or exam-panic themed.
+- **Core idea:** a quiet study space with clear next actions and visible progress.
+- **Density:** moderate. Prefer one primary action per section, concise labels, and generous but purposeful spacing.
+- **Motion:** restrained and useful. The sign-in hero may use a slow dot-matrix shimmer; ordinary controls use short transitions. Respect reduced-motion accessibility settings.
 
----
+## Color system
 
-## Global Rules
+| Role | Light | Dark | Use |
+|---|---|---|---|
+| Primary | `#0D4F4A` | `#4ED3B8` | Primary actions, selected navigation, key progress |
+| Primary soft | `#D8F1EA` | `#115E59` | Selection and quiet brand surfaces |
+| Background | `#F7F7F2` | `#081719` | App canvas |
+| Surface | `#FFFEFB` | `#102528` | Cards and sheets |
+| Muted surface | `#F2F4EF` | `#20383A` | Fields, secondary panels |
+| Main text | `#132B2F` | `#EDF6F2` | Titles and body copy |
+| Secondary text | `#52656A` | `#9CB1AD` | Supporting labels |
+| Success | `#0D8B68` | `#34D399` | Correct answers and completed goals |
+| Warning | `#B7791F` | `#FBBF24` | Streaks and due reminders |
+| Error | `#B94545` | `#F87171` | Validation and destructive actions |
 
-### Color Palette
+Subject accents remain distinct and consistent: **Biology** teal-green, **Chemistry** violet, **Physics** amber. Prefer soft subject-tinted cards with readable foreground text over full-saturation gradients.
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#6B7280` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#78716C` | `--color-secondary` |
-| Accent/CTA | `#0891B2` | `--color-accent` |
-| Background | `#F5F5F0` | `--color-background` |
-| Foreground | `#0F172A` | `--color-foreground` |
-| Muted | `#F6F6F7` | `--color-muted` |
-| Border | `#EDEEEF` | `--color-border` |
-| Destructive | `#DC2626` | `--color-destructive` |
-| Ring | `#6B7280` | `--color-ring` |
+## Typography
 
-**Color Notes:** Sage neutral + calm teal
+Use **Inter** throughout the Flutter app. Use strong, compact headlines for the primary task; use regular-weight body text with comfortable line-height. Reserve uppercase, letter-spaced labels for tiny metadata only. Do not mix in decorative display fonts.
 
-### Typography
+## Layout and shape
 
-- **Heading Font:** Lora
-- **Body Font:** Raleway
-- **Mood:** calm, wellness, health, relaxing, natural, organic
-- **Google Fonts:** [Lora + Raleway](https://fonts.google.com/share?selection.family=Lora:wght@400;500;600;700|Raleway:wght@300;400;500;600;700)
+- Use the existing `AppSpacing`, `AppRadius`, `AppShadows`, and `SubjectColors` tokens in `lib/core/theme/tokens.dart`.
+- Standard screen gutters: 20–24 px; card padding: 16–24 px.
+- Cards: 16–24 px radius, subtle outline, minimal shadow. Avoid stacked heavy shadows.
+- Primary buttons: minimum 48 px high, clear verb-first labels, 12–16 px radius.
+- Form fields: persistent labels, visible focus/error states, comfortable touch targets.
+- Keep scrollable content clear of system insets and the persistent bottom navigation.
 
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap');
-```
+## Signature screens
 
-### Spacing Variables
+### Sign-in and account creation
 
-*Density: 5/10 — Standard*
+Use a dark deep-teal hero with a slowly shimmering fine dot field. The dots brighten into an original M-like study mark, then settle; no stock imagery, DNA clip-art, or distracting particle bursts. Keep the brand and one-line promise legible above a light, rounded form surface. Login, account creation, password recovery, Google sign-in, and guest access must remain easy to distinguish and retain their existing behavior.
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
+### Home dashboard
 
-### Shadow Depths
+Prioritize a personalized greeting, current study context, streak/accuracy, one prominent continue-or-start action, daily goal, quick practice links, and subject progress. Keep the content live and data-driven. Use calm surfaces and distinct subject accents rather than multiple competing gradient cards.
 
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+### Onboarding/setup
 
----
+Keep steps short and clearly numbered. Make selections visibly selected, explain why a choice is requested, expose Back/Skip/Continue actions, and distinguish required study preferences from optional AI/API configuration.
 
-## Component Specs
+### Other feature sections
 
-### Buttons
+Use consistent app-bar titles, surface cards, section spacing, button and field themes, loading/error states, and shared bottom navigation. Subject colors identify content type but must not replace semantic labels or accessible contrast.
 
-```css
-/* Primary Button */
-.btn-primary {
-  background: #0891B2;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
+## Accessibility and interaction
 
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
+- Maintain WCAG AA contrast for text and meaningful controls.
+- Preserve semantic labels/tooltips for icon-only actions and at least 44 px touch targets.
+- Keep focus, pressed, selected, disabled, loading, and error states visible.
+- Never use color alone to communicate correctness, selection, or urgency.
+- Avoid emojis as functional icons; use the existing Material icon family.
+- No horizontal overflow at narrow phone widths; verify both light and dark themes.
 
-/* Secondary Button */
-.btn-secondary {
-  background: transparent;
-  color: #6B7280;
-  border: 2px solid #6B7280;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-```
+## Review checklist
 
-### Cards
-
-```css
-.card {
-  background: #F5F5F0;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-```
-
-### Inputs
-
-```css
-.input {
-  padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 200ms ease;
-}
-
-.input:focus {
-  border-color: #6B7280;
-  outline: none;
-  box-shadow: 0 0 0 3px #6B728020;
-}
-```
-
-### Modals
-
-```css
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.modal {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  width: 90%;
-}
-```
-
----
-
-## Style Guidelines
-
-**Style:** Soft UI Evolution
-
-**Keywords:** Evolved soft UI, better contrast, modern aesthetics, subtle depth, accessibility-focused, improved shadows, hybrid
-
-**Best For:** Modern enterprise apps, SaaS platforms, health/wellness, modern business tools, professional, hybrid
-
-**Key Effects:** Improved shadows (softer than flat, clearer than neumorphism), modern (200-300ms), focus visible, WCAG AA/AAA
-
-### Page Pattern
-
-**Pattern Name:** Feature-Rich Showcase + Demo
-
-- **CTA Placement:** Above fold
-- **Section Order:** Hero > Features > CTA
-
----
-
-## Motion
-
-**Page Transition** (Standard) — Trigger: route change | Duration: 400-600ms | Easing: `power2.inOut`
-
-```js
-const tl = gsap.timeline(); tl.to('.transition-overlay', { yPercent: 0, duration: 0.4, ease: 'power2.inOut' }).call(navigate).to('.transition-overlay', { yPercent: -100, duration: 0.4, ease: 'power2.inOut', delay: 0.1 });
-```
-
-**Framework notes:** Keep the overlay element mounted at the layout root (outside the page component) so it survives the route swap
-
-- ✅ Show a lightweight loading indicator if the destination route's data fetch outlasts the overlay
-- ❌ Don't tie the overlay's reveal directly to data-fetch completion without a max-wait timeout; a slow API stalls the whole transition
-- ⚡ Prefer CSS transform (yPercent) over top/left to keep the overlay animation on the compositor thread
-
----
-
-## Anti-Patterns (Do NOT Use)
-
-- ❌ Inconsistent styling
-- ❌ Poor contrast ratios
-
-### Additional Forbidden Patterns
-
-- ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
-- ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
-- ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
-- ❌ **Invisible focus states** — Focus states must be visible for a11y
-
----
-
-## Pre-Delivery Checklist
-
-Before delivering any UI code, verify:
-
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
-- [ ] `prefers-reduced-motion` respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
-- [ ] No content hidden behind fixed navbars
-- [ ] No horizontal scroll on mobile
+- [ ] Auth and setup actions/validation still work.
+- [ ] Motion pauses when reduced motion is requested.
+- [ ] Main text and field labels are legible in light and dark themes.
+- [ ] Primary action is obvious without scrolling where practical.
+- [ ] Bottom navigation does not cover scroll content or system gestures.
+- [ ] Subject-specific accents remain consistent.
