@@ -108,6 +108,17 @@ interface RequestBody {
   systemPrompt?: unknown;
   questionId?: unknown;
   temperature?: unknown;
+  /**
+   * Opt-in to the shared cache. MUST be false whenever `systemPrompt` carries
+   * any per-student data (accuracy, weak topics, days-to-exam, study mode).
+   *
+   * The cache is a shared corpus: an entry written by one student is served to
+   * every other. Personalised answers are therefore never cacheable — serving
+   * them would leak one student's progress and weak topics to another. An
+   * absent flag means false, so an older client that does not send this is
+   * treated as un-cacheable rather than trusted.
+   */
+  cacheable?: unknown;
 }
 
 function json(
@@ -279,6 +290,19 @@ Deno.serve(async (req) => {
   // Writing is `isAnonymous ? "anon" : "shared"`, so both sides now use:
   const readableScope = isAnonymous ? "anon" : "shared";
 
+  // Opt-in only. A personalised prompt produces an answer that is correct for
+  // ONE student; sharing it would leak their accuracy, weak topics and
+  // exam countdown to everyone else, so those requests bypass the cache in
+  // both directions rather than being written with a key that happens to be
+  // unique. Callers that send a subject-only, student-independent system prompt
+  // opt in and get the shared corpus the table exists for.
+  const cacheable = body.cacheable === true;
+  if (body.cacheable !== undefined && body.cacheable !== true) {
+    console.warn(
+      `gemini-proxy: cacheable must be boolean true; got ${typeof body.cacheable}`,
+    );
+  }
+
   // ---- T2: cache lookup ---------------------------------------------------
   // temperature is part of the key: it is client-controlled and materially
   // changes the output, so omitting it let one caller seed a `temperature: 1.0`
@@ -294,7 +318,7 @@ Deno.serve(async (req) => {
 
   const { data: cached, error: cacheErr } = await cacheQuery.maybeSingle();
 
-  if (!cacheErr && cached?.response) {
+  if (cacheable && !cacheErr && cached?.response) {
     return json(
       {
         cached: true,
@@ -358,7 +382,10 @@ Deno.serve(async (req) => {
   try {
     const response = await callGemini(prompt, systemPrompt, temperature);
 
-    if (response) {
+    if (response && cacheable) {
+      // Only unpersonalised answers are persisted. Writing a personalised
+      // response here would put one student's accuracy / weak topics / exam
+      // countdown into a table every other student can read back.
       // `original_prompt` is stored in a table the user cannot read or delete.
       // Store only a short prefix: it is enough to diagnose a bad generation,
       // and it does not persist a full transcript of what a student typed.
