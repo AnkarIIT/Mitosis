@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/providers/providers.dart';
+import '../../../core/services/question_inventory_service.dart';
 import '../../../core/models/subject_model.dart';
 import '../../../core/models/user_progress_model.dart';
 import '../../../core/models/batch_model.dart';
@@ -10,7 +11,6 @@ import '../../../core/services/exam_engine_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/tokens.dart';
-import '../../../core/widgets/modern_sidebar.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
@@ -57,8 +57,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
 
   static const _chipLabels = [
     'All',
-    'Botany',
-    'Zoology',
+    'Biology',
     'Physics',
     'Chemistry',
     'Error Book',
@@ -69,14 +68,12 @@ class _HomeTabState extends ConsumerState<HomeTab>
       case 0:
         return null;
       case 1:
-        return 'biology';
+        return 'bio';
       case 2:
-        return 'biology';
-      case 3:
         return 'phys';
-      case 4:
+      case 3:
         return 'chem';
-      case 5:
+      case 4:
         return null;
       default:
         return null;
@@ -146,29 +143,9 @@ class _HomeTabState extends ConsumerState<HomeTab>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildProfileRow(context, streak, stats),
-            const SizedBox(height: 20),
-            _buildSearchBar(context),
             const SizedBox(height: 16),
-            _buildChipRow(context),
-            const SizedBox(height: 24),
-            _buildFeaturedSubjectsHeader(),
-            const SizedBox(height: 14),
-            _buildFeaturedCards(context, filteredSubjects, totalMCQs),
-            const SizedBox(height: 28),
-            _buildOngoingSectionHeader(),
-            const SizedBox(height: 14),
+            // Today loop first: goal → due revision → primary plan action.
             _buildDailyGoalCard(context, dailyGoal),
-            const SizedBox(height: 12),
-            _buildContinueStudyingCard(context, recentActivity, subjects),
-            const SizedBox(height: 12),
-            _buildOngoingRevisionCards(context, recentActivity, subjects),
-            const SizedBox(height: 12),
-            // Resume an in-progress CBT mock (only shows when a checkpoint exists)
-            _buildResumeMockCard(context),
-            // CBT Mock Test CTA
-            _buildCbtMockTestCard(context, subjects),
-            _buildAllenStudyModulesCard(context),
-            _buildDppBanner(context),
             if (dueCount > 0) ...[
               const SizedBox(height: 12),
               _buildDueReviewBanner(context, dueCount),
@@ -177,6 +154,33 @@ class _HomeTabState extends ConsumerState<HomeTab>
               const SizedBox(height: 12),
               _buildWeakTopicsBanner(context, weakTopics),
             ],
+            const SizedBox(height: 12),
+            // Single primary action — opens the planner, never claims to
+            // resume a session it doesn't resume.
+            _buildTodayPlanCard(context, recentActivity, subjects),
+            const SizedBox(height: 12),
+            // Resume an in-progress CBT mock (only shows when a checkpoint exists)
+            _buildResumeMockCard(context),
+            const SizedBox(height: 20),
+            _buildOngoingSectionHeader(),
+            const SizedBox(height: 14),
+            _buildQuickActions(context),
+            const SizedBox(height: 16),
+            _buildOngoingRevisionCards(context, recentActivity, subjects),
+            const SizedBox(height: 20),
+            _buildSearchBar(context),
+            const SizedBox(height: 16),
+            _buildChipRow(context),
+            const SizedBox(height: 24),
+            _buildFeaturedSubjectsHeader(),
+            const SizedBox(height: 14),
+            _buildFeaturedCards(context, filteredSubjects, totalMCQs),
+            const SizedBox(height: 12),
+            // CBT Mock Test CTA
+            _buildCbtMockTestCard(context, subjects),
+            _buildResourceLibraryCard(context),
+            _buildAllenStudyModulesCard(context),
+            _buildDppBanner(context),
             const SizedBox(height: 24),
           ],
         ),
@@ -195,137 +199,178 @@ class _HomeTabState extends ConsumerState<HomeTab>
     final accuracy = (stats['accuracy'] as double);
     final authState = ref.watch(authProvider);
     final user = authState.user;
-    final displayName = user?.fullName ?? user?.username ?? 'Guest';
+    final rawName = (user?.fullName ?? user?.username ?? 'Guest').trim();
+    final displayName = rawName.isEmpty ? 'Student' : rawName;
     final avatarLetter = displayName[0].toUpperCase();
     final batch = ref.watch(batchServiceProvider);
     final batchSubtitle = batch != null
         ? '${batch.type.displayName} • ${batch.studyMode.label}'
         : 'NEET Aspirant';
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 22,
-          backgroundColor: AdaptiveColors.surface(context),
-          child: Text(
-            avatarLetter,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 17,
-              color: AdaptiveColors.textPrimary(context),
+    final hour = DateTime.now().hour;
+    final greeting = hour < 12
+        ? 'Good morning,'
+        : hour < 17
+        ? 'Good afternoon,'
+        : 'Good evening,';
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0B3538), Color(0xFF0E5B54)],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0B3538).withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -28,
+            top: -42,
+            child: Icon(
+              Icons.hub_rounded,
+              size: 156,
+              color: Colors.white.withValues(alpha: 0.055),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Hello, $displayName',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                  color: AdaptiveColors.textPrimary(context),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                batchSubtitle,
-                style: TextStyle(
-                  color: AdaptiveColors.textSecondary(context),
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Streak badge
-        AnimatedScale(
-          scale: streak > 0 ? 1.0 : 0.8,
-          duration: AppDuration.normal,
-          curve: Curves.elasticOut,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: AdaptiveColors.warning(context).withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppRadius.full),
-              border: Border.all(
-                color: AdaptiveColors.warning(context).withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.local_fire_department_rounded,
-                  size: 14,
-                  color: AdaptiveColors.warning(context),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '$streak',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: AdaptiveColors.warning(context),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => context.push('/profile'),
+                    child: CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.white.withValues(alpha: 0.16),
+                      child: Text(
+                        avatarLetter,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        // Accuracy badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: AdaptiveColors.primary(context).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppRadius.full),
-            border: Border.all(
-              color: AdaptiveColors.primary(context).withValues(alpha: 0.28),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.trending_up_rounded,
-                size: 14,
-                color: AdaptiveColors.primary(context),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          greeting,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.72),
+                            fontSize: 12,
+                            letterSpacing: 0.35,
+                          ),
+                        ),
+                        Text(
+                          displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 22,
+                            letterSpacing: -0.35,
+                          ),
+                        ),
+                        Text(
+                          batchSubtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.72),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Notifications',
+                    icon: const Icon(
+                      Icons.notifications_none_rounded,
+                      color: Colors.white,
+                      size: 23,
+                    ),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No new notifications'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(width: 4),
-              Text(
-                '${accuracy.toStringAsFixed(0)}%',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: AdaptiveColors.primary(context),
-                ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _buildHeroMetric(
+                    icon: Icons.local_fire_department_rounded,
+                    value: '$streak',
+                    label: 'day streak',
+                    iconColor: const Color(0xFFFFD78A),
+                  ),
+                  _buildHeroMetric(
+                    icon: Icons.trending_up_rounded,
+                    value: '${accuracy.toStringAsFixed(0)}%',
+                    label: 'accuracy',
+                    iconColor: const Color(0xFF8DE7CE),
+                  ),
+                ],
               ),
             ],
           ),
-        ),
-        const SizedBox(width: 6),
-        // Notifications
-        IconButton(
-          icon: Icon(
-            Icons.notifications_none_rounded,
-            color: AdaptiveColors.textSecondary(context),
-            size: 24,
-          ),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('No new notifications'),
-                duration: Duration(seconds: 1),
-              ),
-            );
-          },
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-        ),
-      ],
+        ],
+      ),
     ).animate().fade(duration: 400.ms).slideY(begin: 0.15, end: 0);
+  }
+
+  Widget _buildHeroMetric({
+    required IconData icon,
+    required String value,
+    required String label,
+    required Color iconColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppRadius.full),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: iconColor),
+          const SizedBox(width: 6),
+          Text(
+            '$value $label',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ────────────────────────────────────────────────────────────
@@ -499,18 +544,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
               )
               .animate(delay: (200 + index * 80).ms)
               .fade(duration: 450.ms)
-              .scale(
-                begin: const Offset(0.94, 0.94),
-                end: const Offset(1, 1),
-                curve: Curves.easeOutBack,
-              )
-              .then()
-              .scale(
-                begin: const Offset(1.03, 1.03),
-                end: const Offset(1, 1),
-                duration: AppDuration.normal,
-                curve: Curves.elasticOut,
-              );
+              .slideY(begin: 0.08, end: 0, duration: 450.ms);
         },
       ),
     );
@@ -524,90 +558,86 @@ class _HomeTabState extends ConsumerState<HomeTab>
     required double accuracy,
   }) {
     final color = _getSubjectAccent(subject.id);
-    return GestureDetector(
-      onTap: () => context.push(
-        '/subjects/${subject.id}?subjectName=${Uri.encodeComponent(subject.name)}',
-      ),
-      child: Container(
-        width: 155,
-        margin: const EdgeInsets.only(right: 14),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color, color.withValues(alpha: 0.72)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
-            ),
-          ],
+    final isDark = AdaptiveColors.isDark(context);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.push(
+          '/subjects/${subject.id}?subjectName=${Uri.encodeComponent(subject.name)}',
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Thin accent bar
-            Container(
-              height: 3,
-              width: 32,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          width: 164,
+          margin: const EdgeInsets.only(right: 14),
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AdaptiveColors.surface(context)
+                : color.withValues(alpha: 0.075),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: color.withValues(alpha: isDark ? 0.38 : 0.25),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _getSubjectIcon(subject.id),
+                      color: color,
+                      size: 22,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.arrow_outward_rounded,
+                    color: AdaptiveColors.textSecondary(context),
+                    size: 17,
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  _getSubjectIcon(subject.id),
-                  color: Colors.white,
-                  size: 26,
-                ),
-                Icon(
-                  Icons.bookmark_border_rounded,
-                  color: Colors.white70,
-                  size: 18,
-                ),
-              ],
-            ),
-            const Spacer(),
-            Expanded(
-              child: Text(
+              const Spacer(),
+              Text(
                 subject.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                style: TextStyle(
+                  color: AdaptiveColors.textPrimary(context),
+                  fontWeight: FontWeight.w700,
                   fontSize: 16,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              '$chapterCount Chapters • $mcqCount MCQs',
-              style: const TextStyle(color: Colors.white70, fontSize: 10),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (accuracy > 0) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: 3),
+              Text(
+                '$chapterCount chapters • $mcqCount MCQs',
+                style: TextStyle(
+                  color: AdaptiveColors.textSecondary(context),
+                  fontSize: 10,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 9),
               ClipRRect(
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: (accuracy / 100).clamp(0.0, 1.0),
-                  minHeight: 3,
-                  backgroundColor: Colors.white24,
-                  valueColor: const AlwaysStoppedAnimation(Colors.white),
+                  minHeight: 4,
+                  backgroundColor: color.withValues(alpha: 0.13),
+                  valueColor: AlwaysStoppedAnimation(color),
                 ),
               ),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -665,7 +695,9 @@ class _HomeTabState extends ConsumerState<HomeTab>
                     CircularProgressIndicator(
                       value: animValue,
                       strokeWidth: 5,
-                      backgroundColor: AdaptiveColors.surface(context),
+                      backgroundColor: AdaptiveColors.outlineVariant(
+                        context,
+                      ).withValues(alpha: 0.5),
                       valueColor: AlwaysStoppedAnimation(
                         animValue >= 1.0
                             ? AdaptiveColors.success(context)
@@ -716,7 +748,9 @@ class _HomeTabState extends ConsumerState<HomeTab>
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6,
-                    backgroundColor: AdaptiveColors.surface(context),
+                    backgroundColor: AdaptiveColors.outlineVariant(
+                      context,
+                    ).withValues(alpha: 0.5),
                     valueColor: AlwaysStoppedAnimation(
                       progress >= 1.0
                           ? AdaptiveColors.success(context)
@@ -732,8 +766,108 @@ class _HomeTabState extends ConsumerState<HomeTab>
     ).animate().fade(delay: 260.ms, duration: 400.ms);
   }
 
-  // Continue Studying CTA
-  Widget _buildContinueStudyingCard(
+  Widget _buildQuickActions(BuildContext context) {
+    const actions =
+        <({String label, IconData icon, Color color, String route})>[
+          (
+            label: 'DPP',
+            icon: Icons.today_rounded,
+            color: SubjectColors.biology,
+            route: '/dpp/neet',
+          ),
+          (
+            label: 'Mocks',
+            icon: Icons.assignment_outlined,
+            color: SubjectColors.physics,
+            route: '/test-series',
+          ),
+          (
+            label: 'Cards',
+            icon: Icons.style_rounded,
+            color: SubjectColors.chemistry,
+            route: '/flashcards',
+          ),
+          (
+            label: 'Review',
+            icon: Icons.replay_rounded,
+            color: AppColors.primary,
+            route: '/review',
+          ),
+        ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Quick practice',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AdaptiveColors.textPrimary(context),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            for (var index = 0; index < actions.length; index++) ...[
+              if (index > 0) const SizedBox(width: 8),
+              Expanded(child: _buildQuickActionTile(context, actions[index])),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActionTile(
+    BuildContext context,
+    ({String label, IconData icon, Color color, String route}) action,
+  ) {
+    return Material(
+      color: AdaptiveColors.surface(context),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: () => context.push(action.route),
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 88,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AdaptiveColors.outlineVariant(context)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: action.color.withValues(alpha: 0.11),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(action.icon, size: 18, color: action.color),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                action.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: AdaptiveColors.textPrimary(context),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Today's primary action. Opens the Study Planner — the label says so
+  // instead of claiming to resume a session it doesn't resume.
+  Widget _buildTodayPlanCard(
     BuildContext context,
     List recentActivity,
     List<Subject> subjects,
@@ -751,15 +885,19 @@ class _HomeTabState extends ConsumerState<HomeTab>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              SubjectColors.physics.withValues(alpha: 0.9),
-              SubjectColors.physics.withValues(alpha: 0.7),
-            ],
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0E5B54), Color(0xFF0B3538)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0B3538).withValues(alpha: 0.14),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -780,9 +918,9 @@ class _HomeTabState extends ConsumerState<HomeTab>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    hasActivity ? 'Continue Studying' : 'Start Your First Quiz',
-                    style: const TextStyle(
+                  const Text(
+                    "Start today's plan",
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
@@ -791,7 +929,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
                   const SizedBox(height: 3),
                   Text(
                     hasActivity
-                        ? 'Pick up where you left off — $topicLabel'
+                        ? 'Last: $topicLabel • Open planner to continue'
                         : 'Open Study Plan to begin your NEET prep',
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
@@ -933,16 +1071,20 @@ class _HomeTabState extends ConsumerState<HomeTab>
   // CBT Mock Test CTA
   Widget _buildCbtMockTestCard(BuildContext context, List<Subject> subjects) {
     // Subtitle derived from ExamConfig so it can't drift from the real pattern.
-    final neet = ExamConfig.neet();
+    final neet = ExamConfig.neet2024();
     final subtitle =
         '${neet.totalQuestionSlots} questions • '
         '${neet.totalDurationSeconds ~/ 60} minutes • '
         '+${neet.marksPerCorrect}/${neet.marksPerWrong}/0 marking';
+
+    // Watch inventory readiness for NEET 2024 mock.
+    final readinessAsync = ref.watch(neet2024ReadinessProvider);
+
     return GestureDetector(
       onTap: () {
         final allQuestions = ref.read(allQuestionsProvider).valueOrNull ?? [];
         final pool = ExamEngineService.validatePool(allQuestions);
-        if (pool.isEmpty) {
+        if (!ExamEngineService.hasSufficientPool(pool, neet)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('No valid questions available for the mock test.'),
@@ -955,51 +1097,128 @@ class _HomeTabState extends ConsumerState<HomeTab>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              SubjectColors.physics.withValues(alpha: 0.9),
-              SubjectColors.physics.withValues(alpha: 0.7),
-            ],
+          gradient: const LinearGradient(
+            colors: [Color(0xFF164D58), Color(0xFF0B3538)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.quiz_rounded, color: Colors.white, size: 24),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.quiz_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Start CBT Mock Test',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white60,
+                  size: 16,
+                ),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Start CBT Mock Test',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+            const SizedBox(height: 12),
+            // Readiness indicator
+            readinessAsync.when(
+              loading: () => const SizedBox(
+                height: 20,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (result) {
+                final isReady = result.isReady;
+                final percent = result.readinessPercent;
+                final color = isReady
+                    ? Colors.greenAccent
+                    : Colors.orangeAccent;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Expanded so the label wraps instead of overflowing.
+                        // At 360dp with the 1.3x accessibility text scale this
+                        // Row overflowed by 29px.
+                        Expanded(
+                          child: Text(
+                            isReady
+                                ? 'Ready for full mock'
+                                : 'Incomplete — $percent% ready',
+                            style: TextStyle(
+                              color: color,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Colors.white60,
-              size: 16,
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      value: percent / 100,
+                      minHeight: 4,
+                      backgroundColor: Colors.white24,
+                      valueColor: AlwaysStoppedAnimation(color),
+                    ),
+                    if (!isReady) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        'Tap to see missing questions',
+                        style: TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                    ],
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -1164,6 +1383,29 @@ class _HomeTabState extends ConsumerState<HomeTab>
   }
 
   // Allen Study Modules CTA
+  Widget _buildResourceLibraryCard(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Card(
+        child: ListTile(
+          leading: const CircleAvatar(
+            backgroundColor: Color(0x1A4F46E5),
+            child: Icon(Icons.library_books, color: AppColors.primary),
+          ),
+          title: const Text(
+            'NCERT Resource Library',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: const Text(
+            'Read every Biology, Physics and Chemistry chapter offline',
+          ),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+          onTap: () => context.push('/resources'),
+        ),
+      ),
+    );
+  }
+
   Widget _buildAllenStudyModulesCard(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/study-modules'),
@@ -1300,9 +1542,11 @@ class _HomeTabState extends ConsumerState<HomeTab>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: AdaptiveColors.warning(context).withValues(alpha: 0.4),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1311,7 +1555,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
             children: [
               Icon(
                 Icons.warning_amber_rounded,
-                color: AppColors.warning,
+                color: AdaptiveColors.warning(context),
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -1336,16 +1580,18 @@ class _HomeTabState extends ConsumerState<HomeTab>
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.08),
+                  color: AdaptiveColors.warning(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.warning.withValues(alpha: 0.2),
+                    color: AdaptiveColors.warning(
+                      context,
+                    ).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(
                   topic.name,
                   style: TextStyle(
-                    color: AppColors.warning,
+                    color: AdaptiveColors.warning(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1599,48 +1845,6 @@ class _HomeTabState extends ConsumerState<HomeTab>
     final m = seconds ~/ 60;
     final s = seconds % 60;
     return s > 0 ? '${m}m ${s}s' : '${m}m';
-  }
-
-  void _showMobileSidebar(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        minChildSize: 0.5,
-        maxChildSize: 1.0,
-        expand: false,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              // Handle bar
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: AdaptiveColors.outline(context),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              // Sidebar content
-              Expanded(
-                child: ModernSidebar(
-                  isVisible: true,
-                  onToggle: () => Navigator.of(context).pop(),
-                  isMobile: true,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
 
