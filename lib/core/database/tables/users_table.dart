@@ -33,6 +33,24 @@ class Users extends Table {
   TextColumn get supabaseId => text().nullable()();
 
   // Account lockout / brute-force protection
-  IntColumn get failedLoginAttempts => integer().withDefault(const Constant(0))();
+  IntColumn get failedLoginAttempts =>
+      integer().withDefault(const Constant(0))();
   DateTimeColumn get lockedUntil => dateTime().nullable()();
+
+  // Email-OTP throttling: caps guesses on a live code and rate-limits resends.
+  //
+  // These three were declared but never read or written by any query, so OTP
+  // guessing was unbounded. Enforced by verifyTwoFactorCode() and
+  // isTwoFactorResendThrottled().
+  IntColumn get twoFactorAttempts => integer().withDefault(const Constant(0))();
+  DateTimeColumn get twoFactorLockedUntil => dateTime().nullable()();
+  DateTimeColumn get twoFactorLastSentAt => dateTime().nullable()();
+
+  // Password-reset OTP throttling: same threat model as the 2FA columns above.
+  // A 6-digit reset code is 10^6 candidates, so the guess count must be bounded
+  // independently of the password-login lockout.
+  IntColumn get passwordResetAttempts =>
+      integer().withDefault(const Constant(0))();
+  DateTimeColumn get passwordResetLockedUntil => dateTime().nullable()();
+  DateTimeColumn get passwordResetLastSentAt => dateTime().nullable()();
 }
