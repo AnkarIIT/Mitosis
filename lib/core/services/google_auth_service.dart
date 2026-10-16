@@ -6,6 +6,14 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../config/app_config.dart';
 import '../database/drift_database.dart' as db;
+import 'auth_service.dart' show kGooglePasswordSentinel;
+
+/// Sentinel stored in `users.passwordHash` for accounts that can only be
+/// authenticated through a federated provider.
+///
+/// Re-exported from `auth_service.dart` so the two creation paths cannot drift
+/// again.
+const String _googlePasswordSentinel = kGooglePasswordSentinel;
 
 class GoogleAuthService {
   final db.AppDatabase _db;
@@ -16,45 +24,49 @@ class GoogleAuthService {
           googleSignIn ??
           GoogleSignIn(serverClientId: AppConfig.googleServerClientId);
 
-  supabase.SupabaseClient? get _supabaseClient =>
-      AppConfig.enableCloudAuth ? supabase.Supabase.instance.client : null;
+  supabase.SupabaseClient? get _supabaseClient {
+    if (!AppConfig.enableCloudAuth) return null;
+    try {
+      return supabase.Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
+  }
 
-  bool get _cloudAuthEnabled => _supabaseClient != null;
+  Future<supabase.SupabaseClient?> _waitForSupabaseClient() async {
+    if (!AppConfig.enableCloudAuth) return null;
+    for (var attempt = 0; attempt < 25; attempt++) {
+      final client = _supabaseClient;
+      if (client != null) return client;
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    }
+    return _supabaseClient;
+  }
 
   Future<({bool success, String message, db.User? user})>
   signInWithGoogle() async {
-    if (!_cloudAuthEnabled) {
+    final client = await _waitForSupabaseClient();
+    if (client == null) {
       return (
         success: false,
-        message: 'Cloud auth is not configured',
+        message:
+            'Cloud sign-in is not ready. Check your connection or use email sign-in.',
         user: null,
       );
     }
 
     try {
       log('🔍 Google Sign-In: Starting...');
-      log('🔍 Google Server Client ID: ${AppConfig.googleServerClientId}');
-      log('🔍 Supabase URL: ${AppConfig.supabaseUrl}');
-
       final GoogleSignInAccount? googleAccount = await _googleSignIn.signIn();
       if (googleAccount == null) {
         log('🔍 Google Sign-In: Cancelled by user');
         return (success: false, message: 'Sign-in was cancelled', user: null);
       }
 
-      log('🔍 Google Sign-In: Got account: ${googleAccount.email}');
-
       final GoogleSignInAuthentication googleAuth =
           await googleAccount.authentication;
       final String? idToken = googleAuth.idToken;
       final String? accessToken = googleAuth.accessToken;
-
-      log(
-        '🔍 Google Sign-In: ID Token: ${idToken != null ? 'present (${idToken.length} chars)' : 'NULL'}',
-      );
-      log(
-        '🔍 Google Sign-In: Access Token: ${accessToken != null ? 'present' : 'NULL'}',
-      );
 
       if (idToken == null) {
         return (
@@ -63,9 +75,6 @@ class GoogleAuthService {
           user: null,
         );
       }
-
-      final client = _supabaseClient!;
-      log('🔑 Attempting Supabase Google sign-in with ID token');
 
       final response = await client.auth.signInWithIdToken(
         provider: supabase.OAuthProvider.google,
@@ -89,13 +98,15 @@ class GoogleAuthService {
           googleAccount.displayName ??
           email.split('@').first;
 
-      await _upsertLocalUser(
+      // Use the row that `_upsertLocalUser` actually resolved. Re-querying by email
+      // would find the *other* account when an email collision forced a separate
+      // bucket, handing this session someone else's local history.
+      final localUser = await _upsertLocalUser(
         email: email,
         username: email.split('@').first,
         fullName: displayName,
+        supabaseId: supabaseUser.id,
       );
-
-      final localUser = await _db.getUserByEmail(email);
       return (success: true, message: 'Signed in with Google', user: localUser);
     } on PlatformException catch (e) {
       log('Google auth platform error: ${e.code} - ${e.message}');
@@ -113,7 +124,7 @@ class GoogleAuthService {
         return (
           success: false,
           message:
-              'Google sign-in failed with code 12500. This usually means the app signing certificate is not registered in Google Cloud/Firebase. Add this debug SHA-1 to your Android OAuth client: 49162e9ff8e0a2f61a7fd4b1ea1d37ca2c00e553',
+              'Google sign-in is not configured for this app build. Verify the Android package, OAuth client, and debug/release SHA-1 certificates.',
           user: null,
         );
       }
@@ -131,49 +142,176 @@ class GoogleAuthService {
       );
     } catch (e) {
       log('Unexpected Google auth error: $e');
-      return (success: false, message: 'Something went wrong: $e', user: null);
+      return (
+        success: false,
+        message: 'Google sign-in failed. Please try again.',
+        user: null,
+      );
     }
   }
 
   Future<void> signOut() async {
     try {
       await _googleSignIn.signOut();
-      if (_cloudAuthEnabled) {
-        await _supabaseClient!.auth.signOut();
+      final client = _supabaseClient;
+      if (client != null) {
+        await client.auth.signOut();
       }
     } catch (e) {
       log('Sign out error: $e');
     }
   }
 
-  Future<void> _upsertLocalUser({
+  /// Resolves the local user row for a freshly authenticated Google identity.
+  ///
+  /// ## Why this is not a simple email upsert
+  /// The previous implementation looked the email up and, on a hit, overwrote
+  /// `supabaseId` / `username` / `fullName` on that row. Combined with local
+  /// registration never verifying email ownership, that was an account-takeover
+  /// path:
+  ///
+  ///   1. Attacker registers `victim@example.com` locally (no email proof needed).
+  ///   2. The real victim later signs in with Google on that same address.
+  ///   3. The victim's local account — and all its study history — is silently
+  ///      rebound to the attacker's Google identity, and vice versa.
+  ///
+  /// ## The rule now
+  /// An email match is **not** proof of identity. A local row is only adopted when
+  /// it is already a cloud-linked row for this same `supabaseId` (a plain profile
+  /// refresh). Otherwise a distinct local user is created for the Google identity
+  /// and the pre-existing password account is left untouched.
+  ///
+  /// The two histories are merged only through explicit, authenticated linking
+  /// (see `linkLocalAccountToCloud`), which requires the local password.
+  Future<db.User> _upsertLocalUser({
     required String email,
     required String username,
     required String fullName,
+    required String supabaseId,
+  }) async {
+    final resolved = await _resolveLocalUser(
+      email: email,
+      username: username,
+      fullName: fullName,
+      supabaseId: supabaseId,
+    );
+    if (resolved == null) {
+      // registerUser returns null when the insert failed (e.g. a username
+      // collision survived disambiguation). Fail loudly rather than handing
+      // the caller a null user that would later be dereferenced.
+      throw StateError(
+        'Could not create a local account for the Google identity',
+      );
+    }
+    return resolved;
+  }
+
+  Future<db.User?> _resolveLocalUser({
+    required String email,
+    required String username,
+    required String fullName,
+    required String supabaseId,
   }) async {
     final existing = await _db.getUserByEmail(email);
 
     if (existing != null) {
-      await (_db.update(
-        _db.users,
-      )..where((t) => t.id.equals(existing.id))).write(
-        db.UsersCompanion(
-          email: Value(email),
-          username: Value(username),
+      // Already this same cloud identity → refresh the profile fields only.
+      final alreadyLinked = existing.supabaseId == supabaseId;
+      if (alreadyLinked) {
+        await (_db.update(
+          _db.users,
+        )..where((t) => t.id.equals(existing.id))).write(
+          db.UsersCompanion(
+            fullName: Value(fullName),
+            username: Value(username),
+          ),
+        );
+        return await _db.getUserById(existing.id);
+      }
+
+      // A different cloud identity, or an unlinked local-only password account,
+      // already holds this email. Do NOT adopt it: that would hand this Google
+      // session the other identity's local data.
+      //
+      // `users.email` is UNIQUE, so a second row cannot reuse the address. The
+      // new row therefore stores a NULL email and is identified purely by
+      // `supabaseId` — the local row is a data bucket for this cloud identity,
+      // and the authoritative address stays with Supabase.
+      final created = await _db.registerUser(
+        db.UsersCompanion.insert(
+          username: _uniqueUsername(username, supabaseId),
+          email: const Value(null),
           fullName: Value(fullName),
+          supabaseId: Value(supabaseId),
+          passwordHash: const Value(_googlePasswordSentinel),
+          // Records the address for display/recovery without claiming it.
+          isEmailVerified: const Value(true),
         ),
       );
-      return;
+      log(
+        'Google sign-in created a separate local account; the existing '
+        'account with this email was left untouched. Merging them requires '
+        'explicit linking with the local password.',
+      );
+      return created;
     }
 
-    await _db.registerUser(
+    final created = await _db.registerUser(
       db.UsersCompanion.insert(
         username: username,
         email: Value(email),
         fullName: Value(fullName),
-        passwordHash: const Value('google_auth'),
+        supabaseId: Value(supabaseId),
+        passwordHash: const Value(_googlePasswordSentinel),
       ),
     );
+    return created;
+  }
+
+  /// Produces a username that cannot collide with an existing row.
+  ///
+  /// `users.username` has a UNIQUE constraint, and `email` is unique too — so
+  /// the only way a Google user collides is by sharing a display name with
+  /// another account.
+  static String _uniqueUsername(String desired, String supabaseId) {
+    final base = desired.trim().isEmpty ? 'student' : desired.trim();
+    final suffix = supabaseId.replaceAll(RegExp('[^A-Za-z0-9]'), '');
+    final short = suffix.length <= 6 ? suffix : suffix.substring(0, 6);
+    return '$base.$short';
+  }
+
+  /// Marks a local password account as owned by a verified cloud identity.
+  ///
+  /// This is the ONLY path that may merge a pre-existing local account into a
+  /// cloud one, and it requires the caller to have already proved ownership of
+  /// the local credentials (see `AuthService.verifyLocalPassword`) plus a
+  /// verified email on the cloud side.
+  Future<({bool success, String message})> linkLocalAccountToCloud({
+    required int localUserId,
+    required String supabaseId,
+  }) async {
+    final user = await _db.getUserById(localUserId);
+    if (user == null) {
+      return (success: false, message: 'Local account not found.');
+    }
+    if (user.supabaseId != null && user.supabaseId!.isNotEmpty) {
+      // Already linked. Linking again must not silently re-point the account at
+      // a different identity — that is the takeover path this guards.
+      if (user.supabaseId == supabaseId) {
+        return (success: true, message: 'Account already linked.');
+      }
+      return (
+        success: false,
+        message:
+            'This account is already linked to a different sign-in method. '
+            'Sign out first, or contact support to merge your progress.',
+      );
+    }
+
+    await (_db.update(_db.users)..where((t) => t.id.equals(localUserId))).write(
+      db.UsersCompanion(supabaseId: Value(supabaseId)),
+    );
+    return (success: true, message: 'Account linked.');
   }
 
   String _friendlySupabaseError(String? message) {
@@ -201,6 +339,6 @@ class GoogleAuthService {
     }
 
     log('Unmapped Supabase auth error: $message');
-    return message;
+    return 'Authentication failed. Please try again or use email sign-in.';
   }
 }
