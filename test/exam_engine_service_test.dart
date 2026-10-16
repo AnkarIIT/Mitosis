@@ -67,8 +67,8 @@ ExamConfig _optionalConfig() {
 
 void main() {
   group('ExamConfig', () {
-    test('neet() default is the modern flat 180q / 180min mock', () {
-      final config = ExamConfig.neet();
+    test('neetLegacy() default is the legacy flat 180q / 180min mock', () {
+      final config = ExamConfig.neetLegacy();
       expect(config.mode, ExamMode.neet);
       expect(config.sections.length, 4);
       expect(config.sections.map((s) => s.name).toList(), [
@@ -80,7 +80,7 @@ void main() {
       expect(config.totalDurationSeconds, 180 * 60);
       expect(config.marksPerCorrect, 4);
       expect(config.marksPerWrong, -1);
-      // Modern default: free navigation, no break, full-length mock.
+      // Legacy default: free navigation, no break, full-length mock.
       expect(config.sectionLock, isFalse);
       expect(config.breaksEnabled, isFalse);
       expect(config.breakAfterSectionIndex, -1);
@@ -89,15 +89,36 @@ void main() {
       expect(config.totalGraded, 180); // all compulsory
     });
 
-    test('neetWithOptionalB() expresses compulsory + optional N-of-M', () {
-      final config = ExamConfig.neetWithOptionalB();
-      // 4 subjects × (Section A + Section B) = 8 sections.
-      expect(config.sections.length, 8);
-      final optional = config.sections.where((s) => s.isOptional).toList();
-      expect(optional.length, 4);
-      expect(optional.every((s) => s.gradedCount < s.presentedCount), isTrue);
-      expect(config.isFullLengthMock, isTrue);
-    });
+    test(
+      'neet2024() expresses NTA NEET 2024 pattern (200q, 180 graded, 200min)',
+      () {
+        final config = ExamConfig.neet2024();
+        // 4 subjects × (Section A + Section B) = 8 sections.
+        expect(config.sections.length, 8);
+        // Sections 0-3 are A (compulsory), 4-7 are B (optional)
+        final aSections = config.sections.take(4).toList();
+        final bSections = config.sections.skip(4).toList();
+        expect(aSections.length, 4);
+        expect(bSections.length, 4);
+        // A sections: all compulsory
+        expect(
+          aSections.every((s) => s.gradedCount == s.presentedCount),
+          isTrue,
+        );
+        // B sections: optional (graded < presented)
+        expect(
+          bSections.every((s) => s.gradedCount < s.presentedCount),
+          isTrue,
+        );
+        // Total counts
+        expect(config.totalDurationSeconds, 200 * 60);
+        expect(config.totalQuestionSlots, 200);
+        expect(config.totalGraded, 180);
+        expect(config.isFullLengthMock, isTrue);
+        // NTA NEET 2024: no per-section timing, no scheduled breaks
+        expect(config.breaksEnabled, isFalse);
+      },
+    );
 
     test('practice config has single unlocked section', () {
       final config = ExamConfig.practice(
@@ -113,7 +134,7 @@ void main() {
     });
 
     test('ExamConfig JSON round-trips (incl. optional sections)', () {
-      final config = ExamConfig.neetWithOptionalB();
+      final config = ExamConfig.neet2024();
       final restored = ExamConfig.fromJson(config.toJson());
       expect(restored.sections.length, config.sections.length);
       expect(restored.totalGraded, config.totalGraded);
