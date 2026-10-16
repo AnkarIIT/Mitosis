@@ -3,9 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:neet_mitos/features/exam_engine/on_screen_calculator.dart';
 
 Widget _host() {
-  return const MaterialApp(
-    home: Scaffold(body: OnScreenCalculator()),
-  );
+  return const MaterialApp(home: Scaffold(body: OnScreenCalculator()));
 }
 
 String _currentDisplay(WidgetTester tester) {
