@@ -752,13 +752,31 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     }
 
     var target = index;
-    while (target < _sectionQuestions.length &&
-        _sectionQuestions[target].isEmpty) {
+    // Never skip ACROSS the A→B boundary while in block A. Skipping an empty
+    // section 3 would land directly in section 4, bypassing the block
+    // transition that only `_goToBBlock` is allowed to perform.
+    final hardLimit =
+        (_isNeet2024 && _inABlock && 4 <= _sectionQuestions.length)
+        ? 4
+        : _sectionQuestions.length;
+    while (target < hardLimit && _sectionQuestions[target].isEmpty) {
       target++;
     }
-    if (target >= _sectionQuestions.length) {
+
+    // Out of questions: either we hit the block boundary, or the paper ended.
+    // `target >= hardLimit` short-circuits, so the second clause is never
+    // evaluated with an out-of-range index.
+    if (target >= hardLimit || _sectionQuestions[target].isEmpty) {
       setState(() => _sectionDeadline = null);
-      _confirmSubmit();
+      if (_isNeet2024 && _inABlock) {
+        if (_isABlockLastQuestion) {
+          await _goToBBlock();
+        } else {
+          _confirmSubmit();
+        }
+      } else {
+        _confirmSubmit();
+      }
       return;
     }
     setState(() {
