@@ -136,6 +136,16 @@ class GeminiProxyService {
       finalSystemPrompt = _buildSystemPrompt(context);
     }
 
+    // The proxy's cache is a SHARED corpus: an entry is served to every other
+    // caller. An answer generated from this student's accuracy, weak topics and
+    // exam countdown is personal to them, so it must never be written to or read
+    // from that corpus. Requests built without a ChatContext are student-
+    // independent and opt in.
+    // A ChatContext makes the request personal. A caller-supplied
+    // `systemPrompt` is not necessarily personalised, so it can still opt in —
+    // that is how a subject-only tutor prompt reaches the shared cache.
+    final isPersonalised = context != null;
+
     try {
       final data = await _invoker(
         'gemini-proxy',
@@ -145,6 +155,7 @@ class GeminiProxyService {
             'systemPrompt': finalSystemPrompt,
           if (questionId != null && questionId.isNotEmpty)
             'questionId': questionId,
+          'cacheable': !isPersonalised,
         },
       );
 
