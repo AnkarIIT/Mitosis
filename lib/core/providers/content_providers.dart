@@ -1,10 +1,17 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../models/question_model.dart';
-import '../models/subject_model.dart';
+import '../models/subject_model.dart' as subject_model;
+import '../models/study_resource.dart';
+import '../models/learning_recommendation.dart';
+import '../models/study_resource_content.dart';
+import '../services/ncert_book_catalog.dart';
+import '../services/chapter_service.dart';
 import '../models/flashcard_model.dart';
+import '../models/chapter_model.dart';
 import '../constants/neet_sample_data.dart';
 import '../config/app_config.dart';
 import '../database/question_repository.dart';
@@ -14,15 +21,19 @@ import '../services/dpp_engine.dart';
 import '../services/mastery_service.dart';
 import '../services/unified_question_pool_service.dart';
 import 'core_providers.dart';
-import 'auth_providers.dart';
+
+import 'current_user_provider.dart';
 import '../database/drift_database.dart' as db;
 
 // ============= SUBJECT & CONTENT =============
-final subjectsProvider = Provider<List<Subject>>((ref) {
+final subjectsProvider = Provider<List<subject_model.Subject>>((ref) {
   return subjects;
 });
 
-final subjectByIdProvider = Provider.family<Subject?, String>((ref, subjectId) {
+final subjectByIdProvider = Provider.family<subject_model.Subject?, String>((
+  ref,
+  subjectId,
+) {
   final allSubjects = ref.watch(subjectsProvider);
   try {
     return allSubjects.firstWhere((s) => s.id == subjectId);
@@ -31,15 +42,27 @@ final subjectByIdProvider = Provider.family<Subject?, String>((ref, subjectId) {
   }
 });
 
-final chaptersProvider = Provider.family<List<Chapter>, String>((
+// NOTE ON `Chapter`:
+// There are two unrelated classes with this name in the codebase:
+//   * models/subject_model.dart — legacy catalog chapter (`name`, `subjectId`,
+//     `topics`), reachable through `Subject.chapters`.
+//   * models/chapter_model.dart  — new lesson-based chapter (`title`,
+//     `lessons`, `summaryQuiz`) used by the chapter feature and ChapterService.
+// `chapter_model.dart` is imported unprefixed, so bare `Chapter` resolves to
+// the NEW model. Every provider below that walks the legacy `Subject.chapters`
+// tree must therefore spell the type out as `subject_model.Chapter`.
+final chaptersProvider = Provider.family<List<subject_model.Chapter>, String>((
   ref,
   subjectId,
 ) {
   final subject = ref.watch(subjectByIdProvider(subjectId));
-  return subject?.chapters ?? [];
+  return subject?.chapters ?? <subject_model.Chapter>[];
 });
 
-final topicsProvider = Provider.family<List<Topic>, String>((ref, chapterId) {
+final topicsProvider = Provider.family<List<subject_model.Topic>, String>((
+  ref,
+  chapterId,
+) {
   final allSubjects = ref.watch(subjectsProvider);
   for (var subject in allSubjects) {
     for (var chapter in subject.chapters) {
@@ -48,13 +71,184 @@ final topicsProvider = Provider.family<List<Topic>, String>((ref, chapterId) {
       }
     }
   }
-  return [];
+  return <subject_model.Topic>[];
 });
+
+final chapterByIdProvider = Provider.family<subject_model.Chapter?, String>((
+  ref,
+  chapterId,
+) {
+  for (final subject in ref.watch(subjectsProvider)) {
+    for (final chapter in subject.chapters) {
+      if (chapter.id == chapterId) return chapter;
+    }
+  }
+  return null;
+});
+
+/// Read-only catalog of learning resources. User progress/bookmarks belong in
+/// separate user-scoped tables; the catalog itself is shared content.
+final studyResourcesProvider = Provider<List<StudyResource>>((ref) {
+  final resources = <StudyResource>[];
+  for (final entry in NcertBookCatalog.allEntries) {
+    resources.add(
+      StudyResource(
+        id: entry.assetPath,
+        title: 'NCERT: ${entry.chapterTitle}',
+        subject: entry.subject,
+        classLevel: entry.classLevel,
+        chapterId: _chapterIdForEntry(entry),
+        chapterTitle: entry.chapterTitle,
+        type: StudyResourceType.ncertPdf,
+        source: 'NCERT',
+        assetPath: entry.assetPath,
+        offlineAvailable: true,
+      ),
+    );
+  }
+  for (final subject in subjects) {
+    for (final chapter in subject.chapters) {
+      if (chapter.topics.isEmpty) continue;
+      resources.add(
+        StudyResource(
+          id: 'notes_${chapter.id}',
+          title: 'Mitosis Notes: ${chapter.name}',
+          subject: subject.name,
+          classLevel: chapter.classLevel ?? 'NEET',
+          chapterId: chapter.id,
+          chapterTitle: chapter.name,
+          type: StudyResourceType.mitosisNotes,
+          source: 'Mitosis',
+          offlineAvailable: true,
+        ),
+      );
+      resources.add(
+        StudyResource(
+          id: 'revision_${chapter.id}',
+          title: 'One-page revision: ${chapter.name}',
+          subject: subject.name,
+          classLevel: chapter.classLevel ?? 'NEET',
+          chapterId: chapter.id,
+          chapterTitle: chapter.name,
+          type: StudyResourceType.revisionSheet,
+          source: 'Mitosis',
+          offlineAvailable: true,
+        ),
+      );
+      resources.add(
+        StudyResource(
+          id: 'formula_${chapter.id}',
+          title:
+              '${subject.name == 'Biology' ? 'Fact' : 'Formula'} sheet: ${chapter.name}',
+          subject: subject.name,
+          classLevel: chapter.classLevel ?? 'NEET',
+          chapterId: chapter.id,
+          chapterTitle: chapter.name,
+          type: StudyResourceType.formulaSheet,
+          source: 'Mitosis',
+          offlineAvailable: true,
+        ),
+      );
+      resources.add(
+        StudyResource(
+          id: 'pyq_${chapter.id}',
+          title: 'PYQ practice: ${chapter.name}',
+          subject: subject.name,
+          classLevel: chapter.classLevel ?? 'NEET',
+          chapterId: chapter.id,
+          chapterTitle: chapter.name,
+          type: StudyResourceType.pyqSet,
+          source: 'Mitosis',
+          offlineAvailable: true,
+        ),
+      );
+      resources.add(
+        StudyResource(
+          id: 'diagrams_${chapter.id}',
+          title: 'Diagram and flow revision: ${chapter.name}',
+          subject: subject.name,
+          classLevel: chapter.classLevel ?? 'NEET',
+          chapterId: chapter.id,
+          chapterTitle: chapter.name,
+          type: StudyResourceType.diagramSheet,
+          source: 'Mitosis',
+          offlineAvailable: true,
+        ),
+      );
+    }
+  }
+  return resources;
+});
+
+final resourcesForSubjectProvider =
+    Provider.family<List<StudyResource>, String>((ref, subject) {
+      return ref
+          .watch(studyResourcesProvider)
+          .where((resource) => resource.subject == subject)
+          .toList(growable: false);
+    });
+
+final resourcesForChapterProvider =
+    Provider.family<List<StudyResource>, String>((ref, chapterId) {
+      return ref
+          .watch(studyResourcesProvider)
+          .where((resource) => resource.chapterId == chapterId)
+          .toList(growable: false);
+    });
+
+final resourceProgressProvider =
+    FutureProvider<Map<String, db.ResourceProgressData>>((ref) async {
+      final userId = ref.watch(currentLocalUserIdProvider);
+      if (userId == null) return const {};
+      final rows = await ref
+          .watch(databaseProvider)
+          .getResourceProgress(userId: userId);
+      return {for (final row in rows) row.resourceId: row};
+    });
+
+final studyResourceContentProvider = Provider.family<StudyResourceContent, String>((
+  ref,
+  chapterId,
+) {
+  final authored = studyResourceContent[chapterId];
+  if (authored != null) return authored;
+
+  final chapter = ref.watch(chapterByIdProvider(chapterId));
+  final points =
+      chapter?.topics
+          .expand((topic) => topic.keyPoints ?? const <String>[])
+          .toList(growable: false) ??
+      const <String>[];
+  final overview =
+      chapter?.description ??
+      'Chapter revision content is being expanded by the Mitosis content team.';
+  return StudyResourceContent(
+    chapterId: chapterId,
+    overview: overview,
+    keyFacts: points,
+    revisionRules: const [
+      'Read the matching NCERT chapter and mark every missed practice question.',
+      'Revise this sheet before attempting the chapter quiz again.',
+    ],
+  );
+});
+
+String? _chapterIdForEntry(NcertBookEntry entry) {
+  for (final subject in subjects) {
+    for (final chapter in subject.chapters) {
+      if (NcertBookCatalog.entryFor(chapter)?.assetPath == entry.assetPath) {
+        return chapter.id;
+      }
+    }
+  }
+  return null;
+}
 
 // ============= FLASHCARDS =============
 final flashcardsFromDbProvider = FutureProvider<List<Flashcard>>((ref) async {
   final db = ref.watch(databaseProvider);
-  final rows = await db.getAllFlashcards();
+  final userId = ref.watch(currentLocalUserIdProvider) ?? guestOwnerId;
+  final rows = await db.getAllFlashcards(userId: userId);
   if (rows.isEmpty) return sampleFlashcards;
   return rows
       .map(
@@ -88,7 +282,8 @@ final flashcardsProvider = Provider<List<Flashcard>>((ref) {
 
 final dueFlashcardsProvider = FutureProvider<List<Flashcard>>((ref) async {
   final db = ref.watch(databaseProvider);
-  final rows = await db.getDueFlashcards(DateTime.now());
+  final userId = ref.watch(currentLocalUserIdProvider) ?? guestOwnerId;
+  final rows = await db.getDueFlashcards(DateTime.now(), userId: userId);
   return rows
       .map(
         (r) => Flashcard(
@@ -123,11 +318,75 @@ final flashcardsForSubjectProvider = Provider.family<List<Flashcard>, String>((
   return all.where((f) => f.subject == subject).toList();
 });
 
+// ============= CHAPTERS =============
+
+final allChaptersProvider = Provider<List<Chapter>>((ref) {
+  return ChapterService.allChapters;
+});
+
+final chaptersBySubjectProvider = Provider.family<List<Chapter>, String>((
+  ref,
+  subject,
+) {
+  return ChapterService.getChaptersBySubject(subject);
+});
+
+final chaptersByClassProvider = Provider.family<List<Chapter>, String>((
+  ref,
+  classLevel,
+) {
+  return ChapterService.getChaptersByClass(classLevel);
+});
+
+final chapterProvider = FutureProvider.family<Chapter?, String>((
+  ref,
+  chapterId,
+) async {
+  return ChapterService.getChapter(chapterId);
+});
+
+// Chapter progress provider (per-user)
+final chapterProgressProvider = FutureProvider.family<ChapterProgress?, String>(
+  (ref, chapterId) async {
+    final db = ref.watch(databaseProvider);
+    final userId = ref.watch(currentLocalUserIdProvider) ?? guestOwnerId;
+    final tableData = await db.getChapterProgress(chapterId, userId);
+    if (tableData == null) return null;
+    // Convert from table data (JSON strings) to model (Set/Map)
+    Set<String> completedIds = {};
+    try {
+      final decoded = JsonDecoder().convert(tableData.completedLessonIds);
+      if (decoded is List) {
+        completedIds = decoded.cast<String>().toSet();
+      }
+    } catch (_) {}
+    Map<String, int> quickScores = {};
+    try {
+      final decoded = JsonDecoder().convert(tableData.quickCheckScores);
+      if (decoded is Map) {
+        quickScores = decoded.map((k, v) => MapEntry(k.toString(), v as int));
+      }
+    } catch (_) {}
+    return ChapterProgress(
+      chapterId: tableData.chapterId,
+      userId: tableData.userId,
+      currentLessonId: tableData.currentLessonId,
+      completedLessonIds: completedIds,
+      quickCheckScores: quickScores,
+      summaryQuizScore: tableData.summaryQuizScore,
+      startedAt: tableData.startedAt,
+      lastAccessedAt: tableData.lastAccessedAt,
+      completedAt: tableData.completedAt,
+    );
+  },
+);
+
 // ============= QUESTIONS =============
 final recentlySeenQuestionIdsProvider =
     FutureProvider.family<Set<String>, String?>((ref, subject) async {
       final database = ref.watch(databaseProvider);
-      final history = QuestionHistoryService(database);
+      final owner = ref.watch(currentLocalUserIdProvider) ?? guestOwnerId;
+      final history = QuestionHistoryService(database, userId: owner);
       return history.getRecentSeenQuestionIds(subject: subject);
     });
 
@@ -186,12 +445,14 @@ final contentSyncProvider = FutureProvider<void>((ref) async {
 final dppEngineProvider = Provider<DppEngine>((ref) {
   final database = ref.watch(databaseProvider);
   final questionRepo = QuestionRepository(database);
-  final history = QuestionHistoryService(database);
+  final owner = ref.watch(currentLocalUserIdProvider) ?? guestOwnerId;
+  final history = QuestionHistoryService(database, userId: owner);
   final mastery = MasteryService(
     database,
     questionRepo.getAllQuestionsFromDb(),
+    userId: owner,
   );
-  final userId = ref.watch(authProvider).user?.id ?? 0;
+  final userId = owner;
   return DppEngine(database, questionRepo, history, mastery, userId: userId);
 });
 
@@ -311,23 +572,24 @@ Future<Map<DateTime, double>> _computeWeeklyAccuracy(
 
 final unifiedQuestionPoolServiceProvider = Provider<UnifiedQuestionPoolService>(
   (ref) {
-    final database = ref.watch(databaseProvider);
     final repo = ref.watch(questionRepositoryProvider);
     final history = ref.watch(questionHistoryServiceProvider);
     final mastery = ref.watch(masteryServiceProvider);
-    return UnifiedQuestionPoolService(database, repo, history, mastery);
+    return UnifiedQuestionPoolService(repo, history, mastery);
   },
 );
 
 final questionHistoryServiceProvider = Provider<QuestionHistoryService>((ref) {
   final database = ref.watch(databaseProvider);
-  return QuestionHistoryService(database);
+  final owner = ref.watch(currentLocalUserIdProvider) ?? guestOwnerId;
+  return QuestionHistoryService(database, userId: owner);
 });
 
 final masteryServiceProvider = Provider<MasteryService>((ref) {
   final database = ref.watch(databaseProvider);
   final questionBank = ref.watch(allQuestionsProvider.future);
-  return MasteryService(database, questionBank);
+  final owner = ref.watch(currentLocalUserIdProvider) ?? guestOwnerId;
+  return MasteryService(database, questionBank, userId: owner);
 });
 
 // Adaptive quiz questions with mastery-based selection and anti-repetition
@@ -385,4 +647,23 @@ class AdaptiveQuizRequest {
     this.deduplicateConcepts = true,
     this.subjectWeights,
   });
+
+  factory AdaptiveQuizRequest.fromRecommendation(
+    LearningRecommendation recommendation, {
+    int count = 15,
+  }) {
+    final speedDrill =
+        recommendation.primaryAction == LearningActionType.speedDrill;
+    final revision = recommendation.primaryAction == LearningActionType.revise;
+    return AdaptiveQuizRequest(
+      subjects: [recommendation.subject],
+      chapterId: recommendation.chapterId,
+      topicId: recommendation.topicId,
+      count: count,
+      easyPercent: speedDrill ? 45 : (revision ? 40 : 30),
+      mediumPercent: speedDrill ? 45 : 45,
+      hardPercent: speedDrill ? 10 : 15,
+      biasWeakTopics: true,
+    );
+  }
 }
