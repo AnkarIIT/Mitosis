@@ -230,8 +230,11 @@ class ChapterNotesScreen extends ConsumerWidget {
           label: const Text('Quiz'),
         ),
         FilledButton.icon(
-          onPressed: () =>
-              context.push('/dpp/${_subjectName(subjectId).toLowerCase()}'),
+          // Pass the subject NAME, not a lowercased id: DppScreen resolves
+          // either, but the DPP engine matches the questions table on the
+          // exact name, so '/dpp/chemistry' produced an empty pool and a
+          // "not enough questions" message on every press.
+          onPressed: () => context.push('/dpp/${_subjectName(subjectId)}'),
           icon: const Icon(Icons.assignment, size: 18),
           label: const Text('DPP'),
         ),
