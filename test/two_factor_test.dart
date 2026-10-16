@@ -4,27 +4,45 @@ import 'package:neet_mitos/core/database/drift_database.dart';
 import 'package:neet_mitos/core/services/auth_service.dart';
 import 'package:neet_mitos/core/services/email_service.dart';
 
+/// Captures sends instead of performing them.
+///
+/// Overrides [send] rather than the retired `sendTransactionalEmail`, because
+/// the service no longer accepts caller-supplied HTML at all — a template name
+/// is what crosses the wire.
 class _CapturingEmailService extends EmailService {
   @override
   bool get isConfigured => true;
 
-  final List<String> sentTexts = [];
-  final List<String> sentHtmls = [];
   final List<String> recipients = [];
+  final List<String> usernames = [];
+  final List<String> codes = [];
+  final List<EmailTemplate> templates = [];
+  final List<EmailPurpose> purposes = [];
 
   @override
-  Future<EmailSendResult> sendTransactionalEmail({
+  Future<EmailSendResult> send({
     required String to,
-    required String subject,
-    required String html,
-    String? text,
-    String? from,
+    required EmailTemplate template,
+    EmailPurpose purpose = EmailPurpose.securityNotice,
+    String? username,
+    String? code,
+    Duration? timeout,
   }) async {
     recipients.add(to);
-    sentHtmls.add(html);
-    sentTexts.add(text ?? '');
-    return EmailSendResult.ok('sent');
+    usernames.add(username ?? '');
+    codes.add(code ?? '');
+    templates.add(template);
+    purposes.add(purpose);
+    return EmailSendResult.sent();
   }
+}
+
+/// The code from the most recent captured send.
+String _codeFromLastEmail(_CapturingEmailService email) {
+  expect(email.codes, isNotEmpty, reason: 'No email was captured');
+  final code = email.codes.last;
+  expect(code, matches(RegExp(r'^\d{6}$')));
+  return code;
 }
 
 void main() {
@@ -47,7 +65,7 @@ void main() {
       final result = await auth.register(
         email: email,
         username: email.split('@').first,
-        password: 'c0rrect-password',
+        password: 'C0rrect-Password!',
       );
       expect(result.success, isTrue);
       return result.user!;
@@ -60,8 +78,37 @@ void main() {
       final result = await noEmail.enable2FA(user.email!);
 
       expect(result.success, isFalse);
-      expect(result.message, contains('not configured'));
-      expect(await db.getActiveTwoFactorCode(user.id), isNull);
+      expect(result.message, contains('not set up on this build'));
+    });
+
+    test('enable2FA is rate limited by resend cooldown', () async {
+      // This path previously had no throttle and never recorded a send. Because
+      // it is keyed on a caller-supplied email, it was an unbounded amplifier:
+      // anyone who knew a registered address could drive unlimited
+      // transactional mail and churn the live code on every request.
+      final user = await registerUser('cooldown@example.com');
+
+      // Registration itself sends a verification mail, so count only the
+      // two-factor template when asserting on delivery.
+      int twoFactorSendsTo(String address) {
+        var n = 0;
+        for (var i = 0; i < email.templates.length; i++) {
+          if (email.templates[i] == EmailTemplate.twoFactorEnable &&
+              email.recipients[i] == address) {
+            n++;
+          }
+        }
+        return n;
+      }
+
+      final first = await auth.enable2FA(user.email!);
+      expect(first.success, isTrue);
+      expect(twoFactorSendsTo('cooldown@example.com'), 1);
+
+      final second = await auth.enable2FA(user.email!);
+      expect(second.success, isFalse);
+      expect(second.message, contains('wait before requesting another code'));
+      expect(twoFactorSendsTo('cooldown@example.com'), 1);
     });
 
     test('enable flow stores the code and confirm enables 2FA', () async {
@@ -73,36 +120,41 @@ void main() {
       expect(enable.message, contains('enable@example.com'));
       expect(email.recipients, contains('enable@example.com'));
 
-      final stored = await db.getActiveTwoFactorCode(user.id);
-      expect(stored, isNotNull);
-      expect(stored!.code.length, 6);
-      expect(stored.code, allOf(isNot(contains(' ')), isNot(contains('.'))));
+      final code = _codeFromLastEmail(email);
+      expect(code.length, 6);
+      expect(code, allOf(isNot(contains(' ')), isNot(contains('.'))));
 
-      expect(email.sentTexts.single, contains(stored.code));
-      expect(email.sentHtmls.single, contains(stored.code));
-      expect(email.sentHtmls.single, contains('Hi enable,'));
-      expect(email.sentHtmls.single, contains('Hi ${user.username},'));
-      expect(
-        email.sentHtmls.single,
-        contains('Enable two-factor authentication'),
+      // The client sends a template *name*, not HTML. Rendering happens server-side
+      // so untrusted text can never be interpolated into a security email.
+      // `.last` rather than `.single`: registration also sends a verification
+      // mail, so the two-factor template is not the only send in the log.
+      expect(email.templates.last, EmailTemplate.twoFactorEnable);
+      expect(email.purposes.last, EmailPurpose.twoFactorEnable);
+      expect(email.codes.last, code);
+      expect(email.usernames.last, user.username);
+
+      // The code and username must still appear, escaped, in the rendered
+      // preview — this is what proves the escaping path is wired end to end.
+      final html = EmailTemplate.twoFactorEnable.render(
+        purpose: EmailPurpose.twoFactorEnable,
+        username: email.usernames.last,
+        code: email.codes.last,
       );
+      expect(html, contains(code));
+      expect(html, contains('turn on two-factor authentication'));
 
       final wrong = await auth.confirmEnable2FA('enable@example.com', '999999');
       expect(wrong.success, isFalse);
       expect(user.isTwoFactorEnabled, isFalse);
 
-      final good = await auth.confirmEnable2FA(
-        'enable@example.com',
-        stored.code,
-      );
+      final good = await auth.confirmEnable2FA('enable@example.com', code);
       expect(good.success, isTrue);
 
       final updated = await db.getUserById(user.id);
       expect(updated!.isTwoFactorEnabled, isTrue);
-      expect(await db.getActiveTwoFactorCode(user.id), isNull);
     });
 
-    test('getActiveTwoFactorCode returns null once code has expired', () async {
+    test('expired code cannot enable 2FA', () async {
       final user = await registerUser('expired@example.com');
       await auth.enable2FA(user.email!);
 
@@ -112,7 +164,6 @@ void main() {
         DateTime.now().subtract(const Duration(minutes: 1)),
       );
 
-      expect(await db.getActiveTwoFactorCode(user.id), isNull);
       final confirm = await auth.confirmEnable2FA(
         'expired@example.com',
         '123456',
@@ -123,27 +174,25 @@ void main() {
     test('login for a 2FA user verifies via OTP', () async {
       final user = await registerUser('login@example.com');
       await auth.enable2FA(user.email!);
-      final stored = await db.getActiveTwoFactorCode(
-        (await db.getUserByEmail('login@example.com'))!.id,
-      );
+      final enableCode = _codeFromLastEmail(email);
       final confirmed = await auth.confirmEnable2FA(
         'login@example.com',
-        stored!.code,
+        enableCode,
       );
       expect(confirmed.success, isTrue);
 
       final login = await auth.login(
         email: 'login@example.com',
-        password: 'c0rrect-password',
+        password: 'C0rrect-Password!',
       );
       expect(login.success, isTrue);
 
       final sent = await auth.sendLogin2FAEmail(login.user!.id);
       expect(sent.success, isTrue);
-      final loginCode = (await db.getActiveTwoFactorCode(login.user!.id))!.code;
-      expect(email.sentTexts.last, contains(loginCode));
-      expect(email.sentHtmls.last, contains(loginCode));
-      expect(email.sentHtmls.last, contains('Login verification'));
+      final loginCode = _codeFromLastEmail(email);
+      expect(email.templates.last, EmailTemplate.loginVerification);
+      expect(email.purposes.last, EmailPurpose.loginVerification);
+      expect(email.codes.last, loginCode);
 
       final bad = await auth.verifyLogin2FA(login.user!.id, '000000');
       expect(bad.success, isFalse);
@@ -151,21 +200,19 @@ void main() {
       final good = await auth.verifyLogin2FA(login.user!.id, loginCode);
       expect(good.success, isTrue);
       expect(good.user!.isTwoFactorEnabled, isTrue);
-      expect(await db.getActiveTwoFactorCode(login.user!.id), isNull);
     });
 
-    test('disable2FA clears the flag and any pending code', () async {
+    test('disable2FA clears the flag', () async {
       final user = await registerUser('disable@example.com');
       await auth.enable2FA(user.email!);
-      final stored = await db.getActiveTwoFactorCode(user.id);
-      await auth.confirmEnable2FA('disable@example.com', stored!.code);
+      final code = _codeFromLastEmail(email);
+      await auth.confirmEnable2FA('disable@example.com', code);
 
       final result = await auth.disable2FA(user.id);
       expect(result.success, isTrue);
 
       final updated = await db.getUserById(user.id);
       expect(updated!.isTwoFactorEnabled, isFalse);
-      expect(await db.getActiveTwoFactorCode(user.id), isNull);
     });
   });
 }
