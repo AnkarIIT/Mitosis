@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "804142434049",
-    "project_id": "mitos-825df",
-    "storage_bucket": "mitos-825df.firebasestorage.app"
+    "project_number": "111410073045",
+    "project_id": "mitosis-e519b",
+    "storage_bucket": "mitosis-e519b.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:804142434049:android:72d7e9a3f346648c2afd00",
+        "mobilesdk_app_id": "1:111410073045:android:d9069ebe4b0a8dae05015c",
         "android_client_info": {
           "package_name": "com.neetmitos.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDuRVSyjaTRNeKPW53N4v465BG-HvFOU-g"
+          "current_key": "AIzaSyCnq5jZihwYqtpuIIU248H_bBLbQzuRNFs"
         }
       ],
       "services": {
