@@ -1,5 +1,6 @@
 import 'dart:math';
 import '../models/question_model.dart';
+import '../utils/answer_normalizer.dart';
 
 enum ExamMode { neet, practice }
 
@@ -127,10 +128,19 @@ class ExamConfig {
     int? botanyMinutes,
     int? zoologyMinutes,
   }) {
-    final physicsSec = physicsMinutes ?? (durationMinutes ~/ 4 * 60);
-    final chemistrySec = chemistryMinutes ?? (durationMinutes ~/ 4 * 60);
-    final botanySec = botanyMinutes ?? (durationMinutes ~/ 8 * 60);
-    final zoologySec = zoologyMinutes ?? (durationMinutes ~/ 8 * 60);
+    final defaultSectionSeconds = durationMinutes * 60 ~/ 4;
+    final physicsSec = physicsMinutes != null
+        ? physicsMinutes * 60
+        : defaultSectionSeconds;
+    final chemistrySec = chemistryMinutes != null
+        ? chemistryMinutes * 60
+        : defaultSectionSeconds;
+    final botanySec = botanyMinutes != null
+        ? botanyMinutes * 60
+        : defaultSectionSeconds;
+    final zoologySec = zoologyMinutes != null
+        ? zoologyMinutes * 60
+        : durationMinutes * 60 - physicsSec - chemistrySec - botanySec;
     return ExamConfig(
       mode: ExamMode.neet,
       testType: 'mock',
@@ -177,29 +187,35 @@ class ExamConfig {
     );
   }
 
-  /// Optional Section-B variant: per subject a compulsory Section A plus an
-  /// optional Section B where the candidate attempts N of M. Modelled as two
-  /// sections per subject so grading, palette and navigation all treat the
-  /// optional block correctly. ⚠️ Verify counts against the NTA bulletin.
-  static ExamConfig neetWithOptionalB({
+  /// NTA NEET 2024 exact pattern: 200 questions (attempt 180), 200 minutes.
+  ///
+  /// Structure per official NTA Information Bulletin:
+  /// - Physics: 35A + 15B (attempt 10 of 15)
+  /// - Chemistry: 35A + 15B (attempt 10 of 15)
+  /// - Botany: 35A + 15B (attempt 10 of 15)
+  /// - Zoology: 35A + 15B (attempt 10 of 15)
+  /// - Total: 140 compulsory + 60 optional = 200 presented, 180 graded
+  /// - Duration: 200 minutes, NO per-section timing, NO scheduled breaks
+  /// - Navigation: Free within Section A block (indices 0-3), free within
+  ///   Section B block (indices 4-7). No cross-block nav until A is done.
+  /// - Marking: +4 / -1 / 0
+  static ExamConfig neet2024({
     int sectionACount = 35,
     int sectionBPresented = 15,
     int sectionBGraded = 10,
     int durationMinutes = 200,
-    bool sectionLock = true,
-    bool breaksEnabled = false,
-    int breakMinutes = 5,
+    bool sectionLock = false, // Free nav within A-block and B-block
   }) {
-    ExamSection compulsory(int index, String name, String source) =>
-        ExamSection(
-          index: index,
-          name: name,
-          sourceSubject: source,
-          presentedCount: sectionACount,
-        );
-    ExamSection optional(int index, String name, String source) => ExamSection(
+    ExamSection sectionA(int index, String name, String source) => ExamSection(
       index: index,
-      name: name,
+      name: '$name · A',
+      sourceSubject: source,
+      presentedCount: sectionACount,
+      gradedCount: sectionACount,
+    );
+    ExamSection sectionB(int index, String name, String source) => ExamSection(
+      index: index,
+      name: '$name · B',
       sourceSubject: source,
       presentedCount: sectionBPresented,
       gradedCount: sectionBGraded,
@@ -211,22 +227,98 @@ class ExamConfig {
       topicId: 'mock_test',
       subjectLabel: 'NEET',
       totalDurationSeconds: durationMinutes * 60,
-      sectionLock: sectionLock,
-      breaksEnabled: breaksEnabled,
-      breakDurationSeconds: breakMinutes * 60,
+      sectionLock: sectionLock, // Lock only between A-block and B-block
+      breaksEnabled: false, // NTA NEET has NO scheduled breaks
+      breakDurationSeconds: 0,
       breakAfterSectionIndex: -1,
       marksPerCorrect: 4,
       marksPerWrong: -1,
       isFullLengthMock: true,
       sections: [
-        compulsory(0, 'Physics · A', 'Physics'),
-        optional(1, 'Physics · B', 'Physics'),
-        compulsory(2, 'Chemistry · A', 'Chemistry'),
-        optional(3, 'Chemistry · B', 'Chemistry'),
-        compulsory(4, 'Botany · A', 'Biology'),
-        optional(5, 'Botany · B', 'Biology'),
-        compulsory(6, 'Zoology · A', 'Biology'),
-        optional(7, 'Zoology · B', 'Biology'),
+        // Section A block (indices 0-3): all compulsory, free navigation within
+        sectionA(0, 'Physics', 'Physics'),
+        sectionA(1, 'Chemistry', 'Chemistry'),
+        sectionA(2, 'Botany', 'Biology'),
+        sectionA(3, 'Zoology', 'Biology'),
+        // Section B block (indices 4-7): optional, free navigation within
+        sectionB(4, 'Physics', 'Physics'),
+        sectionB(5, 'Chemistry', 'Chemistry'),
+        sectionB(6, 'Botany', 'Biology'),
+        sectionB(7, 'Zoology', 'Biology'),
+      ],
+    );
+  }
+
+  /// Legacy 180-question pattern (pre-2020). Kept for backward compatibility.
+  static ExamConfig neetLegacy({
+    int physicsCount = 45,
+    int chemistryCount = 45,
+    int botanyCount = 45,
+    int zoologyCount = 45,
+    int durationMinutes = 180,
+    bool sectionLock = false,
+    bool breaksEnabled = false,
+    int breakMinutes = 5,
+    int? physicsMinutes,
+    int? chemistryMinutes,
+    int? botanyMinutes,
+    int? zoologyMinutes,
+  }) {
+    final defaultSectionSeconds = durationMinutes * 60 ~/ 4;
+    final physicsSec = physicsMinutes != null
+        ? physicsMinutes * 60
+        : defaultSectionSeconds;
+    final chemistrySec = chemistryMinutes != null
+        ? chemistryMinutes * 60
+        : defaultSectionSeconds;
+    final botanySec = botanyMinutes != null
+        ? botanyMinutes * 60
+        : defaultSectionSeconds;
+    final zoologySec = zoologyMinutes != null
+        ? zoologyMinutes * 60
+        : durationMinutes * 60 - physicsSec - chemistrySec - botanySec;
+    return ExamConfig(
+      mode: ExamMode.neet,
+      testType: 'mock',
+      topicId: 'mock_test',
+      subjectLabel: 'NEET',
+      totalDurationSeconds: durationMinutes * 60,
+      sectionLock: sectionLock,
+      breaksEnabled: breaksEnabled,
+      breakDurationSeconds: breakMinutes * 60,
+      breakAfterSectionIndex: breaksEnabled ? 1 : -1,
+      marksPerCorrect: 4,
+      marksPerWrong: -1,
+      isFullLengthMock: true,
+      sections: [
+        ExamSection(
+          index: 0,
+          name: 'Physics',
+          sourceSubject: 'Physics',
+          presentedCount: physicsCount,
+          durationSeconds: physicsSec,
+        ),
+        ExamSection(
+          index: 1,
+          name: 'Chemistry',
+          sourceSubject: 'Chemistry',
+          presentedCount: chemistryCount,
+          durationSeconds: chemistrySec,
+        ),
+        ExamSection(
+          index: 2,
+          name: 'Botany',
+          sourceSubject: 'Biology',
+          presentedCount: botanyCount,
+          durationSeconds: botanySec,
+        ),
+        ExamSection(
+          index: 3,
+          name: 'Zoology',
+          sourceSubject: 'Biology',
+          presentedCount: zoologyCount,
+          durationSeconds: zoologySec,
+        ),
       ],
     );
   }
@@ -384,8 +476,7 @@ class ExamEngineService {
   /// Normalised answer comparison used everywhere scoring happens (grading and
   /// the error-book/spaced-repetition re-grade), so they can never disagree.
   static bool isAnswerCorrect(String? answer, Question q) {
-    if (answer == null) return false;
-    return answer.trim() == q.correctAnswer.trim();
+    return AnswerNormalizer.isCorrect(answer, q);
   }
 
   /// Drops questions that can't be graded fairly: empty text, fewer than two
@@ -400,7 +491,7 @@ class ExamEngineService {
           .where((o) => o.isNotEmpty)
           .toList();
       if (opts.length < 2) return false;
-      if (!opts.contains(q.correctAnswer.trim())) return false;
+      if (!AnswerNormalizer.isCorrect(q.correctAnswer, q)) return false;
       return true;
     }).toList();
   }
@@ -454,6 +545,21 @@ class ExamEngineService {
       allocated[s] = taken;
     }
     return allocated;
+  }
+
+  static bool hasSufficientPool(
+    List<Question> pool,
+    ExamConfig config, {
+    int? seed,
+  }) {
+    final allocation = allocateQuestions(pool, config, seed: seed);
+    if (allocation.length != config.sections.length) return false;
+    for (var i = 0; i < allocation.length; i++) {
+      if (allocation[i].length < config.sections[i].presentedCount) {
+        return false;
+      }
+    }
+    return true;
   }
 
   static List<Question> flattenAllocated(List<List<Question>> sections) => [
@@ -531,5 +637,29 @@ class ExamEngineService {
       maxScore: maxScore,
       sectionIndexByResult: sectionIndexByResult,
     );
+  }
+
+  /// Returns true if the exam config uses the NTA NEET 2024 A/B block structure.
+  static bool isNeet2024(ExamConfig config) {
+    if (!config.isFullLengthMock || config.mode != ExamMode.neet) return false;
+    if (config.sections.length != 8) return false;
+    // Sections 0-3 should be A (graded == presented), 4-7 should be B (graded < presented)
+    for (int i = 0; i < 4; i++) {
+      if (config.sections[i].gradedCount != config.sections[i].presentedCount)
+        return false;
+    }
+    for (int i = 4; i < 8; i++) {
+      if (config.sections[i].gradedCount >= config.sections[i].presentedCount)
+        return false;
+    }
+    return true;
+  }
+
+  /// For NEET 2024: determines which block a section index belongs to.
+  /// 0 = Section A block (indices 0-3), 1 = Section B block (indices 4-7), -1 = other.
+  static int getNeet2024Block(int sectionIndex) {
+    if (sectionIndex >= 0 && sectionIndex <= 3) return 0;
+    if (sectionIndex >= 4 && sectionIndex <= 7) return 1;
+    return -1;
   }
 }
