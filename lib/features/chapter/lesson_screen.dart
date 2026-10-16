@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../core/models/chapter_model.dart';
+import '../../core/providers/current_user_provider.dart';
+import '../../core/providers/providers.dart';
 import '../../core/services/chapter_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
@@ -30,12 +32,17 @@ class LessonScreen extends ConsumerWidget {
       );
     }
 
-    final lesson = chapter.lessons.firstWhere(
-      (l) => l.id == lessonId,
-      orElse: () => throw Exception('Lesson not found'),
-    );
-
+    // `orElse: throw` inside build() crashed the whole frame. This route is
+    // deep-linkable (/chapter/:id/lesson/:lessonId), so a stale or unknown id
+    // is reachable â€” and the catalog can change between builds.
     final lessonIndex = chapter.lessons.indexWhere((l) => l.id == lessonId);
+    if (lessonIndex < 0) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Lesson Not Found')),
+        body: const Center(child: Text('That lesson is no longer available.')),
+      );
+    }
+    final lesson = chapter.lessons[lessonIndex];
     final isFirst = lessonIndex == 0;
     final isLast = lessonIndex == chapter.lessons.length - 1;
 
@@ -54,7 +61,7 @@ class LessonScreen extends ConsumerWidget {
               icon: const Icon(Icons.picture_as_pdf_rounded),
               tooltip: 'Open NCERT PDF at page ${lesson.ncertPage}',
               onPressed: () => context.push(
-                '/pdf/${chapter.pdfEntryId}?page=${lesson.ncertPage}',
+                '/pdf?entryId=${Uri.encodeComponent(chapter.pdfEntryId)}',
               ),
             ),
         ],
@@ -105,7 +112,9 @@ class LessonScreen extends ConsumerWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: (lesson.order) / chapter.lessons.length,
+                      // lessonIndex + 1: Lesson.order is 1-based, so using it
+                      // showed lesson 1 of 2 already half-complete.
+                      value: (lessonIndex + 1) / chapter.lessons.length,
                       minHeight: 4,
                       backgroundColor: AdaptiveColors.divider(context),
                       valueColor: AlwaysStoppedAnimation(
@@ -168,7 +177,7 @@ class LessonScreen extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                'Section ${lesson.ncertSection} • Page ${lesson.ncertPage}',
+                                'Section ${lesson.ncertSection} â€¢ Page ${lesson.ncertPage}',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: AdaptiveColors.textPrimary(context),
@@ -184,7 +193,7 @@ class LessonScreen extends ConsumerWidget {
                             size: 20,
                           ),
                           onPressed: () => context.push(
-                            '/pdf/${chapter.pdfEntryId}?page=${lesson.ncertPage}',
+                            '/pdf?entryId=${Uri.encodeComponent(chapter.pdfEntryId)}',
                           ),
                           tooltip: 'Open NCERT PDF',
                         ),
@@ -326,7 +335,7 @@ class LessonScreen extends ConsumerWidget {
                       icon: const Icon(Icons.picture_as_pdf_rounded),
                       label: Text('Open NCERT Page ${lesson.ncertPage}'),
                       onPressed: () => context.push(
-                        '/pdf/${chapter.pdfEntryId}?page=${lesson.ncertPage}',
+                        '/pdf?entryId=${Uri.encodeComponent(chapter.pdfEntryId)}',
                       ),
                     ),
                   ),
@@ -339,6 +348,7 @@ class LessonScreen extends ConsumerWidget {
       ),
       bottomNavigationBar: _buildBottomNav(
         context,
+        ref,
         chapter,
         lesson,
         isFirst,
@@ -414,7 +424,10 @@ class LessonScreen extends ConsumerWidget {
       qc.options.asMap().entries.map((entry) {
         final idx = entry.key;
         final option = entry.value;
-        final isCorrectOption = idx.toString() == qc.correctAnswer;
+        // correctAnswer is the option TEXT (e.g. 'Weak nuclear'), not an
+        // index â€” comparing idx.toString() to it was always false, so the
+        // green ring never appeared.
+        final isCorrectOption = option == qc.correctAnswer;
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 3),
           child: Row(
@@ -502,8 +515,28 @@ class LessonScreen extends ConsumerWidget {
     }
   }
 
+  /// Persists "this lesson is done" so the chapter landing screen's progress
+  /// reflects reality. Fire-and-forget from the caller's perspective: a failure
+  /// here must never block navigation.
+  Future<void> _recordLessonComplete(
+    WidgetRef ref,
+    Chapter chapter,
+    Lesson lesson,
+  ) async {
+    try {
+      final userId = ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
+      final db = ref.read(databaseProvider);
+      await db.markLessonCompleted(chapter.id, userId, lesson.id);
+      await db.updateCurrentLesson(chapter.id, userId, lesson.id);
+      ref.invalidate(chapterProgressProvider(chapter.id));
+    } catch (e) {
+      debugPrint('chapter: failed to record lesson progress: $e');
+    }
+  }
+
   Widget _buildBottomNav(
     BuildContext context,
+    WidgetRef ref,
     Chapter chapter,
     Lesson lesson,
     bool isFirst,
@@ -535,7 +568,12 @@ class LessonScreen extends ConsumerWidget {
                   : () {
                       final prevLesson = chapter.getPreviousLesson(lesson.id);
                       if (prevLesson != null) {
-                        context.go(
+                        // pushReplacement, NOT go: `go` rebuilds the page list
+                        // so only one route remains, and the custom back arrow
+                        // (which calls context.pop()) then throws
+                        // "There is nothing to pop" â€” the only way out of the
+                        // screen was broken by navigating forward.
+                        context.pushReplacement(
                           '/chapter/${chapter.id}/lesson/${prevLesson.id}',
                         );
                       }
@@ -546,15 +584,22 @@ class LessonScreen extends ConsumerWidget {
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
+              // Completing the lesson is recorded BEFORE navigating. Nothing
+              // wrote chapter progress anywhere, so the landing screen's
+              // "0 / 2 lessons" and 0% bar were dead for every user forever.
               onPressed: isLast
-                  ? () => context.go('/chapter/${chapter.id}')
-                  : () {
+                  ? () async {
+                      await _recordLessonComplete(ref, chapter, lesson);
+                      if (!context.mounted) return;
+                      context.pushReplacement('/chapter/${chapter.id}');
+                    }
+                  : () async {
+                      await _recordLessonComplete(ref, chapter, lesson);
                       final nextLesson = chapter.getNextLesson(lesson.id);
-                      if (nextLesson != null) {
-                        context.go(
-                          '/chapter/${chapter.id}/lesson/${nextLesson.id}',
-                        );
-                      }
+                      if (nextLesson == null || !context.mounted) return;
+                      context.pushReplacement(
+                        '/chapter/${chapter.id}/lesson/${nextLesson.id}',
+                      );
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: _subjectColor(chapter.subject),
