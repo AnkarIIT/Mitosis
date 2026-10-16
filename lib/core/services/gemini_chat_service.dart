@@ -4,7 +4,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 import 'gemini_proxy_service.dart';
-import '../config/app_config.dart';
 
 enum ChatMode { general, conceptExplanation, doubtSolving, quizHint }
 
