@@ -1,12 +1,13 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:neet_mitos/core/database/drift_database.dart';
 import 'package:neet_mitos/core/models/subject_model.dart';
 import 'package:neet_mitos/core/models/user_preferences_model.dart';
-import 'package:neet_mitos/core/providers/providers.dart';
+import 'package:neet_mitos/core/providers/providers.dart'
+    show databaseProvider, userPreferencesProvider;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'test_helpers.dart';
 
 Subject _subject(List<Chapter> chapters) =>
     Subject(id: 'bio', name: 'Biology', icon: '🧬', chapters: chapters);
@@ -163,8 +164,8 @@ void main() {
   group('UserPreferencesNotifier', () {
     test('save writes to prefs and updates state', () async {
       SharedPreferences.setMockInitialValues({});
-      final container = ProviderContainer(
-        overrides: [
+      final container = createTestContainer(
+        additionalOverrides: [
           databaseProvider.overrideWithValue(
             AppDatabase(NativeDatabase.memory()),
           ),
