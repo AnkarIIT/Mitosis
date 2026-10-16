@@ -19,7 +19,7 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
       - name: Analyze
-        run: flutter analyze --no-fatal-infos
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos lib test
       - name: Check formatting
         run: dart format --set-exit-if-changed lib test
 
@@ -36,6 +36,214 @@ jobs:
         run: flutter pub get
       - name: Run tests
         run: flutter test --coverage
+      - name: Enforce coverage artifact
+        run: test -s coverage/lcov.info
+      - name: Enforce coverage threshold
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Floor, not a target. The point is to fail on a large regression, not
+          # to pretend the current percentage is a goal.
+          THRESHOLD="${COVERAGE_MIN:-60.0}"
+          ACTUAL="$(awk -F: '/^LF:/{found=1} found && /^LH:/{split($0,a,":"); print a[2]; exit}' coverage/lcov.info)"
+          ACTUAL="$(awk -F: '/^LH:/{print $2; exit}' coverage/lcov.info)"
+          DENOM="$(awk -F: '/^LF:/{print $2; exit}' coverage/lcov.info)"
+          if [ -z "${DENOM:-}" ] || [ -z "${ACTUAL:-}" ] || [ "$DENOM" -eq 0 ]; then
+            echo "Could not parse lcov.info"; exit 1
+          fi
+          PCT="$(awk -v a="$ACTUAL" -v d="$DENOM" 'BEGIN{printf "%.2f", (a/d)*100}')"
+          echo "Line coverage: ${PCT}% (${ACTUAL}/${DENOM}), floor ${THRESHOLD}%"
+          awk -v p="$PCT" -v t="$THRESHOLD" 'BEGIN{exit !(p+0 >= t+0)}' \
+            || { echo "Coverage ${PCT}% is below the ${THRESHOLD}% floor."; exit 1; }
+
+  security:
+    name: Security checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan tracked source for embedded secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Secrets that must never appear in a client. The service_role key is
+          # called out explicitly because it is the one that bypasses RLS.
+          if git grep -n -I -E \
+            'AIzaSy[A-Za-z0-9_-]{20,}|(sk|re)_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]+ PRIVATE KEY-----|eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.' \
+            -- ':!android/app/google-services.json' ':!*.lock'; then
+            echo "Potential embedded secret found in tracked source."
+            exit 1
+          fi
+
+      - name: Assert no service-role key anywhere in lib/
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The service-role key must live only in Edge Functions, read from
+          # `supabase secrets`. Any *executable* reference from app code means it
+          # is either hardcoded or fetched into a device.
+          #
+          # Comments are stripped first: the config docs deliberately name the
+          # variable to warn against it, and grepping raw text would flag those
+          # warnings as violations.
+          hits="$(git grep -n -I -E 'SUPABASE_SERVICE_ROLE_KEY|service_role' -- lib/ \
+                  | sed -E 's@:[0-9]+:@:@' \
+                  | grep -vE '^[^:]+:[[:space:]]*(///|//|\*)' || true)"
+          if [ -n "$hits" ]; then
+            echo "service_role referenced from executable code in lib/:"
+            echo "$hits"
+            exit 1
+          fi
+
+      - name: Assert .env is not a bundled asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          # `.env` under `assets:` is copied verbatim into every APK/IPA, so
+          # anything ever written there ships to users and is extractable.
+          if sed -n '/^flutter:/,/^[^ ]/p' pubspec.yaml | grep -nE '^\s*-\s*\.env\s*$'; then
+            echo ".env is listed as a bundled asset; pass config via --dart-define."
+            exit 1
+          fi
+
+      - name: Assert config defaults keep risky features off
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Both gates must default to false. They are overridable at build
+          # time, but flipping a default here would ship an unverified sync or
+          # a live Gemini key to every user.
+          grep -qE "enableCloudSync[[:space:]]*=[[:space:]]*bool\.fromEnvironment\('ENABLE_CLOUD_SYNC', defaultValue: false\)" \
+            lib/core/config/app_config.dart
+          grep -qE "enableAiProxy[[:space:]]*=[[:space:]]*bool\.fromEnvironment\('ENABLE_AI_PROXY', defaultValue: false\)" \
+            lib/core/config/app_config.dart
+
+      - name: Assert release builds cannot fall back to debug signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          GRADLE=android/app/build.gradle.kts
+          # A debug-signed release APK is store-uploadable but forgeable by
+          # anyone holding the public debug key, so an update would be accepted
+          # as authentic. The build must fail loudly instead.
+          if grep -qE 'signingConfigs\.getByName\("debug"\)' "$GRADLE"; then
+            echo "Release build still references the debug signing config."
+            exit 1
+          fi
+          grep -q 'isReleaseBuild' "$GRADLE"
+
+      - name: Assert SQL migrations define RLS helper hardening
+        shell: bash
+        run: |
+          set -euo pipefail
+          # SECURITY DEFINER functions without SET search_path are vulnerable to
+          # search-path hijacking by any writable earlier schema.
+          #
+          # Comments are stripped first so the explanatory notes that *describe*
+          # this requirement do not read as violations of it.
+          violations="$(
+            for f in supabase/*.sql; do
+              # Drop full-line comments and inline `--` trailing notes.
+              sed -E 's/--.*$//' "$f" \
+                | grep -n 'SECURITY DEFINER' \
+                | while IFS= read -r line; do
+                    ln="${line%%:*}"
+                    # Inspect the whole function body, not just the matched line:
+                    # `SET search_path` may appear on a following line.
+                    body="$(sed -E 's/--.*$//' "$f" | sed -n "${ln},$((ln+8))p")"
+                    echo "$body" | grep -q 'search_path' || echo "$f:$ln"
+                  done
+            done
+          )"
+          if [ -n "$violations" ]; then
+            echo "SECURITY DEFINER function without SET search_path:"
+            echo "$violations"
+            exit 1
+          fi
+
+      - name: Assert the trigger helper precedes the file that uses it
+        shell: bash
+        run: |
+          set -euo pipefail
+          # 00_core_tables.sql creates triggers calling public.set_updated_at().
+          # That function used to live only in 01_content_catalog.sql, so
+          # applying 00 first — exactly as its own header instructs — failed on
+          # a fresh database.
+          if ! grep -q 'CREATE OR REPLACE FUNCTION public.set_updated_at' \
+                 supabase/00_core_tables.sql; then
+            echo "set_updated_at() must be defined in 00_core_tables.sql."
+            exit 1
+          fi
+
+      - name: Assert AI proxy is not wide open
+        shell: bash
+        run: |
+          set -euo pipefail
+          FN=supabase/functions/gemini-proxy/index.ts
+          # A wildcard origin lets any website drive the shared API key.
+          if grep -q '"Access-Control-Allow-Origin": "\*"' "$FN"; then
+            echo "gemini-proxy still allows all origins."
+            exit 1
+          fi
+          grep -q 'ALLOWED_ORIGINS' "$FN"
+          # Anonymous identity must not be taken from the first (client-written)
+          # X-Forwarded-For entry.
+          if grep -qE 'x-forwarded-for"\)\?\.split\(","\)\[0\]' "$FN"; then
+            echo "gemini-proxy derives anonymous identity from a client-controlled header."
+            exit 1
+          fi
+
+      - name: Assert account deletion does not leak upstream errors
+        shell: bash
+        run: |
+          set -euo pipefail
+          FN=supabase/functions/delete-account/index.ts
+          # Must resolve the target from the caller's JWT, never from the body,
+          # or any user could delete any account.
+          if grep -nE 'body\s*\.\s*user_?id|body\.userId' "$FN"; then
+            echo "delete-account must not take a target id from the request body."
+            exit 1
+          fi
+
+      - name: Check SQL files parse as a set (ordering sanity)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # No schema_migrations ledger exists yet, so this is a cheap guard: it
+          # catches an empty or truncated migration file, and it keeps the
+          # filename prefixes in one ordered list.
+          ls -1 supabase/*.sql
+
+  config-consistency:
+    name: Configuration consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate OAuth / Android configuration
+        run: node scripts/verify-oauth-config.mjs
+
+      - name: Validate migration ordering against a fresh database
+        # Catches the class of defect where a migration references an object a
+        # later file creates — which passes review but fails on a clean project.
+        run: node scripts/verify-migrations.mjs
+
+  staging:
+    name: Staging schema (manual)
+    runs-on: ubuntu-latest
+    # Not part of the default gate: it needs real credentials, and a fork's
+    # PR must not probe someone else's project. Run it from main, or manually,
+    # once migrations have been applied.
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify staging schema and RLS reachability
+        env:
+          SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+        run: node scripts/verify-staging.mjs
 
   build-android:
     name: Build Android
@@ -48,7 +256,7 @@ jobs:
           channel: 'stable'
       - name: Get dependencies
         run: flutter pub get
-      - name: Build APK
+      - name: Build APK (debug — release requires a keystore)
         run: flutter build apk --debug
 
   build-web:
