@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/providers.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/question_model.dart';
 
@@ -39,7 +38,7 @@ class ErrorBookScreen extends ConsumerWidget {
           Icon(
             Icons.check_circle_outline,
             size: 80,
-            color: AppColors.success.withValues(alpha: 0.5),
+            color: AdaptiveColors.success(context).withValues(alpha: 0.6),
           ),
           const SizedBox(height: 20),
           Text(
@@ -58,6 +57,18 @@ class ErrorBookScreen extends ConsumerWidget {
               style: TextStyle(color: AdaptiveColors.textSecondary(context)),
             ),
           ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => context.push('/practice'),
+                icon: const Icon(Icons.edit_note_outlined, size: 20),
+                label: const Text('Start practicing'),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -74,20 +85,22 @@ class ErrorBookScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.05),
+            color: AdaptiveColors.primary(context).withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+            border: Border.all(
+              color: AdaptiveColors.primary(context).withValues(alpha: 0.2),
+            ),
           ),
           child: Row(
             children: [
-              const Icon(Icons.info_outline, color: AppColors.primary),
+              Icon(Icons.info_outline, color: AdaptiveColors.primary(context)),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Review and re-test your mistakes. Once you answer correctly in a re-test, they can be removed.',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: AppColors.primary),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AdaptiveColors.primary(context),
+                  ),
                 ),
               ),
             ],
@@ -113,8 +126,6 @@ class ErrorBookScreen extends ConsumerWidget {
               icon: const Icon(Icons.play_arrow),
               label: const Text('RE-TEST ALL ERRORS'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -167,8 +178,8 @@ class ErrorBookScreen extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   question.correctAnswer,
-                  style: const TextStyle(
-                    color: AppColors.success,
+                  style: TextStyle(
+                    color: AdaptiveColors.success(context),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
