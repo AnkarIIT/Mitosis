@@ -6,6 +6,7 @@ import 'package:confetti/confetti.dart';
 
 import '../../core/models/flashcard_model.dart';
 import '../../core/providers/providers.dart';
+import '../../core/providers/current_user_provider.dart';
 import '../../core/services/flashcard_scheduler_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
@@ -36,6 +37,10 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   List<Flashcard> _queue = [];
   late ConfettiController _confettiController;
 
+  /// Captured while mounted: `ref` throws if touched after dispose, so the
+  /// leave-refresh goes through the container instead.
+  ProviderContainer? _container;
+
   @override
   void initState() {
     super.initState();
@@ -52,12 +57,18 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _container ??= ProviderScope.containerOf(context);
+  }
+
+  @override
   void dispose() {
     _flipController.dispose();
     _confettiController.dispose();
     // Invalidate providers when leaving so the list refreshes on next visit.
-    ref.invalidate(flashcardsFromDbProvider);
-    ref.invalidate(dueFlashcardsProvider);
+    _container?.invalidate(flashcardsFromDbProvider);
+    _container?.invalidate(dueFlashcardsProvider);
     super.dispose();
   }
 
@@ -77,6 +88,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
     if (_currentIndex >= _queue.length) return;
     final card = _queue[_currentIndex];
     final db = ref.read(databaseProvider);
+    final userId = ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
 
     final result = FlashcardScheduler.review(
       rating: rating,
@@ -96,6 +108,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
       lapses: result.lapses,
       dueAt: result.dueAt,
       lastReviewedAt: DateTime.now(),
+      userId: userId,
     );
 
     if (!mounted) return;
@@ -221,7 +234,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     .scale(
                       begin: const Offset(0.8, 0.8),
                       end: const Offset(1, 1),
-                      curve: Curves.elasticOut,
+                      curve: Curves.easeOutCubic,
                       duration: AppDuration.normal,
                     ),
                 const SizedBox(width: 8),
@@ -236,7 +249,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     .scale(
                       begin: const Offset(0.8, 0.8),
                       end: const Offset(1, 1),
-                      curve: Curves.elasticOut,
+                      curve: Curves.easeOutCubic,
                       duration: AppDuration.normal,
                     ),
                 const SizedBox(width: 8),
@@ -251,7 +264,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     .scale(
                       begin: const Offset(0.8, 0.8),
                       end: const Offset(1, 1),
-                      curve: Curves.elasticOut,
+                      curve: Curves.easeOutCubic,
                       duration: AppDuration.normal,
                     ),
                 const SizedBox(width: 8),
@@ -266,7 +279,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     .scale(
                       begin: const Offset(0.8, 0.8),
                       end: const Offset(1, 1),
-                      curve: Curves.elasticOut,
+                      curve: Curves.easeOutCubic,
                       duration: AppDuration.normal,
                     ),
               ],
@@ -290,20 +303,22 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   }
 
   Widget _buildFront(Flashcard card) {
+    // Fixed deep-teal gradient (not theme-adaptive): in dark mode
+    // AdaptiveColors.primary resolves to a light mint where fixed white
+    // text loses contrast. A constant dark surface keeps white readable
+    // in both light and dark mode.
+    const frontGradient = LinearGradient(
+      colors: [Color(0xFF0B3538), Color(0xFF0E5B54)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
     return Card(
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: [
-              AdaptiveColors.primary(context),
-              AdaptiveColors.primary(context).withValues(alpha: 0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: frontGradient,
         ),
         padding: const EdgeInsets.all(28),
         child: Column(
@@ -385,10 +400,11 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                 child: Text(
                   card.back,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     height: 1.4,
+                    color: AdaptiveColors.textPrimary(context),
                   ),
                 ).animate().fadeIn(delay: 150.ms, duration: AppDuration.normal),
               ),
@@ -544,7 +560,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                   .scale(
                     begin: const Offset(0.8, 0.8),
                     end: const Offset(1, 1),
-                    curve: Curves.elasticOut,
+                    curve: Curves.easeOutCubic,
                     duration: AppDuration.slow,
                   ),
               const SizedBox(height: 8),
