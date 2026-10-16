@@ -69,7 +69,6 @@ class ExamBlueprintService {
     final actualCounts = <String, int>{};
 
     for (int i = 0; i < sectionQuestions.length; i++) {
-      final subject = sectionSubjects[i];
       for (final q in sectionQuestions[i]) {
         actualCounts[q.chapter] = (actualCounts[q.chapter] ?? 0) + 1;
       }
@@ -77,7 +76,6 @@ class ExamBlueprintService {
 
     final mismatches = <String, (int, int)>{};
     for (final subjectEntry in _neetBlueprint.entries) {
-      final subject = subjectEntry.key;
       final blueprint = subjectEntry.value;
 
       for (final chapterEntry in blueprint.entries) {
