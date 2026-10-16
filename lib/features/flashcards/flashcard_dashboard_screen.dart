@@ -19,6 +19,7 @@ class FlashcardDashboardScreen extends ConsumerWidget {
     final allFlashcards = ref.watch(flashcardsProvider);
 
     return Scaffold(
+      backgroundColor: AdaptiveColors.background(context),
       appBar: AppBar(
         title: const Text('Flashcards'),
         centerTitle: true,
@@ -93,7 +94,7 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                     ),
                     Expanded(
                       child: _StatItem(
-                        label: 'Mastered',
+                        label: 'Not due',
                         value: '${totalCount - dueCount}',
                         color: AppColors.success,
                         icon: Icons.check_circle,
@@ -110,13 +111,23 @@ class FlashcardDashboardScreen extends ConsumerWidget {
                   ),
                 ] else ...[
                   const SizedBox(height: 16),
-                  Text(
-                    'All caught up! 🎉',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AdaptiveColors.textSecondary(context),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline_rounded,
+                        color: AdaptiveColors.success(context),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'All caught up',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AdaptiveColors.textSecondary(context),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ],
