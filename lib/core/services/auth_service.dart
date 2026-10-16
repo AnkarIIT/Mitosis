@@ -9,9 +9,20 @@ import 'package:drift/drift.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../database/drift_database.dart' as db;
+import '../database/tables/consent_records_table.dart';
 import '../config/app_config.dart';
 import 'email_service.dart';
-import '../utils/security_utils.dart';
+import '../utils/password_policy.dart';
+
+/// Shared marker written to `users.passwordHash` for accounts that can only
+/// authenticate through a federated provider.
+///
+/// Single source of truth for three call sites that previously disagreed:
+/// `AuthService.login` (friendly "use Google" branch), `createUserFromCloud`
+/// (previously wrote `''`) and `GoogleAuthService` (previously wrote
+/// `'google_auth'`). Divergence meant the friendly branch only fired for one of
+/// the two creation paths.
+const String kGooglePasswordSentinel = 'google_auth';
 
 class AuthService {
   final db.AppDatabase _db;
@@ -31,41 +42,18 @@ class AuthService {
     final trimmedEmail = email.trim().toLowerCase();
     final trimmedUsername = (username ?? trimmedEmail.split('@').first).trim();
 
-    // Stronger password policy: min 8 chars, uppercase, lowercase, digit, special char
-    if (trimmedEmail.isEmpty || password.length < 8) {
+    if (trimmedEmail.isEmpty) {
       return (
         success: false,
-        message: 'Enter a valid email and a password with at least 8 characters.',
+        message:
+            'Enter a valid email and a password with at least ${PasswordPolicy.minLength} characters.',
         user: null,
       );
     }
-    if (!RegExp(r'[A-Z]').hasMatch(password)) {
-      return (
-        success: false,
-        message: 'Password must contain at least one uppercase letter.',
-        user: null,
-      );
-    }
-    if (!RegExp(r'[a-z]').hasMatch(password)) {
-      return (
-        success: false,
-        message: 'Password must contain at least one lowercase letter.',
-        user: null,
-      );
-    }
-    if (!RegExp(r'\d').hasMatch(password)) {
-      return (
-        success: false,
-        message: 'Password must contain at least one number.',
-        user: null,
-      );
-    }
-    if (!RegExp(r'[!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?]').hasMatch(password)) {
-      return (
-        success: false,
-        message: 'Password must contain at least one special character (!@#\$%^&*...).',
-        user: null,
-      );
+    // Shared with resetPassword() so recovery cannot bypass signup rules.
+    final passwordError = PasswordPolicy.validate(password);
+    if (passwordError != null) {
+      return (success: false, message: passwordError, user: null);
     }
 
     final existing = await _db.getUserByEmail(trimmedEmail);
@@ -92,16 +80,51 @@ class AuthService {
     );
 
     if (user != null) {
-      unawaited(
-        _syncAccountToCloud(
-          localUserId: user.id,
-          email: trimmedEmail,
-          password: password,
-        ),
-      );
+      // Persist acceptance. The sign-up checkbox was previously an in-memory
+      // boolean, so it reset on every restart and nothing was ever written
+      // down — consent could not be demonstrated after the fact. Recording the
+      // exact policy version is what a store reviewer or regulator asks for.
+      await _recordSignupConsent(user.id);
+
+      // Verification email is advisory: a failed send must not block signup,
+      // because the app is offline-first and the account works regardless.
+      final address = user.email?.trim();
+      if (address != null &&
+          address.isNotEmpty &&
+          _emailService != null &&
+          _emailService.isConfigured) {
+        try {
+          await _emailService.send(
+            to: address,
+            template: EmailTemplate.emailVerification,
+            purpose: EmailPurpose.emailVerification,
+            username: user.username,
+            code: _generateNumericCode(6),
+          );
+        } catch (_) {
+          // Non-fatal.
+        }
+      }
     }
 
     return (success: true, message: 'Registered', user: user);
+  }
+
+  /// Writes the consent rows implied by a successful sign-up.
+  ///
+  /// The UI already gates sign-up on the checkbox, so by the time this runs the
+  /// user has demonstrably accepted both documents at the current version.
+  Future<void> _recordSignupConsent(int userId) async {
+    for (final entry in const [
+      (ConsentDocument.terms, ConsentDocument.termsVersion),
+      (ConsentDocument.privacy, ConsentDocument.privacyVersion),
+    ]) {
+      try {
+        await _db.recordConsent(userId, document: entry.$1, version: entry.$2);
+      } catch (_) {
+        // Never block registration on an audit write.
+      }
+    }
   }
 
   Future<({bool success, String message, db.User? user})> login({
@@ -123,12 +146,19 @@ class AuthService {
     if (await _db.isAccountLocked(user.id)) {
       return (
         success: false,
-        message: 'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.',
+        message:
+            'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.',
         user: null,
       );
     }
 
-    if (user.passwordHash == null || user.passwordHash!.isEmpty) {
+    // Federated accounts carry the `google_auth` sentinel, not a real hash.
+    // Checking for it explicitly is what turns a confusing "Incorrect
+    // password" into an actionable "sign in with Google" — the account
+    // genuinely has no password to mistype.
+    if (user.passwordHash == kGooglePasswordSentinel ||
+        user.passwordHash == null ||
+        user.passwordHash!.isEmpty) {
       return (
         success: false,
         message:
@@ -143,18 +173,16 @@ class AuthService {
       return (success: false, message: 'Incorrect password.', user: null);
     }
 
+    // Upgrade legacy hashes after a successful verification so old accounts
+    // leave the weaker SHA-256 format without requiring a forced reset.
+    if (_isLegacyPasswordHash(user.passwordHash!)) {
+      await _db.updateUserPassword(user.id, _hashPassword(password));
+    }
+
     // Reset failed attempts on successful login
     await _db.resetFailedLoginAttempts(user.id);
     await _db.updateLastLogin(user.id);
     final updated = await _db.getUserById(user.id);
-
-    unawaited(
-      _syncAccountToCloud(
-        localUserId: user.id,
-        email: trimmedEmail,
-        password: password,
-      ),
-    );
 
     return (success: true, message: 'Logged in', user: updated);
   }
@@ -199,44 +227,6 @@ class AuthService {
       await client.auth.signOut();
     } catch (e) {
       developer.log('Cloud sign-out skipped: $e');
-    }
-  }
-
-  /// Ensures a Supabase auth identity exists and syncs the profile row. Used by
-  /// register/login: signUp first (throws if already registered), then falls
-  /// back to signInWithPassword so pre-existing/legacy accounts get linked too.
-  Future<void> _syncAccountToCloud({
-    required int localUserId,
-    required String email,
-    required String password,
-  }) async {
-    final client = _supabaseClient;
-    if (client == null) return;
-
-    try {
-      supabase.AuthResponse res;
-      try {
-        res = await client.auth.signUp(email: email, password: password);
-      } on supabase.AuthException {
-        res = await client.auth.signInWithPassword(
-          email: email,
-          password: password,
-        );
-      }
-      final cloudUser = res.user;
-      if (cloudUser == null) return;
-
-      final localUser = await _db.getUserById(localUserId);
-      if (localUser == null) return;
-
-      if (localUser.supabaseId != cloudUser.id) {
-        await _db.setSupabaseId(localUserId, cloudUser.id);
-      }
-      final linked = await _db.getUserById(localUserId);
-      await _upsertCloudProfile(client, linked ?? localUser);
-    } catch (e) {
-      // Never block local auth on cloud sync problems.
-      developer.log('Cloud account sync skipped: $e');
     }
   }
 
@@ -346,15 +336,59 @@ class AuthService {
     await deleteCloudAccountBySupabaseId(supabaseId);
   }
 
-  Future<void> deleteCloudAccountBySupabaseId(String supabaseId) async {
+  /// Deletes the caller's cloud account via the `delete-account` Edge Function.
+  ///
+  /// Returns `true` when the cloud account was removed, `false` when the
+  /// attempt failed. It deliberately does **not** throw.
+  ///
+  /// ## Why this must not throw
+  /// The caller (see `AuthNotifier.deleteAccount`) must be able to wipe the
+  /// local database even when the cloud call fails. The previous version threw
+  /// on any non-200, and that exception propagated out of the notifier's `try`
+  /// before `clearAllUserData()` ran — so a user with a `supabaseId` but an
+  /// expired session, or an outage, could never delete their own local data.
+  /// That is a data-retention problem, not a cosmetic one.
+  ///
+  /// The caller is expected to surface [message] so the user knows the cloud
+  /// copy may still exist and should retry.
+  Future<({bool success, String? message})> deleteCloudAccountBySupabaseId(
+    String supabaseId,
+  ) async {
     final client = _supabaseClient;
-    if (client == null) return;
+    if (client == null) {
+      return (
+        success: false,
+        message: 'Cloud deletion is unavailable. Local data was removed.',
+      );
+    }
+
+    // The Edge Function derives the target from the caller's JWT; the
+    // supabaseId argument is retained only so callers keep their existing
+    // signature and so an unlinked local account can short-circuit.
+    if (supabaseId.isEmpty) {
+      return (success: true, message: null);
+    }
+
     try {
-      // Delete the Supabase auth user (requires admin privileges or user's own session)
-      // For now, delete the profile; auth deletion requires server-side function
-      await client.from('profiles').delete().eq('id', supabaseId);
-    } catch (e) {
-      developer.log('Cloud profile delete skipped: $e');
+      final response = await client.functions.invoke('delete-account');
+      if (response.status == 200) {
+        return (success: true, message: null);
+      }
+      return (
+        success: false,
+        message:
+            'Cloud account deletion failed (${response.status}). '
+            'Your local data was removed; retry to finish deleting the '
+            'cloud copy.',
+      );
+    } catch (error) {
+      return (
+        success: false,
+        message:
+            'Could not reach the cloud account service. '
+            'Your local data was removed; retry to finish deleting the '
+            'cloud copy.',
+      );
     }
   }
 
@@ -379,20 +413,59 @@ class AuthService {
   Future<({bool success, String message})> sendPasswordReset({
     required String email,
   }) async {
-    final trimmedEmail = email.trim().toLowerCase();
-    final user = await _db.getUserByEmail(trimmedEmail);
-    if (user == null) {
-      // Don't reveal whether email exists.
-      return (
-        success: true,
-        message: 'If an account exists, a reset code has been sent.',
-      );
-    }
+    // ── Anti-enumeration ───────────────────────────────────────────────────
+    // Every branch below must return the SAME message and the SAME success
+    // value, otherwise this endpoint becomes an account-existence oracle: the
+    // auth screen renders `message` verbatim, so any wording difference is
+    // observable.
+    //
+    // It previously leaked four distinguishable states — unknown email, sent,
+    // throttled, and "not configured" — which defeated the "don't reveal whether
+    // email exists" intent that sat right above it in the source.
+    const acknowledgement =
+        'If an account exists for that email, a reset code has been sent.';
 
+    // ── 1. Build-level check, before any account lookup ────────────────────
+    // "This build has no email backend" is a fact about the *binary*, not the
+    // account, so answering it identically for everyone leaks nothing. Checking
+    // it after the lookup would turn it into an oracle: unknown → generic,
+    // known → "not configured".
     if (_emailService == null || !_emailService.isConfigured) {
       return (
         success: false,
-        message: 'Password reset email is not configured in Settings.',
+        message:
+            'Email is not set up on this build, so a code cannot be sent. '
+            'Use Google sign-in, or contact support.',
+      );
+    }
+
+    final trimmedEmail = email.trim().toLowerCase();
+    final user = await _db.getUserByEmail(trimmedEmail);
+
+    // Unknown account: acknowledge and send nothing.
+    if (user == null) return (success: true, message: acknowledgement);
+
+    // A federated or unlinked account has no local password to reset. Same
+    // answer, otherwise this endpoint enumerates which addresses use Google.
+    if (user.passwordHash == kGooglePasswordSentinel ||
+        user.passwordHash == null ||
+        user.passwordHash!.isEmpty) {
+      return (success: true, message: acknowledgement);
+    }
+
+    // ── 2. Resend cooldown ────────────────────────────────────────────────
+    // Necessary for abuse control, and unavoidably a stronger signal than mere
+    // existence — but it is only reachable *after* the account is known, so it
+    // cannot be used to discover whether an address is registered.
+    if (await _db.isPasswordResetResendThrottled(
+      user.id,
+      cooldown: _otpResendCooldown,
+    )) {
+      return (
+        success: false,
+        message:
+            'Please wait before requesting another code. '
+            'If you did not request it, you can ignore this.',
       );
     }
 
@@ -400,13 +473,16 @@ class AuthService {
     final expiry = DateTime.now().add(_resetCodeTTL);
 
     try {
-      await _emailService.sendTransactionalEmail(
+      final result = await _emailService.send(
         to: trimmedEmail,
-        subject: 'Reset your NEET Mitos password',
-        html: _buildResetEmailHtml(user.username, code),
-        text:
-            'Your NEET Mitos password reset code is: $code. It expires in 15 minutes.',
+        template: EmailTemplate.passwordReset,
+        purpose: EmailPurpose.passwordReset,
+        username: user.username,
+        code: code,
       );
+      if (!result.success) {
+        return (success: false, message: result.message);
+      }
     } catch (e) {
       return (
         success: false,
@@ -415,7 +491,11 @@ class AuthService {
     }
 
     await _db.updateUserPasswordReset(user.id, code, expiry);
-    return (success: true, message: 'Reset code sent to $trimmedEmail');
+    await _db.markPasswordResetSent(user.id);
+    // Identical to the unknown-account answer. Echoing the address back —
+    // "Reset code sent to real@example.com" — confirmed existence, which is
+    // exactly what the generic wording above exists to prevent.
+    return (success: true, message: acknowledgement);
   }
 
   Future<({bool success, String message, db.User? user})> resetPassword({
@@ -429,13 +509,26 @@ class AuthService {
       return (success: false, message: 'Invalid request.', user: null);
     }
 
-    final reset = await _db.getActivePasswordReset(user.id, code);
-    if (reset == null) {
+    // Enforces the guess budget and lockout — same threat model as 2FA.
+    final outcome = await _db.verifyPasswordResetCode(
+      user.id,
+      code,
+      maxAttempts: _otpMaxAttempts,
+      lockout: _otpLockout,
+    );
+    if (outcome != db.OtpAttemptOutcome.verified) {
+      // Identical message for wrong code and for lockout, so an attacker
+      // cannot use the response to learn whether guesses are landing.
       return (
         success: false,
         message: 'Invalid or expired reset code.',
         user: null,
       );
+    }
+
+    final passwordError = PasswordPolicy.validate(newPassword);
+    if (passwordError != null) {
+      return (success: false, message: passwordError, user: null);
     }
 
     final passwordHash = _hashPassword(newPassword);
@@ -451,8 +544,32 @@ class AuthService {
         await client.auth.updateUser(
           supabase.UserAttributes(password: newPassword),
         );
+        // Sign out other sessions so a token stolen before the reset stops
+        // working. Without this, resetting a password after a compromise leaves
+        // the attacker's live session valid — the victim locks the door while
+        // the intruder is still inside.
+        //
+        // Best-effort: the local password is already changed, and failing to
+        // revoke must not fail the reset.
+        await client.auth.signOut();
       } catch (e) {
-        developer.log('Cloud password update skipped: $e');
+        developer.log('Cloud password update/sign-out skipped: $e');
+      }
+    }
+
+    // Tell the owner their password changed. A reset is the standard moment to
+    // alert the legitimate user; without it, a silent reset is indistinguishable
+    // from an attacker's.
+    if (_emailService != null && _emailService.isConfigured) {
+      try {
+        await _emailService.send(
+          to: trimmedEmail,
+          template: EmailTemplate.securityNotice,
+          purpose: EmailPurpose.securityNotice,
+          username: user.username,
+        );
+      } catch (_) {
+        // Notification is advisory; never block the reset on it.
       }
     }
 
@@ -473,31 +590,45 @@ class AuthService {
     }
 
     if (_emailService == null || !_emailService.isConfigured) {
+      return (success: false, message: 'Email is not set up on this build.');
+    }
+
+    // Resend cooldown.
+    //
+    // This path previously had no throttle and never recorded a send, unlike
+    // `sendPasswordReset` and `sendLogin2FAEmail`. Because it is keyed on an
+    // arbitrary email string that the caller supplies, and because it wrote a
+    // fresh code on every call, it was an unbounded amplifier: anyone who knew
+    // a registered address could drive unlimited transactional mail at the
+    // provider's cost and churn the live code indefinitely.
+    if (await _db.isTwoFactorResendThrottled(
+      user.id,
+      cooldown: _otpResendCooldown,
+    )) {
       return (
         success: false,
-        message: 'Email service is not configured in Settings.',
+        message:
+            'Please wait before requesting another code. '
+            'If you did not request it, you can ignore this.',
       );
     }
 
     final code = _generateNumericCode(_twoFactorCodeLength);
     final expiry = DateTime.now().add(_twoFactorCodeTTL);
 
-    try {
-      await _emailService.sendTransactionalEmail(
-        to: trimmedEmail,
-        subject: 'Enable two-factor authentication for NEET Mitos',
-        html: _build2FAEmailHtml(user.username, code, 'enable'),
-        text:
-            'Your NEET Mitos 2FA verification code is: $code. It expires in 15 minutes.',
-      );
-    } catch (e) {
-      return (
-        success: false,
-        message: 'Could not send email. Please try again later.',
-      );
+    final result = await _emailService.send(
+      to: trimmedEmail,
+      template: EmailTemplate.twoFactorEnable,
+      purpose: EmailPurpose.twoFactorEnable,
+      username: user.username,
+      code: code,
+    );
+    if (!result.success) {
+      return (success: false, message: result.message);
     }
 
     await _db.setTwoFactorCode(user.id, code, expiry);
+    await _db.markTwoFactorSent(user.id);
     return (success: true, message: 'Verification code sent to $trimmedEmail');
   }
 
@@ -511,8 +642,16 @@ class AuthService {
       return (success: false, message: 'Account not found.');
     }
 
-    final active = await _db.getActiveTwoFactorCode(user.id, code);
-    if (active == null) {
+    // Pass the explicit guess budget rather than relying on the database
+    // defaults: those happened to equal _otpMaxAttempts/_otpLockout, so this
+    // was silently diverging the moment either constant changed.
+    final active = await _db.verifyTwoFactorCode(
+      user.id,
+      code,
+      maxAttempts: _otpMaxAttempts,
+      lockout: _otpLockout,
+    );
+    if (active != db.OtpAttemptOutcome.verified) {
       return (success: false, message: 'Invalid or expired verification code.');
     }
 
@@ -537,10 +676,40 @@ class AuthService {
       return (success: false, message: 'User not found.', user: null);
     }
 
+    // A federated or unlinked row may have no email at all — GoogleAuthService
+    // deliberately inserts `email: null` for a collision-avoidance bucket.
+    // Force-unwrapping here would crash for exactly those accounts.
+    final recipient = user.email?.trim() ?? '';
+    if (recipient.isEmpty) {
+      return (
+        success: false,
+        message:
+            'This account has no email address on file, so a verification code '
+            'cannot be sent.',
+        user: null,
+      );
+    }
+
     if (_emailService == null || !_emailService.isConfigured) {
       return (
         success: false,
-        message: 'Email service is not configured.',
+        message: 'Email is not set up on this build.',
+        user: null,
+      );
+    }
+
+    // Resend cooldown. Without it the login flow could drive unlimited
+    // transactional email against the provider (cost amplification), and a live
+    // code is exactly what the guess budget below protects.
+    if (await _db.isTwoFactorResendThrottled(
+      userId,
+      cooldown: _otpResendCooldown,
+    )) {
+      return (
+        success: false,
+        message:
+            'Please wait before requesting another code. '
+            'If you did not request it, you can ignore this.',
         user: null,
       );
     }
@@ -548,22 +717,19 @@ class AuthService {
     final code = _generateNumericCode(_twoFactorCodeLength);
     final expiry = DateTime.now().add(_twoFactorCodeTTL);
 
-    try {
-      await _emailService.sendTransactionalEmail(
-        to: user.email!,
-        subject: 'Your NEET Mitos login verification code',
-        html: _build2FAEmailHtml(user.username, code, 'login'),
-        text: 'Your NEET Mitos login code is: $code. It expires in 15 minutes.',
-      );
-    } catch (e) {
-      return (
-        success: false,
-        message: 'Could not send verification email.',
-        user: null,
-      );
+    final result = await _emailService.send(
+      to: recipient,
+      template: EmailTemplate.loginVerification,
+      purpose: EmailPurpose.loginVerification,
+      username: user.username,
+      code: code,
+    );
+    if (!result.success) {
+      return (success: false, message: result.message, user: null);
     }
 
     await _db.setTwoFactorCode(user.id, code, expiry);
+    await _db.markTwoFactorSent(userId);
     return (success: true, message: 'Verification code sent.', user: user);
   }
 
@@ -576,8 +742,19 @@ class AuthService {
       return (success: false, message: 'User not found.', user: null);
     }
 
-    final active = await _db.getActiveTwoFactorCode(userId, code);
-    if (active == null) {
+    // Enforces the guess budget and lockout. A 6-digit code has 10^6 candidates;
+    // without this the local database alone was enough to brute force it, and
+    // every miss was free to repeat.
+    final outcome = await _db.verifyTwoFactorCode(
+      userId,
+      code,
+      maxAttempts: _otpMaxAttempts,
+      lockout: _otpLockout,
+    );
+
+    if (outcome != db.OtpAttemptOutcome.verified) {
+      // Deliberately identical message for a wrong code and for a lockout:
+      // distinguishing them would tell an attacker their guesses are landing.
       return (success: false, message: 'Invalid or expired code.', user: null);
     }
 
@@ -588,6 +765,23 @@ class AuthService {
   }
 
   // ============= INTERNALS =============
+
+  // ---------------------------------------------------------------------------
+  // OTP throttling policy (2FA codes and password-reset codes).
+  //
+  // A 6-digit code is only 10^6 candidates and the hash lives in a local
+  // SQLite file, so both code paths need a bounded guess budget, a lockout, and
+  // a resend cooldown. Without these, OTP verification was an unlimited oracle.
+  // ---------------------------------------------------------------------------
+
+  /// Wrong guesses tolerated against a live code before lockout.
+  static const int _otpMaxAttempts = 5;
+
+  /// How long guessing stays blocked after the budget is exhausted.
+  static const Duration _otpLockout = Duration(minutes: 15);
+
+  /// Minimum gap between two code sends to the same account.
+  static const Duration _otpResendCooldown = Duration(seconds: 60);
 
   // ---------------------------------------------------------------------------
   // Password hashing: PBKDF2-HMAC-SHA256 with a random per-user salt.
@@ -630,6 +824,11 @@ class AuthService {
     final legacy = sha256.convert(utf8.encode('neet_mitos_local:$password'));
     return _constantTimeEquals(legacy.toString(), stored);
   }
+
+  /// True when [stored] uses the pre-PBKDF2 scheme, which must be rehashed on
+  /// the next successful sign-in.
+  static bool _isLegacyPasswordHash(String stored) =>
+      !stored.startsWith('pbkdf2-sha256\$');
 
   static List<int> _randomBytes(int length) {
     final random = Random.secure();
@@ -708,34 +907,14 @@ class AuthService {
     await prefs.remove('auth_user_id');
   }
 
-  String _buildResetEmailHtml(String username, String code) {
-    return '''
-      <div style="font-family: Arial, sans-serif; color: #1f2937;">
-        <h2 style="color: #2563eb;">Reset your NEET Mitos password</h2>
-        <p>Hi $username,</p>
-        <p>Use this code to reset your password:</p>
-        <p style="font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #111827;">$code</p>
-        <p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>
-      </div>
-    ''';
-  }
-
-  String _build2FAEmailHtml(String username, String code, String purpose) {
-    final title = purpose == 'enable'
-        ? 'Enable two-factor authentication'
-        : 'Login verification';
-    final body = purpose == 'enable'
-        ? 'Use this code to enable two-factor authentication on your NEET Mitos account:'
-        : 'Use this code to verify your login:';
-
-    return '''
-      <div style="font-family: Arial, sans-serif; color: #1f2937;">
-        <h2 style="color: #2563eb;">$title</h2>
-        <p>Hi $username,</p>
-        <p>$body</p>
-        <p style="font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #111827;">$code</p>
-        <p>This code expires in 15 minutes. If you did not request this, you can ignore this message.</p>
-      </div>
-    ''';
-  }
+  // NOTE: `_buildResetEmailHtml` and `_build2FAEmailHtml` were removed.
+  //
+  // Both interpolated `users.username` into HTML **unescaped**, so a username of
+  // `<img src=x onerror=…>` rendered as markup in every password-reset and 2FA
+  // email the app delivered. `EmailService.escapeHtml` existed but was applied
+  // only to `sendWelcomeEmail`, which nothing called.
+  //
+  // HTML now lives entirely in the `send-email` Edge Function and travels as a
+  // template *name*, so there is no client-side path that can interpolate user
+  // text into a security email. See EmailService.send and EmailTemplate.
 }
