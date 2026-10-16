@@ -15,7 +15,7 @@ class PyqPdfDownloaderService {
       url: 'https://medicine.careers360.com/articles/neet-2025-question-paper',
       year: 2025,
       label: 'NEET 2025 Question Paper',
-      isOfficial: true,
+      isOfficial: false,
     ),
     PdfSource(
       url: 'https://medicine.careers360.com/articles/neet-2024-question-paper',
