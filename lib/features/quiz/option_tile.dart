@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/models/question_model.dart';
+import '../../core/utils/answer_normalizer.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/tokens.dart';
 
 class OptionTile extends ConsumerWidget {
@@ -27,7 +27,7 @@ class OptionTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isSelected = selectedAnswer == option;
-    final isCorrect = option == question.correctAnswer;
+    final isCorrect = AnswerNormalizer.isCorrect(option, question);
 
     Color borderColor = AdaptiveColors.divider(context);
     Color bgColor = AdaptiveColors.surface(context);
@@ -38,13 +38,13 @@ class OptionTile extends ConsumerWidget {
       bgColor = AdaptiveColors.primary(context).withValues(alpha: 0.05);
     } else if (isAnswered) {
       if (isCorrect) {
-        borderColor = AppColors.success;
-        bgColor = AppColors.success.withValues(alpha: 0.05);
-        textColor = AppColors.success;
+        borderColor = AdaptiveColors.success(context);
+        bgColor = AdaptiveColors.success(context).withValues(alpha: 0.05);
+        textColor = AdaptiveColors.success(context);
       } else if (isSelected) {
-        borderColor = AppColors.error;
-        bgColor = AppColors.error.withValues(alpha: 0.05);
-        textColor = AppColors.error;
+        borderColor = AdaptiveColors.error(context);
+        bgColor = AdaptiveColors.error(context).withValues(alpha: 0.05);
+        textColor = AdaptiveColors.error(context);
       }
     }
 
@@ -96,9 +96,12 @@ class OptionTile extends ConsumerWidget {
                       ),
                     ),
                     if (isAnswered && isCorrect)
-                      const Icon(Icons.check_circle, color: AppColors.success)
+                      Icon(
+                        Icons.check_circle,
+                        color: AdaptiveColors.success(context),
+                      )
                     else if (isAnswered && isSelected)
-                      const Icon(Icons.cancel, color: AppColors.error),
+                      Icon(Icons.cancel, color: AdaptiveColors.error(context)),
                   ],
                 ),
               ),
@@ -126,7 +129,7 @@ class OptionTile extends ConsumerWidget {
               ? const Offset(1.05, 1.05)
               : const Offset(1, 1),
           end: const Offset(1, 1),
-          curve: Curves.elasticOut,
+          curve: Curves.easeOutCubic,
         );
   }
 }
