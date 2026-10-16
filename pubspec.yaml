@@ -24,14 +24,15 @@ dependencies:
   # State Management & Database
   flutter_riverpod: 2.5.1
   go_router: ^14.3.0
-  drift: ^2.33.0
+  drift: 2.34.0
   sqlite3: ^3.3.1
   path: ^1.9.1
   path_provider: ^2.1.5
   shared_preferences: ^2.5.5
   flutter_secure_storage: ^10.2.0
   supabase_flutter: ^2.12.4
-  flutter_dotenv: ^6.0.1
+  # Removed: flutter_dotenv. `.env` is no longer a bundled asset; config comes
+  # from --dart-define at build time. See lib/core/config/app_config.dart.
   internet_connection_checker: ^1.0.0+1
   
   # UI & UX Components
@@ -62,7 +63,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  drift_dev: ^2.33.0
+  drift_dev: 2.34.0
   build_runner: ^2.15.0
 
 flutter:
@@ -80,7 +81,18 @@ flutter:
     - assets/ncert_books/physics/Physics_Class_12_Part_1/
     - assets/ncert_books/physics/Physics_Class_12_Part_2/
     - assets/questions/
-    - .env
+  # ⚠️ `.env` is deliberately NOT an asset.
+  #
+  # Listing it here copied the whole file into the APK/IPA bundle, so any value
+  # ever placed in it shipped to every user and was extractable with
+  # `unzip app.apk`. Only public config belongs in a client anyway — pass it at
+  # build time instead:
+  #
+  #   flutter build apk --release --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
+  #
+  # Secrets (service_role key, Gemini API key, SMTP credentials) must never be
+  # passed to --dart-define either; they belong in `supabase secrets set` and
+  # are read only inside Edge Functions. See lib/core/config/app_config.dart.
   fonts:
     - family: Inter
       fonts:
