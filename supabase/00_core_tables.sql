@@ -26,10 +26,31 @@
 -- ---------------------------------------------------------------------------
 -- Helper: SECURITY DEFINER function for auth.uid() in RLS policies
 -- ---------------------------------------------------------------------------
+-- SET search_path pins the resolution of every unqualified name to public,
+-- closing the search-path hijack surface that a bare SECURITY DEFINER function
+-- exposes (an attacker with CREATE on any earlier schema could otherwise
+-- shadow auth.uid()).
 CREATE OR REPLACE FUNCTION public.current_user_id()
 RETURNS UUID AS $$
   SELECT auth.uid();
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public, pg_temp;
+
+-- ---------------------------------------------------------------------------
+-- Helper: automatic updated_at maintenance
+-- ---------------------------------------------------------------------------
+-- ⚠️ ORDERING: this function is used by the triggers created in THIS file, so it
+-- must be defined before them. It previously lived only in
+-- 01_content_catalog.sql, which made this file — documented as "run this FIRST"
+-- — fail outright on a fresh database with
+-- "function public.set_updated_at() does not exist".
+CREATE OR REPLACE FUNCTION public.set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at := NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 -- ---------------------------------------------------------------------------
 -- 1. quiz_attempts
@@ -625,6 +646,29 @@ CREATE TRIGGER quiz_sessions_updated_at
   BEFORE UPDATE ON public.quiz_sessions
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
+-- ---------------------------------------------------------------------------
+-- Upgrade path
+-- ---------------------------------------------------------------------------
+-- `CREATE TABLE IF NOT EXISTS` is a no-op when the table already exists, so a
+-- column added to the definition above is NEVER applied to a database created
+-- from an older version of this file. The migration then reports success while
+-- leaving a divergent schema, which is what every "safe to re-run" comment in
+-- this set silently assumes will not happen.
+--
+-- Columns with a NOT NULL constraint and no DEFAULT cannot simply be added to a
+-- populated table, so existing rows are backfilled first.
+ALTER TABLE public.quiz_sessions
+  ADD COLUMN IF NOT EXISTS seed INTEGER;
+UPDATE public.quiz_sessions SET seed = 0 WHERE seed IS NULL;
+ALTER TABLE public.quiz_sessions
+  ALTER COLUMN seed SET NOT NULL;
+
+ALTER TABLE public.quiz_sessions
+  ADD COLUMN IF NOT EXISTS test_type TEXT NOT NULL DEFAULT 'topic';
+
+ALTER TABLE public.quiz_attempts
+  ADD COLUMN IF NOT EXISTS test_type TEXT NOT NULL DEFAULT 'topic';
+
 DELETE FROM public.quiz_sessions a
 USING (
   SELECT ctid FROM (
@@ -673,6 +717,8 @@ CREATE INDEX IF NOT EXISTS idx_quiz_sessions_user_updated ON public.quiz_session
 CREATE TABLE IF NOT EXISTS public.evaluations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    -- FK added in 01_content_catalog.sql, after public.tests exists. It cannot
+    -- be declared inline here: this file runs FIRST.
     test_id UUID,
     test_type TEXT NOT NULL,
     subject TEXT NOT NULL,
