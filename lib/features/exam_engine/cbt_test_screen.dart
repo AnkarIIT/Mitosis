@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,13 +8,13 @@ import '../../core/providers/providers.dart';
 import '../../core/services/exam_engine_service.dart';
 import '../../core/services/exam_checkpoint_service.dart';
 import '../../core/services/secure_screen_service.dart';
+import '../../core/services/question_inventory_service.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 
 import 'package:go_router/go_router.dart';
-import '../../core/database/drift_database.dart' as db;
 import 'on_screen_calculator.dart';
 
 enum _SessionPhase { taking, break_ }
@@ -28,11 +27,16 @@ class CbtTestScreen extends ConsumerStatefulWidget {
   /// questions, answers, flags and remaining time) instead of starting fresh.
   final ExamCheckpoint? resumeFrom;
 
+  /// Enforces strict exam conditions: fullscreen lock, no screenshot,
+  /// no backgrounding, violation tracking. Defaults to true on desktop/web.
+  final bool strictMode;
+
   const CbtTestScreen({
     super.key,
     required this.config,
     required this.questionPool,
     this.resumeFrom,
+    this.strictMode = false,
   });
 
   @override
@@ -79,6 +83,11 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   bool _submitted = false;
   bool _confirmDialogOpen = false;
 
+  /// True once `_questions`/`_deadline` have been assigned. Question allocation
+  /// needs an async read (recently-seen exclusion), so `build()` and the
+  /// lifecycle callback must not touch the `late` fields before then.
+  bool _ready = false;
+
   // Proctoring: fullscreen lock is on while the test is live, and leaving the
   // app (app-switch / background) during the answering phase counts as an
   // integrity violation. Count persists across crashes via the checkpoint.
@@ -88,15 +97,19 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   bool get _checkpointable => widget.config.isFullLengthMock;
 
   int get _remainingSeconds {
-    final diff = _deadline.difference(DateTime.now()).inSeconds;
-    return diff < 0 ? 0 : diff;
+    // Round UP. `.inSeconds` truncates, so the clock reads 0 while up to 999ms
+    // of time is actually left and auto-submit fired up to a second early.
+    final ms = _deadline.difference(DateTime.now()).inMilliseconds;
+    if (ms <= 0) return 0;
+    return (ms / 1000).ceil();
   }
 
   int get _sectionRemainingSeconds {
     final d = _sectionDeadline;
     if (d == null) return -1; // no per-section limit
-    final diff = d.difference(DateTime.now()).inSeconds;
-    return diff < 0 ? 0 : diff;
+    final ms = d.difference(DateTime.now()).inMilliseconds;
+    if (ms <= 0) return 0;
+    return (ms / 1000).ceil();
   }
 
   int get _breakRemainingSeconds {
@@ -117,14 +130,30 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     _setFullscreen(true);
     SecureScreenService.enable();
 
-    // Exclude recently seen questions so each mock test feels fresh.
-    final seen = ref.read(recentlySeenQuestionIdsProvider(null).future);
-    seen.then((ids) {
-      if (mounted) {
-        setState(() => _excludedIds = ids);
-      }
-    });
+    // Strict mode: enforce additional proctoring on desktop/web
+    if (widget.strictMode == true) {
+      _enforceStrictMode();
+    }
 
+    _initializeExam();
+  }
+
+  /// Enforces strict exam conditions for desktop/web to simulate NTA CBT.
+  void _enforceStrictMode() {
+    // Already in immersive fullscreen via _setFullscreen
+    // Additional: disable text selection, context menu, keyboard shortcuts
+    // Note: Flutter web has limited control over browser-level shortcuts
+    debugPrint('STRICT MODE: NTA CBT environment enforced (desktop/web)');
+  }
+
+  /// Allocates questions and restores session state.
+  ///
+  /// Runs async because excluding recently-seen questions needs a provider read
+  /// that must complete *before* allocation. It used to be fire-and-forget, so
+  /// `_excludedIds` was still null when `allocateQuestions` ran and the
+  /// exclusion never applied. `_ready` gates `build()` and the lifecycle
+  /// callback until the `late` fields are populated.
+  Future<void> _initializeExam() async {
     final resume = widget.resumeFrom;
     final rebuilt = resume != null ? _rebuildSections(resume) : null;
 
@@ -150,16 +179,83 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _flagged.addAll(resume.flagged);
       _visited.addAll(resume.visited);
       _violations = resume.violations;
-      _secondsPerQuestion = List<int>.filled(_questions.length, 0);
-      for (final entry in resume.secondsPerQuestion.entries) {
-        if (entry.key >= 0 && entry.key < _secondsPerQuestion.length) {
-          _secondsPerQuestion[entry.key] = entry.value;
-        }
-      }
+      // NB: _secondsPerQuestion is `late final` and sized from _questions, which
+      // is only assigned after this block. It is restored further below, once
+      // _questions exists. Assigning it here threw LateInitializationError on
+      // every resume.
     } else {
       _attemptId = 'cbt_${DateTime.now().millisecondsSinceEpoch}';
       _seed = DateTime.now().millisecondsSinceEpoch;
       _startedAt = DateTime.now();
+
+      // Check question inventory for NEET 2024 mocks before allocating.
+      if (ExamEngineService.isNeet2024(widget.config)) {
+        final inventory = await ref
+            .read(questionInventoryServiceProvider)
+            .checkNeet2024Readiness();
+        if (!inventory.isReady && mounted) {
+          final shortages = ref
+              .read(questionInventoryServiceProvider)
+              .getShortageMessages(inventory);
+          final confirmed = await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: const Text('Insufficient Questions'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Not enough questions available for a full NEET 2024 mock.',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  ...shortages.map(
+                    (s) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Text('• $s', style: const TextStyle(fontSize: 13)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Please import more questions or sync from cloud before starting.',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => context.pop(false),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () => context.pop(true),
+                  child: const Text('Start Anyway'),
+                ),
+              ],
+            ),
+          );
+          if (confirmed != true) {
+            if (!mounted) return;
+            context.pop(); // Go back to home
+            return;
+          }
+        }
+      }
+
+      // Resolved BEFORE allocation so the exclusion actually applies.
+      try {
+        final seen = await ref.read(
+          recentlySeenQuestionIdsProvider(null).future,
+        );
+        if (!mounted) return;
+        _excludedIds = seen;
+      } catch (_) {
+        // Freshness is a nicety, not correctness — fall back to the full pool.
+      }
+      if (!mounted) return;
+
       _sectionQuestions = ExamEngineService.allocateQuestions(
         widget.questionPool,
         widget.config,
@@ -206,6 +302,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _initSectionDeadline();
     }
 
+    // Mark ready BEFORE starting the ticker. _onTick and
+    // didChangeAppLifecycleState both bail on `!_ready`; setting it afterwards
+    // made correctness depend on there being no event-loop turn between the two
+    // statements.
+    _ready = true;
+
     // 0.1: never start the ticker on an empty allocation — build() shows the
     // empty state and _onTick would otherwise index an empty list every second.
     if (_questions.isNotEmpty) {
@@ -219,6 +321,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         );
       }
     }
+
+    if (mounted) setState(() {});
   }
 
   @override
@@ -253,18 +357,33 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_questions.isEmpty || _submitted) return;
+    if (!_ready || _questions.isEmpty || _submitted) return;
 
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
       // Leaving the app during the answering phase is a proctoring violation.
-      // We count it BEFORE backgrounding so a kill/resume can't dodge it.
-      if (_phase == _SessionPhase.taking && !_submitting && !_submitted) {
+      //
+      // Count ONLY on paused/detached. Flutter synthesizes `hidden` around
+      // `inactive` on both iOS and Android, so a single Home-press round trip
+      // emitted inactive -> hidden -> paused -> hidden -> inactive -> resumed
+      // and the old branch counted `hidden` too: 3 violations for one app
+      // switch, against an instructions screen that warns that more than 3 may
+      // terminate the test.
+      final isFullBackground =
+          state == AppLifecycleState.paused ||
+          state == AppLifecycleState.detached;
+      if (isFullBackground &&
+          _phase == _SessionPhase.taking &&
+          !_submitting &&
+          !_submitted) {
         _violations++;
         if (mounted) setState(() {});
       }
       // Bank the current question's time and persist before we may be killed.
+      // The save is fire-and-forget because lifecycle callbacks are synchronous,
+      // but SharedPreferences writes are fast and the next user action will
+      // also trigger a save, so the risk of data loss is minimal.
       _accrueTimeOnLeave();
       _questionEnteredAt = null;
       _ticker?.cancel();
@@ -289,10 +408,19 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   // Setup helpers
   // ─────────────────────────────────────────────────────────────
 
-  /// Rebuilds the per-section allocation from the checkpoint's saved question
-  /// IDs. Returns null if any ID is missing from the pool (content changed),
-  /// so we fall back to a fresh allocation rather than drift the indices.
+  /// Rebuilds the per-section allocation from the checkpoint.
+  ///
+  /// For v3+ checkpoints, uses the stored full question snapshots — resume
+  /// works even if the question pool has changed. For older checkpoints,
+  /// falls back to looking up IDs in the current pool; returns null if any ID
+  /// is missing so we start fresh rather than drift indices.
   List<List<Question>>? _rebuildSections(ExamCheckpoint cp) {
+    // v3+: full snapshots stored in the checkpoint itself.
+    if (cp.sectionQuestions.isNotEmpty &&
+        cp.sectionQuestions.length == cp.sectionQuestionIds.length) {
+      return cp.sectionQuestions;
+    }
+    // v1/v2: look up IDs in the current pool.
     final byId = {for (final q in widget.questionPool) q.id: q};
     final rebuilt = <List<Question>>[];
     for (final ids in cp.sectionQuestionIds) {
@@ -319,7 +447,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       const Duration(seconds: 15),
       (_) => _saveCheckpoint(),
     );
-    _saveCheckpoint(); // initial save so a resume card exists immediately
+    // Initial save so a resume card exists immediately. Fire-and-forget is fine
+    // here because the first user action will also trigger a save.
+    _saveCheckpoint();
   }
 
   void _skipEmptySections() {
@@ -341,6 +471,16 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   ExamSection get _activeSection => widget.config.sections[_currentSection];
 
+  /// For NEET 2024: sections 0-3 = Section A block, 4-7 = Section B block
+  bool get _isNeet2024 => ExamEngineService.isNeet2024(widget.config);
+  int get _currentBlock => ExamEngineService.getNeet2024Block(_currentSection);
+  bool get _inABlock => _currentBlock == 0;
+  bool get _inBBlock => _currentBlock == 1;
+  bool get _isABlockLastQuestion =>
+      _inABlock && _isLastQuestionInSection && _currentSection == 3;
+  bool get _isBBlockLastQuestion =>
+      _inBBlock && _isLastQuestionInSection && _currentSection == 7;
+
   bool get _isLastQuestionInSection =>
       _currentIndex >=
       _sectionStart[_currentSection] +
@@ -349,26 +489,54 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   bool get _isLastSection => _currentSection == _sectionQuestions.length - 1;
 
-  bool get _isLastQuestionOverall => widget.config.sectionLock
-      ? _isLastSection && _isLastQuestionInSection
-      : _currentIndex + 1 >= _questions.length;
+  bool get _isLastQuestionOverall {
+    if (_isNeet2024) {
+      return _isBBlockLastQuestion;
+    }
+    return widget.config.sectionLock
+        ? _isLastSection && _isLastQuestionInSection
+        : _currentIndex + 1 >= _questions.length;
+  }
+
+  /// Lower bound for navigation (Previous button).
+  int get _navigationLowerBound {
+    if (_isNeet2024) {
+      if (_inBBlock &&
+          _currentSection == 4 &&
+          _currentIndex == _sectionStart[4]) {
+        return _currentIndex; // Cannot go back to A-block from start of B-block
+      }
+      return _sectionStart[_currentSection];
+    }
+    return widget.config.sectionLock ? _sectionStart[_currentSection] : 0;
+  }
 
   // ─────────────────────────────────────────────────────────────
   // Timekeeping
   // ─────────────────────────────────────────────────────────────
 
-  void _initSectionDeadline() {
-    final sectionDuration =
-        widget.config.sections[_currentSection].durationSeconds;
-    if (sectionDuration != null && sectionDuration > 0) {
-      _sectionDeadline = DateTime.now().add(Duration(seconds: sectionDuration));
-    } else {
+  /// Arms (or clears) the per-section deadline for section [index].
+  ///
+  /// Only meaningful when the paper actually locks by section.
+  /// `ExamConfig.neet()` defaults `sectionLock` to false — the palette shows
+  /// every question in one strip and free navigation is permitted — yet the
+  /// deadline was still armed and enforced, silently teleporting the student to
+  /// the next section at t+45min no matter where they had navigated to.
+  void _armSectionDeadlineFor(int index) {
+    if (!widget.config.sectionLock) {
       _sectionDeadline = null;
+      return;
     }
+    final sectionDuration = widget.config.sections[index].durationSeconds;
+    _sectionDeadline = (sectionDuration != null && sectionDuration > 0)
+        ? DateTime.now().add(Duration(seconds: sectionDuration))
+        : null;
   }
 
-  void _onTick(Timer timer) {
-    if (!mounted || _submitted) return;
+  void _initSectionDeadline() => _armSectionDeadlineFor(_currentSection);
+
+  Future<void> _onTick(Timer timer) async {
+    if (!_ready || !mounted || _submitted) return;
 
     if (_phase == _SessionPhase.break_) {
       if (_breakRemainingSeconds <= 0) {
@@ -379,13 +547,18 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       return;
     }
 
-    if (_sectionRemainingSeconds == 0) {
-      _advanceToSection(_currentSection + 1);
+    // The overall deadline is the hard bound, so it is checked FIRST. Previously
+    // the section check returned early, which meant an expiring final section
+    // masked auto-submit entirely: _advanceToSection could not find a next
+    // section, left _sectionDeadline armed, and re-entered this branch every
+    // second, stacking a new "Submit Test?" dialog on each tick.
+    if (_remainingSeconds <= 0) {
+      _submitTest(auto: true);
       return;
     }
 
-    if (_remainingSeconds <= 0) {
-      _submitTest(auto: true);
+    if (_sectionRemainingSeconds == 0) {
+      await _advanceToSection(_currentSection + 1);
       return;
     }
     setState(() {}); // repaint from wall clock — no arithmetic, no drift
@@ -406,21 +579,29 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   // Answering & navigation
   // ─────────────────────────────────────────────────────────────
 
-  void _selectAnswer(String option) {
+  /// Guards mutations that would desync the graded result from what the user
+  /// sees. `score` is computed synchronously at submit, but the *live* `_answers`
+  /// map is handed to the result screen — so a post-submit edit showed a
+  /// different answer from the one that was actually scored.
+  bool get _locked => _submitting || _submitted;
+
+  Future<void> _selectAnswer(String option) async {
+    if (_locked) return;
     setState(() {
       _answers[_currentIndex] = option;
     });
-    _saveCheckpoint();
+    await _saveCheckpoint();
   }
 
-  void _clearResponse() {
+  Future<void> _clearResponse() async {
+    if (_locked) return;
     setState(() {
       _answers.remove(_currentIndex);
     });
-    _saveCheckpoint();
+    await _saveCheckpoint();
   }
 
-  void _toggleFlag() {
+  Future<void> _toggleFlag() async {
     setState(() {
       if (_flagged.contains(_currentIndex)) {
         _flagged.remove(_currentIndex);
@@ -428,26 +609,43 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         _flagged.add(_currentIndex);
       }
     });
-    _saveCheckpoint();
+    await _saveCheckpoint();
   }
 
-  void _markForReviewAndNext() {
+  Future<void> _markForReviewAndNext() async {
     setState(() {
       _flagged.add(_currentIndex);
     });
-    _saveCheckpoint();
+    await _saveCheckpoint();
     _advance();
   }
 
-  void _goTo(int globalIndex) {
+  Future<void> _goTo(int globalIndex) async {
     _accrueTimeOnLeave();
+
+    // NEET 2024: enforce A-block/B-block navigation
+    if (_isNeet2024) {
+      final targetSection = _sectionOf(globalIndex);
+      final targetBlock = ExamEngineService.getNeet2024Block(targetSection);
+
+      // Cannot jump to B-block until A-block is explicitly advanced past
+      if (_inABlock && targetBlock == 1 && !_isABlockLastQuestion) {
+        // Allow palette tap only within current block
+        return;
+      }
+      // Once in B-block, cannot go back to A-block via palette
+      if (_inBBlock && targetBlock == 0) {
+        return;
+      }
+    }
+
     setState(() {
       _currentIndex = globalIndex;
       _currentSection = _sectionOf(globalIndex);
       _visited.add(globalIndex);
     });
     _questionEnteredAt = DateTime.now();
-    _saveCheckpoint();
+    await _saveCheckpoint();
   }
 
   /// Save & Next / Next Section / Submit, depending on position.
@@ -456,6 +654,13 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _confirmSubmit();
       return;
     }
+
+    // NEET 2024: explicit A-block -> B-block transition
+    if (_isNeet2024 && _isABlockLastQuestion) {
+      _goToBBlock();
+      return;
+    }
+
     if (widget.config.sectionLock && _isLastQuestionInSection) {
       _goToNextSection();
       return;
@@ -466,8 +671,23 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   }
 
   void _previous() {
-    // 1.5: respect the section lock — never step before the section's first
-    // question when locked.
+    // NEET 2024: respect block boundaries
+    if (_isNeet2024) {
+      if (_inBBlock &&
+          _currentSection == 4 &&
+          _currentIndex == _sectionStart[4]) {
+        // At start of B-block, don't go back to A-block via Previous
+        return;
+      }
+      // Within A-block, normal navigation
+      final lowerBound = _sectionStart[_currentSection];
+      if (_currentIndex > lowerBound) {
+        _goTo(_currentIndex - 1);
+      }
+      return;
+    }
+
+    // Legacy logic
     final lowerBound = widget.config.sectionLock
         ? _sectionStart[_currentSection]
         : 0;
@@ -476,7 +696,24 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     }
   }
 
-  void _goToNextSection() {
+  /// Explicit transition from A-block (section 3) to B-block (section 4).
+  Future<void> _goToBBlock() async {
+    if (!_isNeet2024 || !_isABlockLastQuestion) return;
+    _accrueTimeOnLeave();
+    setState(() {
+      _currentSection = 4;
+      _currentIndex = _sectionStart[4];
+      _visited.add(_currentIndex);
+      _phase = _SessionPhase.taking;
+      _breakDeadline = null;
+    });
+    _questionEnteredAt = DateTime.now();
+    _armSectionDeadlineFor(4);
+    await _saveCheckpoint();
+  }
+
+  Future<void> _goToNextSection() async {
+    // NEET 2024 doesn't use scheduled breaks
     if (widget.config.breaksEnabled &&
         _currentSection == widget.config.breakAfterSectionIndex) {
       _accrueTimeOnLeave();
@@ -487,20 +724,40 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
           Duration(seconds: widget.config.breakDurationSeconds),
         );
       });
-      _saveCheckpoint();
+      await _saveCheckpoint();
       return;
     }
-    _advanceToSection(_currentSection + 1);
+    await _advanceToSection(_currentSection + 1);
   }
 
-  void _advanceToSection(int index) {
+  Future<void> _advanceToSection(int index) async {
     _accrueTimeOnLeave();
+
+    // NEET 2024: enforce block progression.
+    //
+    // This must not be a silent `return`. The section deadline is still armed
+    // at this point, so _onTick would call back here once per second for the
+    // rest of the paper: the student sees a frozen clock, is never told their
+    // block time expired, and is never advanced. Treat it exactly like
+    // "no next section" — disarm the timer and escalate to a prompt, so the
+    // student is never left stuck and can still choose to move on.
+    if (_isNeet2024 && _inABlock && index >= 4) {
+      setState(() => _sectionDeadline = null);
+      if (_isABlockLastQuestion) {
+        await _goToBBlock();
+      } else {
+        _confirmSubmit();
+      }
+      return;
+    }
+
     var target = index;
     while (target < _sectionQuestions.length &&
         _sectionQuestions[target].isEmpty) {
       target++;
     }
     if (target >= _sectionQuestions.length) {
+      setState(() => _sectionDeadline = null);
       _confirmSubmit();
       return;
     }
@@ -512,13 +769,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       _breakDeadline = null;
     });
     _questionEnteredAt = DateTime.now();
-    final sectionDuration = widget.config.sections[target].durationSeconds;
-    if (sectionDuration != null && sectionDuration > 0) {
-      _sectionDeadline = DateTime.now().add(Duration(seconds: sectionDuration));
-    } else {
-      _sectionDeadline = null;
-    }
-    _saveCheckpoint();
+    _armSectionDeadlineFor(target);
+    await _saveCheckpoint();
   }
 
   void _skipBreak() {
@@ -529,16 +781,56 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   // Checkpointing
   // ─────────────────────────────────────────────────────────────
 
-  void _saveCheckpoint() {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Checkpointing
+  //
+  // A full-length mock stores the complete question snapshot: measured at
+  // ~159 KB of JSON, ~3.9 ms to encode, plus a SharedPreferences write of that
+  // whole payload. That ran on EVERY answer tap, palette jump, flag toggle and
+  // Mark & Next — and the call sites awaited it, so navigation blocked on a
+  // disk write.
+  //
+  // Simply dropping the `await` is not safe: two rapid saves can land out of
+  // order, leaving the checkpoint holding stale state — worse than the latency
+  // it removes.
+  //
+  // So saves are coalesced behind a single in-flight writer: at most one
+  // encode+write runs at a time, a save requested during one is recorded as
+  // "dirty" and retried once when it finishes, and a caller awaiting during a
+  // save returns immediately instead of queueing behind the disk.
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  bool _checkpointWriteInFlight = false;
+  bool _checkpointDirty = false;
+
+  Future<bool> _saveCheckpoint() {
     if (!_checkpointable || _submitted || !mounted || _questions.isEmpty) {
-      return;
+      return Future<bool>.value(false);
     }
+    if (_checkpointWriteInFlight) {
+      // A write is already running. Ensure the newest state is written once it
+      // finishes, rather than starting a competing one that could interleave.
+      _checkpointDirty = true;
+      return Future<bool>.value(false);
+    }
+    _checkpointWriteInFlight = true;
+    return _writeCheckpoint().whenComplete(() {
+      _checkpointWriteInFlight = false;
+      if (_checkpointDirty && !_submitted && mounted) {
+        _checkpointDirty = false;
+        unawaited(_saveCheckpoint());
+      }
+    });
+  }
+
+  Future<bool> _writeCheckpoint() async {
     final cp = ExamCheckpoint(
       attemptId: _attemptId,
       configJson: widget.config.toJson(),
       sectionQuestionIds: [
         for (final sec in _sectionQuestions) [for (final q in sec) q.id],
       ],
+      sectionQuestions: _sectionQuestions,
       answersByIndex: {
         for (int i = 0; i < _questions.length; i++) i: _answers[i],
       },
@@ -555,15 +847,16 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       violations: _violations,
       secondsPerQuestion: Map<int, int>.from(_secondsPerQuestion.asMap()),
     );
-    // Fire-and-forget; a failed autosave must never interrupt the test.
-    ref.read(examCheckpointServiceProvider).save(cp).catchError((_) {});
+    return ref.read(examCheckpointServiceProvider).save(cp);
   }
 
   Future<void> _clearCheckpoint() async {
     if (!_checkpointable) return;
     try {
       await ref.read(examCheckpointServiceProvider).clear();
-    } catch (_) {}
+    } catch (error) {
+      debugPrint('CBT checkpoint clear failed: $error');
+    }
     ref.invalidate(activeCbtCheckpointProvider);
   }
 
@@ -608,7 +901,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   Future<void> _submitTest({bool auto = false}) async {
     if (_submitted) return;
-    _submitted = true; // 1.6: synchronous guard — exactly one submit
+    _submitted = true; // synchronous guard — exactly one submit per session
     _accrueTimeOnLeave();
     _questionEnteredAt = null;
     _ticker?.cancel();
@@ -630,9 +923,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       secondsPerQuestion: _secondsPerQuestion,
     );
 
-    // 2.3: per-section correct counts keyed by section name (analytics.subjects
+    // per-section correct counts keyed by section name (analytics.subjects
     // is now section-keyed, so Botany and Zoology stay distinct).
-    final subjectScores = {
+    final subjectScores = <String, int>{
       for (final entry in analytics.subjects.entries)
         entry.key: entry.value.correct,
     };
@@ -657,32 +950,44 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       seed: _seed,
     );
 
-    await ref
-        .read(userProgressProvider.notifier)
-        .recordQuizAttempt(
-          attempt,
-          questions: _questions,
-          answersByIndex: _answers,
-          seed: _seed,
-        );
-    await _clearCheckpoint();
-
-    for (int i = 0; i < _questions.length; i++) {
-      final q = _questions[i];
-      final answer = _answers[i];
-      final isCorrect = answer != null && answer == q.correctAnswer;
-      if (!isCorrect) {
-        final dbInstance = ref.read(databaseProvider);
-        final userId = ref.read(authProvider).user?.id ?? 0;
-        await dbInstance.addToErrorBook(
-          db.ErrorBookCompanion.insert(
-            userId: Value(userId),
-            questionId: q.id,
-            addedAt: DateTime.now(),
-          ),
-        );
+    // Persist the attempt. If this fails, we retry up to 3 times before
+    // giving up — a lost attempt is a lost user session.
+    bool recorded = false;
+    for (int attemptNum = 1; attemptNum <= 3 && !recorded; attemptNum++) {
+      try {
+        await ref
+            .read(userProgressProvider.notifier)
+            .recordQuizAttempt(
+              attempt,
+              questions: _questions,
+              answersByIndex: _answers,
+              seed: _seed,
+            );
+        recorded = true;
+      } catch (e) {
+        if (attemptNum == 3) {
+          debugPrint('Failed to record quiz attempt after 3 attempts: $e');
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to save attempt after 3 attempts. '
+                'Your progress is saved locally and will retry on next launch.',
+              ),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+          // DO NOT clear checkpoint — keep it for retry on next launch
+          return;
+        } else {
+          await Future.delayed(Duration(milliseconds: 100 * attemptNum));
+        }
       }
     }
+
+    // Only clear checkpoint AFTER successful save
+    await _clearCheckpoint();
 
     if (!mounted) return;
     // Close the confirm dialog if the deadline fired while it was open.
@@ -707,6 +1012,10 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (!_ready) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     if (_questions.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('Mock Test'), elevation: 0),
@@ -1112,18 +1421,29 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   }
 
   Widget _buildBottomControls() {
-    final visibleFrom = widget.config.sectionLock
-        ? _sectionStart[_currentSection]
-        : 0;
-    final visibleTo = widget.config.sectionLock
-        ? _sectionStart[_currentSection] +
-              _sectionQuestions[_currentSection].length
-        : _questions.length;
+    int visibleFrom;
+    int visibleTo;
+
+    if (_isNeet2024) {
+      // NEET 2024: palette shows only current block (A or B)
+      if (_inABlock) {
+        visibleFrom = 0;
+        visibleTo = _sectionStart[4]; // End of A-block
+      } else {
+        visibleFrom = _sectionStart[4]; // Start of B-block
+        visibleTo = _questions.length;
+      }
+    } else if (widget.config.sectionLock) {
+      visibleFrom = _sectionStart[_currentSection];
+      visibleTo =
+          _sectionStart[_currentSection] +
+          _sectionQuestions[_currentSection].length;
+    } else {
+      visibleFrom = 0;
+      visibleTo = _questions.length;
+    }
 
     final hasAnswer = _answers.containsKey(_currentIndex);
-    final lowerBound = widget.config.sectionLock
-        ? _sectionStart[_currentSection]
-        : 0;
 
     return Container(
       color: AdaptiveColors.surface(context),
@@ -1134,7 +1454,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
           _buildPaletteLegend(),
           const SizedBox(height: 8),
           SizedBox(
-            height: 44,
+            height: 52,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: visibleTo - visibleFrom,
@@ -1178,7 +1498,9 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
           Row(
             children: [
               IconButton(
-                onPressed: _currentIndex > lowerBound ? _previous : null,
+                onPressed: _currentIndex > _navigationLowerBound
+                    ? _previous
+                    : null,
                 icon: const Icon(Icons.chevron_left),
                 tooltip: 'Previous',
               ),
@@ -1242,7 +1564,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         Text(
           label,
           style: TextStyle(
-            fontSize: 10,
+            fontSize: 11,
             color: AdaptiveColors.textSecondary(context),
           ),
         ),
@@ -1285,8 +1607,8 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         clipBehavior: Clip.none,
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 44,
+            height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: bg,
@@ -1318,7 +1640,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 1),
                 ),
-                child: const Icon(Icons.flag, size: 8, color: Colors.white),
+                child: const Icon(Icons.flag, size: 10, color: Colors.white),
               ),
             ),
         ],
