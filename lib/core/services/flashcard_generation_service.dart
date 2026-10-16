@@ -16,6 +16,7 @@ class FlashcardGenerationProgress {
     this.processed,
     this.total,
     this.lastError,
+    this.cards,
   });
 
   final String status;
@@ -23,6 +24,10 @@ class FlashcardGenerationProgress {
   final int? processed;
   final int? total;
   final String? lastError;
+  final List<GeneratedFlashcard>? cards;
+
+  /// True if this progress event contains the final generated cards.
+  bool get hasCards => cards != null && cards!.isNotEmpty;
 }
 
 /// A single AI-generated flashcard grounded in an NCERT source paragraph.
@@ -246,6 +251,7 @@ class FlashcardGenerationService {
       currentStep: 'done',
       processed: processed,
       total: total,
+      cards: deduped,
     );
   }
 
