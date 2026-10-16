@@ -183,6 +183,20 @@ function renderHtml(
 </body></html>`;
 }
 
+/** Best-effort caller IP, used to rate-limit the unauthenticated reset path.
+ *
+ *  The anon identity for password reset is keyed on this. It is deliberately
+ *  weak — a caller can rotate proxies — so it is only ever a *second* ceiling
+ *  alongside the per-recipient limit, never the only one. */
+function clientIp(req: Request): string {
+  const fwd = req.headers.get("x-forwarded-for");
+  if (fwd) {
+    const hops = fwd.split(",").map((h) => h.trim()).filter(Boolean);
+    if (hops.length > 0) return hops[hops.length - 1];
+  }
+  return req.headers.get("x-real-ip")?.trim() || "unknown";
+}
+
 /** Strips characters that let a caller forge extra lines or a fake URL in the
  *  text/plain part of a branded security email.
  *
@@ -240,23 +254,10 @@ Deno.serve(async (req) => {
     return json({ error: "Email service is not configured" }, 503, origin);
   }
 
-  // ── Authenticate ─────────────────────────────────────────────────────────
-  // The provider key must never be reachable by an anonymous caller.
-  const authHeader = req.headers.get("Authorization");
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-  if (!token) return json({ error: "Unauthorized" }, 401, origin);
-
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
-  const { data, error: userErr } = await supabase.auth.getUser(token);
-  if (userErr || !data.user?.id) {
-    return json({ error: "Unauthorized" }, 401, origin);
-  }
-  const identity = data.user.id;
-
-  // ── Validate ─────────────────────────────────────────────────────────────
+  // ── Parse before authenticating ──────────────────────────────────────────
+  // Password reset is requested while SIGNED OUT, so there is no session to
+  // present. Reading the body first lets us recognise that one legitimate
+  // unauthenticated case without loosening anything else.
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -264,6 +265,55 @@ Deno.serve(async (req) => {
     return json({ error: "Invalid JSON body" }, 400, origin);
   }
 
+  // ── Authenticate ─────────────────────────────────────────────────────────
+  // The provider key must never be reachable by an anonymous caller — with ONE
+  // narrow exception, below.
+  const authHeader = req.headers.get("Authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  /** Identity used for rate limiting; also decides the auth policy below. */
+  let identity: string;
+  let accountEmail: string | null;
+  /** True only for the single unauthenticated case (password reset). */
+  let anonymousReset = false;
+
+  if (token) {
+    const { data, error: userErr } = await supabase.auth.getUser(token);
+    if (userErr || !data.user?.id) {
+      return json({ error: "Unauthorized" }, 401, origin);
+    }
+    identity = data.user.id;
+    accountEmail = data.user.email ?? null;
+  } else {
+    // ---- The one unauthenticated path: password reset only ------------------
+    // Scoped as tightly as possible:
+    //   * template MUST be password_reset — welcome / 2FA / verification /
+    //     deletion notices all stay authenticated, so this cannot be used to
+    //     send arbitrary mail or spoof a security notice.
+    //   * the recipient cannot be constrained to an account (the whole point is
+    //     that the caller is signed out), so abuse is bounded by rate limits
+    //     keyed on BOTH the recipient and the caller IP.
+    //   * `username` and `purpose` are IGNORED below and replaced with fixed
+    //     text, so the caller cannot author the body of a branded mail.
+    const requestedTemplate = clean(body.template, 40);
+    const requestedCode = clean(body.code, 12);
+    if (requestedTemplate !== "password_reset") {
+      return json({ error: "Unauthorized" }, 401, origin);
+    }
+    if (!/^\d{6}$/.test(requestedCode)) {
+      return json({ error: "Unauthorized" }, 401, origin);
+    }
+    anonymousReset = true;
+    identity = `anon:${clientIp(req)}`;
+    accountEmail = null;
+  }
+
+  // ── Validate ─────────────────────────────────────────────────────────────
   const template = clean(body.template, 40);
   // `in` walks the prototype chain, so "toString"/"constructor"/"__proto__"
   // passed the guard and resolved `meta.subject` to undefined. Own-property
@@ -278,27 +328,34 @@ Deno.serve(async (req) => {
     return json({ error: "Invalid recipient" }, 400, origin);
   }
 
-  // The recipient must be the authenticated account's own verified address.
-  // Otherwise any signed-up user can send a branded password-reset mail, with
-  // attacker-chosen greeting and body text, to an arbitrary victim on the
-  // app's real sending domain. Rejecting foreign addresses preserves
-  // anti-enumeration: a caller still cannot probe whether an account exists,
-  // because the request simply never sends.
-  const accountEmail = (data.user.email ?? "").trim().toLowerCase();
-  if (!accountEmail || to !== accountEmail) {
-    console.warn(
-      `send-email: rejected foreign recipient for identity ${identity}`,
-    );
-    return json(
-      { error: "Recipient must match the signed-in account" },
-      403,
-      origin,
-    );
+  // For an authenticated caller the recipient must be the account's own
+  // verified address: otherwise any signed-up user can send a branded
+  // password-reset mail, with attacker-chosen greeting and body text, to an
+  // arbitrary victim on the app's real sending domain.
+  //
+  // The unauthenticated reset path skips this by necessity — there is no
+  // account — and is bounded by the per-IP + per-recipient limits instead.
+  if (!anonymousReset) {
+    const bound = (accountEmail ?? "").trim().toLowerCase();
+    if (!bound || to !== bound) {
+      console.warn(
+        `send-email: rejected foreign recipient for identity ${identity}`,
+      );
+      return json(
+        { error: "Recipient must match the signed-in account" },
+        403,
+        origin,
+      );
+    }
   }
 
-  const username = clean(body.username, 80);
+  // The caller cannot author the body of an unauthenticated mail: both of
+  // these are replaced with fixed text.
+  const username = anonymousReset ? "" : clean(body.username, 80);
   const code = clean(body.code, 12);
-  const purpose = clean(body.purpose, 120) || "complete a request on your account";
+  const purpose = anonymousReset
+    ? "reset your password"
+    : clean(body.purpose, 120) || "complete a request on your account";
 
   // ── Rate limit ───────────────────────────────────────────────────────────
   // Two independent ceilings: per session, and per recipient. The second matters
