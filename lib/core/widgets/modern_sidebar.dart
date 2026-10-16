@@ -373,8 +373,8 @@ class ModernSidebar extends ConsumerWidget {
           context: context,
           icon: Icons.insert_drive_file_outlined,
           selectedIcon: Icons.insert_drive_file,
-          label: 'PDF Viewer',
-          location: '/pdf',
+          label: 'Study Resources',
+          location: '/resources',
           currentLocation: currentLocation,
         ),
 
