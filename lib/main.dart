@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -10,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'core/config/app_config.dart';
 import 'core/database/question_repository.dart';
 import 'core/providers/providers.dart' as app_providers;
+import 'core/providers/bootstrap_provider.dart';
 import 'core/providers/settings_providers.dart';
 import 'core/router/app_router.dart';
 import 'core/services/notification_service.dart';
@@ -25,11 +27,19 @@ void main() async {
   // consistent typography on every launch.
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  try {
-    await dotenv.load(fileName: '.env');
-  } catch (e) {
-    debugPrint('⚠️ .env not loaded: $e');
-  }
+  // ⚠️ No runtime `.env` load.
+  //
+  // `.env` used to be a bundled asset (listed under `assets:` in pubspec.yaml),
+  // which copied it verbatim into every APK/IPA — anything written there, even
+  // a key added "just to test", was extractable with `unzip app.apk`.
+  //
+  // Configuration now arrives at BUILD time via `--dart-define` and is compiled
+  // into the Dart program (see lib/core/config/app_config.dart). A missing
+  // `.env` is the correct state for a release build, not a warning.
+  //
+  // For local development, either pass the same flags to `flutter run`, or — if
+  // you want a convenience file — load it HERE and read it explicitly. Do not
+  // re-add `.env` to the assets list.
 
   // Initialize notification service with timeout
   try {
@@ -60,15 +70,15 @@ void main() async {
 }
 
 Future<void> _initSupabaseBackground(ProviderContainer container) async {
-  if (!AppConfig.enableCloudAuth) return;
+  if (!AppConfig.enableCloudAuth) {
+    container.read(bootstrapStatusProvider.notifier).state =
+        BootstrapStatus.readyOffline;
+    return;
+  }
 
   try {
     final url = AppConfig.supabaseUrl;
     final key = AppConfig.supabaseAnonKey;
-    debugPrint('🔧 Supabase URL: $url');
-    debugPrint(
-      '🔧 Supabase key prefix: ${key.substring(0, key.length > 10 ? 10 : key.length)}...',
-    );
     await supabase.Supabase.initialize(url: url, publishableKey: key).timeout(
       const Duration(seconds: 5),
       onTimeout: () {
@@ -76,11 +86,17 @@ Future<void> _initSupabaseBackground(ProviderContainer container) async {
         throw TimeoutException('Supabase init timeout');
       },
     );
-    debugPrint('✅ Supabase connected: ${AppConfig.supabaseUrl}');
+    debugPrint('✅ Supabase initialized');
+    container.read(bootstrapStatusProvider.notifier).state =
+        BootstrapStatus.readyWithCloud;
   } on TimeoutException {
     debugPrint('⚠️ Supabase init timeout - continuing offline');
+    container.read(bootstrapStatusProvider.notifier).state =
+        BootstrapStatus.cloudUnavailable;
   } catch (e) {
     debugPrint('❌ Supabase init failed: $e');
+    container.read(bootstrapStatusProvider.notifier).state =
+        BootstrapStatus.cloudUnavailable;
   }
 }
 
@@ -174,6 +190,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   }
 
   Future<void> _checkBiometricLock() async {
+    // Biometric lock is not supported on web — never engage the lock overlay.
+    if (kIsWeb) return;
     final bioService = ref.read(app_providers.biometricServiceProvider);
     final isEnabled = await bioService.isBiometricEnabled();
 
