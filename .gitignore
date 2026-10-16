@@ -52,6 +52,7 @@ app.*.map.json
 # Environment secrets
 .env
 .env*.local
+.dart-defines.local.json
 
 # NEET PYQ downloaded PDFs (runtime downloaded or kept local)
 /assets/pyq/downloaded/
