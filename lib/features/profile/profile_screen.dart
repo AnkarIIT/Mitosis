@@ -49,7 +49,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Future<void> _saveTargetScore() async {
     final parsed = int.tryParse(_targetScoreController.text.trim());
-    final nextTarget = parsed ?? _targetScore;
+    // NEET is scored out of 720 — clamp so the marks/marks bar stays valid.
+    final nextTarget = (parsed ?? _targetScore).clamp(1, 720);
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_targetScoreKey, nextTarget);
@@ -66,21 +67,32 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(overallStatsProvider);
+    final mockStats = ref.watch(mockTestStatsProvider);
     final authState = ref.watch(authProvider);
     final currentAccuracy = (stats['accuracy'] as double);
+    final hasMock = (mockStats['hasMockTests'] as bool?) ?? false;
+    final bestMockScore = (mockStats['highestScore'] as int?) ?? 0;
+    // Progress is marks-over-marks, not accuracy-over-marks: both sides of
+    // the ratio are NEET marks (0–720) so the bar actually means something.
     final progress = _targetScore == 0
         ? 0.0
-        : (currentAccuracy / _targetScore).clamp(0.0, 1.0);
+        : (bestMockScore / _targetScore).clamp(0.0, 1.0);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Student Profile'), elevation: 0),
+      backgroundColor: AdaptiveColors.background(context),
+      appBar: AppBar(title: const Text('Profile')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             _buildProfileHeader(authState),
             const SizedBox(height: 32),
-            _buildTargetScoreCard(currentAccuracy, progress),
+            _buildTargetScoreCard(
+              currentAccuracy,
+              progress,
+              bestMockScore,
+              hasMock,
+            ),
             const SizedBox(height: 24),
             _buildAchievementSection(stats),
             const SizedBox(height: 24),
@@ -136,37 +148,36 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildProfileHeader(AuthState auth) {
+    final fullName = auth.user?.fullName?.trim();
+    final username = auth.user?.username.trim();
+    final displayName = (fullName?.isNotEmpty ?? false)
+        ? fullName!
+        : (username?.isNotEmpty ?? false)
+        ? username!
+        : 'Guest Learner';
+    final initial = displayName.substring(0, 1).toUpperCase();
+
     return Column(
       children: [
-        Stack(
-          children: [
-            const CircleAvatar(
-              radius: 60,
-              backgroundColor: AppColors.primary,
-              child: Icon(Icons.person, size: 60, color: Colors.white),
+        CircleAvatar(
+          radius: 54,
+          backgroundColor: AdaptiveColors.primaryContainer(context),
+          child: Text(
+            initial,
+            style: TextStyle(
+              color: AdaptiveColors.primary(context),
+              fontSize: 40,
+              fontWeight: FontWeight.w700,
             ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: AdaptiveColors.surface(context),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.edit,
-                    size: 18,
-                    color: AppColors.primary,
-                  ),
-                  onPressed: () {},
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
         const SizedBox(height: 16),
         Text(
-          auth.user?.username ?? 'Guest Learner',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          displayName,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         Text(
           auth.user?.email ?? 'Complete your profile to sync data',
@@ -176,7 +187,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildTargetScoreCard(double currentAccuracy, double progress) {
+  Widget _buildTargetScoreCard(
+    double currentAccuracy,
+    double progress,
+    int bestMockScore,
+    bool hasMock,
+  ) {
     return Card(
       elevation: 0,
       color: AppColors.primary.withValues(alpha: 0.05),
@@ -251,9 +267,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    'Current Est: ${currentAccuracy.toStringAsFixed(0)}',
-                    style: const TextStyle(fontSize: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        hasMock
+                            ? 'Best mock: $bestMockScore / $_targetScore marks'
+                            : 'Best mock: — / $_targetScore marks',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        hasMock
+                            ? 'Practice accuracy: ${currentAccuracy.toStringAsFixed(0)}% • ${(progress * 100).toStringAsFixed(0)}% of target'
+                            : 'Solve a full mock to get a marks estimate • Practice accuracy: ${currentAccuracy.toStringAsFixed(0)}%',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AdaptiveColors.textSecondary(context),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 TextButton(
@@ -399,7 +435,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       crossAxisCount: 2,
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
-      childAspectRatio: 1.5,
+      // Roomy enough for 1.3x accessibility text: the icon + value +
+      // label column overflowed at tighter ratios on 360px screens.
+      childAspectRatio: 1.2,
       children: [
         _buildStatCard(
           'Total Solved',
