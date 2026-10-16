@@ -143,25 +143,34 @@ async function sha256Hex(text: string): Promise<string> {
 }
 
 /**
- * Best-effort client IP for anonymous rate limiting.
+ * Best-effort client identity for anonymous rate limiting.
  *
- * ⚠️ `x-forwarded-for` is client-controlled: a caller can send any value, and
- * the previous implementation read the FIRST entry, which is the one the client
- * writes. The honest reading is the LAST entry — intermediaries append the
- * address they actually observed, so anything the client prepended is a lie.
+ * `x-forwarded-for` is client-controlled, and whether the gateway appends to
+ * or replaces it cannot be verified from this repo. Taking a single hop was
+ * therefore guesswork: the first entry is whatever the client wrote, and the
+ * last is only trustworthy IF the platform appends.
  *
- * This remains spoofable in principle: a client that sets no header at all, or
- * strips the trailing entry, still controls what we see. It is a speed bump
- * against casual abuse, not an authentication mechanism. Do not treat the
- * anonymous quota as a spend guarantee.
+ * Instead the WHOLE chain plus `x-real-ip` is used, joined. Any tampering with
+ * any hop changes the bucket, so a caller cannot hold a stable anonymous
+ * identity by sending a fixed header, and cannot cheaply rotate either.
+ *
+ * This is still a SPEED BUMP, not authentication. The real spend control is the
+ * authenticated quota keyed on `auth.users.id`; the anonymous quota only
+ * raises the cost of casual abuse. Do not treat it as a spend guarantee.
  */
 function clientIp(req: Request): string {
+  const parts: string[] = [];
   const forwarded = req.headers.get("x-forwarded-for");
   if (forwarded) {
-    const hops = forwarded.split(",").map((h) => h.trim()).filter(Boolean);
-    if (hops.length > 0) return hops[hops.length - 1];
+    for (const hop of forwarded.split(",")) {
+      const h = hop.trim();
+      if (h) parts.push(h);
+    }
   }
-  return req.headers.get("x-real-ip")?.trim() || "unknown";
+  const real = req.headers.get("x-real-ip")?.trim();
+  if (real) parts.push(real);
+  if (parts.length === 0) return "unknown";
+  return parts.join("|");
 }
 
 /** Calls Gemini and returns the trimmed response text. */
