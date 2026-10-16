@@ -9,7 +9,7 @@ def setup_gemini():
     if not api_key:
         print("Error: GEMINI_API_KEY environment variable not set.")
         print("Get your free API key from https://aistudio.google.com/app/apikey")
-        print("Then run: export GEMINI_API_KEY=AIzaSyCxwdOA3U8D_i7qxyx1hDIlXgjo0BcLJLM")
+        print("Then set GEMINI_API_KEY in your local environment.")
         exit(1)
     genai.configure(api_key=api_key)
 
