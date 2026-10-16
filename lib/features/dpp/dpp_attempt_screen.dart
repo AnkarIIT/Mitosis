@@ -5,10 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/database/drift_database.dart' as db;
 import '../../core/providers/core_providers.dart';
-import '../../core/providers/auth_providers.dart';
+import '../../core/providers/current_user_provider.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/services/result_export_service.dart';
+import '../../core/utils/answer_normalizer.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import 'package:drift/drift.dart' hide Column;
@@ -66,7 +67,10 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
 
   Future<void> _autoSubmit() async {
     if (_submitted) return;
-    _submitted = true;
+    // Do NOT set _submitted here: _submitDpp owns the guard and sets it
+    // synchronously on entry. Setting it first made _submitDpp's own
+    // `if (_submitted) return;` fire immediately, so timer expiry never
+    // persisted, never showed review, and never navigated.
     _timer?.cancel();
     await _submitDpp(auto: true);
   }
@@ -89,32 +93,14 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
   }
 
   static bool _checkAnswerCorrect(Question q, String? userVal) {
-    if (userVal == null || userVal.isEmpty) return false;
-    final cleanUser = userVal.trim().toLowerCase();
-    final cleanCorrect = q.correctAnswer.trim().toLowerCase();
-
-    if (cleanUser == cleanCorrect) return true;
-
-    // Check letter vs option text vs option index (0, 1, 2, 3 or A, B, C, D)
-    if (userVal.length == 1) {
-      final letterCode = userVal.toUpperCase().codeUnitAt(0);
-      if (letterCode >= 65 && letterCode <= 68) {
-        final idx = letterCode - 65;
-        // Check if correctAnswer is index string ('0', '1', '2', '3')
-        if (cleanCorrect == idx.toString()) return true;
-        // Check if correctAnswer matches option text at index
-        if (idx < q.options.length &&
-            q.options[idx].trim().toLowerCase() == cleanCorrect) {
-          return true;
-        }
-      }
-    }
-
-    // Check if userVal is option text matching correctAnswer
-    return false;
+    return AnswerNormalizer.isCorrect(userVal, q);
   }
 
   Future<void> _submitDpp({bool auto = false}) async {
+    if (_submitted) return;
+    _submitted = true; // synchronous guard — exactly one submit per session
+    _timer?.cancel();
+
     final correct = <int>[];
     final incorrect = <int>[];
     final unattempted = <int>[];
@@ -131,6 +117,45 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
     }
 
     if (!mounted) return;
+    // Snapshot the elapsed time BEFORE any UI — avoids counting review-reading
+    // time into the attempt duration.
+    final elapsedAtSubmit = _elapsedSeconds();
+
+    // Persist FIRST — data is safe even if user kills app during review.
+    bool persisted = false;
+    for (int attempt = 1; attempt <= 3 && !persisted; attempt++) {
+      try {
+        await _persistDppResult(
+          correctCount: correct.length,
+          incorrectCount: incorrect.length,
+          unattemptedCount: unattempted.length,
+          elapsedAtSubmit: elapsedAtSubmit,
+        );
+        persisted = true;
+      } catch (e) {
+        if (attempt == 3) {
+          debugPrint('Failed to persist DPP result after 3 attempts: $e');
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to save DPP result after 3 attempts. '
+                'Will retry on next app launch.',
+              ),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+          return; // Don't show review if persist failed
+        } else {
+          await Future.delayed(Duration(milliseconds: 100 * attempt));
+        }
+      }
+    }
+
+    if (!mounted) return;
+
+    // THEN show review — data is already durably saved.
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -145,76 +170,98 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
       ),
     );
 
-    await _persistDppResult(
-      correctCount: correct.length,
-      incorrectCount: incorrect.length,
-      unattemptedCount: unattempted.length,
-    );
-
     if (!mounted) return;
-    context.go('/');
+    // The review sheet's action is labelled "Back to DPP", so return there.
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/');
+    }
+  }
+
+  /// Seconds of the paper actually spent, clamped to the paper's own duration.
+  int _elapsedSeconds() {
+    final elapsed =
+        _durationSeconds - _deadline!.difference(DateTime.now()).inSeconds;
+    return elapsed.clamp(0, _durationSeconds).toInt();
   }
 
   Future<void> _persistDppResult({
     required int correctCount,
     required int incorrectCount,
     required int unattemptedCount,
+    required int elapsedAtSubmit,
   }) async {
     try {
       final database = ref.read(databaseProvider);
       final set = widget.dppResult.set;
-      final timeSpent =
-          _durationSeconds - _deadline!.difference(DateTime.now()).inSeconds;
-      final safeTime = timeSpent > 0 ? timeSpent : _durationSeconds;
+      // Taken at submit, not now — see the snapshot in _submitDpp.
+      final safeTime = elapsedAtSubmit;
+      final userId = ref.read(currentLocalUserIdProvider) ?? guestOwnerId;
 
-      await (database.update(
-        database.dppSets,
-      )..where((t) => t.id.equals(set.id))).write(
-        db.DppSetsCompanion(
-          correctCount: Value(correctCount),
-          incorrectCount: Value(incorrectCount),
-          unattemptedCount: Value(unattemptedCount),
-          timeSpentSeconds: Value(safeTime),
-          isCompleted: Value(true),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
-
-      await database.insertQuizAttempt(
-        db.QuizAttemptsCompanion.insert(
-          topicId: 'dpp_${set.subject.toLowerCase()}',
-          subject: set.subject,
-          testType: const Value('dpp'),
-          score: correctCount,
-          incorrectCount: Value(incorrectCount),
-          totalQuestions: _questions.length,
-          timeSpentSeconds: safeTime,
-          attemptedAt: DateTime.now(),
-          selectedAnswers: jsonEncode(
-            List<String>.filled(_questions.length, ''),
+      // ONE transaction for the whole unit. Without it, a failure in the
+      // trailing error-book loop left the dppSets update and the quiz_attempts
+      // insert already committed; the retry then ran the insert a second time
+      // and produced TWO quiz_attempts rows for a single DPP, double-counting
+      // score and totalQuestions in history and analytics. `quiz_attempts.id`
+      // is autoIncrement with no natural key to deduplicate on.
+      await database.transaction(() async {
+        await (database.update(
+          database.dppSets,
+        )..where((t) => t.id.equals(set.id))).write(
+          db.DppSetsCompanion(
+            correctCount: Value(correctCount),
+            incorrectCount: Value(incorrectCount),
+            unattemptedCount: Value(unattemptedCount),
+            timeSpentSeconds: Value(safeTime),
+            isCompleted: Value(true),
+            updatedAt: Value(DateTime.now()),
           ),
-          rawScore: Value(correctCount * 4 - incorrectCount),
-          maxMarks: Value(_questions.length * 4),
-        ),
-      );
+        );
 
-      for (int i = 0; i < _questions.length; i++) {
-        final q = _questions[i];
-        final answer = _attempt.answersByIndex[i];
-        final isCorrect = answer != null && answer == q.correctAnswer;
-        if (!isCorrect) {
-          final userId = ref.read(authProvider).user?.id ?? 0;
-          await database.addToErrorBook(
-            db.ErrorBookCompanion.insert(
-              userId: Value(userId),
-              questionId: q.id,
-              addedAt: DateTime.now(),
+        await database.insertQuizAttempt(
+          db.QuizAttemptsCompanion.insert(
+            topicId: 'dpp_${set.subject.toLowerCase()}',
+            subject: set.subject,
+            userId: Value(userId),
+            testType: const Value('dpp'),
+            score: correctCount,
+            incorrectCount: Value(incorrectCount),
+            totalQuestions: _questions.length,
+            timeSpentSeconds: safeTime,
+            attemptedAt: DateTime.now(),
+            selectedAnswers: jsonEncode(
+              List.generate(
+                _questions.length,
+                (i) => _attempt.answersByIndex[i] ?? '',
+              ),
             ),
-          );
+            rawScore: Value(correctCount * 4 - incorrectCount),
+            maxMarks: Value(_questions.length * 4),
+          ),
+        );
+
+        for (int i = 0; i < _questions.length; i++) {
+          final q = _questions[i];
+          final answer = _attempt.answersByIndex[i];
+          final isCorrect = _checkAnswerCorrect(q, answer);
+          if (answer != null && answer.isNotEmpty && !isCorrect) {
+            await database.addToErrorBook(
+              db.ErrorBookCompanion.insert(
+                userId: Value(userId),
+                questionId: q.id,
+                addedAt: DateTime.now(),
+              ),
+            );
+          }
         }
-      }
+      });
     } catch (e) {
       debugPrint('❌ Error persisting DPP result: $e');
+      // Rethrow so the caller's retry loop can actually retry. Swallowing here
+      // made `persisted = true` unconditional, so a single DB failure silently
+      // discarded the whole DPP result on the first attempt.
+      rethrow;
     }
   }
 
@@ -264,7 +311,14 @@ class _DppAttemptScreenState extends ConsumerState<DppAttemptScreen> {
     final theme = Theme.of(context);
     final question = _currentQuestion;
     final selectedAnswer = _attempt.answersByIndex[_currentQuestionIndex];
-    final remaining = _deadline!.difference(DateTime.now()).inSeconds;
+    // Clamp: the ticker stops at expiry, but any later rebuild (tapping Next,
+    // opening a sheet) would otherwise render a negative clock — and Dart's
+    // `-1 % 60 == -1` produced "0:-1".
+    final remaining = _deadline!
+        .difference(DateTime.now())
+        .inSeconds
+        .clamp(0, 1 << 31)
+        .toInt();
     final progress = remaining <= 0 ? 1.0 : remaining / _durationSeconds;
     final timerColor = remaining < 60
         ? AppColors.error
@@ -682,10 +736,12 @@ class _DppReviewSheet extends StatelessWidget {
                               ...q.options.asMap().entries.map((entry) {
                                 final idx = entry.key;
                                 final option = entry.value;
-                                final isUserChoice =
-                                    userAnswer == String.fromCharCode(65 + idx);
+                                final optionLetter = String.fromCharCode(
+                                  65 + idx,
+                                );
+                                final isUserChoice = userAnswer == optionLetter;
                                 final isCorrectOption =
-                                    idx.toString() == q.correctAnswer;
+                                    AnswerNormalizer.isCorrect(optionLetter, q);
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 3,
