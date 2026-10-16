@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'connection.dart'
     if (dart.library.js_util) 'connection_web.dart'
@@ -19,8 +21,19 @@ import 'tables/sync_watermarks_table.dart';
 import 'tables/spaced_repetition_table.dart';
 import 'tables/flashcards_table.dart';
 import 'tables/dpp_tables.dart';
+import 'tables/resource_progress_table.dart';
+import 'tables/learning_analytics_tables.dart';
+import 'tables/consent_records_table.dart';
+import 'tables/chapter_progress_table.dart';
 
 part 'drift_database.g.dart';
+
+/// Result of a single OTP verification attempt.
+///
+/// Distinguishes *wrong code* from *locked out* so the caller can enforce the
+/// lock while still surfacing a generic message that does not reveal whether the
+/// guess was close.
+enum OtpAttemptOutcome { verified, wrongCode, lockedOut, noActiveCode }
 
 @DriftDatabase(
   tables: [
@@ -39,6 +52,11 @@ part 'drift_database.g.dart';
     Flashcards,
     DppSets,
     DppQuestions,
+    ResourceProgress,
+    MistakeEvents,
+    RetentionReviews,
+    ConsentRecords,
+    ChapterProgressTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -57,7 +75,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 32;
+  int get schemaVersion => 40;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -286,6 +304,76 @@ class AppDatabase extends _$AppDatabase {
         // Daily Practice Paper tables.
         await m.createTable(dppSets);
         await m.createTable(dppQuestions);
+      }
+      if (from < 34) {
+        // Replace the legacy global bookmark key with the correct per-owner
+        // composite key. Keep the newest row for each owner/question pair.
+        await customStatement(
+          'DELETE FROM bookmarks WHERE id NOT IN '
+          '(SELECT MAX(id) FROM bookmarks GROUP BY user_id, question_id)',
+        );
+        await customStatement(
+          'DROP INDEX IF EXISTS bookmarks_question_id_unique',
+        );
+        await customStatement(
+          'DROP INDEX IF EXISTS bookmarks_user_question_uidx',
+        );
+        await customStatement(
+          'CREATE UNIQUE INDEX IF NOT EXISTS bookmarks_user_question_unique '
+          'ON bookmarks(user_id, question_id)',
+        );
+      }
+      if (from < 35) {
+        await m.createTable(resourceProgress);
+      }
+      if (from < 37) {
+        // Delta-cursor id component. A timestamp-only watermark skips every row
+        // sharing that exact timestamp because the next query is a strict `gt`,
+        // so the cursor becomes a (timestamp, id) tuple. Nullable so rows
+        // written by older builds load unchanged.
+        await _addColumnSafely(
+          m,
+          syncWatermarks,
+          (syncWatermarks as dynamic).cursorId,
+        );
+        // Composite index matching the sync page query's ORDER BY, so the
+        // catalog delta scan is index-ordered instead of sorted per page.
+        await customStatement(
+          'CREATE INDEX IF NOT EXISTS questions_sync_cursor_idx '
+          'ON questions(updated_at, id)',
+        );
+      }
+      if (from < 38) {
+        // Password-reset OTP throttling. The 2FA equivalents
+        // (twoFactorAttempts / twoFactorLockedUntil / twoFactorLastSentAt)
+        // already existed as columns but were never read or written by any
+        // query, so both 2FA and reset codes were brute-forceable from a copy of
+        // the local database. These bring reset codes in line with the now
+        // enforced 2FA path.
+        await _addColumnSafely(
+          m,
+          users,
+          (users as dynamic).passwordResetAttempts,
+        );
+        await _addColumnSafely(
+          m,
+          users,
+          (users as dynamic).passwordResetLockedUntil,
+        );
+        await _addColumnSafely(
+          m,
+          users,
+          (users as dynamic).passwordResetLastSentAt,
+        );
+      }
+      if (from < 39) {
+        // Persisted consent records.
+        //
+        // Acceptance was previously an in-memory boolean on the sign-up screen:
+        // it reset on every restart and was never written anywhere, so consent
+        // could not be demonstrated after the fact. Each row pins the exact
+        // policy version accepted at a timestamp.
+        await m.createTable(consentRecords);
       }
       if (from < 24) {
         // Persist the shuffle seed for each attempt so the question order
@@ -562,6 +650,14 @@ class AppDatabase extends _$AppDatabase {
           'CREATE UNIQUE INDEX IF NOT EXISTS questions_remote_id_unique ON questions(remoteId)',
         );
       }
+      if (from < 36) {
+        await m.createTable(mistakeEvents);
+        await m.createTable(retentionReviews);
+      }
+      if (from < 40) {
+        // Chapter progress tracking for structured learning modules.
+        await m.createTable(chapterProgressTable);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign keys
@@ -592,18 +688,18 @@ class AppDatabase extends _$AppDatabase {
   Future<void> addToErrorBook(ErrorBookCompanion entry) =>
       into(errorBook).insertOnConflictUpdate(entry);
 
-  Future<void> removeFromErrorBook(String questionId, {int userId = 0}) =>
+  Future<void> removeFromErrorBook(String questionId, {int userId = -1}) =>
       (delete(errorBook)..where(
             (t) => t.questionId.equals(questionId) & t.userId.equals(userId),
           ))
           .go();
 
-  Future<List<ErrorBookData>> getErrorBookEntries({int userId = 0}) =>
+  Future<List<ErrorBookData>> getErrorBookEntries({int userId = -1}) =>
       (select(errorBook)..where((t) => t.userId.equals(userId))).get();
 
   Future<void> resolveErrorBookEntry(
     String questionId, {
-    int userId = 0,
+    int userId = -1,
   }) async {
     await (update(errorBook)..where(
           (t) => t.questionId.equals(questionId) & t.userId.equals(userId),
@@ -619,18 +715,35 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Creates a local user from an already-authenticated Supabase user.
+  /// Creates a local row for a cloud-linked identity.
+  ///
+  /// ## Password sentinel
+  /// `passwordHash` is set to the shared `google_auth` marker rather than `''`.
+  /// The two paths previously wrote *different* sentinels, and the login path only
+  /// recognises one of them — so accounts created here got a misleading
+  /// "Incorrect password" instead of "sign in with Google".
+  ///
+  /// ## Email ownership
+  /// `isEmailVerified` is set from the caller's own verification result. Local
+  /// registration leaves it false, and nothing previously checked it, which is
+  /// what allowed an unverified local signup to block a real account's Google
+  /// sign-in.
   Future<User?> createUserFromCloud({
     required String email,
     required String username,
     required String supabaseId,
     String? fullName,
+    bool emailVerified = true,
   }) async {
     final companion = UsersCompanion(
       email: Value(email),
       username: Value(username),
       supabaseId: Value(supabaseId),
       fullName: Value(fullName),
-      passwordHash: Value(''), // No local password for cloud-linked accounts
+      // No local password exists for a federated account. The marker lets the
+      // login path say "use Google" rather than "wrong password".
+      passwordHash: const Value('google_auth'),
+      isEmailVerified: Value(emailVerified),
       createdAt: Value(DateTime.now()),
     );
     final id = await into(users).insert(companion);
@@ -663,7 +776,9 @@ class AppDatabase extends _$AppDatabase {
     await (update(users)..where((t) => t.id.equals(userId))).write(
       UsersCompanion(
         failedLoginAttempts: Value(attempts),
-        lockedUntil: lockedUntil != null ? Value(lockedUntil) : const Value.absent(),
+        lockedUntil: lockedUntil != null
+            ? Value(lockedUntil)
+            : const Value.absent(),
       ),
     );
   }
@@ -677,7 +792,7 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-Future<bool> isAccountLocked(int userId) async {
+  Future<bool> isAccountLocked(int userId) async {
     final user = await getUserById(userId);
     if (user == null || user.lockedUntil == null) return false;
     return user.lockedUntil!.isAfter(DateTime.now());
@@ -717,6 +832,9 @@ Future<bool> isAccountLocked(int userId) async {
       UsersCompanion(
         twoFactorCode: Value(codeHash),
         twoFactorExpiresAt: Value(expiresAt),
+        // A fresh code resets the guess budget: the attacker no longer benefits
+        // from attempts burned against a previous code.
+        twoFactorAttempts: const Value(0),
       ),
     );
   }
@@ -726,32 +844,96 @@ Future<bool> isAccountLocked(int userId) async {
       const UsersCompanion(
         twoFactorCode: Value(null),
         twoFactorExpiresAt: Value(null),
+        twoFactorAttempts: Value(0),
+        twoFactorLockedUntil: Value(null),
+        twoFactorLastSentAt: Value(null),
       ),
     );
   }
 
-  Future<({int userId, String code, DateTime expiresAt})?>
-  getActiveTwoFactorCode(int userId, String providedCode) async {
+  /// True when OTP guessing for [userId] is currently locked out.
+  ///
+  /// A 6-digit code is 10^6 candidates; without this the local SQLite file is
+  /// enough to brute-force it offline.
+  Future<bool> isTwoFactorLockedOut(int userId) async {
+    final row = await (select(
+      users,
+    )..where((t) => t.id.equals(userId))).getSingleOrNull();
+    if (row == null) return false;
+    final lockedUntil = row.twoFactorLockedUntil;
+    if (lockedUntil == null) return false;
+    return lockedUntil.isAfter(DateTime.now());
+  }
+
+  /// True when a 2FA/OTP resend would be sooner than [cooldown].
+  ///
+  /// Blocks the email-bomb amplification vector against the transactional
+  /// email provider.
+  Future<bool> isTwoFactorResendThrottled(
+    int userId, {
+    Duration cooldown = const Duration(seconds: 60),
+  }) async {
+    final row = await (select(
+      users,
+    )..where((t) => t.id.equals(userId))).getSingleOrNull();
+    if (row == null) return false;
+    final lastSent = row.twoFactorLastSentAt;
+    if (lastSent == null) return false;
+    return DateTime.now().difference(lastSent) < cooldown;
+  }
+
+  /// Records the send timestamp used by [isTwoFactorResendThrottled].
+  Future<void> markTwoFactorSent(int userId, {DateTime? at}) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(twoFactorLastSentAt: Value(at ?? DateTime.now())),
+    );
+  }
+
+  /// Verifies an OTP and atomically advances the guess budget.
+  ///
+  /// Increments `twoFactorAttempts` on every miss and locks the account for
+  /// [lockout] once [maxAttempts] is reached. The increment happens in the same
+  /// read-then-write as the verification, so concurrent taps cannot race past
+  /// the limit.
+  Future<OtpAttemptOutcome> verifyTwoFactorCode(
+    int userId,
+    String providedCode, {
+    int maxAttempts = 5,
+    Duration lockout = const Duration(minutes: 15),
+  }) async {
     final row = await (select(
       users,
     )..where((t) => t.id.equals(userId))).getSingleOrNull();
     if (row == null ||
         row.twoFactorCode == null ||
         row.twoFactorExpiresAt == null) {
-      return null;
+      return OtpAttemptOutcome.noActiveCode;
     }
-    if (row.twoFactorExpiresAt!.isBefore(DateTime.now())) {
-      return null;
+
+    final now = DateTime.now();
+    final lockedUntil = row.twoFactorLockedUntil;
+    if (lockedUntil != null && lockedUntil.isAfter(now)) {
+      return OtpAttemptOutcome.lockedOut;
     }
-    // Verify the provided code against the stored hash
-    if (!SecurityUtils.verifyPassword(providedCode, row.twoFactorCode!)) {
-      return null;
+    if (row.twoFactorExpiresAt!.isBefore(now)) {
+      return OtpAttemptOutcome.noActiveCode;
     }
-    return (
-      userId: row.id,
-      code: providedCode,
-      expiresAt: row.twoFactorExpiresAt!,
+
+    if (SecurityUtils.verifyPassword(providedCode, row.twoFactorCode!)) {
+      return OtpAttemptOutcome.verified;
+    }
+
+    // Miss: advance the guess budget.
+    final attempts = row.twoFactorAttempts + 1;
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(
+        twoFactorAttempts: Value(attempts),
+        twoFactorLockedUntil: Value(
+          attempts >= maxAttempts ? now.add(lockout) : null,
+        ),
+      ),
     );
+    return OtpAttemptOutcome.wrongCode;
   }
 
   Future<void> updateUserPreferences(
@@ -785,8 +967,91 @@ Future<bool> isAccountLocked(int userId) async {
       UsersCompanion(
         passwordResetCode: Value(codeHash),
         passwordResetExpiresAt: Value(expiresAt),
+        // A new reset code restores the guess budget — attempts burned against
+        // a previous code must not carry over.
+        passwordResetAttempts: const Value(0),
       ),
     );
+  }
+
+  /// True when password-reset code guessing is currently locked out.
+  Future<bool> isPasswordResetLockedOut(int userId) async {
+    final row = await (select(
+      users,
+    )..where((t) => t.id.equals(userId))).getSingleOrNull();
+    if (row == null) return false;
+    final lockedUntil = row.passwordResetLockedUntil;
+    if (lockedUntil == null) return false;
+    return lockedUntil.isAfter(DateTime.now());
+  }
+
+  /// True when a password-reset resend would be sooner than [cooldown].
+  ///
+  /// Blocks the email-bomb amplification vector against the transactional
+  /// provider.
+  Future<bool> isPasswordResetResendThrottled(
+    int userId, {
+    Duration cooldown = const Duration(seconds: 60),
+  }) async {
+    final row = await (select(
+      users,
+    )..where((t) => t.id.equals(userId))).getSingleOrNull();
+    if (row == null) return false;
+    final lastSent = row.passwordResetLastSentAt;
+    if (lastSent == null) return false;
+    return DateTime.now().difference(lastSent) < cooldown;
+  }
+
+  /// Records the reset-send timestamp used by
+  /// [isPasswordResetResendThrottled].
+  Future<void> markPasswordResetSent(int userId, {DateTime? at}) async {
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(passwordResetLastSentAt: Value(at ?? DateTime.now())),
+    );
+  }
+
+  /// Verifies a password-reset code and atomically advances the guess budget.
+  ///
+  /// Same threat model as [verifyTwoFactorCode]: a 6-digit code is only 10^6
+  /// candidates, so the guess count must be bounded and the lock enforced.
+  Future<OtpAttemptOutcome> verifyPasswordResetCode(
+    int userId,
+    String providedCode, {
+    int maxAttempts = 5,
+    Duration lockout = const Duration(minutes: 15),
+  }) async {
+    final row = await (select(
+      users,
+    )..where((t) => t.id.equals(userId))).getSingleOrNull();
+    if (row == null ||
+        row.passwordResetCode == null ||
+        row.passwordResetExpiresAt == null) {
+      return OtpAttemptOutcome.noActiveCode;
+    }
+
+    final now = DateTime.now();
+    final lockedUntil = row.passwordResetLockedUntil;
+    if (lockedUntil != null && lockedUntil.isAfter(now)) {
+      return OtpAttemptOutcome.lockedOut;
+    }
+    if (row.passwordResetExpiresAt!.isBefore(now)) {
+      return OtpAttemptOutcome.noActiveCode;
+    }
+
+    if (SecurityUtils.verifyPassword(providedCode, row.passwordResetCode!)) {
+      return OtpAttemptOutcome.verified;
+    }
+
+    final attempts = row.passwordResetAttempts + 1;
+    await (update(users)..where((t) => t.id.equals(userId))).write(
+      UsersCompanion(
+        passwordResetAttempts: Value(attempts),
+        passwordResetLockedUntil: Value(
+          attempts >= maxAttempts ? now.add(lockout) : null,
+        ),
+      ),
+    );
+    return OtpAttemptOutcome.wrongCode;
   }
 
   Future<({int userId, String code, DateTime expiresAt})?>
@@ -818,6 +1083,8 @@ Future<bool> isAccountLocked(int userId) async {
       const UsersCompanion(
         passwordResetCode: Value(null),
         passwordResetExpiresAt: Value(null),
+        passwordResetAttempts: Value(0),
+        passwordResetLockedUntil: Value(null),
       ),
     );
   }
@@ -840,6 +1107,9 @@ Future<bool> isAccountLocked(int userId) async {
     await (delete(dppQuestions)..where((t) => t.userId.equals(userId))).go();
     await (delete(quizSessions)..where((t) => t.userId.equals(userId))).go();
     await (delete(evaluations)..where((t) => t.userId.equals(userId))).go();
+    await (delete(
+      resourceProgress,
+    )..where((t) => t.userId.equals(userId))).go();
     // Finally delete the user
     await (delete(users)..where((t) => t.id.equals(userId))).go();
   }
@@ -873,19 +1143,47 @@ Future<bool> isAccountLocked(int userId) async {
   Future<void> insertChatMessage(ChatsCompanion message) =>
       into(chats).insert(message);
 
-  Future<List<Chat>> getAllChats({int userId = 0}) =>
+  Future<List<Chat>> getAllChats({int userId = -1}) =>
       (select(chats)
             ..where((t) => t.userId.equals(userId))
             ..orderBy([(t) => OrderingTerm(expression: t.timestamp)]))
           .get();
 
-  Future<void> clearChatHistory({int userId = 0}) =>
+  Future<void> clearChatHistory({int userId = -1}) =>
       (delete(chats)..where((t) => t.userId.equals(userId))).go();
 
   // ============= QUIZ ATTEMPTS =============
 
   Future<int> insertQuizAttempt(Insertable<QuizAttempt> attempt) =>
       into(quizAttempts).insert(attempt);
+
+  Future<void> recordMistakeEvent(MistakeEventsCompanion event) =>
+      into(mistakeEvents).insert(event);
+
+  Future<List<MistakeEvent>> getMistakeEvents({int userId = -1}) =>
+      (select(mistakeEvents)
+            ..where((t) => t.userId.equals(userId))
+            ..orderBy([
+              (t) => OrderingTerm(
+                expression: t.createdAt,
+                mode: OrderingMode.desc,
+              ),
+            ]))
+          .get();
+
+  Future<void> recordRetentionReview(RetentionReviewsCompanion review) =>
+      into(retentionReviews).insert(review);
+
+  Future<List<RetentionReview>> getRetentionReviews({int userId = -1}) =>
+      (select(retentionReviews)
+            ..where((t) => t.userId.equals(userId))
+            ..orderBy([
+              (t) => OrderingTerm(
+                expression: t.checkedAt,
+                mode: OrderingMode.desc,
+              ),
+            ]))
+          .get();
 
   Future<void> upsertQuizAttempt(QuizAttemptsCompanion attempt) async {
     final attemptedAt = attempt.attemptedAt.value;
@@ -909,12 +1207,12 @@ Future<bool> isAccountLocked(int userId) async {
     }
   }
 
-  Future<List<QuizAttempt>> getAllQuizAttempts({int userId = 0}) =>
+  Future<List<QuizAttempt>> getAllQuizAttempts({int userId = -1}) =>
       (select(quizAttempts)..where((t) => t.userId.equals(userId))).get();
 
   Future<List<QuizAttempt>> getQuizAttemptsBySubject(
     String subjectName, {
-    int userId = 0,
+    int userId = -1,
   }) =>
       (select(quizAttempts)..where(
             (t) => t.subject.equals(subjectName) & t.userId.equals(userId),
@@ -926,14 +1224,14 @@ Future<bool> isAccountLocked(int userId) async {
   Future<void> upsertTopicProgress(Insertable<TopicProgressEntry> entry) =>
       into(topicProgressEntries).insertOnConflictUpdate(entry);
 
-  Future<List<TopicProgressEntry>> getAllTopicProgress({int userId = 0}) =>
+  Future<List<TopicProgressEntry>> getAllTopicProgress({int userId = -1}) =>
       (select(
         topicProgressEntries,
       )..where((t) => t.userId.equals(userId))).get();
 
   Future<TopicProgressEntry?> getTopicProgress(
     String topicId, {
-    int userId = 0,
+    int userId = -1,
   }) =>
       (select(topicProgressEntries)
             ..where((t) => t.topicId.equals(topicId) & t.userId.equals(userId)))
@@ -946,19 +1244,22 @@ Future<bool> isAccountLocked(int userId) async {
   Future<void> insertBookmark(BookmarksCompanion bookmark) =>
       into(bookmarks).insert(
         bookmark,
-        onConflict: DoUpdate((_) => bookmark, target: [bookmarks.questionId]),
+        onConflict: DoUpdate(
+          (_) => bookmark,
+          target: [bookmarks.userId, bookmarks.questionId],
+        ),
       );
 
-  Future<void> removeBookmark(String questionId, {int userId = 0}) =>
+  Future<void> removeBookmark(String questionId, {int userId = -1}) =>
       (delete(bookmarks)..where(
             (t) => t.questionId.equals(questionId) & t.userId.equals(userId),
           ))
           .go();
 
-  Future<List<Bookmark>> getAllBookmarks({int userId = 0}) =>
+  Future<List<Bookmark>> getAllBookmarks({int userId = -1}) =>
       (select(bookmarks)..where((t) => t.userId.equals(userId))).get();
 
-  Future<bool> isBookmarked(String questionId, {int userId = 0}) async {
+  Future<bool> isBookmarked(String questionId, {int userId = -1}) async {
     final result =
         await (select(bookmarks)..where(
               (t) => t.questionId.equals(questionId) & t.userId.equals(userId),
@@ -967,22 +1268,68 @@ Future<bool> isAccountLocked(int userId) async {
     return result.isNotEmpty;
   }
 
+  Future<List<ResourceProgressData>> getResourceProgress({int userId = -1}) =>
+      (select(resourceProgress)..where((t) => t.userId.equals(userId))).get();
+
+  Future<ResourceProgressData?> getResourceProgressFor(
+    String resourceId, {
+    int userId = -1,
+  }) =>
+      (select(resourceProgress)..where(
+            (t) => t.resourceId.equals(resourceId) & t.userId.equals(userId),
+          ))
+          .getSingleOrNull();
+
+  Future<void> upsertResourceProgress(ResourceProgressCompanion progress) =>
+      into(resourceProgress).insert(
+        progress,
+        onConflict: DoUpdate(
+          (_) => progress,
+          target: [resourceProgress.userId, resourceProgress.resourceId],
+        ),
+      );
+
   // ============= CONTENT SYNC WATERMARKS =============
+
+  /// The raw persisted sync cursor for [tableName].
+  ///
+  /// Stores the encoded `(updated_at, id)` delta tuple. Legacy rows written by
+  /// older builds hold only a timestamp; [getLastSyncTimestamp] still reads
+  /// those correctly.
+  Future<String?> getSyncCursorId(String tableName) async {
+    final row = await (select(
+      syncWatermarks,
+    )..where((t) => t.remoteTable.equals(tableName))).getSingleOrNull();
+    return row?.cursorId;
+  }
 
   Future<DateTime?> getLastSyncTimestamp(String tableName) async {
     final row = await (select(
       syncWatermarks,
     )..where((t) => t.remoteTable.equals(tableName))).getSingleOrNull();
-    return row?.lastSyncedAt;
+    // Normalised to UTC on read: the cursor is a UTC instant end-to-end, and
+    // handing back local time would reintroduce the DST-fragile round-trip.
+    return row?.lastSyncedAt.toUtc();
   }
 
-  Future<void> setSyncTimestamp(String tableName, DateTime timestamp) =>
-      into(syncWatermarks).insertOnConflictUpdate(
-        SyncWatermarksCompanion.insert(
-          remoteTable: tableName,
-          lastSyncedAt: timestamp,
-        ),
-      );
+  /// Persists the sync cursor.
+  ///
+  /// [lastSyncedAt] is the tuple's timestamp (kept in its own column for
+  /// readability and for backwards compatibility) and [cursorId] is the tuple's
+  /// remote-id component. Passing both lets the next run resume exactly where
+  /// this one stopped instead of re-reading rows that share the final
+  /// timestamp.
+  Future<void> setSyncTimestamp(
+    String tableName,
+    DateTime timestamp, {
+    String? cursorId,
+  }) => into(syncWatermarks).insertOnConflictUpdate(
+    SyncWatermarksCompanion.insert(
+      remoteTable: tableName,
+      lastSyncedAt: timestamp.toUtc(),
+      cursorId: Value(cursorId),
+    ),
+  );
 
   /// Local ids of every remote-sourced (catalog) question, used to reconcile
   /// rows that were removed/deactivated on the server.
@@ -993,18 +1340,108 @@ Future<bool> isAccountLocked(int userId) async {
     return rows.map((r) => r.id).toList();
   }
 
+  Future<String?> getRemoteQuestionIdByLocalId(String localId) async {
+    final row = await (select(
+      questions,
+    )..where((t) => t.id.equals(localId))).getSingleOrNull();
+    return row?.remoteId;
+  }
+
+  /// Batch variant of [getRemoteQuestionIdByLocalId]: maps local id → remote id
+  /// for the supplied keys in a single query.
+  ///
+  /// Sync checks every incoming row for a surrogate-key collision. Doing that
+  /// one SELECT per row meant 1000 extra round-trips per page; this collapses
+  /// it to one query per chunk regardless of page size.
+  Future<Map<String, String>> getRemoteIdMapForLocalIds(
+    List<String> localIds,
+  ) async {
+    if (localIds.isEmpty) return const {};
+    final rows = await (select(
+      questions,
+    )..where((t) => t.id.isIn(localIds) & t.remoteId.isNotNull())).get();
+    final map = <String, String>{};
+    for (final row in rows) {
+      final remoteId = row.remoteId;
+      if (remoteId != null) map[row.id] = remoteId;
+    }
+    return map;
+  }
+
+  /// Soft-deletes catalog questions whose remote rows were deactivated.
+  ///
+  /// Returns the number of rows actually flipped. Only ever called after a
+  /// clean sync pass — deactivating on a partial catalog would hide valid
+  /// content. Bundled sample questions are untouched because they carry a null
+  /// [Question.remoteId].
+  Future<int> deactivateQuestionsByRemoteIds(List<String> remoteIds) async {
+    if (remoteIds.isEmpty) return 0;
+    return (update(questions)
+          ..where((t) => t.remoteId.isIn(remoteIds) & t.isActive.equals(true)))
+        .write(const QuestionsCompanion(isActive: Value(false)));
+  }
+
+  // ============= CONSENT RECORDS =============
+
+  /// Records that the user accepted a given policy version.
+  ///
+  /// ## Why this is persisted
+  /// Consent was previously an in-memory boolean on the auth screen. It reset on
+  /// every app restart, was never written anywhere, and therefore could not be
+  /// produced as evidence after the fact. Storing the version and timestamp per
+  /// account makes acceptance demonstrable rather than merely asserted.
+  Future<void> recordConsent(
+    int userId, {
+    required String document,
+    required String version,
+  }) async {
+    await into(consentRecords).insertOnConflictUpdate(
+      ConsentRecordsCompanion.insert(
+        userId: userId,
+        document: document,
+        version: version,
+        acceptedAt: DateTime.now(),
+      ),
+    );
+  }
+
+  Future<List<ConsentRecord>> getConsentRecords(int userId) =>
+      (select(consentRecords)..where((t) => t.userId.equals(userId))).get();
+
+  /// Whether the user has accepted [version] of [document].
+  ///
+  /// Used to decide whether to re-ask after a policy change.
+  Future<bool> hasAcceptedConsent(
+    int userId, {
+    required String document,
+    required String version,
+  }) async {
+    final row =
+        await (select(consentRecords)..where(
+              (t) =>
+                  t.userId.equals(userId) &
+                  t.document.equals(document) &
+                  t.version.equals(version),
+            ))
+            .getSingleOrNull();
+    return row != null;
+  }
+
+  Future<void> clearConsentRecords(int userId) =>
+      (delete(consentRecords)..where((t) => t.userId.equals(userId))).go();
+
   // ============= SPACED REPETITION =============
 
   Future<void> upsertSpacedRepetition(Insertable<SpacedRepetitionData> entry) =>
       into(spacedRepetition).insertOnConflictUpdate(entry);
 
   Future<List<SpacedRepetitionData>> getSpacedRepetitionCards({
-    int userId = 0,
+    int userId = -1,
   }) => (select(spacedRepetition)..where((t) => t.userId.equals(userId))).get();
 
   Future<SpacedRepetitionData?> getSpacedRepetition(
     String questionId, {
-    int userId = 0,
+    int userId = -1,
   }) =>
       (select(spacedRepetition)..where(
             (t) => t.questionId.equals(questionId) & t.userId.equals(userId),
@@ -1013,7 +1450,7 @@ Future<bool> isAccountLocked(int userId) async {
 
   Future<List<SpacedRepetitionData>> getDueSpacedRepetition(
     DateTime now, {
-    int userId = 0,
+    int userId = -1,
   }) {
     final query = select(spacedRepetition)
       ..where(
@@ -1023,7 +1460,7 @@ Future<bool> isAccountLocked(int userId) async {
     return query.get();
   }
 
-  Future<void> removeSpacedRepetition(String questionId, {int userId = 0}) =>
+  Future<void> removeSpacedRepetition(String questionId, {int userId = -1}) =>
       (delete(spacedRepetition)..where(
             (t) => t.questionId.equals(questionId) & t.userId.equals(userId),
           ))
@@ -1040,17 +1477,17 @@ Future<bool> isAccountLocked(int userId) async {
     );
   }
 
-  Future<List<Flashcard>> getAllFlashcards({int userId = 0}) =>
+  Future<List<Flashcard>> getAllFlashcards({int userId = -1}) =>
       (select(flashcards)..where((t) => t.userId.equals(userId))).get();
 
   Future<List<Flashcard>> getFlashcardsBySubject(
     String subject, {
-    int userId = 0,
+    int userId = -1,
   }) => (select(
     flashcards,
   )..where((t) => t.subject.equals(subject) & t.userId.equals(userId))).get();
 
-  Future<List<Flashcard>> getDueFlashcards(DateTime now, {int userId = 0}) {
+  Future<List<Flashcard>> getDueFlashcards(DateTime now, {int userId = -1}) {
     final query = select(flashcards)
       ..where(
         (t) => t.dueAt.isSmallerOrEqualValue(now) & t.userId.equals(userId),
@@ -1059,7 +1496,7 @@ Future<bool> isAccountLocked(int userId) async {
     return query.get();
   }
 
-  Future<Flashcard?> getFlashcardById(String id, {int userId = 0}) => (select(
+  Future<Flashcard?> getFlashcardById(String id, {int userId = -1}) => (select(
     flashcards,
   )..where((t) => t.id.equals(id) & t.userId.equals(userId))).getSingleOrNull();
 
@@ -1072,8 +1509,11 @@ Future<bool> isAccountLocked(int userId) async {
     required int lapses,
     required DateTime dueAt,
     DateTime? lastReviewedAt,
+    int userId = -1,
   }) async {
-    await (update(flashcards)..where((t) => t.id.equals(id))).write(
+    await (update(
+      flashcards,
+    )..where((t) => t.id.equals(id) & t.userId.equals(userId))).write(
       FlashcardsCompanion(
         box: Value(box),
         easeFactor: Value(easeFactor),
@@ -1091,6 +1531,120 @@ Future<bool> isAccountLocked(int userId) async {
 
   Future<void> deleteFlashcardsByChapter(String chapterId) =>
       (delete(flashcards)..where((t) => t.chapterId.equals(chapterId))).go();
+
+  // ============= CHAPTER PROGRESS =============
+
+  /// Gets or creates chapter progress for a user.
+  Future<ChapterProgressTableData?> getChapterProgress(
+    String chapterId,
+    int userId,
+  ) async {
+    final row =
+        await (select(chapterProgressTable)..where(
+              (t) => t.chapterId.equals(chapterId) & t.userId.equals(userId),
+            ))
+            .getSingleOrNull();
+    return row;
+  }
+
+  /// Creates or updates chapter progress.
+  Future<void> upsertChapterProgress(
+    ChapterProgressTableCompanion progress,
+  ) async {
+    await into(chapterProgressTable).insertOnConflictUpdate(progress);
+  }
+
+  /// Marks a lesson as completed for a user in a chapter.
+  Future<void> markLessonCompleted(
+    String chapterId,
+    int userId,
+    String lessonId,
+  ) async {
+    final existing = await getChapterProgress(chapterId, userId);
+    final completedIds = <String>{};
+    if (existing != null) {
+      try {
+        completedIds.addAll(
+          List<String>.from(JsonDecoder().convert(existing.completedLessonIds)),
+        );
+      } catch (_) {}
+    }
+    completedIds.add(lessonId);
+
+    await upsertChapterProgress(
+      ChapterProgressTableCompanion(
+        chapterId: Value(chapterId),
+        userId: Value(userId),
+        currentLessonId: Value(''),
+        completedLessonIds: Value(JsonEncoder().convert(completedIds.toList())),
+        startedAt: Value.absent(),
+        lastAccessedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  /// Updates the current lesson for a user in a chapter.
+  Future<void> updateCurrentLesson(
+    String chapterId,
+    int userId,
+    String lessonId,
+  ) async {
+    await upsertChapterProgress(
+      ChapterProgressTableCompanion(
+        chapterId: Value(chapterId),
+        userId: Value(userId),
+        currentLessonId: Value(lessonId),
+        lastAccessedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  /// Records a quick check score for a lesson.
+  Future<void> recordQuickCheckScore(
+    String chapterId,
+    int userId,
+    String lessonId,
+    int score, // 0-100
+  ) async {
+    final existing = await getChapterProgress(chapterId, userId);
+    final scores = <String, int>{};
+    if (existing != null) {
+      try {
+        scores.addAll(
+          Map<String, int>.from(
+            JsonDecoder().convert(existing.quickCheckScores),
+          ),
+        );
+      } catch (_) {}
+    }
+    scores[lessonId] = score;
+
+    await upsertChapterProgress(
+      ChapterProgressTableCompanion(
+        chapterId: Value(chapterId),
+        userId: Value(userId),
+        quickCheckScores: Value(JsonEncoder().convert(scores)),
+        lastAccessedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  /// Records the summary quiz score for a chapter.
+  Future<void> recordSummaryQuizScore(
+    String chapterId,
+    int userId,
+    int score, // 0-100
+  ) async {
+    await upsertChapterProgress(
+      ChapterProgressTableCompanion(
+        chapterId: Value(chapterId),
+        userId: Value(userId),
+        summaryQuizScore: Value(score),
+        completedAt: score >= 70 ? Value(DateTime.now()) : Value.absent(),
+        lastAccessedAt: Value(DateTime.now()),
+      ),
+    );
+  }
 
   // ============= QUIZ ATTEMPT QUESTION IDS =============
 
@@ -1116,12 +1670,17 @@ Future<bool> isAccountLocked(int userId) async {
 
   Future<List> getDppSets() => select(dppSets).get();
 
-  Future getTodayDppSet(String subject) async {
+  Future getTodayDppSet(String subject, {int userId = -1}) async {
     final today = DateTime.now();
     final dateStr =
         '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
     final query = select(dppSets)
-      ..where((t) => t.date.equals(dateStr) & t.subject.equals(subject));
+      ..where(
+        (t) =>
+            t.date.equals(dateStr) &
+            t.subject.equals(subject) &
+            t.userId.equals(userId),
+      );
     return query.getSingleOrNull();
   }
 
@@ -1149,13 +1708,13 @@ Future<bool> isAccountLocked(int userId) async {
   Future<void> upsertQuizSession(QuizSessionsCompanion session) =>
       into(quizSessions).insertOnConflictUpdate(session);
 
-  Future<QuizSession?> getQuizSession(String sessionId, {int userId = 0}) =>
+  Future<QuizSession?> getQuizSession(String sessionId, {int userId = -1}) =>
       (select(quizSessions)..where(
             (t) => t.sessionId.equals(sessionId) & t.userId.equals(userId),
           ))
           .getSingleOrNull();
 
-  Future<List<QuizSession>> getAllQuizSessions({int userId = 0}) =>
+  Future<List<QuizSession>> getAllQuizSessions({int userId = -1}) =>
       (select(quizSessions)
             ..where((t) => t.userId.equals(userId))
             ..orderBy([
@@ -1166,29 +1725,36 @@ Future<bool> isAccountLocked(int userId) async {
             ]))
           .get();
 
-  Future<void> deleteQuizSession(String sessionId, {int userId = 0}) =>
+  Future<void> deleteQuizSession(String sessionId, {int userId = -1}) =>
       (delete(quizSessions)..where(
             (t) => t.sessionId.equals(sessionId) & t.userId.equals(userId),
           ))
           .go();
 
-  Future<void> deleteCompletedQuizSessions({int userId = 0}) => (delete(
+  Future<void> deleteCompletedQuizSessions({int userId = -1}) => (delete(
     quizSessions,
   )..where((t) => t.isCompleted.equals(true) & t.userId.equals(userId))).go();
 
   // ============= RESET DATA =============
 
-  Future<void> clearAllProgress() async {
+  Future<void> clearAllProgress({int userId = -1}) async {
     await transaction(() async {
-      await delete(quizAttempts).go();
-      await delete(topicProgressEntries).go();
-      await delete(bookmarks).go();
-      await delete(dailyGoals).go();
-      await delete(spacedRepetition).go();
-      await delete(errorBook).go();
-      await delete(flashcards).go();
-      await delete(dppSets).go();
-      await delete(dppQuestions).go();
+      await (delete(quizAttempts)..where((t) => t.userId.equals(userId))).go();
+      await (delete(
+        topicProgressEntries,
+      )..where((t) => t.userId.equals(userId))).go();
+      await (delete(bookmarks)..where((t) => t.userId.equals(userId))).go();
+      await (delete(dailyGoals)..where((t) => t.userId.equals(userId))).go();
+      await (delete(
+        spacedRepetition,
+      )..where((t) => t.userId.equals(userId))).go();
+      await (delete(errorBook)..where((t) => t.userId.equals(userId))).go();
+      await (delete(flashcards)..where((t) => t.userId.equals(userId))).go();
+      await (delete(dppSets)..where((t) => t.userId.equals(userId))).go();
+      await (delete(dppQuestions)..where((t) => t.userId.equals(userId))).go();
+      await (delete(
+        resourceProgress,
+      )..where((t) => t.userId.equals(userId))).go();
     });
   }
 }
