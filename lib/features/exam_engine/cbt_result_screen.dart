@@ -6,6 +6,7 @@ import '../../core/services/test_analytics_service.dart';
 import '../../core/services/result_export_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/answer_normalizer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -477,7 +478,7 @@ class CbtResultScreen extends ConsumerWidget {
       final answer = answers[i];
       if (answer == null || answer.isEmpty) {
         unattempted.add(i);
-      } else if (answer.trim() == q.correctAnswer.trim()) {
+      } else if (AnswerNormalizer.isCorrect(answer, q)) {
         correct.add(i);
       } else {
         incorrect.add(i);
@@ -556,10 +557,12 @@ class CbtResultScreen extends ConsumerWidget {
                       ...q.options.asMap().entries.map((entry) {
                         final idx = entry.key;
                         final option = entry.value;
-                        final isUserChoice =
-                            userAnswer == String.fromCharCode(65 + idx);
-                        final isCorrectOption =
-                            idx.toString() == q.correctAnswer;
+                        final optionLetter = String.fromCharCode(65 + idx);
+                        final isUserChoice = userAnswer == optionLetter;
+                        final isCorrectOption = AnswerNormalizer.isCorrect(
+                          optionLetter,
+                          q,
+                        );
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 3),
                           child: Row(
