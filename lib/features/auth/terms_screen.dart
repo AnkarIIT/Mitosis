@@ -58,7 +58,7 @@ class TermsScreen extends StatelessWidget {
             _buildSection(
               context,
               '6. Data & Privacy',
-              'Your quiz progress, flashcard schedules, and error book are stored locally on your device. If you enable cloud sync, data is synced to Supabase. See our Privacy Policy for details.',
+              'Your quiz progress, flashcard schedules, and error book are stored locally on your device. If you enable cloud sync, data is synced to Supabase. Verification codes are emailed through our server and a delivery provider. Read the full Privacy Policy in Settings → Privacy Policy for what is collected and how to exercise your rights.',
             ),
             _buildSection(
               context,
@@ -82,8 +82,42 @@ class TermsScreen extends StatelessWidget {
             ),
             _buildSection(
               context,
-              '11. Contact',
-              'For questions about these Terms, contact us through the App\'s support channel.',
+              '11. Eligibility',
+              'You must be at least 13 years old to create an account. If you are '
+                  'between 13 and 18 you need the consent of a parent or guardian. '
+                  'By creating an account you confirm you meet this requirement.',
+            ),
+            _buildSection(
+              context,
+              '12. Refunds & Payments',
+              'The App is provided at no cost and we do not currently charge for '
+                  'premium features. If paid features are introduced, refund terms '
+                  'will be stated at the point of purchase and will comply with '
+                  'applicable consumer protection law, including India\'s Consumer '
+                  'Protection Act, 2019. Consumed digital content is generally '
+                  'non-refundable except where required by law.',
+            ),
+            _buildSection(
+              context,
+              '13. Termination',
+              'You may stop using the App and delete your account at any time from '
+                  'Settings. We may suspend or terminate access if you breach these '
+                  'Terms, for example by abusing the service or attempting to access '
+                  'another user\'s data.',
+            ),
+            _buildSection(
+              context,
+              '14. Governing Law',
+              'These Terms are governed by the laws of India. The courts of India '
+                  'have exclusive jurisdiction, subject to any mandatory consumer '
+                  'protection rights available where you live.',
+            ),
+            _buildSection(
+              context,
+              '15. Contact',
+              'For questions about these Terms, email support@neetmitos.app or use '
+                  'Help & Support in the App. We do not ask for your password or any '
+                  'verification code by email.',
             ),
             const SizedBox(height: 24),
             Text(
