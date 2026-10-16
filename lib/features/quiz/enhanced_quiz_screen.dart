@@ -9,6 +9,7 @@ import '../../core/theme/tokens.dart';
 import 'package:confetti/confetti.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/answer_normalizer.dart';
 import 'quiz_header.dart';
 import 'question_card.dart';
 import 'quiz_footer.dart';
@@ -20,6 +21,8 @@ class EnhancedQuizScreen extends ConsumerStatefulWidget {
   final String subject;
   final String? testType;
   final int? timeLimitSeconds; // Total time limit (default: 60s per question)
+  final int marksPerCorrect;
+  final int marksPerWrong;
 
   const EnhancedQuizScreen({
     super.key,
@@ -29,6 +32,8 @@ class EnhancedQuizScreen extends ConsumerStatefulWidget {
     required this.subject,
     this.testType,
     this.timeLimitSeconds,
+    this.marksPerCorrect = 4,
+    this.marksPerWrong = -1,
   });
 
   @override
@@ -49,8 +54,22 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   bool _showPalette = false;
   bool _autoSubmitted = false;
 
+  /// Single source of truth for the quiz time limit.
+  ///
+  /// Previously the auto-submit path derived the limit from `widget.questions`
+  /// — which is null when the screen loads questions from a provider, falling
+  /// back to a hard-coded 600s — while the timer bar independently recomputed
+  /// `questions.length * 60`. The displayed clock and the enforced deadline
+  /// disagreed, so a 25-question quiz counted down from 25:00 but auto-submitted
+  /// at 10:00. Both now read this one value.
+  int? _loadedTimeLimitSeconds;
+
+  /// Set once a provider-backed load has resolved to an empty list, so the
+  /// screen can show an empty state instead of an indefinite spinner.
+  bool _loadResolvedEmpty = false;
+
   int get _timeLimitSeconds =>
-      widget.timeLimitSeconds ?? (widget.questions?.length ?? 10) * 60;
+      widget.timeLimitSeconds ?? _loadedTimeLimitSeconds ?? 600;
   int get _remainingSeconds =>
       (_timeLimitSeconds - _elapsedSeconds).clamp(0, _timeLimitSeconds);
   bool get _isTimeUp => _remainingSeconds <= 0 && _timeLimitSeconds > 0;
@@ -66,7 +85,8 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final sessionId = 'quiz_${DateTime.now().millisecondsSinceEpoch}';
-        if (widget.questions != null) {
+        if (widget.questions != null && widget.questions!.isNotEmpty) {
+          _loadedTimeLimitSeconds = widget.questions!.length * 60;
           ref
               .read(quizProvider.notifier)
               .initializeQuiz(
@@ -77,8 +97,18 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                 subject: widget.subject,
                 testType: widget.testType ?? 'topic',
               );
+        } else if (widget.questions != null) {
+          // Explicitly empty paper — resolve straight to the empty state rather
+          // than starting a quiz over an empty list.
+          _loadResolvedEmpty = true;
         } else if (widget.topicId.isNotEmpty) {
           _loadQuestionsFromProvider(sessionId: sessionId);
+        } else {
+          // No paper supplied AND no topic to load from. Previously no branch
+          // ran here, so `quizState.questions` stayed empty, the screen spun
+          // on "Loading...", and the 600s fallback still auto-submitted a
+          // 0-question attempt — the exact failure the flag exists to prevent.
+          _loadResolvedEmpty = true;
         }
       }
     });
@@ -86,26 +116,45 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   }
 
   Future<void> _loadQuestionsFromProvider({required String sessionId}) async {
-    final questions = await ref.read(
-      questionsForTopicProvider(widget.topicId).future,
-    );
-    if (mounted && questions.isNotEmpty) {
-      ref
-          .read(quizProvider.notifier)
-          .initializeQuiz(
-            questions,
-            sessionId: sessionId,
-            topicId: widget.topicId,
-            subject: widget.subject,
-            testType: widget.testType ?? 'topic',
+    final recommendations = ref.read(learningRecommendationsProvider);
+    final recommendation = recommendations
+        .where((item) => item.topicId == widget.topicId)
+        .firstOrNull;
+    final questions = recommendation == null
+        ? await ref.read(questionsForTopicProvider(widget.topicId).future)
+        : await ref.read(
+            adaptiveQuizQuestionsProvider(
+              AdaptiveQuizRequest.fromRecommendation(recommendation),
+            ).future,
           );
+    if (!mounted) return;
+    if (questions.isEmpty) {
+      // Stop the 1s stopwatch loop rather than spinning forever, and render an
+      // explicit empty state instead of an indefinite "Loading...".
+      setState(() => _loadResolvedEmpty = true);
+      return;
     }
+    setState(() => _loadedTimeLimitSeconds = questions.length * 60);
+    ref
+        .read(quizProvider.notifier)
+        .initializeQuiz(
+          questions,
+          sessionId: sessionId,
+          timeLimitSeconds: _timeLimitSeconds,
+          topicId: widget.topicId,
+          subject: widget.subject,
+          testType: widget.testType ?? 'topic',
+        );
   }
 
   void _startTimer() {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return false;
+      // Nothing to time if the topic resolved to zero questions; otherwise the
+      // loop kept running and auto-submitted an empty attempt at the 600s
+      // fallback limit.
+      if (_loadResolvedEmpty) return false;
       setState(() {
         _elapsedSeconds = _stopwatch.elapsed.inSeconds;
       });
@@ -216,15 +265,32 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     );
   }
 
-  void _navigateToResults() {
+  Future<void> _navigateToResults() async {
     final quizState = ref.read(quizProvider);
     final Map<String, int> subjectScores = {};
+    var correctCount = 0;
+    var incorrectCount = 0;
     for (int i = 0; i < quizState.questions.length; i++) {
       final q = quizState.questions[i];
       final answer = quizState.selectedAnswers[i];
-      if (answer == q.correctAnswer) {
+      // Prefer the verdict the notifier already recorded. `selectAnswer` stores
+      // an ML short-answer grade in `answerResults`, NOT in `selectedAnswers`,
+      // so re-deriving from the answer text threw the AI verdict away — and for
+      // a free-text card `AnswerNormalizer` can never resolve it, so anything
+      // the grader accepted was persisted as incorrect.
+      final recordedVerdict = quizState.answerResults[i];
+      final isCorrect =
+          recordedVerdict ??
+          (q.options.isEmpty
+              ? answer != null &&
+                    answer.trim().toLowerCase() ==
+                        q.correctAnswer.trim().toLowerCase()
+              : AnswerNormalizer.isCorrect(answer, q));
+      if (isCorrect) {
+        correctCount++;
         subjectScores[q.subject] = (subjectScores[q.subject] ?? 0) + 1;
-      } else {
+      } else if (answer != null && answer.trim().isNotEmpty) {
+        incorrectCount++;
         subjectScores[q.subject] = subjectScores[q.subject] ?? 0;
       }
     }
@@ -237,8 +303,8 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
           widget.testType ??
           (widget.topicId == 'mock_test' ? 'mock' : 'subject'),
       subjectScores: subjectScores,
-      score: quizState.score,
-      incorrectCount: quizState.incorrectCount,
+      score: correctCount,
+      incorrectCount: incorrectCount,
       totalQuestions: quizState.questions.length,
       timeSpentSeconds: _elapsedSeconds,
       attemptedAt: DateTime.now(),
@@ -248,7 +314,35 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
       ),
     );
 
-    ref.read(userProgressProvider.notifier).recordQuizAttempt(attempt);
+    // Persist with retry — a lost quiz attempt is a lost user session.
+    bool recorded = false;
+    for (int attemptNum = 1; attemptNum <= 3 && !recorded; attemptNum++) {
+      try {
+        await ref
+            .read(userProgressProvider.notifier)
+            .recordQuizAttempt(attempt);
+        recorded = true;
+      } catch (e) {
+        if (attemptNum == 3) {
+          debugPrint('Failed to record quiz attempt after 3 attempts: $e');
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to save quiz result after 3 attempts. '
+                'Your progress is saved locally and will retry on next launch.',
+              ),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+          return;
+        } else {
+          await Future.delayed(Duration(milliseconds: 100 * attemptNum));
+        }
+      }
+    }
+
     if (!mounted) return;
     context.go('/quiz/result', extra: attempt);
   }
@@ -257,6 +351,12 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     String studentAnswer,
     String correctAnswer,
   ) async {
+    // Capture the target index BEFORE the await. It used to be read from
+    // `currentIndex` after the ML call returned, so navigating during
+    // evaluation recorded this answer and its verdict against whichever
+    // question the user had since moved to.
+    final targetIndex = ref.read(quizProvider).currentIndex;
+
     setState(() {
       _isEvaluatingShortAnswer = true;
       _shortAnswerScore = null;
@@ -268,6 +368,19 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
           .read(mlServiceProvider)
           .evaluateShortAnswer(studentAnswer, correctAnswer);
       if (!mounted) return;
+      // Bail BEFORE the setState. The check used to sit below it, so navigating
+      // during the ML round-trip still painted question N's verdict onto
+      // question N+1 — only the write to the notifier was suppressed.
+      if (ref.read(quizProvider).currentIndex != targetIndex) {
+        // Drop the verdict for the question we navigated away from, and clear
+        // the spinner so it cannot stay stuck on the new one.
+        setState(() {
+          _isEvaluatingShortAnswer = false;
+          _shortAnswerScore = null;
+          _shortAnswerFeedback = null;
+        });
+        return;
+      }
       setState(() {
         _shortAnswerScore = score * 100;
         _isEvaluatingShortAnswer = false;
@@ -278,12 +391,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
       final isCorrect = _shortAnswerScore! >= 65;
       ref
           .read(quizProvider.notifier)
-          .selectAnswer(
-            ref.read(quizProvider).currentIndex,
-            studentAnswer,
-            0,
-            isCorrect: isCorrect,
-          );
+          .selectAnswer(targetIndex, studentAnswer, 0, isCorrect: isCorrect);
       if (isCorrect) _confettiController.play();
     } catch (e) {
       if (mounted) setState(() => _isEvaluatingShortAnswer = false);
@@ -295,6 +403,25 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     final quizState = ref.watch(quizProvider);
 
     if (quizState.questions.isEmpty) {
+      // A topic with no questions resolves to an empty list, so initializeQuiz
+      // is never called and the state stays empty forever. Previously this
+      // rendered a spinner indefinitely and then auto-submitted a 0-question
+      // attempt when the timer expired.
+      if (_loadResolvedEmpty) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('Quiz')),
+          body: const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Text(
+                'No questions available for this topic yet.\n\n'
+                'Sync more content or pick a different topic.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        );
+      }
       return Scaffold(
         appBar: AppBar(title: const Text('Loading...')),
         body: const Center(child: CircularProgressIndicator()),
@@ -354,7 +481,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                 // Timer bar with pulse when time is low
                 _QuizTimerBar(
                   elapsedSeconds: _elapsedSeconds,
-                  totalQuestions: quizState.questions.length,
+                  timeLimitSeconds: _timeLimitSeconds,
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -367,6 +494,8 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                     QuizScoreIndicator(
                       selectedAnswer: selectedAnswer,
                       correctAnswer: currentQuestion.correctAnswer,
+                      marksPerCorrect: widget.marksPerCorrect,
+                      marksPerWrong: widget.marksPerWrong,
                     ),
                   ],
                 ),
@@ -674,15 +803,20 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
 /// Timer bar that fills based on elapsed time and pulses red when < 30s remain.
 class _QuizTimerBar extends StatelessWidget {
   final int elapsedSeconds;
-  final int totalQuestions;
+  final int timeLimitSeconds;
 
-  const _QuizTimerBar({required this.elapsedSeconds, this.totalQuestions = 10});
+  const _QuizTimerBar({
+    required this.elapsedSeconds,
+    required this.timeLimitSeconds,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final timeLimit = totalQuestions * 60; // 1 min per question default
+    // Supplied by the caller so the bar and the auto-submit deadline can never
+    // disagree. Guarded against 0 to keep the fraction finite.
+    final timeLimit = timeLimitSeconds > 0 ? timeLimitSeconds : 1;
     final remaining = (timeLimit - elapsedSeconds).clamp(0, timeLimit);
-    final fraction = elapsedSeconds / timeLimit;
+    final fraction = (elapsedSeconds / timeLimit).clamp(0.0, 1.0);
     final isLow = remaining < 30;
     final color = isLow ? AppColors.error : SubjectColors.physics;
 
