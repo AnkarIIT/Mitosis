@@ -1,20 +1,27 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/question_model.dart';
 import 'exam_engine_service.dart';
 
 /// A snapshot of an in-progress CBT attempt, enough to restore the *exact*
 /// same paper and remaining time after the app is killed or backgrounded.
 ///
-/// The allocated question IDs are stored (not a re-run of the randomised
-/// allocator) so resume reconstructs the identical question set. The timer is
-/// stored as an absolute wall-clock deadline (epoch ms), so remaining time is
-/// always `deadline - now` regardless of how long the app was gone.
+/// Full question snapshots are stored (not just IDs) so resume works even if
+/// the question pool changes between sessions. The timer is stored as an
+/// absolute wall-clock deadline (epoch ms), so remaining time is always
+/// `deadline - now` regardless of how long the app was gone.
 class ExamCheckpoint {
   final String attemptId;
   final Map<String, dynamic> configJson;
   final List<List<String>> sectionQuestionIds;
+
+  /// Full question snapshots per section. Stored so resume works even if the
+  /// question pool changes (questions updated/deleted) between sessions.
+  final List<List<Question>> sectionQuestions;
+
   final Map<int, String?> answersByIndex;
   final List<int> flagged;
   final List<int> visited;
@@ -43,6 +50,7 @@ class ExamCheckpoint {
     required this.attemptId,
     required this.configJson,
     required this.sectionQuestionIds,
+    required this.sectionQuestions,
     required this.answersByIndex,
     required this.flagged,
     required this.visited,
@@ -60,7 +68,7 @@ class ExamCheckpoint {
   });
 
   /// Current checkpoint schema version.
-  static const int kCurrentCheckpointVersion = 2;
+  static const int kCurrentCheckpointVersion = 3;
 
   /// The oldest checkpoint version this build can still read. Anything older
   /// is treated as incompatible and discarded by the service's `read()`.
@@ -78,6 +86,10 @@ class ExamCheckpoint {
     'attemptId': attemptId,
     'config': configJson,
     'sectionQuestionIds': sectionQuestionIds,
+    'sectionQuestions': [
+      for (final section in sectionQuestions)
+        [for (final q in section) q.toJson()],
+    ],
     'answers': answersByIndex.map((k, v) => MapEntry(k.toString(), v)),
     'flagged': flagged,
     'visited': visited,
@@ -96,47 +108,104 @@ class ExamCheckpoint {
     'version': version,
   };
 
-  factory ExamCheckpoint.fromJson(Map<String, dynamic> json) => ExamCheckpoint(
-    attemptId: json['attemptId'] as String,
-    configJson: (json['config'] as Map).cast<String, dynamic>(),
-    sectionQuestionIds: (json['sectionQuestionIds'] as List)
-        .map((s) => (s as List).map((e) => e as String).toList())
-        .toList(),
-    answersByIndex: (json['answers'] as Map).map(
-      (k, v) => MapEntry(int.parse(k as String), v as String?),
-    ),
-    flagged: (json['flagged'] as List).map((e) => (e as num).toInt()).toList(),
-    visited: (json['visited'] as List).map((e) => (e as num).toInt()).toList(),
-    currentIndex: (json['currentIndex'] as num).toInt(),
-    currentSection: (json['currentSection'] as num).toInt(),
-    phase: json['phase'] as String,
-    deadlineEpochMs: (json['deadlineEpochMs'] as num).toInt(),
-    breakDeadlineEpochMs: (json['breakDeadlineEpochMs'] as num?)?.toInt(),
-    sectionDeadlineEpochMs: (json['sectionDeadlineEpochMs'] as num?)?.toInt(),
-    startedAtEpochMs: (json['startedAtEpochMs'] as num).toInt(),
-    savedAtEpochMs: (json['savedAtEpochMs'] as num).toInt(),
-    violations: (json['violations'] as num?)?.toInt() ?? 0,
-    secondsPerQuestion:
-        (json['secondsPerQuestion'] as Map?)?.map(
-          (k, v) => MapEntry(int.parse(k as String), (v as num).toInt()),
-        ) ??
-        {},
-    // Checkpoints saved before the `version` field existed default to v1.
-    version: (json['version'] as num?)?.toInt() ?? 1,
-  );
+  factory ExamCheckpoint.fromJson(Map<String, dynamic> json) {
+    // Parse section questions if present (v3+), otherwise fall back to IDs only.
+    final sectionQuestionsJson = json['sectionQuestions'] as List?;
+    final sectionQuestions = sectionQuestionsJson != null
+        ? sectionQuestionsJson
+              .map(
+                (section) => (section as List)
+                    .map(
+                      (q) =>
+                          Question.fromJson((q as Map).cast<String, dynamic>()),
+                    )
+                    .toList(),
+              )
+              .toList()
+        : const <List<Question>>[];
+
+    return ExamCheckpoint(
+      attemptId: json['attemptId'] as String,
+      configJson: (json['config'] as Map).cast<String, dynamic>(),
+      sectionQuestionIds: (json['sectionQuestionIds'] as List)
+          .map((s) => (s as List).map((e) => e as String).toList())
+          .toList(),
+      sectionQuestions: sectionQuestions,
+      answersByIndex: (json['answers'] as Map).map(
+        (k, v) => MapEntry(int.parse(k as String), v as String?),
+      ),
+      flagged: (json['flagged'] as List)
+          .map((e) => (e as num).toInt())
+          .toList(),
+      visited: (json['visited'] as List)
+          .map((e) => (e as num).toInt())
+          .toList(),
+      currentIndex: (json['currentIndex'] as num).toInt(),
+      currentSection: (json['currentSection'] as num).toInt(),
+      phase: json['phase'] as String,
+      deadlineEpochMs: (json['deadlineEpochMs'] as num).toInt(),
+      breakDeadlineEpochMs: (json['breakDeadlineEpochMs'] as num?)?.toInt(),
+      sectionDeadlineEpochMs: (json['sectionDeadlineEpochMs'] as num?)?.toInt(),
+      startedAtEpochMs: (json['startedAtEpochMs'] as num).toInt(),
+      savedAtEpochMs: (json['savedAtEpochMs'] as num).toInt(),
+      violations: (json['violations'] as num?)?.toInt() ?? 0,
+      secondsPerQuestion:
+          (json['secondsPerQuestion'] as Map?)?.map(
+            (k, v) => MapEntry(int.parse(k as String), (v as num).toInt()),
+          ) ??
+          {},
+      // Checkpoints saved before the `version` field existed default to v1.
+      version: (json['version'] as num?)?.toInt() ?? 1,
+    );
+  }
 }
 
 /// Persists the single active CBT checkpoint to [SharedPreferences].
 ///
-/// Only one live mock at a time, so a single key is used. Chosen over a Drift
-/// table: it's a transient blob, needs no migration, and mirrors how the
+/// Only one live mock *per user* at a time, so the key is suffixed with the
+/// owner id. A single global key meant one user's in-progress mock stayed
+/// visible to the next person to sign in on the same device. Chosen over a
+/// Drift table: it's a transient blob, needs no migration, and mirrors how the
 /// onboarding flags are already stored.
 class ExamCheckpointService {
-  static const String _key = 'cbt_active_checkpoint';
+  static const String _keyPrefix = 'cbt_active_checkpoint';
 
-  Future<void> save(ExamCheckpoint checkpoint) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_key, jsonEncode(checkpoint.toJson()));
+  /// Owner of the checkpoint. Guest is `-1`, matching `guestOwnerId`.
+  final int userId;
+
+  ExamCheckpointService({this.userId = -1});
+
+  String get _key => '$_keyPrefix-$userId';
+
+  /// Maximum number of save attempts before giving up.
+  static const int _maxSaveAttempts = 3;
+
+  /// Delay between save retries.
+  static const Duration _retryDelay = Duration(milliseconds: 100);
+
+  /// Saves the checkpoint with retry logic. Returns true if the save succeeded.
+  ///
+  /// Retries up to [_maxSaveAttempts] times with a [_retryDelay] between
+  /// attempts. This ensures that transient SharedPreferences failures don't
+  /// silently lose exam progress.
+  Future<bool> save(ExamCheckpoint checkpoint) async {
+    final json = jsonEncode(checkpoint.toJson());
+    for (int attempt = 1; attempt <= _maxSaveAttempts; attempt++) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_key, json);
+        return true;
+      } catch (e) {
+        if (attempt == _maxSaveAttempts) {
+          debugPrint(
+            'CBT checkpoint save failed after $_maxSaveAttempts attempts: $e',
+          );
+          return false;
+        }
+        await Future.delayed(_retryDelay);
+      }
+    }
+    return false;
   }
 
   Future<ExamCheckpoint?> read() async {
