@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:neet_mitos/core/models/question_model.dart';
 import 'package:neet_mitos/core/services/exam_checkpoint_service.dart';
 import 'package:neet_mitos/core/services/exam_engine_service.dart';
 
@@ -14,7 +15,54 @@ ExamCheckpoint _sample({int? deadlineEpochMs}) {
       [],
       [],
     ],
-    answersByIndex: const {0: 'Option A', 1: null, 2: 'Option C'},
+    sectionQuestions: [
+      [
+        Question(
+          id: '1',
+          subject: 'Physics',
+          chapter: 'Mechanics',
+          topic: 'Newton\'s Laws',
+          topicId: 'phy_01',
+          questionText: 'What is Newton\'s first law?',
+          options: ['Inertia', 'F=ma', 'Action-Reaction', 'Gravity'],
+          correctAnswer: 'Inertia',
+          difficulty: 'Easy',
+          tags: ['physics', 'mechanics'],
+          type: 'mcq',
+        ),
+        Question(
+          id: '2',
+          subject: 'Physics',
+          chapter: 'Mechanics',
+          topic: 'Friction',
+          topicId: 'phy_02',
+          questionText: 'Friction opposes:',
+          options: ['Motion', 'Force', 'Gravity', 'Mass'],
+          correctAnswer: 'Motion',
+          difficulty: 'Easy',
+          tags: ['physics', 'mechanics'],
+          type: 'mcq',
+        ),
+      ],
+      [
+        Question(
+          id: '3',
+          subject: 'Chemistry',
+          chapter: 'Organic',
+          topic: 'Alkanes',
+          topicId: 'chem_01',
+          questionText: 'Methane formula?',
+          options: ['CH4', 'C2H6', 'C3H8', 'CO2'],
+          correctAnswer: 'CH4',
+          difficulty: 'Easy',
+          tags: ['chemistry', 'organic'],
+          type: 'mcq',
+        ),
+      ],
+      [],
+      [],
+    ],
+    answersByIndex: const {0: 'Inertia', 1: null, 2: 'CH4'},
     flagged: const [1],
     visited: const [0, 1, 2],
     currentIndex: 2,
@@ -88,6 +136,23 @@ void main() {
         sectionQuestionIds: const [
           ['1'],
         ],
+        sectionQuestions: [
+          [
+            Question(
+              id: '1',
+              subject: 'Physics',
+              chapter: 'Ch1',
+              topic: 'T1',
+              topicId: 't1',
+              questionText: 'Q1?',
+              options: ['A', 'B'],
+              correctAnswer: 'A',
+              difficulty: 'Easy',
+              tags: ['test'],
+              type: 'mcq',
+            ),
+          ],
+        ],
         answersByIndex: const {},
         flagged: const [],
         visited: const [0],
@@ -118,6 +183,23 @@ void main() {
         sectionQuestionIds: const [
           ['1'],
         ],
+        sectionQuestions: [
+          [
+            Question(
+              id: '1',
+              subject: 'Physics',
+              chapter: 'Ch1',
+              topic: 'T1',
+              topicId: 't1',
+              questionText: 'Q1?',
+              options: ['A', 'B'],
+              correctAnswer: 'A',
+              difficulty: 'Easy',
+              tags: ['test'],
+              type: 'mcq',
+            ),
+          ],
+        ],
         answersByIndex: const {},
         flagged: const [],
         visited: const [0],
@@ -133,6 +215,60 @@ void main() {
         jsonDecode(jsonEncode(cp.toJson())) as Map<String, dynamic>,
       );
       expect(restored.violations, 3);
+    });
+
+    test('question snapshots survive a JSON round-trip', () {
+      final cp = _sample();
+      final restored = ExamCheckpoint.fromJson(
+        jsonDecode(jsonEncode(cp.toJson())) as Map<String, dynamic>,
+      );
+
+      expect(restored.sectionQuestions.length, 4);
+      expect(restored.sectionQuestions[0].length, 2);
+      expect(restored.sectionQuestions[0][0].id, '1');
+      expect(
+        restored.sectionQuestions[0][0].questionText,
+        'What is Newton\'s first law?',
+      );
+      expect(restored.sectionQuestions[0][0].options.length, 4);
+      expect(restored.sectionQuestions[0][0].correctAnswer, 'Inertia');
+      expect(restored.sectionQuestions[1][0].id, '3');
+      expect(restored.sectionQuestions[1][0].subject, 'Chemistry');
+    });
+
+    test('v1/v2 checkpoints without snapshots still parse', () {
+      // Simulate an old checkpoint without sectionQuestions field.
+      final oldJson = {
+        'attemptId': 'old-attempt',
+        'config': ExamConfig.neet().toJson(),
+        'sectionQuestionIds': [
+          ['1', '2'],
+          ['3'],
+          [],
+          [],
+        ],
+        'answers': {'0': 'Inertia', '1': null, '2': 'CH4'},
+        'flagged': [1],
+        'visited': [0, 1, 2],
+        'currentIndex': 2,
+        'currentSection': 1,
+        'phase': 'taking',
+        'deadlineEpochMs': 1893499200000,
+        'startedAtEpochMs': 1893495600000,
+        'savedAtEpochMs': 1893495700000,
+        'version': 2,
+      };
+
+      final restored = ExamCheckpoint.fromJson(oldJson);
+      expect(restored.attemptId, 'old-attempt');
+      expect(restored.sectionQuestions, isEmpty);
+      expect(restored.sectionQuestionIds.length, 4);
+      expect(restored.answersByIndex[0], 'Inertia');
+    });
+
+    test('checkpoint version is 3', () {
+      final cp = _sample();
+      expect(cp.version, 3);
     });
   });
 }
