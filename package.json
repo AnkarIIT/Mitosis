@@ -27,6 +27,10 @@
   ],
   "author": "Ankar IIT",
   "license": "ISC",
+  "dependencies": {
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.112.4"
+  },
   "bugs": {
     "url": "https://github.com/AnkarIIT/Mitosis/issues"
   },
