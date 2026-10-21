@@ -39,6 +39,15 @@ migrate_working_dir/
 node_modules/
 npm-debug.log*
 
+# Deno
+# The edge functions in supabase/functions/ import 'npm:@supabase/supabase-js@2'.
+# Deno resolves npm: specifiers through the root package.json + node_modules,
+# which npm populates from package-lock.json. deno.lock is a competing lockfile
+# for the same dependency (it pins 2.118.0 while package-lock.json pins
+# 2.112.4) and the two fight over node_modules, so npm stays the single source
+# of truth. This repo has no deno.json and does not configure Deno as a project.
+deno.lock
+
 # Agent scratch directories.
 # .manus/ was committed and contained scraped snapshots of an AUTHENTICATED
 # Google Cloud Console session — including a captured titusXsrfToken — plus the
