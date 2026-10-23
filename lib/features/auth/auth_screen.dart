@@ -401,6 +401,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: Image.asset(
+                                      'assets/images/mitos-app-icon-1024.png',
+                                      width: 52,
+                                      height: 52,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
                                   const Text(
                                     'NEET Mitos',
                                     style: TextStyle(
@@ -412,7 +422,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    'Prepare smarter. Score higher.',
+                                    'A calmer way to prepare for NEET.',
                                     style: TextStyle(
                                       color: Colors.white.withValues(
                                         alpha: 0.78,
