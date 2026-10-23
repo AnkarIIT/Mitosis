@@ -1,4 +1,3 @@
-/// Chapter summary quiz screen - end-of-chapter quiz with 5-10 MCQs.
 library chapter_quiz_screen;
 
 import 'package:flutter/material.dart';
