@@ -10,7 +10,7 @@ import '../../core/theme/tokens.dart';
 
 /// Modern, student-focused home screen with quick actions and progress tracking
 class ModernHomeScreen extends ConsumerStatefulWidget {
-  const ModernHomeScreen({Key? key}) : super(key: key);
+  const ModernHomeScreen({super.key});
 
   @override
   ConsumerState<ModernHomeScreen> createState() => _ModernHomeScreenState();
@@ -22,7 +22,7 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -336,9 +336,9 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Center(
         child: Text(
