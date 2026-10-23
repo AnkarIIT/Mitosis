@@ -1,4 +1,3 @@
-/// Lesson screen - displays lesson content with PDF link, worked example, misconception, and quick checks.
 library lesson_screen;
 
 import 'package:flutter/material.dart';
