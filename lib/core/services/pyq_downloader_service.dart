@@ -362,15 +362,20 @@ class PyqDownloaderService {
 
   String _inferChapter(String text, String subject) {
     final lower = text.toLowerCase();
-    if (lower.contains('cell division') || lower.contains('mitosis'))
+    if (lower.contains('cell division') || lower.contains('mitosis')) {
       return 'Cell Biology';
+    }
     if (lower.contains('genetics') ||
         lower.contains('dna') ||
-        lower.contains('rna'))
+        lower.contains('rna')) {
       return 'Genetics';
-    if (lower.contains('chemical bonding')) return 'Chemical Bonding';
-    if (lower.contains('atom') || lower.contains('structure'))
+    }
+    if (lower.contains('chemical bonding')) {
+      return 'Chemical Bonding';
+    }
+    if (lower.contains('atom') || lower.contains('structure')) {
       return 'Atomic Structure';
+    }
     return 'General';
   }
 
