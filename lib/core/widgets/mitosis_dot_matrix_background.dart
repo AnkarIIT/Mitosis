@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 /// Lightweight, procedurally painted dot field for the NEET Mitos sign-in hero.
 /// The slow shimmer pauses when the device requests reduced motion.
 class MitosisDotMatrixBackground extends StatefulWidget {
@@ -54,7 +56,11 @@ class _MitosisDotMatrixBackgroundState extends State<MitosisDotMatrixBackground>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF061619), Color(0xFF0B282B), Color(0xFF0A2023)],
+            colors: [
+              AppColors.backgroundDark,
+              AppColors.brandNavy,
+              Color(0xFF071C37),
+            ],
           ),
         ),
         child: RepaintBoundary(
@@ -74,20 +80,7 @@ class _DotMatrixPainter extends CustomPainter {
 
   final Animation<double> animation;
 
-  static const _mint = Color(0xFF69E2C5);
-  static const _gold = Color(0xFFFFD78A);
-  static const _mark = <Offset>[
-    Offset(0.34, 0.70),
-    Offset(0.43, 0.38),
-    Offset(0.50, 0.66),
-    Offset(0.58, 0.34),
-    Offset(0.68, 0.70),
-  ];
-  static const _sparkPoints = <Offset>[
-    Offset(0.18, 0.31),
-    Offset(0.79, 0.61),
-    Offset(0.82, 0.27),
-  ];
+  static const _teal = AppColors.brandTeal;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -109,73 +102,15 @@ class _DotMatrixPainter extends CustomPainter {
         final verticalFade = (1 - normalized.dy * 0.46).clamp(0.42, 1.0);
         final baseAlpha = (0.07 + wave * 0.15) * horizontalFade * verticalFade;
 
-        var markStrength = 0.0;
-        for (var index = 0; index < _mark.length - 1; index++) {
-          final distance = _distanceToSegment(
-            normalized,
-            _mark[index],
-            _mark[index + 1],
-          );
-          markStrength = math
-              .max(markStrength, 1 - distance / 0.028)
-              .toDouble();
-        }
-        markStrength = markStrength.clamp(0.0, 1.0).toDouble();
-
-        var sparkleStrength = 0.0;
-        for (final spark in _sparkPoints) {
-          final distance = (normalized - spark).distance;
-          sparkleStrength = math
-              .max(sparkleStrength, 1 - distance / 0.023)
-              .toDouble();
-        }
-        sparkleStrength = sparkleStrength.clamp(0.0, 1.0).toDouble();
-
-        final alpha = (baseAlpha + markStrength * (0.48 + wave * 0.28))
-            .clamp(0.035, 0.95)
-            .toDouble();
-        final radius = step * (0.075 + wave * 0.025 + markStrength * 0.07);
-        if (markStrength > 0.58) {
-          canvas.drawCircle(
-            point,
-            radius * 2.7,
-            Paint()
-              ..color = _mint.withValues(alpha: markStrength * 0.18)
-              ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
-          );
-        }
+        final alpha = baseAlpha.clamp(0.035, 0.24).toDouble();
+        final radius = step * (0.075 + wave * 0.025);
         canvas.drawCircle(
           point,
           radius,
-          Paint()..color = _mint.withValues(alpha: alpha),
+          Paint()..color = _teal.withValues(alpha: alpha),
         );
-        if (sparkleStrength > 0.58) {
-          canvas.drawCircle(
-            point,
-            step * 0.42,
-            Paint()
-              ..color = _gold.withValues(alpha: sparkleStrength * 0.22)
-              ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
-          );
-          canvas.drawCircle(
-            point,
-            step * (0.09 + sparkleStrength * 0.055),
-            Paint()..color = _gold.withValues(alpha: sparkleStrength),
-          );
-        }
       }
     }
-  }
-
-  double _distanceToSegment(Offset point, Offset start, Offset end) {
-    final segment = end - start;
-    final relative = point - start;
-    final lengthSquared = segment.dx * segment.dx + segment.dy * segment.dy;
-    final projection =
-        ((relative.dx * segment.dx + relative.dy * segment.dy) / lengthSquared)
-            .clamp(0.0, 1.0)
-            .toDouble();
-    return (point - (start + segment * projection)).distance;
   }
 
   @override
