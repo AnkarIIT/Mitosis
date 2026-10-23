@@ -26,25 +26,25 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      title: 'Master NEET Concepts',
+      title: 'Study with a clear plan',
       description:
-          'Comprehensive coverage of Biology, Chemistry, and Physics based strictly on NCERT.',
-      icon: Icons.auto_stories,
+          'Keep Biology, Chemistry, and Physics moving with a daily goal that fits your routine.',
+      icon: Icons.track_changes_rounded,
       color: AppColors.primary,
     ),
     OnboardingPage(
-      title: 'AI-Powered Doubt Solving',
+      title: 'Practice at your pace',
       description:
-          'Stuck on a question? Take a photo or type it in, and our AI Tutor will guide you to the answer.',
-      icon: Icons.psychology_rounded,
-      color: AppColors.primary,
+          'Build confidence with quizzes, daily practice papers, and previous year questions—even offline.',
+      icon: Icons.edit_note_rounded,
+      color: AppColors.brandTeal,
     ),
     OnboardingPage(
-      title: 'Track Your Progress',
+      title: 'Build steady progress',
       description:
-          'Identify your weak spots with smart analytics and focus on what matters most.',
-      icon: Icons.analytics_rounded,
-      color: AppColors.primary,
+          'Practice, review missed questions, and see where your study time is going.',
+      icon: Icons.show_chart_rounded,
+      color: AppColors.brandTeal,
     ),
   ];
 
