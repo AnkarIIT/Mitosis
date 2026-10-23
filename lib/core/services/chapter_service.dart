@@ -1,4 +1,3 @@
-/// Service for loading chapters and managing chapter progress.
 library chapter_service;
 
 import '../models/chapter_model.dart';
