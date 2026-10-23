@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
-import '../../core/widgets/modern_sidebar.dart';
 import '../../core/widgets/offline_banner.dart';
-import '../../core/providers/ui_providers.dart';
 
 class HomeShellScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -15,40 +13,93 @@ class HomeShellScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sidebarVisible = ref.watch(sidebarVisibilityProvider);
-    final isDesktop = MediaQuery.of(context).size.width >= 600;
+    final isWide = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
       backgroundColor: AdaptiveColors.background(context),
-      body: Stack(
+      body: Row(
         children: [
-          Column(
-            children: [
-              const OfflineBanner(),
-              Expanded(child: navigationShell),
-            ],
-          ),
-          if (isDesktop && sidebarVisible)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: ModernSidebar(
-                isVisible: sidebarVisible,
-                onToggle: () =>
-                    ref.read(sidebarVisibilityProvider.notifier).state = false,
-              ),
+          if (isWide)
+            _AppNavigationRail(
+              currentIndex: navigationShell.currentIndex,
+              onTap: (index) => _selectBranch(index),
             ),
+          Expanded(
+            child: Column(
+              children: [
+                const OfflineBanner(),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 960),
+                      child: navigationShell,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
-      bottomNavigationBar: _ModernBottomNavigation(
-        currentIndex: navigationShell.currentIndex,
-        onTap: (index) {
-          navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          );
-        },
+      bottomNavigationBar: isWide
+          ? null
+          : _ModernBottomNavigation(
+              currentIndex: navigationShell.currentIndex,
+              onTap: _selectBranch,
+            ),
+    );
+  }
+
+  void _selectBranch(int index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
+}
+
+class _AppNavigationRail extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const _AppNavigationRail({required this.currentIndex, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return NavigationRail(
+      backgroundColor: AdaptiveColors.cardBackground(context),
+      selectedIndex: currentIndex,
+      onDestinationSelected: onTap,
+      labelType: NavigationRailLabelType.all,
+      groupAlignment: -0.65,
+      leading: Padding(
+        padding: const EdgeInsets.only(bottom: 28, top: 12),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(
+            'assets/images/mitos-app-icon-1024.png',
+            width: 44,
+            height: 44,
+          ),
+        ),
       ),
+      destinations: const [
+        NavigationRailDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: Text('Today'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.menu_book_outlined),
+          selectedIcon: Icon(Icons.menu_book_rounded),
+          label: Text('Study'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.person_outline_rounded),
+          selectedIcon: Icon(Icons.person_rounded),
+          label: Text('You'),
+        ),
+      ],
     );
   }
 }
@@ -117,24 +168,14 @@ class _ModernBottomNavigation extends StatelessWidget {
                 label: 'Today',
               ),
               NavigationDestination(
-                icon: Icon(Icons.school_outlined),
-                selectedIcon: Icon(Icons.school_rounded),
-                label: 'Learn',
+                icon: Icon(Icons.menu_book_outlined),
+                selectedIcon: Icon(Icons.menu_book_rounded),
+                label: 'Study',
               ),
               NavigationDestination(
-                icon: Icon(Icons.edit_note_outlined),
-                selectedIcon: Icon(Icons.edit_note_rounded),
-                label: 'Practice',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.replay_outlined),
-                selectedIcon: Icon(Icons.replay_rounded),
-                label: 'Review',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.insights_outlined),
-                selectedIcon: Icon(Icons.insights_rounded),
-                label: 'Progress',
+                icon: Icon(Icons.person_outline_rounded),
+                selectedIcon: Icon(Icons.person_rounded),
+                label: 'You',
               ),
             ],
           ),
