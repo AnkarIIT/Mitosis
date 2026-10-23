@@ -645,12 +645,14 @@ class ExamEngineService {
     if (config.sections.length != 8) return false;
     // Sections 0-3 should be A (graded == presented), 4-7 should be B (graded < presented)
     for (int i = 0; i < 4; i++) {
-      if (config.sections[i].gradedCount != config.sections[i].presentedCount)
+      if (config.sections[i].gradedCount != config.sections[i].presentedCount) {
         return false;
+      }
     }
     for (int i = 4; i < 8; i++) {
-      if (config.sections[i].gradedCount >= config.sections[i].presentedCount)
+      if (config.sections[i].gradedCount >= config.sections[i].presentedCount) {
         return false;
+      }
     }
     return true;
   }
