@@ -1,7 +1,3 @@
-/// Chapter and lesson data models for structured learning.
-///
-/// A chapter contains multiple lessons in sequence. Each lesson has
-/// original prose, worked examples, misconceptions, and NCERT references.
 library chapter_model;
 
 /// A single lesson within a chapter.
