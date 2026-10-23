@@ -65,10 +65,12 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   drift_dev: 2.34.0
   build_runner: ^2.15.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/mitos-app-icon-1024.png
     - assets/ml/
     - assets/ncert_books/biology/Biology_Class_11/
     - assets/ncert_books/biology/Biology_Class_12/
@@ -107,3 +109,22 @@ flutter:
           weight: 600
         - asset: assets/fonts/Poppins-Bold.ttf
           weight: 700
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/mitos-app-icon-1024.png"
+  adaptive_icon_background: "#0A2344"
+  adaptive_icon_foreground: "assets/images/mitos-app-icon-1024.png"
+  remove_alpha_ios: true
+  background_color_ios: "#0A2344"
+  web:
+    generate: true
+    background_color: "#0A2344"
+    theme_color: "#0A2344"
+  windows:
+    generate: true
+    icon_path: "assets/images/mitos-app-icon-1024.png"
+  macos:
+    generate: true
+    icon_path: "assets/images/mitos-app-icon-1024.png"
