@@ -1,6 +1,3 @@
-/// Service to check question inventory availability per subject.
-///
-/// Used to gate full-length mocks and show readiness on home screen.
 library question_inventory_service;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
