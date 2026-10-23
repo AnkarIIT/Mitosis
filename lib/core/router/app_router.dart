@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/providers.dart';
-import '../theme/app_colors.dart';
 import '../../features/auth/auth_screen.dart';
 
 import '../../features/auth/terms_screen.dart';
@@ -12,11 +11,10 @@ import '../../features/auth/help_support_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/home/home_shell_screen.dart';
 import '../../features/home/home_content/home_tab.dart';
-import '../../features/home/home_content/learn_hub_screen.dart';
-import '../../features/home/home_content/practice_hub_screen.dart';
-import '../../features/home/home_content/review_tab.dart';
-import '../../features/home/home_content/progress_tab.dart';
+import '../../features/home/home_content/study_hub_screen.dart';
+import '../../features/home/home_content/you_hub_screen.dart';
 import '../../features/home/home_content/profile_tab.dart';
+import '../../features/home/home_content/progress_tab.dart';
 import '../../features/topic_browser/topic_browser_screen.dart';
 import '../../features/topic_browser/topic_detail_screen.dart';
 import '../../features/quiz/enhanced_quiz_screen.dart';
@@ -105,17 +103,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.school_rounded,
-                    size: 40,
-                    color: Colors.white,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    'assets/images/mitos-app-icon-1024.png',
+                    width: 72,
+                    height: 72,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -146,48 +140,37 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => HomeShellScreen(navigationShell: shell),
         branches: [
-          // Today · Learn · Practice · Review · Progress. Profile lives
-          // outside the tabs (avatar/settings entry point).
+          // Today · Study · You. Secondary tools are grouped within the hubs.
           StatefulShellBranch(
             routes: [GoRoute(path: '/', builder: (_, _) => const HomeTab())],
           ),
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/learn',
-                builder: (_, _) => const LearnHubScreen(),
+                path: '/study',
+                builder: (_, state) => StudyHubScreen(
+                  initialSection: state.uri.queryParameters['section'],
+                ),
               ),
             ],
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/practice',
-                builder: (_, _) => const PracticeHubScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(path: '/review', builder: (_, _) => const ReviewTab()),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/progress',
-                builder: (_, _) => const ProgressTab(),
-              ),
+              GoRoute(path: '/you', builder: (_, _) => const YouHubScreen()),
             ],
           ),
         ],
       ),
-      // Reachable from Learn hub / deep links (not a bottom tab).
+      GoRoute(path: '/learn', redirect: (_, _) => '/study?section=learn'),
+      GoRoute(path: '/practice', redirect: (_, _) => '/study?section=practice'),
+      GoRoute(path: '/review', redirect: (_, _) => '/study?section=review'),
+      GoRoute(path: '/progress', builder: (_, _) => const ProgressTab()),
+      // Secondary study tools remain deep-linkable outside the primary shell.
       GoRoute(
         path: '/flashcards',
         builder: (_, _) => const FlashcardDashboardScreen(),
       ),
-      // Profile is reachable via the Today header avatar and settings.
+      // Detailed profile is reachable from the You destination.
       GoRoute(path: '/profile', builder: (_, _) => const ProfileTab()),
 
       GoRoute(
