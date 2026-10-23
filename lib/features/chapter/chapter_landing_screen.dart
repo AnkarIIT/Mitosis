@@ -1,4 +1,3 @@
-/// Chapter landing screen - shows learning outcomes, lessons, and progress.
 library chapter_landing_screen;
 
 import 'package:flutter/material.dart';
