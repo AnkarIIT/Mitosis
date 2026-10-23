@@ -10,7 +10,7 @@ import '../../core/providers/providers.dart';
 /// Unified Test Module - Consolidates all exam-related features
 /// Under ONE category: "TEST"
 class TestModuleScreen extends ConsumerStatefulWidget {
-  const TestModuleScreen({Key? key}) : super(key: key);
+  const TestModuleScreen({super.key});
 
   @override
   ConsumerState<TestModuleScreen> createState() => _TestModuleScreenState();
@@ -177,12 +177,11 @@ class _PracticeCard extends StatelessWidget {
   final String description;
 
   const _PracticeCard({
-    Key? key,
     required this.context,
     required this.icon,
     required this.title,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +192,7 @@ class _PracticeCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
           child: Icon(icon, color: theme.colorScheme.primary),
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
