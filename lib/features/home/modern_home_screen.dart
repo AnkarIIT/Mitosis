@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import './widgets/student_stats_card.dart';
 import './widgets/quick_action_button.dart';
 import './widgets/topic_progress_bar.dart';
+import '../../core/constants/feature_flags.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/tokens.dart';
@@ -93,12 +94,13 @@ class _ModernHomeScreenState extends ConsumerState<ModernHomeScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        QuickActionButton(
-                          icon: Icons.book,
-                          label: 'PYQ Downloads',
-                          color: AdaptiveColors.primary(context),
-                          onTap: () => Navigator.pushNamed(context, '/pyq'),
-                        ),
+                        if (FeatureFlags.pyqDownloads)
+                          QuickActionButton(
+                            icon: Icons.book,
+                            label: 'PYQ Downloads',
+                            color: AdaptiveColors.primary(context),
+                            onTap: () => Navigator.pushNamed(context, '/pyq'),
+                          ),
                         QuickActionButton(
                           icon: Icons.smart_toy,
                           label: 'AI Tutor',
