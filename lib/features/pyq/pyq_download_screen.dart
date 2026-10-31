@@ -59,16 +59,9 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withValues(alpha: 0.1),
-            theme.colorScheme.primary.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +96,7 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                     Text(
                       'Download and practice from 19 years of NEET question papers (2006-2024)',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -136,7 +129,9 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.8),
           ),
         ),
       ],
@@ -196,7 +191,9 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+            side: BorderSide(
+              color: theme.colorScheme.outline.withValues(alpha: 0.2),
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -217,7 +214,9 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                         border: Border.all(
                           color: isDownloaded
                               ? AppColors.success.withValues(alpha: 0.3)
-                              : theme.colorScheme.primary.withValues(alpha: 0.3),
+                              : theme.colorScheme.primary.withValues(
+                                  alpha: 0.3,
+                                ),
                         ),
                       ),
                       child: Center(
@@ -248,7 +247,9 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                           Text(
                             _getYearDescription(year),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
                             ),
                           ),
                         ],
@@ -315,7 +316,9 @@ class _PyqDownloadScreenState extends ConsumerState<PyqDownloadScreen> {
                       const SizedBox(height: 8),
                       LinearProgressIndicator(
                         value: progress,
-                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        backgroundColor: theme.colorScheme.primary.withValues(
+                          alpha: 0.1,
+                        ),
                         valueColor: AlwaysStoppedAnimation(
                           theme.colorScheme.primary,
                         ),
