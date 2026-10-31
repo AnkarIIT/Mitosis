@@ -43,7 +43,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Featured Subjects'), findsOneWidget);
+      expect(find.text('Your next step'), findsOneWidget);
     });
 
     testWidgets('Learn tab shows learn hub', (tester) async {
