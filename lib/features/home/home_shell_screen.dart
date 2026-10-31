@@ -1,9 +1,10 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../core/theme/tokens.dart';
 import '../../core/widgets/offline_banner.dart';
 
 class HomeShellScreen extends ConsumerWidget {
@@ -136,51 +137,58 @@ class _ModernBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AdaptiveColors.isDark(context);
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return CupertinoTabBar(
+        backgroundColor: AdaptiveColors.cardBackground(context),
+        activeColor: AdaptiveColors.primary(context),
+        inactiveColor: AdaptiveColors.textSecondary(context),
+        border: Border(top: BorderSide(color: AdaptiveColors.divider(context))),
+        currentIndex: currentIndex,
+        onTap: onTap,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.house),
+            activeIcon: Icon(CupertinoIcons.house_fill),
+            label: 'Today',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.book),
+            activeIcon: Icon(CupertinoIcons.book_fill),
+            label: 'Study',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.person_crop_circle),
+            activeIcon: Icon(CupertinoIcons.person_crop_circle_fill),
+            label: 'You',
+          ),
+        ],
+      );
+    }
 
-    return SafeArea(
-      top: false,
-      minimum: const EdgeInsets.fromLTRB(14, 8, 14, 10),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AdaptiveColors.cardBackground(context),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: AdaptiveColors.outlineVariant(
-              context,
-            ).withValues(alpha: 0.7),
-          ),
-          boxShadow: AppShadows.raised(isDark),
+    return NavigationBar(
+      backgroundColor: AdaptiveColors.cardBackground(context),
+      elevation: 0,
+      height: 68,
+      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+      selectedIndex: currentIndex,
+      onDestinationSelected: onTap,
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: 'Today',
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: NavigationBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            height: 72,
-            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-            selectedIndex: currentIndex,
-            onDestinationSelected: onTap,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home_rounded),
-                label: 'Today',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.menu_book_outlined),
-                selectedIcon: Icon(Icons.menu_book_rounded),
-                label: 'Study',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person_outline_rounded),
-                selectedIcon: Icon(Icons.person_rounded),
-                label: 'You',
-              ),
-            ],
-          ),
+        NavigationDestination(
+          icon: Icon(Icons.menu_book_outlined),
+          selectedIcon: Icon(Icons.menu_book_rounded),
+          label: 'Study',
         ),
-      ),
+        NavigationDestination(
+          icon: Icon(Icons.person_outline_rounded),
+          selectedIcon: Icon(Icons.person_rounded),
+          label: 'You',
+        ),
+      ],
     );
   }
 }
