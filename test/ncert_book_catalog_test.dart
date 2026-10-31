@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:neet_mitos/core/constants/neet_sample_data.dart';
 import 'package:neet_mitos/core/models/subject_model.dart';
 import 'package:neet_mitos/core/services/ncert_book_catalog.dart';
 
@@ -40,20 +41,44 @@ void main() {
       final humanReproduction = NcertBookCatalog.entryFor(
         _chapter('bio_ch3_12', 'Human Reproduction', 'bio', 'Class 12'),
       )!;
-      expect(humanReproduction.assetPath, endsWith('lebo103.pdf'));
+      // Rationalised NCERT dropped "Reproduction in Organisms", so app
+      // chapter 3 is file lebo102, not lebo103.
+      expect(humanReproduction.assetPath, endsWith('lebo102.pdf'));
+
+      final inheritance = NcertBookCatalog.entryFor(
+        _chapter(
+          'bio_ch5_12',
+          'Principles of Inheritance and Variation',
+          'bio',
+          'Class 12',
+        ),
+      )!;
+      expect(inheritance.assetPath, endsWith('lebo104.pdf'));
+
+      final biodiversity = NcertBookCatalog.entryFor(
+        _chapter(
+          'bio_ch15_12',
+          'Biodiversity and Conservation',
+          'bio',
+          'Class 12',
+        ),
+      )!;
+      expect(biodiversity.assetPath, endsWith('lebo113.pdf'));
     });
 
     test('resolves app Physics and Chemistry chapters', () {
       final units = NcertBookCatalog.entryFor(
         _chapter('phys_ch2', 'Units & Measurements', 'phys', 'Class 11'),
       )!;
-      expect(units.assetPath, endsWith('keph102.pdf'));
-      expect(units.chapterNumber, 2);
+      // "Physical World" was removed, so Units and Measurements is ch 1.
+      expect(units.assetPath, endsWith('keph101.pdf'));
+      expect(units.chapterNumber, 1);
 
       final motion = NcertBookCatalog.entryFor(
         _chapter('phys_ch3', 'Motion in a Straight Line', 'phys', 'Class 11'),
       )!;
-      expect(motion.assetPath, endsWith('keph103.pdf'));
+      expect(motion.assetPath, endsWith('keph102.pdf'));
+      expect(motion.chapterNumber, 2);
 
       final atom = NcertBookCatalog.entryFor(
         _chapter('chem_ch2', 'Structure of Atom', 'chem', 'Class 11'),
@@ -86,7 +111,54 @@ void main() {
         ),
       );
       expect(entry, isNotNull);
-      expect(entry!.assetPath, endsWith('keph102.pdf'));
+      expect(entry!.assetPath, endsWith('keph101.pdf'));
+    });
+
+    test('chapters removed from the current syllabus have no PDF', () {
+      // Both were dropped by the rationalised NCERT: showing a PDF for them
+      // would serve the wrong chapter. UI must hide the PDF action instead.
+      for (final removed in [
+        _chapter('bio_ch1_12', 'Reproduction in Organisms', 'bio', 'Class 12'),
+        _chapter(
+          'bio_ch9_12',
+          'Strategies for Enhancement in Food Production',
+          'bio',
+          'Class 12',
+        ),
+      ]) {
+        expect(NcertBookCatalog.entryFor(removed), isNull, reason: removed.id);
+        expect(NcertBookCatalog.isAvailable(removed), isFalse, reason: removed.id);
+      }
+    });
+
+    test('placeholder chapters have no PDF', () {
+      for (final id in ['bio_ch20', 'bio_ch21', 'bio_ch22']) {
+        expect(
+          NcertBookCatalog.entryFor(_chapter(id, 'Chapter 20', 'bio', 'Class 11')),
+          isNull,
+          reason: id,
+        );
+      }
+    });
+
+    test('shipped chapter data carries the rationalised-removal flag', () {
+      final all = [for (final s in subjects) ...s.chapters];
+
+      final removed = all
+          .where((c) => c.isRemovedFromSyllabus)
+          .map((c) => c.id)
+          .toSet();
+      expect(removed, {'bio_ch1_12', 'bio_ch9_12'});
+
+      for (final c in all.where((c) => c.isRemovedFromSyllabus)) {
+        expect(NcertBookCatalog.entryFor(c), isNull, reason: c.id);
+      }
+
+      // The empty "Chapter 20/21/22" placeholders must not ship at all.
+      expect(all.any((c) => c.name.startsWith('Chapter 2')), isFalse);
+      for (final id in ['bio_ch20', 'bio_ch21', 'bio_ch22']) {
+        expect(all.any((c) => c.id == id), isFalse, reason: id);
+      }
     });
 
     test('returns null for unknown chapters', () {
