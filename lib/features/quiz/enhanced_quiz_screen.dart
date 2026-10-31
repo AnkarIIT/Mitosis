@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/question_model.dart';
 import '../../core/models/user_progress_model.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/tokens.dart';
-import 'package:confetti/confetti.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/answer_normalizer.dart';
@@ -44,7 +43,6 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     with WidgetsBindingObserver {
   late Stopwatch _stopwatch;
   int _elapsedSeconds = 0;
-  late ConfettiController _confettiController;
   final TextEditingController _shortAnswerController = TextEditingController();
   bool _isEvaluatingShortAnswer = false;
   double? _shortAnswerScore;
@@ -79,9 +77,6 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _stopwatch = Stopwatch()..start();
-    _confettiController = ConfettiController(
-      duration: const Duration(seconds: 1),
-    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final sessionId = 'quiz_${DateTime.now().millisecondsSinceEpoch}';
@@ -212,7 +207,6 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _stopwatch.stop();
-    _confettiController.dispose();
     _shortAnswerController.dispose();
     super.dispose();
   }
@@ -286,7 +280,7 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                     answer.trim().toLowerCase() ==
                         q.correctAnswer.trim().toLowerCase()
               : AnswerNormalizer.isCorrect(answer, q));
-      if (isCorrect) {
+      if (isCorrect && answer != null && answer.trim().isNotEmpty) {
         correctCount++;
         subjectScores[q.subject] = (subjectScores[q.subject] ?? 0) + 1;
       } else if (answer != null && answer.trim().isNotEmpty) {
@@ -308,6 +302,10 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
       totalQuestions: quizState.questions.length,
       timeSpentSeconds: _elapsedSeconds,
       attemptedAt: DateTime.now(),
+      rawScore: correctCount * widget.marksPerCorrect +
+          incorrectCount * widget.marksPerWrong,
+      maxMarks: quizState.questions.length * widget.marksPerCorrect,
+      seed: quizState.seed,
       selectedAnswers: List.generate(
         quizState.questions.length,
         (i) => quizState.selectedAnswers[i] ?? '',
@@ -392,7 +390,6 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
       ref
           .read(quizProvider.notifier)
           .selectAnswer(targetIndex, studentAnswer, 0, isCorrect: isCorrect);
-      if (isCorrect) _confettiController.play();
     } catch (e) {
       if (mounted) setState(() => _isEvaluatingShortAnswer = false);
     }
@@ -434,6 +431,10 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     }
 
     final currentQuestion = quizState.questions[quizState.currentIndex];
+    // In practice mode, show correctness immediately.
+    // In exam/test mode, hide correctness until the quiz is complete.
+    final showResults = quizState.isCompleted ||
+        (widget.testType != 'mock' && widget.testType != 'exam');
     final isAnswered = quizState.selectedAnswers.containsKey(
       quizState.currentIndex,
     );
@@ -506,20 +507,16 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                   QuestionCard(
                     question: currentQuestion,
                     isAnswered: isAnswered,
+                    showResults: showResults,
                     selectedAnswer: selectedAnswer,
                   ),
-                if (isAnswered) _buildExplanation(currentQuestion),
+                if (isAnswered && showResults) _buildExplanation(currentQuestion),
               ],
             ),
           ),
           // Question palette overlay
           if (_showPalette) _buildQuestionPalette(context, quizState),
         ],
-      ),
-      floatingActionButton: ConfettiWidget(
-        confettiController: _confettiController,
-        blastDirectionality: BlastDirectionality.explosive,
-        colors: const [AppColors.primary, AppColors.success, AppColors.warning],
       ),
       bottomNavigationBar: QuizFooter(
         currentIndex: quizState.currentIndex,
@@ -583,19 +580,29 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
     return Padding(
       padding: const EdgeInsets.only(top: 24),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AdaptiveColors.primary(context).withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
+          color: AdaptiveColors.primaryContainer(context),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Explanation',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AdaptiveColors.primary(context),
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 8),
-            Text(question.explanation ?? 'No explanation available'),
+            Text(
+              question.explanation ?? 'No explanation available',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AdaptiveColors.textPrimary(context),
+                height: 1.5,
+              ),
+            ),
           ],
         ),
       ),
@@ -656,13 +663,25 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                         runSpacing: 8,
                         alignment: WrapAlignment.center,
                         children: [
-                          _paletteLegendDot(AppColors.success, 'Answered'),
-                          _paletteLegendDot(AppColors.error, 'Not Answered'),
-                          _paletteLegendDot(AppColors.warning, 'Flagged'),
-                          _paletteLegendDot(AppColors.primary, 'Current'),
                           _paletteLegendDot(
-                            AdaptiveColors.divider(context),
-                            'Not Visited',
+                            AdaptiveColors.success(context),
+                            'Answered',
+                          ),
+                          _paletteLegendDot(
+                            AdaptiveColors.error(context),
+                            'Not answered',
+                          ),
+                          _paletteLegendDot(
+                            AdaptiveColors.warning(context),
+                            'Flagged',
+                          ),
+                          _paletteLegendDot(
+                            AdaptiveColors.primary(context),
+                            'Current',
+                          ),
+                          _paletteLegendDot(
+                            AdaptiveColors.outlineVariant(context),
+                            'Not visited',
                           ),
                         ],
                       ),
@@ -696,15 +715,15 @@ class _EnhancedQuizScreenState extends ConsumerState<EnhancedQuizScreen>
                           Color bg;
                           Color fg = Colors.white;
                           if (isAnswered && isFlagged) {
-                            bg = AppColors.success;
+                            bg = AdaptiveColors.success(context);
                           } else if (isAnswered) {
-                            bg = AppColors.success;
+                            bg = AdaptiveColors.success(context);
                           } else if (isFlagged) {
-                            bg = AppColors.warning;
+                            bg = AdaptiveColors.warning(context);
                           } else if (isVisited) {
-                            bg = AppColors.error;
+                            bg = AdaptiveColors.error(context);
                           } else {
-                            bg = AdaptiveColors.background(context);
+                            bg = AdaptiveColors.outlineVariant(context);
                             fg = AdaptiveColors.textPrimary(context);
                           }
 
@@ -818,7 +837,11 @@ class _QuizTimerBar extends StatelessWidget {
     final remaining = (timeLimit - elapsedSeconds).clamp(0, timeLimit);
     final fraction = (elapsedSeconds / timeLimit).clamp(0.0, 1.0);
     final isLow = remaining < 30;
-    final color = isLow ? AppColors.error : SubjectColors.physics;
+    // Use semantic colors: warning amber when time is running low,
+    // otherwise a muted teal that stays calm during study.
+    final color = isLow
+        ? AdaptiveColors.warning(context)
+        : AppColors.primary.withValues(alpha: 0.6);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -845,22 +868,25 @@ class _QuizTimerBar extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         ClipRRect(
-              borderRadius: BorderRadius.circular(3),
-              child: LinearProgressIndicator(
-                value: fraction.clamp(0.0, 1.0),
-                minHeight: 4,
-                backgroundColor: color.withValues(alpha: 0.12),
-                valueColor: AlwaysStoppedAnimation(color),
-              ),
-            )
-            .animate(onPlay: (c) => isLow ? c.repeat(reverse: true) : null)
-            .scale(
-              begin: const Offset(1, 1),
-              end: const Offset(1, 1.8),
-              duration: AppDuration.fast,
-              curve: Curves.easeInOut,
-            )
-            .fadeIn(duration: AppDuration.fast),
+          borderRadius: BorderRadius.circular(3),
+          child: LinearProgressIndicator(
+            value: fraction.clamp(0.0, 1.0),
+            minHeight: 4,
+            backgroundColor: color.withValues(alpha: 0.12),
+            valueColor: AlwaysStoppedAnimation(color),
+          ),
+        )
+        .animate(
+          onPlay: isLow
+              ? (c) => c.repeat(reverse: true, period: const Duration(milliseconds: 800))
+              : null,
+        )
+        .scale(
+          begin: const Offset(1, 1),
+          end: const Offset(1, 1.15),
+          curve: Curves.easeInOut,
+        )
+        .fadeIn(duration: AppDuration.fast),
       ],
     );
   }
