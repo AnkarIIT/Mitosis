@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/feature_flags.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/tokens.dart';
@@ -28,13 +29,14 @@ class PracticeHubScreen extends StatelessWidget {
         color: SubjectColors.physics,
         route: '/test-series',
       ),
-      (
-        title: 'PYQ Papers',
-        subtitle: 'Previous-year NEET papers',
-        icon: Icons.history_edu_rounded,
-        color: SubjectColors.chemistry,
-        route: '/pyq',
-      ),
+      if (FeatureFlags.pyqDownloads)
+        (
+          title: 'PYQ Papers',
+          subtitle: 'Previous-year NEET papers',
+          icon: Icons.history_edu_rounded,
+          color: SubjectColors.chemistry,
+          route: '/pyq',
+        ),
       (
         title: 'Mark Booster',
         subtitle: 'High-yield revision drills',
