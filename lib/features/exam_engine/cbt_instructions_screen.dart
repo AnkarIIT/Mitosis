@@ -4,11 +4,17 @@ import 'package:go_router/go_router.dart';
 import '../../core/models/question_model.dart';
 import '../../core/services/exam_engine_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
+import 'nta_palette.dart';
 
 /// NTA-style instructions screen shown before starting a fresh CBT mock test.
 /// Mirrors the real NEET exam instructions flow: shows rules, timing, marking,
 /// and proctoring warnings, then lets the candidate start the timed attempt.
-class CbtInstructionsScreen extends StatelessWidget {
+///
+/// The declaration checkbox is not decoration: NTA gates the paper behind it,
+/// and gating here also prevents an accidental tap from starting a 200-minute
+/// timer the candidate did not mean to begin.
+class CbtInstructionsScreen extends StatefulWidget {
   const CbtInstructionsScreen({
     super.key,
     required this.config,
@@ -17,6 +23,16 @@ class CbtInstructionsScreen extends StatelessWidget {
 
   final ExamConfig config;
   final List<Question> questionPool;
+
+  @override
+  State<CbtInstructionsScreen> createState() => _CbtInstructionsScreenState();
+}
+
+class _CbtInstructionsScreenState extends State<CbtInstructionsScreen> {
+  bool _declared = false;
+
+  ExamConfig get config => widget.config;
+  List<Question> get questionPool => widget.questionPool;
 
   @override
   Widget build(BuildContext context) {
@@ -51,34 +67,44 @@ class CbtInstructionsScreen extends StatelessWidget {
               _buildQuickStartCard(context),
               const SizedBox(height: 12),
               _buildCollapsibleSection(
+                context,
                 'General Instructions',
                 _generalInstructions(totalQuestions, totalMinutes),
                 initiallyExpanded: true,
               ),
               if (hasSections)
                 _buildCollapsibleSection(
+                  context,
                   'Section Structure',
                   _sectionInstructions(sectionCount, config),
                 ),
               _buildCollapsibleSection(
+                context,
                 'Marking Scheme',
                 _markingInstructions(),
                 initiallyExpanded: true,
               ),
               _buildCollapsibleSection(
+                context,
                 'Navigation & Controls',
                 _navigationInstructions(),
               ),
               _buildCollapsibleSection(
+                context,
                 'Proctoring & Integrity',
                 _proctoringInstructions(),
               ),
               _buildCollapsibleSection(
+                context,
                 'Emergency & Technical',
                 _emergencyInstructions(),
               ),
               const SizedBox(height: 12),
-              _buildImportantNote(),
+              _buildPaletteLegend(context),
+              const SizedBox(height: 12),
+              _buildImportantNote(context),
+              const SizedBox(height: 12),
+              _buildDeclaration(context),
               // Extra space so content never hides behind the sticky bar.
               const SizedBox(height: 96),
             ],
@@ -87,25 +113,42 @@ class CbtInstructionsScreen extends StatelessWidget {
       ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-        child: SizedBox(
-          height: 56,
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () => _startTest(context),
-            icon: const Icon(Icons.play_arrow_rounded, size: 24),
-            label: const Text(
-              'Start Test',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!_declared)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  'Accept the declaration above to start the test.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AdaptiveColors.textSecondary(context),
+                  ),
+                ),
               ),
-              elevation: 2,
+            SizedBox(
+              height: 56,
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _declared ? () => _startTest(context) : null,
+                icon: const Icon(Icons.play_arrow_rounded, size: 24),
+                label: const Text(
+                  'Start Test',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -173,32 +216,138 @@ class CbtInstructionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildImportantNote() {
+  /// The palette legend candidates are expected to know cold. The previous
+  /// copy described the colours wrongly (marked = orange, current = blue),
+  /// which is worse than no legend at all.
+  Widget _buildPaletteLegend(BuildContext context) {
+    const rows = [
+      (NtaPaletteState.answered, 'Option selected and saved.'),
+      (NtaPaletteState.notAnswered, 'Visited, but no option selected.'),
+      (NtaPaletteState.notVisited, 'Not opened yet.'),
+      (
+        NtaPaletteState.marked,
+        'Flagged for review. Counts as unanswered unless you also answer it.',
+      ),
+      (
+        NtaPaletteState.answeredMarked,
+        'Flagged and answered. Considered for evaluation.',
+      ),
+    ];
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
+        color: AdaptiveColors.surface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+        border: Border.all(color: AdaptiveColors.divider(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Question Palette',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: AdaptiveColors.textPrimary(context),
+            ),
+          ),
+          const SizedBox(height: 10),
+          for (final row in rows)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 20,
+                    height: 20,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: NtaPaletteColors.fill(row.$1),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: row.$1 == NtaPaletteState.notVisited
+                            ? AdaptiveColors.outline(context)
+                            : Colors.transparent,
+                      ),
+                    ),
+                    child: row.$1 == NtaPaletteState.answeredMarked
+                        ? const Icon(Icons.check, size: 12, color: Colors.white)
+                        : null,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      '${NtaPaletteColors.label(row.$1)} — ${row.$2}',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        height: 1.4,
+                        color: AdaptiveColors.textPrimary(context),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeclaration(BuildContext context) {
+    return Material(
+      color: AdaptiveColors.surface(context),
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: _declared
+              ? AdaptiveColors.primary(context)
+              : AdaptiveColors.divider(context),
+          width: _declared ? 1.5 : 1,
+        ),
+      ),
+      child: CheckboxListTile(
+        value: _declared,
+        onChanged: (value) => setState(() => _declared = value ?? false),
+        controlAffinity: ListTileControlAffinity.leading,
+        title: const Text(
+          'I have read and understood the instructions. I declare that I am '
+          'not in possession of, or indulging in, any unfair means.',
+          style: TextStyle(fontSize: 13, height: 1.4),
+        ),
+        subtitle: const Text(
+          'Required before the timer starts',
+          style: TextStyle(fontSize: 11),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImportantNote(BuildContext context) {
+    final warning = AdaptiveColors.warning(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: warning.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: warning.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.warning_amber_rounded,
-                color: AppColors.warning,
-                size: 24,
-              ),
+              Icon(Icons.warning_amber_rounded, color: warning, size: 24),
               const SizedBox(width: 10),
               Text(
                 'Important',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.warning,
+                  color: warning,
                 ),
               ),
             ],
@@ -208,7 +357,7 @@ class CbtInstructionsScreen extends StatelessWidget {
             'Once you start, the timer runs continuously. Ensure you have a stable internet connection, sufficient battery, and a quiet environment for the full duration.',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.warning.withValues(alpha: 0.9),
+              color: AdaptiveColors.textPrimary(context),
               height: 1.4,
             ),
           ),
@@ -228,16 +377,9 @@ class CbtInstructionsScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary.withValues(alpha: 0.15),
-            AppColors.primary.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Theme.of(context).colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +388,7 @@ class CbtInstructionsScreen extends StatelessWidget {
             children: [
               Icon(
                 Icons.assignment_outlined,
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
                 size: 28,
               ),
               const SizedBox(width: 12),
@@ -255,7 +397,7 @@ class CbtInstructionsScreen extends StatelessWidget {
                   'NEET Mock Test',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: AdaptiveColors.primary(context),
                   ),
                 ),
               ),
@@ -291,6 +433,7 @@ class CbtInstructionsScreen extends StatelessWidget {
   }
 
   Widget _buildCollapsibleSection(
+    BuildContext context,
     String title,
     List<String> points, {
     bool initiallyExpanded = false,
@@ -302,10 +445,10 @@ class CbtInstructionsScreen extends StatelessWidget {
         shape: const Border(),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: AppColors.primary,
+            color: AdaptiveColors.primary(context),
           ),
         ),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -336,12 +479,20 @@ class CbtInstructionsScreen extends StatelessWidget {
   ];
 
   List<String> _navigationInstructions() => [
-    'Use "Save & Next" to save your answer and move to the next question.',
-    'Use "Mark & Next" to flag a question for review and move forward.',
-    'Use "Clear" to remove your selected answer for the current question.',
-    'The question palette on the right shows: Answered (green), Marked (orange), Not Answered (gray), Current (blue).',
+    'Use "SAVE & NEXT" to store your answer and move to the next question.',
+    'Use "SAVE & MARK FOR REVIEW" to store the answer and flag the question for '
+        'a later look; you stay on the question.',
+    'Use "MARK FOR REVIEW & NEXT" to flag a question without saving an answer '
+        'and move forward.',
+    'Use "CLEAR" to deselect the answer you have chosen.',
+    '"<< BACK" and "NEXT >>" only move between questions; they do not save '
+        'anything.',
+    'The question palette shows five states: Answered (green), Not Answered '
+        '(orange — opened but skipped), Not Visited (grey), Marked for Review '
+        '(purple circle) and Answered & Marked (purple circle with a tick, '
+        'which is counted for evaluation).',
     'You can jump to any question by tapping its number in the palette.',
-    'Questions marked for review appear with an orange dot in the palette.',
+    'On phones, open the palette from the grid icon in the candidate strip.',
   ];
 
   List<String> _proctoringInstructions() => [
@@ -386,24 +537,25 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = AdaptiveColors.primary(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.15),
+        color: accent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        border: Border.all(color: accent.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppColors.primary),
+          Icon(icon, size: 16, color: accent),
           const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.primary,
+              color: accent,
             ),
           ),
         ],
@@ -430,7 +582,7 @@ class _BulletPoint extends StatelessWidget {
               width: 6,
               height: 6,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AdaptiveColors.primary(context),
                 shape: BoxShape.circle,
               ),
             ),
