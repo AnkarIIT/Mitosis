@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/models/subject_model.dart';
 import '../../core/models/user_preferences_model.dart';
 
@@ -53,50 +54,36 @@ class StudyPlanScreen extends ConsumerWidget {
   Widget _buildStreakBanner(BuildContext context, WidgetRef ref) {
     final progress = ref.watch(userProgressProvider);
     final streak = progress.currentStreak;
+    if (streak == 0) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AdaptiveColors.warning(context),
-            AdaptiveColors.warning(context).withValues(alpha: 0.82),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: AdaptiveColors.warning(context).withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(
+          color: AdaptiveColors.warning(context).withValues(alpha: 0.2),
         ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AdaptiveColors.warning(context).withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.local_fire_department,
-            color: Colors.white,
-            size: 40,
+          Icon(
+            Icons.local_fire_department_outlined,
+            color: AdaptiveColors.warning(context),
+            size: 24,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$streak Day Study Streak!',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
+                  '$streak-day study streak',
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
-                const Text(
-                  'Keep it up! You\'re building a powerful habit.',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                Text(
+                  'A steady routine is built one session at a time.',
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),
