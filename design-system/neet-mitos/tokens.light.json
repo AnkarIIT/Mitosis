@@ -1,0 +1,206 @@
+{
+  "$schema": "https://mitos.app/schemas/design-tokens/v1.json",
+  "system": "Mitos Calm Precision",
+  "version": "1.0.0",
+  "platform": "cross-platform",
+  "theme": "light",
+  "status": "implementation-handoff; visual QA pending",
+  "notes": [
+    "Custom project token schema; not a drop-in Android resource.",
+    "Shared light brand tokens with platform-specific typography, units, navigation, and controls.",
+    "Dark themes are intentionally not defined by this file.",
+    "Recalculate contrast if token values change."
+  ],
+  "platformProfiles": {
+    "android": {
+      "layoutUnit": "dp",
+      "fontFamily": "Roboto",
+      "fontFallback": ["Noto Sans Devanagari", "sans-serif"],
+      "textScaling": "Android font scaling",
+      "navigation": "Material 3 destinations and navigation stack",
+      "icons": "Material Symbols, consistent rounded family",
+      "minimumTouchTarget": 44,
+      "darkTheme": "separately designed; see Flutter AppTheme"
+    },
+    "ios": {
+      "layoutUnit": "pt",
+      "fontFamily": "SF Pro / platform system font",
+      "textScaling": "Dynamic Type; content and controls grow without clipping",
+      "textStyles": {
+        "screenTitle": { "semantic": ".largeTitle", "defaultSize": 34 },
+        "compactTitle": { "semantic": ".title2", "defaultSize": 22 },
+        "sectionHeading": { "semantic": ".title3", "defaultSize": 20 },
+        "question": { "semantic": "scaled custom relative to .body", "defaultSize": 18 },
+        "body": { "semantic": ".body", "defaultSize": 17 },
+        "button": { "semantic": ".headline", "defaultSize": 17 },
+        "supportingLabel": { "semantic": ".subheadline", "defaultSize": 15 },
+        "metadata": { "semantic": ".caption", "defaultSize": 12 }
+      },
+      "navigation": ["native navigation stack", "interactive back swipe", "native phone tab bar"],
+      "icons": "SF Symbols with consistent weight and selected variants",
+      "minimumTouchTarget": "44x44 pt",
+      "safeAreas": ["notch", "home indicator", "keyboard"],
+      "accessibility": ["VoiceOver", "Dynamic Type", "Reduce Motion"],
+      "darkTheme": "requires separately designed semantic values; never invert automatically"
+    }
+  },
+  "color": {
+    "background": { "value": "#F7F8F5", "role": "main canvas" },
+    "surface": { "value": "#FFFFFF", "role": "cards, sheets, options" },
+    "textPrimary": { "value": "#172724", "role": "headings, questions, answers" },
+    "textSecondary": { "value": "#566762", "role": "supporting copy and labels" },
+    "primary": { "value": "#146C60", "role": "primary actions, selected controls" },
+    "onPrimary": { "value": "#FFFFFF", "role": "content on primary" },
+    "primaryContainer": { "value": "#E5F2EC", "role": "selected answer background" },
+    "outline": { "value": "#71817A", "role": "interactive boundaries, focus" },
+    "borderSubtle": { "value": "#DCE5DF", "role": "decorative dividers and non-interactive edges" },
+    "success": { "value": "#216A43", "role": "correct answer and positive status" },
+    "successContainer": { "value": "#EAF5ED", "role": "correct answer background" },
+    "error": { "value": "#B3261E", "role": "incorrect answer and validation" },
+    "errorContainer": { "value": "#FCECEB", "role": "incorrect answer background" },
+    "warning": { "value": "#946200", "role": "warning and due status" },
+    "warningContainer": { "value": "#FFF4D6", "role": "warning background" },
+    "brandNavy": { "value": "#0A2344", "role": "app icon and identity moments" },
+    "brandTeal": { "value": "#00B8A9", "role": "app icon and restrained brand accents" }
+  },
+  "contrast": {
+    "method": "WCAG relative luminance",
+    "textMinimum": "4.5:1",
+    "nonTextBoundaryMinimum": "3:1",
+    "verifiedPairs": [
+      { "foreground": "#FFFFFF", "background": "#146C60", "ratio": 6.28 },
+      { "foreground": "#566762", "background": "#FFFFFF", "ratio": 5.98 },
+      { "foreground": "#172724", "background": "#F7F8F5", "ratio": 14.57 },
+      { "foreground": "#216A43", "background": "#EAF5ED", "ratio": 5.86 },
+      { "foreground": "#B3261E", "background": "#FCECEB", "ratio": 5.71 },
+      { "foreground": "#946200", "background": "#FFF4D6", "ratio": 4.78 },
+      { "foreground": "#71817A", "background": "#FFFFFF", "ratio": 4.10 }
+    ],
+    "outlineNote": "#71817A is a non-text boundary token (3:1 target), not small text."
+  },
+  "typography": {
+    "platformDefaults": {
+      "android": { "fontFamily": "Roboto", "fontFallback": ["Noto Sans Devanagari", "sans-serif"], "unit": "sp" },
+      "ios": { "fontFamily": "SF Pro / platform system font", "unit": "pt", "scaling": "Dynamic Type" }
+    },
+    "unit": "sp (Android); pt (iOS)",
+    "roles": {
+      "screenTitle": { "size": 28, "lineHeight": 36, "weight": 600 },
+      "sectionHeading": { "size": 20, "lineHeight": 28, "weight": 600 },
+      "question": { "size": 18, "lineHeight": 28, "weight": 400 },
+      "body": { "size": 16, "lineHeight": 24, "weight": 400 },
+      "answerOption": { "size": 16, "lineHeight": 24, "weight": 400 },
+      "button": { "size": 16, "lineHeight": 24, "weight": 500 },
+      "label": { "size": 14, "lineHeight": 20, "weight": 500 },
+      "metadata": { "size": 12, "lineHeight": 16, "weight": 400 }
+    },
+    "scaling": "Respect Android font scaling; allow line heights and component heights to grow. Never truncate questions or options."
+  },
+  "spacingDp": [4, 8, 12, 16, 20, 24, 32, 48, 64],
+  "spacingPt": [4, 8, 12, 16, 20, 24, 32, 48, 64],
+  "layout": {
+    "phoneHorizontalPadding": 20,
+    "phoneHorizontalPaddingPt": 20,
+    "cardPadding": 20,
+    "cardPaddingPt": 20,
+    "optionGap": 12,
+    "optionGapPt": 12,
+    "sectionGapMin": 24,
+    "sectionGapMinPt": 24,
+    "sectionGapMax": 32,
+    "sectionGapMaxPt": 32,
+    "questionContentMaxWidth": 640,
+    "questionContentMaxWidthPt": 640
+  },
+  "radiusDp": {
+    "small": 8,
+    "control": 12,
+    "card": 16,
+    "sheet": 24
+  },
+  "radiusPt": {
+    "small": 8,
+    "control": 12,
+    "card": 16,
+    "sheet": 24
+  },
+  "components": {
+    "primaryButton": {
+      "minHeight": 52,
+      "horizontalPadding": 20,
+      "radius": 12,
+      "states": ["default", "pressed", "focused", "disabled", "loading"],
+      "loadingBehavior": "Preserve width and label; prevent duplicate submission."
+    },
+    "iosPrimaryButton": {
+      "minHeightPt": 52,
+      "horizontalPaddingPt": 20,
+      "radiusPt": 12,
+      "textStyle": ".headline",
+      "background": "primary",
+      "foreground": "onPrimary",
+      "states": ["default", "pressed", "focused", "disabled", "loading"]
+    },
+    "iosCard": {
+      "radiusPt": 16,
+      "paddingPt": 20,
+      "background": "surface",
+      "border": "borderSubtle",
+      "defaultShadow": false
+    },
+    "card": {
+      "radius": 16,
+      "padding": 20,
+      "borderWidth": 1,
+      "borderToken": "borderSubtle",
+      "defaultElevation": 0
+    },
+    "field": {
+      "minTouchHeight": 48,
+      "label": "persistent-visible",
+      "focusBorderWidth": 2,
+      "boundaryToken": "outline",
+      "placeholderIsLabel": false
+    },
+    "mcqOption": {
+      "minHeight": 64,
+      "minHeightPt": 64,
+      "padding": 16,
+      "paddingPt": 16,
+      "indicatorSize": 24,
+      "indicatorGap": 12,
+      "indicatorGapPt": 12,
+      "radius": 12,
+      "radiusPt": 12,
+      "selectableArea": "whole-row",
+      "reserveBorderSpace": true,
+      "states": {
+        "default": { "background": "surface", "border": "outline", "borderWidth": 1 },
+        "selected": { "background": "primaryContainer", "border": "primary", "borderWidth": 1.5, "indicator": "selected" },
+        "submitting": { "preserveSelection": true, "showCorrectness": false, "temporarilyLocked": true },
+        "correctReview": { "background": "successContainer", "foreground": "success", "icon": "check", "label": "Correct answer" },
+        "selectedIncorrectReview": { "background": "errorContainer", "foreground": "error", "icon": "close", "label": "Your answer · Incorrect", "alsoIdentifyCorrectOption": true },
+        "otherReviewOption": { "background": "surface", "label": null },
+        "unansweredReview": { "questionLabel": "Not answered", "identifyCorrectOption": true },
+        "submissionFailed": { "preserveSelection": true, "showCorrectness": false, "announceRetry": true }
+      },
+      "accessibility": "Pair color with icon and text. Expose option letter, answer copy, selected state, and result through semantics."
+    }
+  },
+  "quizFlows": {
+    "practice": ["select", "check-answer", "show-correctness", "next-question"],
+    "test": ["select", "save-and-next", "submit-test", "review-with-correctness"],
+    "currentImplementation": "EnhancedQuizScreen currently reveals correctness immediately after selection; mode-specific behavior is pending."
+  },
+  "accessibility": {
+    "minimumTouchTargetAndroidDp": 44,
+    "minimumTouchTargetIOSPt": "44x44",
+    "colorAloneCommunicatesState": false,
+    "supportsTalkBack": true,
+    "supportsVoiceOver": true,
+    "supportsKeyboardFocus": true,
+    "supportsLargeText": true,
+    "supportsReduceMotion": true,
+    "verifyHindiAndScienceNotation": true
+  }
+}
