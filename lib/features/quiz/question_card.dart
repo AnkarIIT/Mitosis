@@ -8,12 +8,14 @@ import 'option_tile.dart';
 class QuestionCard extends ConsumerWidget {
   final Question question;
   final bool isAnswered;
+  final bool showResults;
   final String? selectedAnswer;
 
   const QuestionCard({
     super.key,
     required this.question,
     required this.isAnswered,
+    this.showResults = true,
     this.selectedAnswer,
   });
 
@@ -24,13 +26,14 @@ class QuestionCard extends ConsumerWidget {
       children: [
         Text(
           question.questionText,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
             color: AdaptiveColors.textPrimary(context),
-            height: 1.4,
+            height: 1.55,
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
         if (question.type != 'shortAnswer')
           ...question.options.asMap().entries.map((entry) {
             final index = entry.key;
@@ -40,6 +43,7 @@ class QuestionCard extends ConsumerWidget {
               index: index,
               option: option,
               isAnswered: isAnswered,
+              showResults: showResults,
               selectedAnswer: selectedAnswer,
               onTap: () {
                 ref
