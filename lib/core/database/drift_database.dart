@@ -75,7 +75,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? conn.connect());
 
   @override
-  int get schemaVersion => 40;
+  int get schemaVersion => 42;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -657,6 +657,12 @@ class AppDatabase extends _$AppDatabase {
       if (from < 40) {
         // Chapter progress tracking for structured learning modules.
         await m.createTable(chapterProgressTable);
+      }
+      if (from < 41) {
+        await _addColumnSafely(m, chats, (chats as dynamic).groundedChapterKey);
+      }
+      if (from < 42) {
+        await _addColumnSafely(m, chats, (chats as dynamic).groundedUserPdfId);
       }
     },
     beforeOpen: (details) async {
@@ -1680,18 +1686,35 @@ class AppDatabase extends _$AppDatabase {
             t.date.equals(dateStr) &
             t.subject.equals(subject) &
             t.userId.equals(userId),
-      );
+      )
+      // Older builds could leave more than one row per day; prefer the newest
+      // instead of throwing on a single-row lookup.
+      ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+      ..limit(1);
     return query.getSingleOrNull();
   }
 
   Future<int> insertDppSet(DppSetsCompanion dppSet) =>
       into(dppSets).insert(dppSet);
 
+  /// Removes a DPP set and its questions.
+  ///
+  /// `getTodayDppSet` is a single-row lookup, so a user must never end up with
+  /// two sets for the same day and subject. Regeneration replaces the old one.
+  Future<void> deleteDppSet(int dppSetId) async {
+    await transaction(() async {
+      await (delete(
+        dppQuestions,
+      )..where((t) => t.dppSetId.equals(dppSetId))).go();
+      await (delete(dppSets)..where((t) => t.id.equals(dppSetId))).go();
+    });
+  }
+
   Future<void> updateDppSet(DppSet dppSet) async {
     await update(dppSets).replace(dppSet);
   }
 
-  Future<List> getDppQuestions(int dppSetId) async {
+  Future<List<DppQuestion>> getDppQuestions(int dppSetId) async {
     final query = select(dppQuestions)
       ..where((t) => t.dppSetId.equals(dppSetId));
     return query.get();
