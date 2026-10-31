@@ -11,6 +11,12 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import '../../core/providers/providers.dart';
 import '../../core/database/drift_database.dart';
 import '../../core/providers/current_user_provider.dart';
+import '../../core/services/gemini_chat_service.dart';
+import '../../core/services/ncert_book_catalog.dart';
+import '../../core/services/ncert_text_index_service.dart';
+import '../../core/services/user_pdf_index.dart';
+import 'pdf_attachment_bottom_sheet.dart';
+import 'photo_crop_screen.dart';
 
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
@@ -21,11 +27,21 @@ class ChatMessage {
   final String? imagePath;
   final DateTime timestamp;
 
+  /// For AI replies produced in grounded mode: the NCERT chapter the [p.N]
+  /// citations refer to.
+  final String? groundedChapterKey;
+
+  /// For AI replies produced in grounded mode: the user PDF the [p.N]
+  /// citations refer to.
+  final String? groundedUserPdfId;
+
   ChatMessage({
     required this.text,
     required this.isUser,
     this.imagePath,
     required this.timestamp,
+    this.groundedChapterKey,
+    this.groundedUserPdfId,
   });
 }
 
@@ -43,6 +59,22 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
   bool _isLoading = false;
+
+  /// Currently selected NCERT chapter for grounded tutoring, or `null` for a
+  /// general chat. `_groundedChapter` is its loaded text index (lazy).
+  String? _groundedChapterKey;
+  NcertChapterText? _groundedChapter;
+
+  /// Currently selected user PDF for grounded tutoring. Mutually exclusive with
+  /// `_groundedChapterKey` — only one grounding source at a time.
+  String? _groundedUserPdfId;
+  UserPdfIndex? _groundedUserPdf;
+
+  bool _showedGroundedToast = false;
+
+  /// Matches the citation format the grounded system prompt demands, e.g.
+  /// `[p.12]` or `[NCERT p.12]`.
+  static final RegExp _citationPattern = RegExp(r'\[(?:NCERT )?p\.(\d+)\]');
 
   @override
   void initState() {
@@ -79,6 +111,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               text: c.message,
               isUser: c.isUser,
               timestamp: c.timestamp,
+              groundedChapterKey: c.groundedChapterKey,
+              groundedUserPdfId: c.groundedUserPdfId,
             ),
           ),
         );
@@ -96,6 +130,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    // Captured before any await so we never touch context across an async gap.
+    final navigator = Navigator.of(context);
     final geminiService = ref.read(geminiServiceProvider);
     if (!geminiService.isConfigured) {
       _showSettingsPrompt();
@@ -107,9 +143,19 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
 
     if (pickedFile != null) {
       final compressedPath = await _compressImage(pickedFile.path);
+      final imagePath = compressedPath ?? pickedFile.path;
+
+      // Crop step: the student selects just the doubtful part so the vision
+      // model sees the question, not the full page. Cancelling aborts the
+      // photo (don't silently send a photo the student rejected).
+      final croppedPath = await navigator.push<String>(
+        MaterialPageRoute(builder: (_) => PhotoCropScreen(imagePath: imagePath)),
+      );
+      if (croppedPath == null) return;
+
       _sendMessage(
         "Explain this NEET question step-by-step and provide NCERT reference.",
-        imagePath: compressedPath ?? pickedFile.path,
+        imagePath: croppedPath,
       );
     }
   }
@@ -190,6 +236,88 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     );
   }
 
+  /// Selects (or clears) the grounding source (NCERT chapter or user PDF).
+  /// A missing index is surfaced honestly — the chat falls back to the
+  /// un-grounded path instead of pretending to be grounded.
+  Future<void> _selectGroundingSource({
+    String? ncertChapterKey,
+    String? userPdfId,
+  }) async {
+    // Mutually exclusive: clear the other
+    if (ncertChapterKey != null) {
+      setState(() {
+        _groundedChapterKey = ncertChapterKey;
+        _groundedChapter = null;
+        _groundedUserPdfId = null;
+        _groundedUserPdf = null;
+      });
+      if (ncertChapterKey.isEmpty) return;
+      final index = ref.read(ncertTextIndexProvider);
+      final chapter = await index.load(ncertChapterKey);
+      if (!mounted) return;
+      setState(() => _groundedChapter = chapter);
+      if (chapter == null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Text index missing for this chapter — staying in general mode.',
+            ),
+          ),
+        );
+      }
+    } else if (userPdfId != null) {
+      setState(() {
+        _groundedUserPdfId = userPdfId;
+        _groundedUserPdf = null;
+        _groundedChapterKey = null;
+        _groundedChapter = null;
+      });
+      if (userPdfId.isEmpty) return;
+      final index = ref.read(userPdfIndexProvider);
+      final pdf = await index.load(userPdfId);
+      if (!mounted) return;
+      setState(() => _groundedUserPdf = pdf);
+      if (pdf == null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Text index missing for this PDF — staying in general mode.',
+            ),
+          ),
+        );
+      }
+    } else {
+      // Clear all grounding
+      setState(() {
+        _groundedChapterKey = null;
+        _groundedChapter = null;
+        _groundedUserPdfId = null;
+        _groundedUserPdf = null;
+      });
+    }
+  }
+
+  /// Convenience wrapper for NCERT chapter selection.
+  Future<void> _selectGroundedChapter(String? chapterKey) async {
+    await _selectGroundingSource(ncertChapterKey: chapterKey);
+  }
+
+  /// Convenience wrapper for user PDF selection.
+  Future<void> _selectGroundedUserPdf(String? userPdfId) async {
+    await _selectGroundingSource(userPdfId: userPdfId);
+  }
+
+  /// Maps the visible thread (minus the message currently being asked) to
+  /// Gemini turns, bounded by the service's history limit.
+  List<GeminiTurn> _geminiHistory() {
+    final usable = _messages.length > 1
+        ? _messages.sublist(0, _messages.length - 1)
+        : const <ChatMessage>[];
+    return [
+      for (final m in usable) GeminiTurn(isUser: m.isUser, text: m.text),
+    ];
+  }
+
   Future<void> _sendMessage(String text, {String? imagePath}) async {
     final geminiService = ref.read(geminiServiceProvider);
     final db = ref.read(databaseProvider);
@@ -224,6 +352,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
         message: text,
         isUser: true,
         timestamp: userMessage.timestamp,
+        groundedChapterKey: Value(_groundedChapterKey),
+        groundedUserPdfId: Value(_groundedUserPdfId),
       ),
     );
 
@@ -231,8 +361,52 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
       String responseText;
       if (imagePath != null) {
         final imageBytes = await File(imagePath).readAsBytes();
-        final parts = [DataPart('image/jpeg', imageBytes)];
+        // Cropped photos are re-encoded as PNG by PhotoCropScreen; camera/
+        // gallery originals stay JPEG.
+        final mime = imagePath.toLowerCase().endsWith('.png')
+            ? 'image/png'
+            : 'image/jpeg';
+        final parts = [DataPart(mime, imageBytes)];
         responseText = await geminiService.sendMultimodalMessage(text, parts);
+      } else if (_groundedChapter != null) {
+        // Grounded path: whole NCERT chapter text injected, strict citations.
+        responseText = await geminiService.sendGrounded(
+          prompt: text,
+          contextualText: _groundedChapter!.toContextBlock(),
+          sourceLabel:
+              '${_groundedChapter!.className} ${_groundedChapter!.title}',
+          history: _geminiHistory(),
+        );
+        if (!_showedGroundedToast && mounted) {
+          _showedGroundedToast = true;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Grounded reply sent — whole NCERT chapter injected (~40k tokens).',
+              ),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } else if (_groundedUserPdf != null) {
+        // Grounded path: user PDF text injected, strict citations.
+        responseText = await geminiService.sendGrounded(
+          prompt: text,
+          contextualText: _groundedUserPdf!.toContextBlock(),
+          sourceLabel: _groundedUserPdf!.originalName,
+          history: _geminiHistory(),
+        );
+        if (!_showedGroundedToast && mounted) {
+          _showedGroundedToast = true;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Grounded reply sent — your PDF injected (~40k tokens).',
+              ),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
       } else {
         responseText = await geminiService.sendMessage(text);
       }
@@ -241,6 +415,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
         text: responseText,
         isUser: false,
         timestamp: DateTime.now(),
+        groundedChapterKey: _groundedChapterKey,
+        groundedUserPdfId: _groundedUserPdfId,
       );
 
       if (!mounted) return;
@@ -259,6 +435,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
           message: responseText,
           isUser: false,
           timestamp: aiMessage.timestamp,
+          groundedChapterKey: Value(_groundedChapterKey),
+          groundedUserPdfId: Value(_groundedUserPdfId),
         ),
       );
     } catch (e) {
@@ -465,7 +643,393 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               ),
             ),
 
+          _buildGroundedRibbon(),
+
           _buildInputArea(),
+        ],
+      ),
+    );
+  }
+
+  /// The grounded-mode selection ribbon: shows which NCERT chapter or user PDF
+  /// the chat is grounded in, or "General" when ungrounded. Tapping opens the
+  /// chapter/PDF picker.
+  Widget _buildGroundedRibbon() {
+    final ncertChapter = _groundedChapter;
+    final userPdf = _groundedUserPdf;
+    final isNcertGrounded = ncertChapter != null;
+    final isUserPdfGrounded = userPdf != null;
+    final isGrounded = isNcertGrounded || isUserPdfGrounded;
+
+    String label;
+    if (isNcertGrounded) {
+      label =
+          'Grounded in: ${ncertChapter.className} ${ncertChapter.subject} — ${ncertChapter.title}';
+    } else if (isUserPdfGrounded) {
+      label = 'Grounded in: Your PDF — ${userPdf.originalName}';
+    } else {
+      label = 'Grounded in: no chapter (general chat)';
+    }
+
+    return Material(
+      color: isGrounded
+          ? AdaptiveColors.primary(context).withValues(alpha: 0.08)
+          : AdaptiveColors.surfaceContainerHighest(context),
+      child: InkWell(
+        onTap: _showGroundingPicker,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Icon(
+                isUserPdfGrounded ? Icons.picture_as_pdf : Icons.menu_book_outlined,
+                size: 18,
+                color: isGrounded
+                    ? AdaptiveColors.primary(context)
+                    : AdaptiveColors.textSecondary(context),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isGrounded
+                            ? AdaptiveColors.primary(context)
+                            : AdaptiveColors.textSecondary(context),
+                      ),
+                    ),
+                    if (isGrounded)
+                      Text(
+                        '≈40k tokens per message',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: AdaptiveColors.textSecondary(context),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.expand_more,
+                size: 18,
+                color: AdaptiveColors.textSecondary(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Bottom sheet listing NCERT chapters and user PDFs for grounding selection.
+  void _showGroundingPicker() {
+    final entries = NcertBookCatalog.allByChapterKey;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AdaptiveColors.background(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        final sortedKeys = entries.keys.toList()..sort();
+        return SafeArea(
+          child: FutureBuilder<List<UserPdfIndex>>(
+            future: ref.read(userPdfIndexProvider).listIndices(),
+            builder: (context, snapshot) {
+              final userPdfs = snapshot.data ?? const <UserPdfIndex>[];
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AdaptiveColors.divider(context),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // General chat option
+                  ListTile(
+                    leading: const Icon(Icons.chat_bubble_outline),
+                    title: const Text('General chat (no grounding)'),
+                    subtitle: const Text(
+                      'Best for questions outside the listed sources',
+                    ),
+                    onTap: () {
+                      context.pop();
+                      _selectGroundingSource(ncertChapterKey: '');
+                    },
+                  ),
+                  const Divider(height: 1),
+                  // NCERT chapters section
+                  if (sortedKeys.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Text(
+                        'NCERT Chapters',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AdaptiveColors.textSecondary(context),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: sortedKeys.length,
+                        itemBuilder: (context, index) {
+                          final key = sortedKeys[index];
+                          final entry = entries[key]!;
+                          final selected = key == _groundedChapterKey;
+                          return ListTile(
+                            dense: true,
+                            leading: selected
+                                ? Icon(
+                                    Icons.check_circle,
+                                    color: AdaptiveColors.primary(context),
+                                  )
+                                : const Icon(Icons.menu_book_outlined),
+                            title: Text(
+                              '${entry.subject} ${entry.classLevel} — '
+                              'Ch. ${entry.chapterNumber}: ${entry.chapterTitle}',
+                            ),
+                            selected: selected,
+                            onTap: () {
+                              context.pop();
+                              _selectGroundedChapter(key);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    const Divider(height: 1),
+                  ],
+                  // User PDFs section
+                  if (userPdfs.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Your PDFs',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AdaptiveColors.textSecondary(context),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            tooltip: 'Attach new PDF',
+                            icon: const Icon(Icons.add_circle_outline, size: 20),
+                            onPressed: () {
+                              context.pop();
+                              _showAttachPdfSheet();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: userPdfs.length,
+                        itemBuilder: (context, index) {
+                          final pdf = userPdfs[index];
+                          final selected = pdf.pdfId == _groundedUserPdfId;
+                          return ListTile(
+                            dense: true,
+                            leading: selected
+                                ? Icon(
+                                    Icons.check_circle,
+                                    color: AdaptiveColors.primary(context),
+                                  )
+                                : const Icon(Icons.picture_as_pdf_outlined),
+                            title: Text(pdf.originalName),
+                            subtitle: Text(
+                              '${pdf.pageCount} pages · ${pdf.wordCount} words',
+                            ),
+                            selected: selected,
+                            onTap: () {
+                              context.pop();
+                              _selectGroundedUserPdf(pdf.pdfId);
+                            },
+                            trailing: IconButton(
+                              tooltip: 'Remove',
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: AdaptiveColors.error(context),
+                                size: 20,
+                              ),
+                              onPressed: () async {
+                                final navigator = Navigator.of(context);
+                                await ref
+                                    .read(userPdfIndexProvider)
+                                    .delete(pdf.pdfId);
+                                if (!mounted) return;
+                                navigator.pop();
+                                _showGroundingPicker();
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ] else ...[
+                    // Empty state for user PDFs
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      child: Column(
+                        children: [
+                          const Divider(height: 1),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Your PDFs',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AdaptiveColors.textSecondary(
+                                      context,
+                                    ),
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  tooltip: 'Attach new PDF',
+                                  icon: const Icon(
+                                    Icons.add_circle_outline,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    context.pop();
+                                    _showAttachPdfSheet();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.picture_as_pdf_outlined),
+                            title: const Text('No PDFs attached yet'),
+                            subtitle: const Text(
+                              'Attach a PDF to ground answers in your own documents',
+                            ),
+                            onTap: () {
+                              context.pop();
+                              _showAttachPdfSheet();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAttachPdfSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AdaptiveColors.background(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => PdfAttachmentBottomSheet(
+        onPdfAdded: () {
+          if (mounted) _showGroundingPicker();
+        },
+      ),
+    );
+  }
+
+  /// Tappable page-citation chips rendered under grounded AI replies.
+  /// Tapping jumps into the chapter's PDF or user PDF at that physical page.
+  Widget _buildCitationChips(ChatMessage message) {
+    final chapterKey = message.groundedChapterKey;
+    final userPdfId = message.groundedUserPdfId;
+    if (message.isUser || (chapterKey == null && userPdfId == null)) {
+      return const SizedBox.shrink();
+    }
+
+    final pages = _citationPattern
+        .allMatches(message.text)
+        .map((m) => int.parse(m.group(1)!))
+        .toSet()
+        .toList()
+      ..sort();
+    if (pages.isEmpty) return const SizedBox.shrink();
+
+    final isUserPdf = userPdfId != null;
+    final pdfId = userPdfId!; // non-null when isUserPdf is true
+    final chKey = chapterKey!; // non-null when isUserPdf is false
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        children: [
+          for (final page in pages)
+            ActionChip(
+              visualDensity: VisualDensity.compact,
+              avatar: Icon(
+                isUserPdf ? Icons.picture_as_pdf : Icons.auto_stories_outlined,
+                size: 14,
+                color: AdaptiveColors.primary(context),
+              ),
+              label: Text('p.$page'),
+              labelStyle: TextStyle(
+                fontSize: 11,
+                color: AdaptiveColors.primary(context),
+                fontWeight: FontWeight.w600,
+              ),
+              side: BorderSide(
+                color: AdaptiveColors.primary(context).withValues(alpha: 0.4),
+              ),
+              backgroundColor: AdaptiveColors.primary(
+                context,
+              ).withValues(alpha: 0.06),
+              onPressed: () => context.push(
+                isUserPdf
+                    ? '/user-pdf?pdfId=${Uri.encodeComponent(pdfId)}&initialPage=$page'
+                    : '/pdf?entryId=${Uri.encodeComponent(chKey)}&initialPage=$page',
+              ),
+            ),
         ],
       ),
     );
@@ -478,7 +1042,10 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
         : message.text;
     final scheme = Theme.of(context).colorScheme;
 
-    return Align(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -529,6 +1096,13 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
           ],
         ),
       ),
+        ),
+        // Page citations from grounded mode, tap-through to the PDF.
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: _buildCitationChips(message),
+        ),
+      ],
     );
   }
 
