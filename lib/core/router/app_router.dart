@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../constants/feature_flags.dart';
 import '../providers/providers.dart';
 import '../../features/auth/auth_screen.dart';
 
@@ -25,6 +26,7 @@ import '../../features/test_series/pdf_picker_screen.dart';
 import '../../features/exam_engine/cbt_test_screen.dart';
 import '../../features/exam_engine/cbt_result_screen.dart';
 import '../../features/exam_engine/cbt_instructions_screen.dart';
+import '../../features/exam_engine/adaptive_test_screen.dart';
 import '../../core/services/exam_engine_service.dart';
 import '../../core/services/dpp_engine.dart';
 import '../../core/services/exam_checkpoint_service.dart';
@@ -42,6 +44,7 @@ import '../../features/chatbot/chatbot_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/settings/import_questions_screen.dart';
 import '../../features/pdf/ncert_pdf_screen.dart';
+import '../../features/pdf/user_pdf_viewer_screen.dart';
 import '../../features/resources/resources_screen.dart';
 import '../../features/resources/chapter_notes_screen.dart';
 import '../../features/bookmarks/bookmarks_dashboard.dart';
@@ -56,6 +59,17 @@ import '../../features/chapter/lesson_screen.dart';
 import '../../features/chapter/chapter_quiz_screen.dart';
 
 const _publicRoutes = {'/auth', '/terms', '/privacy', '/help'};
+
+/// Redirect target for `/pyq`.
+///
+/// Returns `null` (stay) only when [FeatureFlags.pyqDownloads] is on. The fake
+/// screen used to animate a progress bar without downloading anything, so while
+/// the flag is off a deep link is bounced to the practice hub instead.
+///
+/// Extracted from the route table so a test can assert the screen is not
+/// reachable while the feature is disabled.
+String? pyqRouteRedirect() =>
+    FeatureFlags.pyqDownloads ? null : '/practice';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -236,6 +250,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/adaptive-test',
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final initialPool = (extra?['initialPool'] as List<Question>?) ?? [];
+          final subject = (extra?['subject'] as String?) ?? 'Biology';
+          return AdaptiveTestScreen(
+            initialPool: initialPool,
+            subject: subject,
+          );
+        },
+      ),
+      GoRoute(
         path: '/quiz/result',
         redirect: (context, state) {
           if (state.extra == null) return '/';
@@ -266,7 +292,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/pdf',
         builder: (_, state) {
           final entryId = state.uri.queryParameters['entryId'] ?? '';
-          return NcertPdfScreen(entryId: entryId);
+          final initialPage =
+              int.tryParse(state.uri.queryParameters['initialPage'] ?? '');
+          return NcertPdfScreen(entryId: entryId, initialPage: initialPage);
+        },
+      ),
+      GoRoute(
+        path: '/user-pdf',
+        builder: (_, state) {
+          final pdfId = state.uri.queryParameters['pdfId'] ?? '';
+          final initialPage =
+              int.tryParse(state.uri.queryParameters['initialPage'] ?? '');
+          return UserPdfViewerScreen(pdfId: pdfId, initialPage: initialPage);
         },
       ),
       GoRoute(
@@ -433,7 +470,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           return DppScreen(subject: subject);
         },
       ),
-      GoRoute(path: '/pyq', builder: (_, _) => const PyqDownloadScreen()),
+      // Hidden until wired to a real downloader (see FeatureFlags.pyqDownloads).
+      // The redirect keeps a deep link from opening the fake screen.
+      GoRoute(
+        path: '/pyq',
+        redirect: (_, _) => pyqRouteRedirect(),
+        builder: (_, _) => const PyqDownloadScreen(),
+      ),
       GoRoute(path: '/test', builder: (_, _) => const TestModuleScreen()),
     ],
   );
