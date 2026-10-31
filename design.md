@@ -1,6 +1,6 @@
 # NEET Mitos — App Redesign Blueprint
 
-This is the product brief and implementation plan for a full NEET Mitos redesign. It intentionally resets the product direction while preserving useful, working study capabilities. The current app is a Flutter Android/web product with a broad feature set and an established theme foundation; redesign navigation and screens around student needs before polishing individual components. The shared theme/tokens in `lib/core/theme/` describe current implementation, not a constraint on the new direction. `design-system/neet-mitos/MASTER.md` is the concise visual companion and must stay aligned with this blueprint.
+This is the product brief and implementation plan for a full NEET Mitos redesign. It intentionally resets the product direction while preserving useful, working study capabilities. The current app is a Flutter Android/iOS/web product with a broad feature set and an established theme foundation; redesign navigation and screens around student needs before polishing individual components. The shared theme/tokens in `lib/core/theme/` describe current implementation, not a constraint on the new direction. `design-system/neet-mitos/MASTER.md` is the concise visual companion and must stay aligned with this blueprint.
 
 ## North star
 
@@ -18,17 +18,25 @@ NEET Mitos is a free, offline-first NEET preparation app for Android and web. Th
 
 The supplied app icon is a two-node continuous loop on a deep navy field. It suggests repetition, connection, and steady progress. Carry that simple geometry and contrast into the interface with restrained use of the loop mark, connected progress indicators, and clear recurring study rhythms. Do not use literal spinner imagery as a decorative motif, or imply that a feature is available when it is not.
 
-### Logo-derived brand colors
+### Brand mark and workspace palette
 
-Approximate colors sampled from the supplied 1024 px icon:
+The supplied icon provides the identity pair. Keep it recognizable on launch,
+onboarding, and small brand placements. Study screens use the restrained
+**Calm Precision** palette below so bright logo teal remains a distinct accent.
 
 | Token | Hex | Intended role |
 |---|---|---|
-| Brand navy | `#0A2344` | Brand field, focused exam chrome, high contrast anchor |
-| Brand teal | `#00B8A9` | Brand mark, progress emphasis, selected/highlight accents |
-| White | `#FFFFFF` | Contrast on dark brand surfaces |
+| Logo navy | `#0A2344` | Supplied icon field and identity moments |
+| Logo teal | `#00B8A9` | Supplied mark and restrained brand accents |
+| Action teal | `#146C60` | Primary workspace actions and selected navigation |
+| Warm ivory | `#F7F8F5` | Main light canvas |
+| Soft mint | `#E5F2EC` | Selected answers and quiet highlights |
+| Deep charcoal | `#172724` | Main study text |
+| Muted slate | `#566762` | Supporting text |
 
-Use navy and teal as the recognizable brand pair, especially in identity and selected high-emphasis moments. Teal should not become a large-area background everywhere; protect its meaning by reserving it for actions, progress, selection, and brand accents. Use semantic success/error colors for correctness and validation rather than making all green states look like branding.
+Reserve logo navy and bright teal for identity moments. Use deep action teal
+for important controls; use semantic success and error colors for correctness
+and validation rather than making every green state look like branding.
 
 ## Experience principles
 
@@ -100,44 +108,53 @@ Ask only for information needed to personalize study. Keep steps short, numbered
 
 ## Visual system
 
-### Overall art direction: “quiet momentum”
+### Overall art direction: “Calm Precision”
 
-Use a confident, editorial study interface: strong navy typography and anchors, bright teal for meaningful actions and forward motion, warm near-white reading surfaces, generous whitespace, and a small number of crisp subject accents. The app should feel simpler and more distinctive than the current green-on-green generic dashboard. The loop symbol is the visual signature; use it sparingly as a progress/continuity motif, not as a watermark behind every card. Prefer flat, well-structured surfaces and purposeful dividers over endless rounded cards, gradients, glass, or heavy shadows.
+Use a focused, trustworthy study workspace with warm ivory surfaces, deep teal
+actions, crisp familiar typography, and generous spacing. The app should feel
+encouraging rather than clinical or like a coaching poster. Let the two-node
+loop carry the Mitos identity on onboarding, empty states, and session
+completion; do not decorate question screens with it. Prefer clear structure,
+plain rows, light borders, and purposeful spacing over nested cards, gradients,
+glass effects, and heavy shadows.
 
-Brand ratios are guidance rather than literal screen coverage: mostly light neutral canvas, navy text/structure, teal accents, then small semantic/subject colors. Offer a considered dark theme using deep navy-adjacent surfaces and accessible teal; do not simply invert the logo or use saturated teal as dark-mode body text.
+Use mostly warm neutral canvas, charcoal text, teal actions, then small
+semantic and subject accents. Offer a considered dark theme with deep neutral
+surfaces and readable teal controls; do not simply invert the logo or use
+saturated teal as body text.
 
 ### Design foundations
 
-- **Color:** establish explicit brand, semantic, subject, background, surface, text, and border tokens. Brand teal is not the success color. Provide on-color tokens and verify contrast before changing primary action colors.
-- **Type:** Inter, with a restrained scale; large, human headline on Today, compact section titles, highly readable lesson/question text, quiet metadata.
+- **Color:** establish explicit brand, semantic, subject, background, surface, text, and border tokens. Logo teal is not the primary action or success color. Provide on-color tokens and verify contrast.
+- **Type:** Roboto with a system Devanagari fallback; use a restrained scale, readable lesson/question text, and quiet metadata. Respect user text scaling.
 - **Grid:** 8 px base rhythm; 20 px phone gutter; content max-width around 720 px for reading and forms; tighter, intentional layouts for CBT.
-- **Shape:** consistent 12–16 px control radius; 16–20 px feature surface radius; pills only for filters/chips/status. Use less rounding than the current every-element-is-a-pill/card pattern.
+- **Shape:** 12 px control radius and 16 px card radius; pills only for filters/chips/status.
 - **Elevation:** mostly flat. Use a light border or subtle shadow to separate surfaces; reserve elevated treatment for transient sheets and key action cards.
 - **Iconography:** one family, stroke/filled states consistently paired. No emojis for controls. Use the supplied icon asset faithfully; do not improvise a new wordmark.
 - **Motion:** purposeful 150–250 ms transitions; progress may animate once on entry. No constant shimmer or confetti during study/exams; honor reduced motion.
 
 ### Color and theme
 
-The Flutter theme defines the current semantic colors and light/dark behavior (`lib/core/theme/app_colors.dart`, `app_theme.dart`). Use adaptive theme colors in widgets rather than hardcoded one-off values. The shared theme has been moved toward the icon's navy/teal identity; continue replacing old per-screen colors with these tokens while preserving semantic state colors.
+The Flutter theme defines semantic colors and light/dark behavior (`lib/core/theme/app_colors.dart`, `app_theme.dart`). Use adaptive theme colors in widgets rather than hardcoded one-off values. The shared theme follows Calm Precision: the logo navy/bright teal remain identity colors, while deep teal is the workspace action color.
 
 | Role | Current light token | Current dark token | Guidance |
 |---|---|---|---|
-| Primary action | `#0A2344` | `#52D6C8` | Main actions, active navigation |
-| Brand accent | `#00B8A9` | `#52D6C8` | Progress, selection, identity accents |
-| Primary soft | `#E3F5F2` | `#115E59` | Quiet selection and brand-tinted surfaces |
-| App background | `#F6F8FB` | `#071629` | Main canvas |
-| Surface | `#FFFFFF` | `#0D2038` | Cards and sheets |
-| Main text | `#0A2344` | `#F1F6FC` | Titles and body copy |
-| Supporting text | `#52647A` | `#B2C1D1` | Secondary metadata and hints |
-| Success | `#0D8B68` | `#34D399` | Correct answers and completed goals |
-| Warning | `#B7791F` | `#FBBF24` | Due reminders and caution |
-| Error | `#B94545` | `#F87171` | Errors and destructive actions |
+| Primary action | `#146C60` | `#72C8B5` | Main actions, active navigation |
+| Logo accent | `#00B8A9` | `#52D6C8` | Supplied mark and limited identity accents |
+| Primary soft | `#E5F2EC` | `#17483F` | Selected answers and quiet highlights |
+| App background | `#F7F8F5` | `#071B18` | Main canvas |
+| Surface | `#FFFFFF` | `#102521` | Cards and sheets |
+| Main text | `#172724` | `#F1F6F4` | Titles and body copy |
+| Supporting text | `#566762` | `#B8C7C1` | Secondary metadata and hints |
+| Success | `#187A55` | `#34D399` | Correct answers and completed goals |
+| Warning | `#946200` | `#FBBF24` | Due reminders and caution |
+| Error | `#B3261E` | `#F87171` | Errors and destructive actions |
 
 Subject accents from `SubjectColors`: Biology green (`#059669`), Chemistry violet (`#7C3AED`), Physics amber (`#D97706`). Use soft tints for larger surfaces and saturated accents for small markers/icons. Maintain readable contrast in both themes.
 
 ### Typography
 
-Use **Inter** as the interface typeface, consistent with `AppTheme`. Use compact, semibold/bold headings for hierarchy, regular body text with comfortable line height for study content, and medium labels for controls. Avoid decorative typefaces, excessive all-caps, and long passages set in small text. Keep mathematical notation and question content especially legible.
+Use **Roboto** as the interface typeface, with Android's Noto Sans Devanagari system fallback for Hindi. Use a restrained 28 px screen title, 20 px section title, 18 px question text, 16 px body/options, and 12–14 px metadata. Keep comfortable line height, respect user font scaling, and verify Hindi, equations, and chemical notation with real content.
 
 ### Spacing, shape, and elevation
 
@@ -145,8 +162,8 @@ Use existing `AppSpacing`, `AppRadius`, and `AppShadows` in `lib/core/theme/toke
 
 - Standard page gutter: 20 px; allow up to 24 px on roomy screens.
 - Common spacing rhythm: 4, 8, 12, 16, 24, 32, 48 px.
-- Card padding: 16–24 px; standard card radius: 16–24 px.
-- Controls: at least 48 px high for primary buttons; target at least 44 px touch areas.
+- Card padding: 16–20 px; standard card radius: 16 px.
+- Controls: 52 px primary buttons (never below 48 px); target at least 44 px touch areas.
 - Prefer thin outlines and subtle shadows; avoid stacked elevation and glass effects that reduce clarity.
 - Use the existing rounded, contained bottom navigation on phones; ensure content scrolls above it and respects system insets.
 
@@ -177,11 +194,11 @@ Use short transitions for selection, navigation, and progress updates; motion sh
 
 ## Redesign delivery plan
 
-The project has a useful technical foundation: Material 3, Inter, adaptive light/dark theme definitions, spacing/radius/shadow tokens, subject accents, shared widgets, and the new three-destination shell. Reuse technical primitives where they fit; continue bringing feature screens onto the same visual system.
+The project has a useful technical foundation: Material 3, Roboto, adaptive light/dark theme definitions, spacing/radius/shadow tokens, subject accents, shared widgets, and the three-destination shell. Reuse technical primitives where they fit; continue bringing feature screens onto the same visual system.
 
 ### Phase 1 — Redefine brand foundations
 
-- Confirm logo navy/teal as brand identity colors and define accessible light/dark semantic mappings in `app_colors.dart` and `AppTheme`.
+- Keep logo navy/bright teal as identity colors; use the Calm Precision workspace palette and define adaptive semantic mappings in `app_colors.dart` and `AppTheme`.
 - Keep success green distinct from brand teal; check text/icon contrast on every brand surface.
 - Keep `design-system/neet-mitos/MASTER.md` aligned with this brief and remove competing or stale palette guidance.
 - Establish logo usage (icon-only, wordmark if one exists, clear space, minimum size, background choices) from the supplied asset; do not invent a wordmark asset.
@@ -215,16 +232,209 @@ These phases are the recommended redesign sequence, not a claim that the work is
 - Treat `lib/core/theme/app_theme.dart`, `app_colors.dart`, `tokens.dart`, and shared widgets in `lib/core/theme/` and `lib/core/widgets/` as the Flutter design-system implementation.
 - Prefer shared components/tokens for repeated cards, chips, progress indicators, buttons, fields, and status badges.
 - Keep real feature behavior and capability limits intact when changing presentation.
-- The supplied icon palette and current app theme differ. Before broad UI restyling, reconcile brand navy/teal with semantic light/dark tokens and verify contrast; avoid sprinkling logo hex values ad hoc across screens.
+- The logo identity and Calm Precision workspace palettes are mapped separately in shared light/dark tokens; keep using adaptive colors and verify contrast in each screen.
 - This file guides future product design and is not a claim that every screen already conforms.
+
+## Current implementation status
+
+The shared theme now uses the Calm Precision workspace palette, Roboto with a
+Devanagari system fallback, Material 3 controls, and the logo colors for
+identity moments. Today, Study, and You have been simplified; quiz answer
+states, study-plan feedback, and progress empty states follow the same direction.
+
+The app-wide migration is still in progress. Continue applying these tokens to
+remaining feature pages and verify the full study journey with real content on
+small phones, large text, dark mode, and web. Check every route for empty,
+loading, error, offline, and completion states before calling the redesign done.
 
 ## Design review checklist
 
 - [ ] Is the primary next action clear without competing calls to action?
 - [ ] Does the screen reflect the plan, learn, practice, review, progress loop?
 - [ ] Are all visible metrics and availability claims based on real state?
-- [ ] Are brand, subject, and semantic colors used consistently and accessibly?
+- [ ] Are logo, workspace, subject, and semantic colors used consistently and accessibly?
 - [ ] Are light and dark themes readable, including selected/error/correct states?
 - [ ] Are touch, keyboard, text-scaling, safe-area, and narrow-width needs covered?
 - [ ] Does motion support the task and pause/reduce when requested?
 - [ ] Are offline, loading, empty, and failure states clear and actionable?
+
+## Calm Precision v1.0 — Android light-theme implementation handoff
+
+This section turns the visual direction into measurable component and state
+rules for Android light theme. It is a target specification, not a claim that
+every rule is already implemented or device-verified. A machine-readable copy
+of the tokens is in `design-system/neet-mitos/tokens.light.json`.
+
+### Exact foundations
+
+| Role | Token | Value | Use |
+|---|---|---|---|
+| Main canvas | `background` | `#F7F8F5` | Warm neutral screen background |
+| Surface | `surface` | `#FFFFFF` | Cards, sheets, answer rows |
+| Primary text | `textPrimary` | `#172724` | Titles, questions, answer text |
+| Secondary text | `textSecondary` | `#566762` | Supporting copy and labels |
+| Main action | `primary` | `#146C60` | Primary CTA and selected controls |
+| On action | `onPrimary` | `#FFFFFF` | Text/icons on primary action |
+| Selected container | `primaryContainer` | `#E5F2EC` | Selected answer/control background |
+| Interactive outline | `outline` | `#71817A` | MCQ and input boundaries; focus |
+| Decorative border | `borderSubtle` | `#DCE5DF` | Dividers and non-interactive card edges only |
+| Success | `success` / `successContainer` | `#216A43` / `#EAF5ED` | Correct answer and positive status |
+| Error | `error` / `errorContainer` | `#B3261E` / `#FCECEB` | Incorrect answer and validation |
+| Warning | `warning` / `warningContainer` | `#946200` / `#FFF4D6` | Caution and due status |
+
+Contrast was calculated using WCAG relative luminance for these pairs: white on
+primary **6.28:1**, secondary text on white **5.98:1**, charcoal on warm canvas
+**14.57:1**, success on its container **5.86:1**, error on its container
+**5.71:1**, and warning on its container **4.78:1**. The interactive outline
+`#71817A` on white is **4.10:1**: suitable as a non-text control boundary under
+the 3:1 target, but not for small text. Never use `borderSubtle` as the sole
+visible boundary of an MCQ option or input. Recalculate if any value changes.
+
+### Android type and layout
+
+Roboto is the interface font; use Noto Sans Devanagari as the Android Hindi
+fallback. Scale is in Android `sp`; line heights are starting minimums and may
+grow with font scaling or Devanagari shaping.
+
+| Role | Size / line height | Weight |
+|---|---:|---:|
+| Screen title | 28 / 36 sp | 600 |
+| Section heading | 20 / 28 sp | 600 |
+| Question | 18 / 28 sp | 400 |
+| Body / answer | 16 / 24 sp | 400 |
+| Button | 16 / 24 sp | 500 |
+| Label | 14 / 20 sp | 500 |
+| Metadata | 12 / 16 sp | 400 |
+
+Spacing scale: `4, 8, 12, 16, 20, 24, 32, 48, 64 dp`. Phone gutter is 20dp;
+cards use 20dp padding; option rows have 12dp gaps; sections use 24–32dp.
+Use 8dp small, 12dp control, 16dp card, and 24dp sheet radii. Constrain wide
+question reading columns to 640dp. Heights are minimums, never fixed sizes:
+long questions, Hindi, chemistry notation, equations, and large system text
+must be allowed to wrap and grow.
+
+### Buttons, cards, and fields
+
+- Primary button: 52dp minimum height, 12dp radius, 20dp horizontal padding;
+  keep its width and label stable while loading and block duplicate submits.
+- Button states: default, pressed, keyboard/accessibility focused, disabled,
+  and loading. Secondary actions use text or outline treatment.
+- Card: white surface, 16dp radius, 20dp padding, 1dp subtle border, zero
+  default elevation. Add shadow only when a layer truly floats.
+- Field: persistent visible label, 48dp or taller touch target, 2dp focused
+  outline, clear error text and icon. Placeholder is supplementary only.
+- Icons: one Material rounded family; navigation keeps text labels. Chips are
+  for filters/status, never the only affordance for a primary action.
+
+### MCQ component and state contract
+
+Option anatomy: whole row selectable; at least 64dp tall; 16dp inner padding;
+24dp letter/selection marker; 12dp marker-to-copy gap; 12dp radius. Reserve
+border space in every state so the row never shifts. Long option text wraps;
+never truncate it. Keep correct/incorrect label and icon alongside color.
+
+| State | Visual contract | Interaction |
+|---|---|---|
+| Default | White, 1dp `outline`, empty letter marker | Selectable |
+| Selected | Mint fill, 1.5dp teal outline, checked marker | Can change before check/save |
+| Submitting | Preserve selection and row geometry | Lock briefly; no correctness shown |
+| Correct review | Success container, check icon, “Correct answer” | Review state |
+| Selected incorrect review | Error container, close icon, “Your answer · Incorrect”; highlight correct row too | Review state |
+| Other review options | Neutral surface and text | Do not mark every distractor red |
+| Unanswered review | Question-level “Not answered”; correct row identified | Review state |
+| Submission failure | Keep selected answer; announce actionable retry | Never infer correctness |
+
+**Practice flow:** Select → Check answer → Correct/incorrect feedback → Next.
+**Test flow:** Select → Save & next; hide correctness until the test is submitted
+and the user enters review. Revisit/change answers before submission where the
+test rules allow. The quiz screen now derives reveal behavior from `testType`
+(`mock`/`exam` hide correctness until completion; practice/review reveal it);
+the mode-specific behavior is implemented.
+
+### Acceptance checklist
+
+- [ ] Verify token contrast in the rendered Android theme; keep the listed
+  foreground/container ratios at or above 4.5:1 for text and 3:1 for
+  non-text boundaries.
+- [ ] Verify option states, semantics, keyboard/focus feedback, no layout jump,
+  and no correctness leakage during test mode.
+- [ ] Verify long English/Hindi questions, chemical notation, diagrams, and
+  maximum Android font scale on a narrow phone and a 640dp+ window.
+- [ ] Verify TalkBack names for option letter, answer text, selected state,
+  and result label; color alone must never communicate meaning.
+- [ ] Check loading, empty, failed submission, disabled, and resumed states.
+- [ ] Treat JSON as the project's custom token schema, not a drop-in Android
+  resource or generated theme. Dark theme remains separately specified.
+
+## iOS adaptation — shared brand, native platform behavior
+
+The Android spec above is the visual baseline, not a component blueprint to
+copy onto iOS. Keep Mitos's shared palette, content hierarchy, calm composition,
+cell-division motif, spacing rhythm, semantic answer colors, and practice/test
+rules. Use iOS-specific layout units and familiar iOS navigation, typography,
+controls, and presentation. JSON includes both platform profiles.
+
+### iOS foundations
+
+- **Units:** define iOS layout in points (`pt`), separately from Android `dp`.
+  Shared spacing intent can map to the same numeric rhythm, but components must
+  follow platform conventions and adapt to available width.
+- **Type:** use the iOS system font (SF Pro) and semantic text styles, not a
+  forced Roboto family. Starting defaults: `.largeTitle` 34pt, `.title2` 22pt,
+  `.title3` 20pt, question 18pt scaled relative to `.body`, `.body` 17pt,
+  `.headline` 17pt, `.subheadline` 15pt, and `.caption` 12pt. In Flutter, keep
+  text scale enabled and use the platform system font; map app text roles to
+  equivalent semantic sizes rather than pinning fixed heights.
+- **Dynamic Type:** support the full accessibility text-size range. Rows,
+  buttons, navigation labels, and sheets grow with content. Do not truncate
+  questions or use fixed-height answer rows.
+- **Color:** reuse the exact shared light tokens from the Android profile and
+  `tokens.light.json`. Use named Asset Catalog colors or central semantic
+  tokens. Dark appearance needs deliberately designed values; never auto-invert
+  the light palette.
+- **Controls:** primary button 52pt minimum height, 20pt horizontal padding,
+  12pt radius, `.headline` text. Cards use 16pt radius, 20pt padding, white
+  surface, subtle border, and no default shadow. Touch targets are at least
+  44×44pt; these are Mitos component choices, not claims about Apple's required
+  dimensions.
+- **Icons:** prefer SF Symbols with consistent weight and clear selected
+  variants. Keep visible text labels for primary navigation.
+
+### iOS navigation and system behavior
+
+- Use a native-feeling navigation stack with conventional back behavior,
+  interactive swipe-back, and a native tab bar on phone. In this Flutter app,
+  retain GoRouter as routing state while using Cupertino page transitions and
+  `CupertinoTabBar` for the primary iOS shell.
+- Use platform-appropriate buttons, form affordances, sheets, and alerts for
+  short contextual tasks. Keep the full practice flow in a full screen, never a
+  cramped sheet.
+- Respect safe areas, home-indicator inset, keyboard, and interactive-dismiss
+  behavior. Keep bottom actions above the home indicator.
+- Use haptics only for meaningful feedback. Support VoiceOver, Dynamic Type,
+  Reduce Motion, and accessible focus states; decorative icons should not be
+  announced separately.
+- For iPad, adapt to available width with a readable constrained question
+  column or deliberate split layout. Do not stretch a phone composition across
+  the whole window.
+
+### Shared MCQ behavior
+
+Keep the Android state colors and semantics: selected = mint + teal outline;
+correct = success tint + check + label; selected incorrect = error tint + cross
++ label; other options remain neutral. The whole row is selectable. VoiceOver
+must announce the option's complete text, selected state, and review result.
+Do not expose correctness before review in test mode. Practice remains Select
+→ Check answer → Feedback → Next; test remains Select → Save & next → Submit
+→ Review. This product behavior is platform-independent.
+
+### Current iOS implementation status
+
+The repository has a Flutter iOS target. Shared semantic colors now apply;
+the app theme uses platform text sizing/system font on iOS, page transitions
+use the Cupertino transition, and the primary phone navigation uses
+`CupertinoTabBar`. This is a first adaptation pass, not a full native-control
+migration. Forms, alerts/sheets, MCQ interaction polish, VoiceOver, Dynamic
+Type extremes, Reduce Motion, safe-area behavior, iPad layout, and visual
+contrast still require iOS simulator/device review. This environment cannot
+run Xcode or an iOS simulator, so iOS visual QA is unverified.
