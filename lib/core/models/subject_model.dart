@@ -23,6 +23,13 @@ class Chapter {
   final int weight;
   final List<Topic> topics;
 
+  /// True when NCERT's rationalised syllabus dropped this chapter.
+  ///
+  /// Such a chapter is kept because older PYQs still reference it, but it has
+  /// no current textbook PDF, so the UI must label it and must not offer a
+  /// "read the chapter" action that would serve some other chapter's content.
+  final bool isRemovedFromSyllabus;
+
   Chapter({
     required this.id,
     required this.name,
@@ -31,6 +38,7 @@ class Chapter {
     this.classLevel,
     this.weight = 1,
     required this.topics,
+    this.isRemovedFromSyllabus = false,
   });
 }
 
