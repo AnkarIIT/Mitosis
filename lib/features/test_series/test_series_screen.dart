@@ -100,6 +100,17 @@ class _TestSeriesScreenState extends ConsumerState<TestSeriesScreen> {
                 context.push('/test-series/paper');
               },
             ),
+            const SizedBox(height: 12),
+            _buildTestCard(
+              context,
+              title: 'PDF Test Import & Picker',
+              subtitle: 'Extract and parse questions from custom test PDFs',
+              icon: Icons.picture_as_pdf,
+              color: SubjectColors.biology,
+              onTap: () {
+                context.push('/pdf-picker');
+              },
+            ),
             const SizedBox(height: 24),
             _buildSectionTitle(context, 'Subject-wise Tests'),
             ...subjects.map((subject) {
