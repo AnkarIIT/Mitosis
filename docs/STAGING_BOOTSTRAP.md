@@ -112,9 +112,16 @@ from `google-services.json`, and that array is empty.
 
 ### Android OAuth client
 
-Google Cloud Console → the project owning API key
-`AIzaSyDuRVSyjaTRNeKPW53N4v465BG-HvFOU-g` → **APIs & Services** → **Credentials**
+Google Cloud Console → the project owning the app's API key
+(`<your-google-api-key>` — kept out of this repo; it is in the project's
+Firebase/Cloud console under **APIs & Services → Credentials**) →
+**APIs & Services** → **Credentials**
 → **Create credentials** → **OAuth client ID** → **Android**:
+
+> **Never paste the key back into a tracked file.** A key of this shape was
+> committed here on 2026-10-28 (commit `e825f34`) and must be treated as
+> public: rotate it in Google Cloud before the next release, and use
+> `git filter-repo` if the history has to be cleaned.
 
 | Field | Value |
 |---|---|
