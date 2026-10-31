@@ -56,6 +56,7 @@ class TopicDetailScreen extends ConsumerWidget {
     final questions = questionsAsync.valueOrNull ?? [];
     final progress = ref.watch(userProgressProvider).topicProgress[topicId];
     final accuracy = progress?.accuracy ?? 0.0;
+    final hasProgress = (progress?.questionsAttempted ?? 0) > 0;
     final isCompleted = progress?.isCompleted ?? false;
     final hasQuestions = questions.isNotEmpty;
 
@@ -156,7 +157,9 @@ class TopicDetailScreen extends ConsumerWidget {
                       const SizedBox(width: 12),
                       _InfoPill(
                         label: 'Accuracy',
-                        value: '${accuracy.toStringAsFixed(0)}%',
+                        value: hasProgress
+                            ? '${accuracy.toStringAsFixed(0)}%'
+                            : 'Not yet',
                         color: AppColors.primary.withValues(alpha: 0.15),
                       ),
                     ],
@@ -164,7 +167,35 @@ class TopicDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: () => _startTopicPractice(
+                  context,
+                  topic: resolvedTopic,
+                  hasQuestions: hasQuestions,
+                ),
+                icon: Icon(
+                  hasQuestions ? Icons.play_arrow_rounded : Icons.search_rounded,
+                ),
+                label: Text(
+                  hasQuestions
+                      ? 'Start ${questions.length}-question practice'
+                      : 'Browse mock tests',
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
 
             // --- NCERT SUMMARY SECTION ---
             Text(
@@ -283,61 +314,31 @@ class TopicDetailScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: LinearProgressIndicator(
-                value: hasQuestions ? (accuracy / 100).clamp(0.0, 1.0) : 0.0,
-                minHeight: 12,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                valueColor: AlwaysStoppedAnimation(
-                  accuracy >= 70 ? AppColors.success : AppColors.primary,
+            if (hasProgress) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: (accuracy / 100).clamp(0.0, 1.0),
+                  minHeight: 8,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  valueColor: AlwaysStoppedAnimation(
+                    accuracy >= 70 ? AppColors.success : AppColors.primary,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
+              const SizedBox(height: 10),
+            ],
             Text(
               isCompleted
-                  ? '🎯 Mastery Achieved!'
-                  : hasQuestions
+                  ? 'Mastery achieved.'
+                  : !hasQuestions
+                  ? 'No topic-specific questions are available yet. Try a test series to keep practicing.'
+                  : hasProgress
                   ? 'Aim for 70%+ accuracy to master this topic.'
-                  : 'No topic-specific questions are available yet. Try a test series to keep practicing.',
+                  : 'Your progress will appear after your first practice session.',
               style: TextStyle(
                 color: AdaptiveColors.textSecondary(context),
                 fontSize: 13,
-              ),
-            ),
-
-            const SizedBox(height: 48),
-            // --- ACTION BUTTONS ---
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (hasQuestions) {
-                    context.push(
-                      '/quiz?topicId=${Uri.encodeComponent(resolvedTopic.id)}&topicName=${Uri.encodeComponent(resolvedTopic.name)}&subject=${Uri.encodeComponent(subjectName)}',
-                    );
-                    return;
-                  }
-
-                  context.push('/test-series');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  hasQuestions ? 'START TOPIC TEST' : 'TRY TEST SERIES INSTEAD',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
-                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -361,6 +362,22 @@ class TopicDetailScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _startTopicPractice(
+    BuildContext context, {
+    required Topic topic,
+    required bool hasQuestions,
+  }) {
+    if (!hasQuestions) {
+      context.push('/test-series');
+      return;
+    }
+    context.push(
+      '/quiz?topicId=${Uri.encodeComponent(topic.id)}'
+      '&topicName=${Uri.encodeComponent(topic.name)}'
+      '&subject=${Uri.encodeComponent(subjectName)}',
     );
   }
 
