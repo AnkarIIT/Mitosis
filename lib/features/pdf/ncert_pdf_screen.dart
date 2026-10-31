@@ -16,7 +16,12 @@ import 'paragraph_question_pool.dart';
 class NcertPdfScreen extends ConsumerStatefulWidget {
   final String entryId;
 
-  const NcertPdfScreen({super.key, required this.entryId});
+  /// Explicit landing page (PDF page number, 1-based). Takes priority over
+  /// saved progress — used when jumping in from a grounded-chat citation so
+  /// the student lands on the cited page, not where they last left off.
+  final int? initialPage;
+
+  const NcertPdfScreen({super.key, required this.entryId, this.initialPage});
 
   @override
   ConsumerState<NcertPdfScreen> createState() => _NcertPdfScreenState();
@@ -50,6 +55,12 @@ class _NcertPdfScreenState extends ConsumerState<NcertPdfScreen> {
   }
 
   Future<void> _restoreProgress() async {
+    // An explicit citation jump outranks reading progress.
+    if (widget.initialPage != null) {
+      setState(() => _savedPage = widget.initialPage);
+      if (_loaded) _controller.jumpToPage(widget.initialPage!);
+      return;
+    }
     final userId = ref.read(currentLocalUserIdProvider);
     if (userId == null) return;
     final progress = await ref
