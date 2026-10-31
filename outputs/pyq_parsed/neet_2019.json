@@ -1,0 +1,1726 @@
+{
+ "year": 2019,
+ "total_parsed": 188,
+ "complete": 1,
+ "sections_reported": [
+  [
+   "Biology",
+   92
+  ],
+  [
+   "Chemistry",
+   49
+  ],
+  [
+   "Physics",
+   43
+  ],
+  [
+   "Unknown",
+   4
+  ]
+ ],
+ "questions": [
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 1,
+   "question": "1. Option (a) is correct. Since, the charge Q will be distributed over the surface of hollow metal sphere. (i) For inside (r < R) Apply, Gauss law, /integrall∘∘p∫in (ii) For outside (r > R) E E /c1810 1r2 E=in 0 r O /integrall∘∘p∫ ⋅=ES0 0d qenε Here, qen= Q ()∵ qen= Q So, E 4π εr =2Q 0 0 1 Hence, E0 2∝ 2.Option (b) is correct. Work done under the given variable force is : y2 WF=∫y dy 1 Here, y1 = 0, y2 = 1 m  1 1 So, W =+ =+∫0()20 10 20 10ydyy2 3.Option (a) is correct. Apply the given condition, where all bulbs are glowing, from the given figure. SOLVED PAPE 2019 ANSWERS WITH EXPLANATIONS PHYSICS R R R ES⋅= =d q or, Ein = 0 ()∵q = 0 enε0 0en E Equivalent resistance, R=R + R = 2 eq 3 3 3 22 Initial Power,(P )= EiR = 3E2R …(i) eq (ii) When two section A and one from section B are glowing. E Equivalent resistance, R=R +R= 3 eq 2 2 r 2 Final Power, ()P Ef = 2…(ii) 3 P 2 Now, i :4 2 P = 3E 3Rf2R 2E =9 4.Option (b) is correct. 4T 2y = 25 JFor the soap, Excess pressure=,    0 Gauge pressure = ρgZ 0 Apply the given condition, P +=4T +ρg 00R PZ0 NEET (UG) SOLVED PAPER : 2019 or, Z T= ⋅ρ 0 4Rg",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 2,
+   "question": "2. Non-elimination of excess potassium ions 285",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 3,
+   "question": "3. True coelomates with segmentation of body Select the correct option of animal groups which (a) Annelida, Arthropoda and Mollusca (b) Arthropoda, Mollusca and Chordata",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 4,
+   "question": "4. Reduced RBC production Which of the following options is the most appropriate ? (a)",
+   "options": {
+    "2": "and",
+    "3": "are correct (b)",
+    "4": "are correct (c)",
+    "1": "and"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 93,
+   "question": "93. Option (c) is correct. Some of the columnar or cuboidal cells are modified. They contain cilia on their surface. Such cells are called the ciliated epithelium. They help to move some particle or mucus in a specific direction. They are located on the inner surface of hollow organs like fallopian tubes and bronchioles.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 94,
+   "question": "94. Option (b) is correct. ) = 0.4 Frequency of recessive allele (say q) = 1 – 0.4 = 0.6 Frequency of homozygous dominant individuals (AA) = p2 = (0.4)2 = 0.16 Frequency of heterozygous individuals (Aa) = 2pq = 2(0.4) (0.6) = 0.48 Frequency of homozygous recessive individuals (aa) = q2 = (0.6)2 = 0.36 NEET (UG) SOLVED PAPER : 2019",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 95,
+   "question": "95. Option (b) is correct. Inbreeding exposes harmful recessive genes that are eliminated by selection. It helps in accumulation of superior genes and elimination of less desirable genes. This approach increases the productivity of the inbred population. Continued inbreeding, especially close inbreeding, may reduce fertility and productivity. This is called inbreeding depression.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 96,
+   "question": "96. Option (a) is correct. The loop of Henle and vasa recta play important role in making concentrated urine. The filtrate flow in the two limbs of Henle is in opposite direction. The two limbs of the vasa recta also show the counter current of blood flow. The counter flow near the area of Henle’s loop and vasa recta increases the osmolarity towards the inner medullary interstitium. The osmolarity increases from 300 mOsmolL–1 to 1200 mOsmolL–1. Thus, hyperosmolarity help in the formation of concentrated urine.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 97,
+   "question": "97. Option (c) is correct. Botanical garden is a method of ex-situ Saprophytes are involved in the decomposition of dead organic materials, parasites are organisms that live on living organisms, and lichen is a symbiotic association between algae and fungi, while mycorrhiza is a symbiotic association between fungi and root of higher plants.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 98,
+   "question": "98. Option (c) is correct. GLUT I and GLUT IV are glucose transport proteins that facilitate glucose transport into insulin-sensitive cells. GLUT-I is insulin- independent and is widely distributed in different tissues of the human body while GLUT IV is primarily expressed in adult tissues and exhibit insulin-dependent glucose transport, such as adipose tissue and skeletal and cardiac muscle.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 99,
+   "question": "99. Option (a) is correct. Bulliform cells are modified cells into large, colourless, and empty cells. During the rainy season they absorb water and become turgid to expose the leaf surface. When the weather is dry, the leaves are flaccid because of water stress. The leaf becomes curl inward to reduce the loss of water.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 100,
+   "question": "100. Option (b) is correct. Alkaloids, rubber, flavonoids, essential oils, coloured pigments, scents, spices, and gums are called secondary metabolites. Concanavalin A is a kind of lectin that belongs to one of the secondary metabolites.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 101,
+   "question": "101. Option (b) is correct. The type of sex determination in birds is called female heterogamety and male homogamety. Thus, the sex of the progeny depends on the type of egg rather than the type of sperm. The female birds have two different sex chromosomes designated as Z and W 299 while male birds have two similar sex chromosomes and are called ZZ.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 102,
+   "question": "102. Option (b) is correct. conservation of biodiversity. Ex-situ conser-vation (off site) is the conservation of organisms outside their habitats. e.g., genetic resource centres, zoological parks, botanical gardens, gene banks, etc.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 103,
+   "question": "103. Which of the following statements is incorrect ? (a) Claviceps is source of many alkaloids and LSD. (b) Conidia are produced exogenously and ascospores endogenously. (c) Yeasts have filamentous bodies with long thread- like hyphae. (d) Morels and truffles are edible delicacies.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 104,
+   "question": "104. Option (d) is correct.  Lactational amenorrhea is one of the natural contraceptive methods. The ovulation and menstrual cycles do not occur during intense lactation after parturition. As long as breastfeeding continued the chance of conception is almost nil.  Oral pills contain hormones-either proge-stogens or progestogen–estrogen combina-tions used by the females.  An emergency contraceptive is like the administration of progestogen-estrogen or the use of IUDs within 72 hours of coitus is effective in the prevention of conception.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 105,
+   "question": "105. Option (a) is correct. Pila belongs to mollusca. It has an organ which is a file-like structure that helps in feeding called a radula. Bombyx is an arthropod. Malpighian tubules are the excretory organ in Bombyx. Pleurobrachia belong to ctenophores. It has Comb plates that bear eight external rows of cilia. Taenia belongs to platyhelminthes. It has flame cells to regulate osmoregulation and excretion.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 106,
+   "question": "106. Option (a) is correct. Heroin is commonly called smack, and chemically diacetylmorphine. It is the most dangerous, white, 300 Oswaal NEET (UG) Year-wise Solved Papers odourless, bitter crystalline compound produced by the acetylation of morphine. It is used as a depressant 115. Option (d) is correct. because it reduces the function of the body. It is consumed by snorting or injection.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 107,
+   "question": "107. Match the following organisms with the products they produce : (a) Lactobacillus (i) Cheese (b) Saccharomyces (ii) Curd cerevisiae (c) Aspergillus niger (iii) Citric Acid (d) Acetobacter aceti (iv) Bread Select the correct option from the following (a) (b) (c) (d) (a) (ii) (iv) (iii) (v) (b) (iii) (iv) (v) (i) (c) (ii) (i) (iii) (v) (d) (ii) (iv) (v) (iii)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 108,
+   "question": "108. Option (c) is correct. Light stimulates certain responses in the plant. Such responses to day and night are called photoperiodism. Leaves are the site of the perception of light. Some of the shoot apices are modified to flowering apices before flowering due to photoperiodism.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 109,
+   "question": "109. Option (d) is correct. Expiratory Capacity (EC) is the total volume of air a person can expire after a normal inspiration. This includes tidal volume and expiratory reserve volume. Since, Tidal Volume = 500 ml And Expiratory Reserve Volume = 1000 ml So, Expiratory Capacity = TV + ERV",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 110,
+   "question": "110. Option (c) is correct. Thiobacillus denitrificans cause denitrification. Denitrification is the process of conversion of oxides of nitrogen to free nitrogen by bacteria present in the soil.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 111,
+   "question": "111. Option (a) is correct. Stabilizing selection is a kind of natural selection. The population stabilizes on the non-extreme value of the trait. The newborn having an average body weight between 3 to 3.3 kg. The data shows that they have a chance of a low survival rate. Because newborn is lower than 3 kg and more than 3.3 kg. Hence, data shows stabilizing selection.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 112,
+   "question": "112. Option (c) is correct. The intensity of the phenotype of the heterozy-gote is less compared to that of the concerned dominant allele. So, the phenotype of heterozygotes would be like the homozygotes of the two concerned alleles. Such a condition is called incomplete dominance. Flower colour in Snapdragon is an example of incomplete dominance. A cross between red (RR) and white (rr) would produce a pink flower (Rr). Because it is intermediate between those two homozygotes (RR and rr). It is an example of the exception of Mendel’s inheritance.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 113,
+   "question": "113. Option (d) is correct. Expressed Sequence Tags (ESTs) are DNA sequences that are expressed as mRNA for protein synthesis. These are used in Human Genome Project.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 114,
+   "question": "114. Identify the cells whose secretion protects the lining of gastro-intestinal tract from various enzymes. Out of Syllabus (b) Oxyntic cells (c) Duodenal cells (d) Chief cells",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 115,
+   "question": "115. Extrusion of second polar body from egg nucleus occurs (a) after fertilisation. (b) before entry of sperm into ovum. (c) simultaneously with first cleavage. (d) after entry of sperm but before fertilisation.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 116,
+   "question": "116. Match the hominids with their correct brain size : (a) Homo habilis (i) 900 cc (b) Homo (ii) 1350 cc neanderthalensis (c) Homo erectus (iii) 650-800 cc (v) Acetic Acid (d) Homo sapiens (iv) 1400 cc Select the correct option from the following (a) (b) (c) (d) (a) (iii) (ii) (i) (iv) (b) (iii) (iv) (i) (ii) (c) (iv) (iii) (i) (ii) (d) (iii) (i) (iv) (ii)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 117,
+   "question": "117. Option (c) is correct. Lysosomes are produced by the rough ER and the Golgi. It contains powerful digestive enzymes (about 40 in number) that are capable of breaking down the organic material. Thus, the lysosome serves as an intracellular digestive system and is called digestive bags. The digestive enzymes contained in lysosome are synthesized by RER and are packed into lysosomes by Golgi bodies.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 118,
+   "question": "118. Option (b) is correct. Progestasert and LNG-20 are hormone-releasing IUDs, = 500 + 1000 which makes the uterus unsuitable for implantation = 1500 ml and the cervix hostile to the sperms.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 119,
+   "question": "119. Option (a) is correct. The respiratory quotient (RQ) is the ratio of CO2 produced to O2 consumed while food is being metabolized. RQ = CO2 eliminated/O2 consumed. The respiratory quotient of tripalmitin is : 2(C51H98O6) + 145O2 → 102CO 2 + 98H2O + Energy R.Q. = 102CO2/ 145O2 = 0.7",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 120,
+   "question": "120. Pinus seed cannot germinate and establish without fungal association. This is because (a) it has obligate association with mycorrhizae. (b) it has very hard seed coat. (c) its seeds contain inhibitors that prevent germination. (b) Disruptive Selection (d) its embryo is immature. (d) Directional Selection121. Sequence of organs in the alimentary canal of cockroach starting from mouth Out of Syllabus (a) Pharynx → Oesophagus → Gizzard → Crop → Ileum → Colon → Rectum (b) Pharynx → Oesophagus → Gizzard → Ileum → Crop → Colon → Rectum Ileum → Crop → Gizzard → Colon → Rectum 4 4 4 (d) Pharynx → Oesophagus → Crop → Gizzard → Ileum → Colon → Rectum",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 121,
+   "question": "121. Out of Syllabus",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 122,
+   "question": "122. Under which of the following conditions will there be no change in the reading frame of following mRNA ? 5' AACAGCGGUGCUAUU 3' 284 Oswaal NEET (UG) Year-wise Solved Papers (a) Deletion of G from 5th position131. Match the following genes of the Lac operon with their (b) Insertion of A and G at 4 th and 5th positions respective products respectively (a) i gene (c) Deletion of GGU from 7 th, 8th and 9th positions (b) z gene (d) Insertion of G at 5 th position",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 123,
+   "question": "123. Option (b) is correct. Retention of the female gametophyte with 130. Option (c) is correct. developing young embryo on the parent sporophyte for some time is first observed in pteridophytes. This phenomenon is known as Heterospory. Heterospory evolved first in pteridophytes such as Selaginella and Salvinia and is considered an important step in evolution as it is a precursor to the seed habit. If two types of spores are formed by the same plant such a condition is called heterospory. These spores differ in size. The smaller one is known as the microspore and the larger one is known as the megaspore. The microspore germinates to form the male gametophyte and the megaspore germinates to form the female gametophyte. The male gametophyte releases the male gametes and these reach the female gametophyte to fuse with the egg. The development of the zygote takes place inside the female gametophyte. This retention and germination of the megaspore within the megasporangium ensure proper development of the zygote. The zygote develops into the future sporophyte. The evolution of the seed habit is related to the retention of the megaspore.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 124,
+   "question": "124. Match the following hormones with the respective disease : (a) Insulin (i) Addison’s disease (b) Thyroxin (ii) Diabetes insipidus (c) Corticoids (iii) Acromegaly (d) Growth Hormone (iv) (v) Diabetes mellitus Select the correct option from the following : (a) (b) (c) (d) (a) (ii) (iv) (iii) (i) (b) (v) (iv) (i) (iii) (c) (ii) (iv) (i) (iii) (d) (v) (i) (ii) (iii)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 125,
+   "question": "125. Option (d) is correct. Rudolf Carl Virchow in 1858, gave the concept of “Omnis cellula-e cellula” regarding cell division. This means that all cells arise from pre-existing cells by cell division.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 126,
+   "question": "126. Colostrum, the yellowish fluid, secreted by mother during the initial days of lactation is very essential to carbohydrates fats and proteins. impart immunity to the newborn infants because it 135. The frequency of recombination between gene pairs contains (a) monocytes. (c) immunoglobulin A. (d) natural killer cells.(c) Sutton Boveri.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 127,
+   "question": "127. Polyblend, a fine powder of recycled modified plastic, 136. Identify the correct pairs representing the causative agent has proved to be a good material for (a) use as a fertilizer. (b) construction of roads. (c) making tubes and pipes. (d) making plastic sacks.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 128,
+   "question": "128. It takes very long time for pineapple plant to produce 137. The Earth Summit held in Rio de Janeiro in 1992 was flowers. Which combination of hormones can be applied to artificially induce flowering in pineapple (a) for conservation of biodiversity and sustainable plants throughout the year to increase yield ? (a) Gibberellin and Cytokinin (b) Gibberellin and Abscisic acid (c) Cytokinin and Abscisic acid (d) Auxin and Ethylene",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 129,
+   "question": "129. Option (a) is correct. Hypothalamus, a region of the forebrain is responsible for maintaining constant body temperature. It is the main thermoregulatory centre of the brain. The greenhouse effect refers to an overall increase in the average temperature of the earth due to the presence of greenhouse gases. The gases that cause the greenhouse effect are :  Carbon dioxide (60% effect)  Vapour  Methane (20% effect)  Nitrogen oxide (6% effect)  Ozone  Chlorofluorocarbons (14% effect) Thus, carbon dioxide and methane are the major greenhouse gases.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 130,
+   "question": "130. Which of the following pairs of gases is mainly responsible for green house effect ? (a) Oxygen and Nitrogen (b) Nitrogen and Sulphur dioxide (c) Carbon dioxide and Methane (d) Ozone and Ammonia (i) β-galactosidase (ii) Permease (c) a gene (iii) Repressor Select the correct option from the following (a) (b) (c) (d) (a) (iii) (i) (ii) (iv) (b) pteridophytes.(b) (iii) (i) (iv) (ii) (d) liverworts. (c) (iii) (iv) (i) (ii) (d) (i) (iii) (ii) (iv)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 131,
+   "question": "131. Option (b) is correct. The lac operon consists of :  One regulatory gene (i-gene), which codes for repressor. Three structural genes (z, y, and a).  z gene : Codes for β-galactosidase , which hydrolyze lactose to galactose and glucose.  y gene: Codes for Permease, which incre- ases the permeability of the cell to lactose.  a-gene : Codes for a transacetylase",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 132,
+   "question": "132. DNA precipitation out of a mixture of biomolecules can be achieved by treatment with (a) chilled ethanol. (b) methanol at room temperature. Goitre (c) chilled chloroform. (d) isopropanol.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 133,
+   "question": "133. Option (c) is correct. The sequence of events by which a cell duplicates its genome, synthesizes other cell constituents, and eventually divides into two daughter cells is known as the cell cycle. The correct sequence of phases of cell cycle is: G1 → S → G2 → M.  G1 (Gap",
+   "options": {
+    "1": "phase : It is the first phase of the growth. It is the stage during which the cell grows and prepares its DNA for replication.  S phase (Synthetic phase) : It is the stage during which DNA synthesis occurs.  G2 phase : In this phase, the cell continues to grow and prepares itself for division.  M Phase : A cell reproduces during the mitotic phase. The mitotic phase has two stages : Karyokinesis and Cytokinesis. 302 Oswaal NEET (UG) Year-wise Solved Papers"
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 134,
+   "question": "134. Which of the following statements regarding mitochondria is incorrect ? (a) Enzymes of electron transport are embedded in cellula” regarding cell outer membrane. (b) Inner membrane is convoluted with infoldings. (b) Schleiden. (c) Mitochondrial matrix contains single circular DNA (d) Rudolf Virchow.molecule and ribosomes. (d) Outer membrane is permeable to monomers of on the same chromosome as a measure of the distance (b) macrophages. between genes was explained by (a) Gregor J. Mendel. (b) Alfred Sturtevant. (d) T.H. Morgan. of typhoid fever and the confirmatory test for typhoid. (a) Streptococcus pneumoniae / Widal test (b) Salmonella typhi / Anthrone test (c) Salmonella typhi / Widal test (d) Plasmodum vivax / UTI test called utilisation of its benefits. (b) to assess threat posed to native species by invasive weed species. (c) for immediate steps to discontinue use of CFCs that were damaging the ozone layer. (d) to reduce CO 2 emissions and global warming.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 135,
+   "question": "135. Option (b) is correct. Alfred Sturtevant explained chromosomal mapping Statins are produced by Monascus purpureus based on recombination frequency which is directly proportional to distance between two genes on the same chromosome. Mendel is known as the father of genetics and proposed the laws of inheritance. Theodore Boveri with Walter Sutton proposed the chromosomal theory of inheritance, while Thomas Hunt Morgan formulated the chro mosomal theory of inheritance using fruit flies (Drosophila melanogaster).",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 136,
+   "question": "136. Option (c) is correct. Typhoid is caused by the bacteria Salmonella typhi, which is diagnosed by the widal test. This test is based on antigen-antibody reaction.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 137,
+   "question": "137. Option (a) is correct. The Earth Summit held in Rio de Jeneiro in 1992 had three main objectives: (a)Conservation of biodiversity (b)Sustainable use of biodiversity (c) Sharing of benefits in the utilization of genetic resources.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 138,
+   "question": "138. Option (a) is correct. Hugo deVries proposed the Mutation Theory of evolution. De Vries worked on Oenothera lamarckiana He proposed that mutation leads to evolution but a not minor variation. These mutations are random and directionless. According to Darwinian variations, the muta-tions are small and directional.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 139,
+   "question": "139. Option (d) is correct. Fungus Trichoderma is a biological control agent being developed for use in the treatment of plant diseases. They live in the roots of higher plants and protect them from various pathogens.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 140,
+   "question": "140. Option (c) is correct. Cell-mediated immune response (CMI) causes rejection of the graft. Immune response by T-lymphocytes (T-cells) is by activation of cytotoxic killer cells which detects and destroys the foreign cells and also a cancerous cell is called cell-mediated immune response. If a kidney donated by another person will be treated as foreign material by cell-mediated immune in the recipient. This results in the rejection of kidney graft. Hence, HLA tissue matching and blood group matching are important before the transplantation of kidney.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 141,
+   "question": "141. Option (d) is correct. G0 or quiescent phase is the stage wherein cells remain metabolically active, but do not proliferate unless called to do so. These cells that do not divide further exit the G1 phase to enter an inactive stage. Such cells are used for replacing the cells lost during injury.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 142,
+   "question": "142. Option (a) is correct. yeast. It is used as blood-cholesterol lowering agents. It inhibits the enzymes responsible for the synthesis of cholesterol. Streptokinase is used as a ‘clot buster’ to remove clots from the blood vessels of patients who have myocardial infarction. Lipases are used in detergent formulations. It helps to remove oily stains from the laundry. Cyclosporin A is produced by Trichoderma polysporum (fungus) and is used as an immuno-suppressive agent in organ transplant patients.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 143,
+   "question": "143. Option (a) is correct. Muscular dystrophy is a genetic disorder. It is characterized by progressive degeneration of skeletal muscles, which are the muscles that control movement. Myasthenia Gravis is a kind of autoimmune disease. It affects the neuromuscular junction. This can lead to fatigue. The skeletal muscles become weak and paralyzed. Tetany is a rapid spasm in muscle due to low Ca 2+ in body fluid. . Botulism is a rare and dangerous type of food poisoning caused by the bacterium Clostridium botulinum.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 144,
+   "question": "144. Select the correct option. (a) 11 th and 12th pairs of ribs are connected to the sternum with the help of hyaline cartilage. (b) Each rib is a flat thin bone and all the ribs are (a) Genital warts connected dorsally to the thoracic vertebrae and (c) Chlamydiasis ventrally to the sternum. (c) There are seven pairs of vertebrosternal, three pairs of vertebrochondral and two pairs of vertebral ribs. (d) 8 th, 9th and 10th pairs of ribs articulate directly with the sternum.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 145,
+   "question": "145. Which of the following statements is correct ? (a) Cornea consists of dense connective tissue of elastin and can repair itself. (b) Cornea is convex, transparent layer which is highly vascularised. (c) Cornea consists of dense matrix of collagen and is the most sensitive portion of the eye. (d) Cornea is an external, transparent and protective proteinacious covering of the eye-ball.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 146,
+   "question": "146. Following statements describe the characteristics of the enzyme restriction endonuclease. Identify the incorrect statement. (a) The enzyme binds DNA at specific sites and cuts phloem ? only one of the two strands. (b) The enzyme cuts the sugar-phosphate backbone (c) Bi-directional at specific sites on each strand. (c) The enzyme recognizes a specific palindromic nucleotide sequence in the DNA. (d) The enzyme cuts DNA molecule at identified position with the DNA.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 147,
+   "question": "147. Option (c) is correct. Phloem in angiosperms is composed of sieve tube elements, companion cells, phloem parenchyma and phloem fibres. Gymnosp erms have albuminous cells and sieve cells. They lack sieve tubes and companion cells.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 148,
+   "question": "148. Option (b) is correct. Haemodialysis removes waste, salt, and extra water to prevent them from building up in the body. It keeps a safe level of certain chemicals in our blood such as potassium, sodium and bicarbonate helping to control blood pressure. Also, there will be reduced absorption of calcium ions from the gastrointestinal tract. It reduce the production of RBC due to the deficiency of erythropoietin. NEET (UG) SOLVED PAPER : 2019",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 149,
+   "question": "149. Which of the following statements is incorrect ? (a) Viruses are obligate parasites. (b) Infective constituent in viruses is the protein coat. (c) Prions consist of abnormally folded proteins. (d) Viroids lack a protein coat.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 150,
+   "question": "150. Due to increasing air-borne allergens and pollutants, many people in urban areas are suffering from (b) Streptokinase respiratory disorder causing wheezing due to (d) Cyclosporin A (a) inflammation of bronchi and bronchioles. (b) proliferation of fibrous tissues and damage of the alveolar walls. (b) Myasthenia gravis (c) reduction in the secretion of surfactants by (d) Tetany pneumocytes. Out of Syllabus (d) benign growth on mucous lining of nasal cavity.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 151,
+   "question": "151. Option (b) is correct. Genital Herpes is not completely curable, as it is caused by type II herpes simplex virus. Another Ovary sexually transmitted disease that is not curable is Ovule HIV.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 152,
+   "question": "152. How does steroid hormone influence the cellular activities ? (a) Binding to DNA and forming a genehormone complex (b) Activating cyclic AMP located on the cell membrane (c) Using aquaporin channels as second messenger Out of Syllabus (d) Changing the permeability of the cell membrane",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 153,
+   "question": "153. Option (c) is correct. Annual rings are prominent only in the tress of the temperate region. Because the weather pattern is not uniform in temperate regions throughout the year. There would be differential activity in the cambium. So, annual rings are prominent in the trees of temperate region. In the tropics, climatic conditions are uniform throughout the year. Hence, there is no differential activity of the cambium.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 154,
+   "question": "154. What is the direction of movement of sugars in Out of Syllabus (a) Upward (b) Downward (d) Non-multidirectional",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 155,
+   "question": "155. The shorter and longer arms of a submetacentric chromosome are referred to as (a) p-arm and q-arm respectively. (b) q-arm and p-arm respectively. (c) m-arm and n-arm respectively. (d) s-arm and l-arm respectively.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 156,
+   "question": "156. Which of these following methods is the most suitable for disposal of nuclear waste ? (a) Bury the waste under Antarctic ice-cover (b) Dump the waste within rocks under deep ocean (c) Bury the waste within rocks deep below the Earth's surface (d) Shoot the waste into space 286 Oswaal NEET (UG) Year-wise Solved Papers",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 157,
+   "question": "157. Match the Column-I with Column-II (B) A complete catalytic active enzyme with its bound Column-IColumn-II (a)P-wave(i)Depolarization of (a) (A) is true but (B) (b)QRS complex(ii)Repolarization of (c) (A) is false but (B) is true (c)T-wave(iii)Coronary ischemia165. Conversion of glucose to glucose-6-phosphate, the (d)Reduction in the (iv)Depolarization of (a) hexokinase. size of T-waveatria Select the correct option.generally inverted ? (a) (b) (c) (d) (a) (iv) (i) (ii) (i) (b) (ii) (i) (v) (iii) (c) (ii) (iii) (v) (iv) (d) (iv) (i) (ii) (iii)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 158,
+   "question": "158. Which one of the following statements regarding post-fertilization development in flowering plants is incorrect ? (a) Zygote develops into embryo. (b) Central cell develops into endosperm. possess all the above characteristics. (c) Ovules develop into embryo sac. (d) Ovary develops into fruit.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 159,
+   "question": "159. Option (a) is correct. According to rules of binomial nomenclature, the correct scientific name of mango is Mangifera indica Linn. The first name Mangifera indicates genera, the second name indica indicates species name, and Linn indicates the species name first described by a scientist like Linnaeus.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 160,
+   "question": "160. Option (c) is correct. In flowering plants,  Out of the two male gametes, one gamete fuses with the nucleus of the egg cell and forms the zygote. The process is known as syngamy.  The other male gamete fuses with the two polar nuclei located in the central cell to form a triploid primary endosperm nucleus (PEN). Since the process involves the fusion of three haploid nuclei, it is known as triple fusion.  Since two kinds of fusions (syngamy and triple fusion) take place in an embryo sac it is known as double fertilisation.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 161,
+   "question": "161. Which of the following features of genetic code (a) Moist surface of midgut does allow bacteria to produce human insulin by (b) Alkaline pH of gut recombinant DNA technology ? (a) Genetic code is redundant (b) Genetic code is nearly universal (c) Genetic code is specific (d) Genetic code is not ambiguous",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 162,
+   "question": "162. What of the following pair of organelles does not (a) Seminiferous tubules → contain DNA ? (a) Chloroplast and Vacuoles (b) Lysosomes and Vacuoles (c) Nuclear envelope and Mitochondria (d) Mitochondria and Lysosomes",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 163,
+   "question": "163. In some plants, the female gamete develops into deferens → Ejaculatory duct → embryo without fertilisation. This phenomenon is Urethra → Urethral meatus known as (a) parthenocarpy. (c) parthenogenesis.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 164,
+   "question": "164. Consider the following statements : (a) perisperm. (A)Coenzyme or metal ion that is tightly bound to (c) tegmen. enzyme protein is called prosthetic group. prosthetic group is called apoenzyme. Select the correct option. is false ventricles (b) Both (A) and (B) are false ventricles (d) Both (A) and (B) are true first irreversible reaction of glycolysis, is catalysed by (b) enolase. (c) phosphofructokinase. (d) aldolase. (v)Repolarization of atria166. Which of the following ecological pyramids is (a) Pyramid of energy (b) Pyramid of biomass in a forest (c) Pyramid of biomass in a sea (d) Pyramid of numbers in grassland",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 165,
+   "question": "165. Option (a) is correct. Hexokinase catalyzes the conversion of Glucose to Glucose-6 phosphate. It is the first step of the activation phase of glycolysis. 304 Oswaal NEET (UG) Year-wise Solved Papers",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 166,
+   "question": "166. Option (c) is correct. The pyramid of biomass is inverted in an aquatic ecosystem as the biomass of fishes far exceeds the biomass of zooplankton (upon which they feed).",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 167,
+   "question": "167. Option (d) is correct. Annelida, Arthropoda, and Chordata have all the given three features: Organ system level of organisation, bilateral symmetry, true coelomates with the segmentation of body.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 168,
+   "question": "168. Option (a) is correct. Klinefelter’s syndrome has an additional copy of X-chromosome in male. They have trisomy of sex chromosomes as 44 + XXY (47). They show overall masculine development, gynaecomastia, and are sterile.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 169,
+   "question": "169. Option (d) is correct. Habitat loss and fragmentation is the major cause of biodiversity loss and extinction of plants and animals. Habitat of various organisms are altered or destroyed by uncontrolled and unsustainable human activities such as deforestation, slash and burn agriculture, mining, and urbanisation. This results in the breaking up of the habitat into small pieces, which affects the movement of migratory animals and also, decreases the genetic exchange between populations leading to a declination of species.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 170,
+   "question": "170. Option (b) is correct. Some strains of Bacillus thuringiensis that kill insects like coleopterans (beetles), lepidopterans (tobacco budworm, armyworm) and dipterans (flies, mosquitoes, etc). They form a crystalline protein during their growth. This crystal is called protoxin. It is an inactive form. When an insect consumes this inactive toxin, it is converted into an active form of toxin because of the alkaline pH of the gut. This toxin form pores, swelling, and lysis in the epithelial cells of the gut and kill the insect.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 171,
+   "question": "171. Select the correct sequence for transport of sperm cells in male reproductive system. Rete testis → Vasa efferentia → Epididymis → Vas deferens → Ejaculatory duct → Urethra → Urethral meatus (b) Seminiferous tubules → Vasa efferentia → Epididymis → Inguinal canal → Urethra (c) Testis → Epididymis → Vasa efferentia → Vas Inguinal canal → (d) Testis → Epididymis → Vasa efferentia → Rete (b) syngamy. testis → Inguinal canal → Urethra (d) autogamy.172. Persistent nucellus in the seed is known as (b) hilum. (d) chalaza. NEET (UG) SOLVED PAPER : 2019",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 172,
+   "question": "172. Option (a) is correct. Remnants of nucellus in the matured seed are known as perisperm. e.g., black pepper, beet, etc. Hilum is the point where the body of the ovule is attached to the Funiculus. Tegmen is the delicate inner protective layer of a seed. Chalaza is the basal swollen part of the nucellus (opposite the micropylar end) from where the integuments originate.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 173,
+   "question": "173. Option (c) is correct. Bioreactors are large vessels used for the large scale production of biotechnology products from the raw materials. Here, the raw materials are biologically converted into specific products, enzymes, etc., using microbial plant, animal, or human cells.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 174,
+   "question": "174. Match the following structures with their respective location in organs : (a) Crypts of (i) Pancreas Lieberkühn (b) Glisson’s Capsule (ii) Duodenum (c) Islets of (iii) Small intestine Langerhans (d) Brunner’s Glands (iv) Liver Select the correct option. (a) (b) (c) (d) (a) (ii) (iv) (i) (iii) (b) (iii) (iv) (i) (ii) (c) (iii) (ii) (i) (iv) (d) (iii) (i) (ii) (iv)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 175,
+   "question": "175. Option (b) is correct. Given, Cardiac output = 5L or 5000 mL The Blood volume in ventricles at the end of diastole = 100 mL The Blood volume in ventricles at the end of systole = 50 mL Therefore, Stroke volume = 100 – 50 = 50 mL As we know, Cardiac output = Stroke volume × Heart rate On putting the values, we get 5000 mL = 50 mL × Heart rate or Heart rate = 5000/50 = 100 beats per minute.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 176,
+   "question": "176. Xylem translocates 287 (a) water and mineral salts only. (b) water, mineral salts and some organic nitrogen only. (c) water, mineral salts, some organic nitrogen and (b) Industrial oven (d) BOD incubator hormones. (d) water only. Out of Syllabus 177. Which of the following is true for Golden rice ? (a) It is pest resistant, with a gene from Bacillus thuringiensis. (b) It is drought tolerant, developed using Agrobacterium vector. (c) It has yellow grains, because of a gene introduced from primitive variety of rice. (d) It is Vitamin A enriched, with a gene from daffodil.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 177,
+   "question": "177. Option (d) is correct. Golden rice is vitamin A enriched rice, with a gene have proteins from daffodil and is rich in carotene.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 178,
+   "question": "178. Option (a) is correct. Purines (double carbon-nitrogen rings) include Adenine (A) and Guanine (G) while pyrimidines (single carbon-nitrogen ring) include Cytosine (C), Thymine (T-only in DNA) and Uracil (U-only in RNA).",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 179,
+   "question": "179. Which of the following protocols did aim for reducing emission of chlorofluorocarbons into the atmosphere ? (a) Kyoto Protocol (b) Gothenburg Protocol (c) Geneva Protocol (d) Montreal Protocol",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Biology",
+   "qnum": 180,
+   "question": "180. Placentation, in which ovules develop on the inner wall of the ovary or in peripheral part, is (b) parietal. (c) free central. (d) basal.  288 Oswaal NEET (UG) Year-wise Solved Papers BookletBatchRollNumber A 10+1S0 00 00 00 00 B 10-2V1 11 11 11 11 C 10-3A2 22 22 22 22 D CrashC333 33 33 33 E 4 44 44 44 44 F Paper555 55 55 55 G 6 66 66 66 66 Student's SignaturePartially Filled66 H Paper 177777 77 77 1 I Paper 228888888 88 J 9 99 99 99 99 1 a b c d 6 a b c d 11a b c d 16a b c d 21a b c d 26 a b c d 2 a b c d 7 a b c d 12a b c d 17a b c d 22a b c d 27 a b c d 3 a b c d 8 a b c d 13a b c d 18a b c d 23a b c d 28 a b c d 4 a b c d 9 a b c d 14a b c d 19a b c d 24a b c d 29 a b c d a b c d 10a b c d515a b c d 20a b c d 25a b c d 30 a b c d 31a b c d 36a b c d 41a b c d 46a b c d 51a b c d 56 a b c d 32a b c d 37a b c d 42a b c d 47a b c d 52a b c d 57 a b c d 33a b c d 38a b c d 43a b c d 48a b c d 53a b c d 58 a b c d 34a b c d 39a b c d 44a b c d 49a b c d 54a b c d 59 a b c d 35a b c d 40a b c d 45a b c d 50a b c d 55a b c d 60 a b c d 61a b c d 66a b c d 71a b c d 76a b c d 81a b c d 86 a b c d 62a b c d 67a b c d 72a b c d 77a b c d 82a b c d 87 a b c d 63a b c d 68a b c d 73a b c d 78a b c d 83a b c d 88 a b c d 64a b c d 69a b c d 74a b c d 79a b c d 84a b c d 89 a b c d 65a b c d 70a b c d 75a b c d 80a b c d 85a b c d 90 a b c d 91a b c d 96a b c d 101ab c d 106ab c d 111ab c d 116a b c d 92a b c d 97a b c d 102ab c d 107ab c d 112ab c d 117a b c d 93a b c d 98a b c d 103ab c d 108ab c d 113ab c d 118a b c d 94a b c d 99a b c d 104ab c d 109ab c d 114ab c d 119a b c d 95a b c d 100ab c d 105ab c d 110ab c d 115ab c d 120a b c d 121a b c d 126ab c d 131ab c d 136ab c d 141ab c d 146a b c d 122a b c d 127ab c d 132ab c d 137ab c d 142ab c d 147a b c d 123a b c d 128ab c d 133ab c d 138ab c d 143ab c d 148a b c d 124a b c d 129ab c d 134ab c d 139ab c d 144ab c d 149a b c d 125a b c d 130ab c d 135ab c d 140ab c d 145ab c d 150a b c d 151a b c d 156ab c d 161ab c d 166ab c d 171ab c d 176a b c d 152a b c d 157ab c d 162ab c d 167ab c d 172ab c d 177a b c d 153a b c d 158ab c d 163ab c d 168ab c d 173ab c d 178a b c d 154a b c d 159ab c d 164ab c d 169ab c d 174ab c d 179a b c d 155a b c d 160ab c d 165ab c d 170ab c d 175ab c d 180a b c d Test Center The OMR Sheet will beCode computer checked Fill the clrcles completely00 and dark enough for Name proper detection, Use11 ballpen (black or blue) for marking.22 33 Test DateInvigilator's SignatureAvoid Improper44 Marking 55 Lightly Filled77 88 Certified that all the entries In this section have been properly filled by the student99 NEET (UG) SOLVED PAPER : 2019 1 (a) 2 (b) 3 (a) 4 (b) 34 (a) 5 (d) 35 (d) 65 (a) 6 (c) 7 (d) 37 (c) 8 (d) 38 (d) 68 (c) 9 (a) 10 (a) 11 (c) 12 (b) 13 (a) 14 (a) 15 (b) 45 (c) 16 (c) 17 (c) 18 (a) 19 (d) 49 (a) 20 (b) 21 (a) 22 (c) 23 (b) 24 (c) 25 (a) 26 (b) 27 (a) 28 (a) 29 (a) 30 (a) 289 ANSWER KEY 31 (c) 61 (c) 91 (b) 121 (d) 151 (b) 32 (d) 62 (d) 92 (a) 122 (c) 152 (a) 33 (a) 63 (c) 93 (c) 123 (b) 153 (c) 64 (d) 94 (b) 124 (b) 154 (c) 95 (b) 125 (d) 155 (a) 36 (b) 66 (a) 96 (a) 126 (c) 156 (c) 67 (b) 97 (c) 127 (b) 157 (d) 98 (c) 128 (d) 158 (c) 39 (c) 69 (b) 99 (a) 129 (a) 159 (a) 40 (d) 70 (b) 100 (b) 130 (c) 160 (c) 41 (b) 71 (a) 101 (b) 131 (b) 161 (b) 42 (b) 72 (c) 102 (b) 132 (a) 162 (b) 43 (a) 73 (b) 103 (c) 133 (c) 163 (c) 44 (b) 74 (c) 104 (d) 134 (a) 164 (a) 75 (d) 105 (a) 135 (b) 165 (a) 46 (a) 76 (d) 106 (a) 136 (c) 166 (c) 47 (d) 77 (a) 107 (a) 137 (a) 167 (d) 48 (b) 78 (b) 108 (c) 138 (a) 168 (a) 79 (a) 109 (d) 139 (d) 169 (d) 50 (b) 80 (d) 110 (c) 140 (c) 170 (b) 51 (b) 81 (a) 111 (a) 141 (d) 171 (a) 52 (b) 82 (a) 112 (c) 142 (a) 172 (a) 53 (d) 83 (d) 113 (d) 143 (a) 173 (c) 54 (b) 84 (b) 114 (a) 144 (c) 174 (b) 55 (d) 85 (a) 115 (d) 145 (c) 175 (b) 56 (b) 86 (c) 116 (b) 146 (a) 176 (c) 57 (a) 87 (a) 117 (c) 147 (c) 177 (d) 58 (c) 88 (d) 118 (b) 148 (b) 178 (a) 59 (b) 89 (c) 119 (a) 149 (b) 179 (d) 60 (d) 90 (d) 120 (a) 150 (a) 180 (b) NEETNEET (UG)(UG)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 0,
+   "question": "0. log[]Ax In option (a) ∆S > 0. In option (b) ∆S > 0. In option (c) ∆S < 0 as ∆n g < 0. In option (d) ∆S > 0.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 48,
+   "question": "48. For a cell involving one electron E°cell = 0.59 V at 298 K, (ii) 3MnO H22+/g16/g16/g14/g1114MnO+ MnO the equilibrium constant for the cell reaction is 2.303 RT [Given that = 0.059 V at T = 298 K] F (a) 1.0 × 10 5 (c) 1.0 × 10 30 (d) 1.0 × 10 2",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 49,
+   "question": "49. The structure of intermediate A in the following reaction is CH 3 CH CH3 CH3 HC3 —C—O—O—H (a) CH O—O—CH (b) CH3 CH2—O—O—H HC CH3 (c) CH3 O—CH (d) CH3",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 50,
+   "question": "50. Option (b) is correct. According to Haber’s process, N3() () ()gg g+ ⇌H2NH 22 3 2 moles of NH3 uses 3 moles of H2 cell n So, 20 moles of NH3 will use 3 × moles of H220 2 = 30 moles of H2 1 eq 51. Option (b) is correct. E° 05.9 The amino acids which are synthesised inside the cell0 059.= =0 059.10 human body are called non-essential amino acids. 10=⋅. Example: Glycine, alanine, serine, cysteine, etc.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 51,
+   "question": "51. The non-essential amino acid among the following is (a) leucine. (b) alanine. (c) lysine. (d) valine. (a) N2",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 52,
+   "question": "52. A gas at 350 K and 15 bar has molar volume 20 percent 60. The number of sigma (σ) and pi (π) bonds in pent-2 smaller than that for an ideal gas under the same 279 conditions. The correct option about the gas and its compressibility factor (Z) is Out of Syllabus (a) Z > 1 and repulsive forces and dominant. (b) Z < 1 and attractive forces and dominant. (c) Z < 1 and repulsive forces and dominant. (d) Z > 1 and attractive forces and dominant.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 53,
+   "question": "53. Option (d) is correct. In a disproportionation reaction, same substance undergoes oxidation (increase in oxidation number) 296 Oswaal NEET (UG) Year-wise Solved Papers and reduction (decrease in oxidation number forming two different products. +1 +2 (a) 2Cu + −+ + − +62 (b) 34MnO+4 HM→ 2 nO MnO24++22HO (Disproportionation) ++7 ∆ 6 +4 0 (c) 2KMnO KM4→22nO Mn4++OO2 + − + +72 2 +4 (d) 23KMnO Mn HO MnO4++252→ 2",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 54,
+   "question": "54. Which is the correct thermal stability order for H2E O2 H+ +H CH (E = O, S, Se, Te and Po) ? A H2O 3C 3 (a) H 2O < H2S < H2Se < H2Te < H2Po (b) H 2Po < H2Te < H2Se < H2S < H2O (c) H 2Se < H2Te < H2Po < H2O < H2S (d) H 2S < H2O < H2Se < H2Te < H2Po",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 55,
+   "question": "55. Option (d) is correct. As per Aufbau principle (n + l value of n, greater will be the energy. 4d = 4 + 2 = 6  (Between these two subshell 4d 5p = 5 + 1 = 6 have lower value of n 5f = 5 + 3 = 8 is lower energy sub shell) 6p = 6 + 1 = 7 Hence, the correct order of decreasing energy will be : (c) PCl 5 is reactive molecule due to longer and 5f > 6p > 5p > 4d.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 56,
+   "question": "56. Option (b) is correct. Basic buffer is defined as a mixture of weak base and 59. Option (b) is correct. salt of weak base with strong acid. (a) CH 3COOH + NaOH → Before 100 ml 100 ml 0 × 0.1 M × 0.1 M = 10 m mol = 10 m mol After 0 Salt hydrolysis takes place so, this is not a basic buffer. (b) HCl + NH 4OH → NH Before 100 ml 200 ml × 0.1 M × 0.1 M = 10 m mol = 20 m mol After 0 It is a basic buffer. (c) HCl + NaOH → Before 100 ml 100 ml 0 × 0.1 M × 0.1 M = 10 m mol = 10 m mol After 0 It is a neutral solution. (d) CH 3COOH + NaOH → Before 25 ml 50 ml 0 × 0.1 M × 0.1 M = 2.5 m mol = 5 m mol Cu Cu+→ + (Disproportionation)2+0 After 0 2.5 m mol 2.5 m mol 74It is a basic solution (due to presence of NaOH) but not basic buffer.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 57,
+   "question": "57. Option (a) is correct. Ionization enthalpy is dependent upon the stability. ‘Be’ and ‘N’ have comparatively more stable subshell than B and O. So, the correct increasing order of first ionization enthalpy will be : Li < B < Be< C < O < N < F < Ne +4H+ 58. Option (c) is correct. Cl Cl Axial bond 90° Equatorialbond 120° P Cl Cl Cl Cl rule), higher is the (a) P 180° (True) , Hence itCl (b) Axial bond : 240 pm Equatorial bond : 202 pm (True) weaker, axial bonds. (False) (d) Tr u e Molecular orbital configuration C2 is : CH3COONa + H2Oσσ σσ11ss22,* ,,22ss22*, =ππ22pp22 xy",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 58,
+   "question": "58. Identify the incorrect statement related to PCl5 from the following (a) Two axial P—Cl bonds make an angle of 180° with each other. (b) Axial P—Cl bonds are longer than equatorial P—Cl bonds. (c) PCl5 molecule is non-reactive. (d) Three equatorial P—Cl bonds make an angle of 120° with each other. (b) 30 (c) 40 (d) 1059. Which of the following diatomic molecular species has only π bonds according of Molecular Orbital Theory ? (b) C 2 (c) Be2 (d) O 3 en-4-yne is 280 Oswaal NEET (UG) Year-wise Solved Papers (a) 8 σ bonds and 5 π bonds. (b) 11 σ bonds and 2 π bonds. (c) 13 σ bonds and no π bonds. (d) 10 σ bonds and 3 π bonds.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 60,
+   "question": "60. Option (d) is correct. HH 0 10 m mol H—C—CC—C C—H HH 4Cl + H2ONumber of sigma (σ) bonds = 10 0 Number of pi (π) bonds = 3",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 61,
+   "question": "61. Among the following, the one that is not green house gas is (a) methane. (c) sulphur dioxide. (d) nitrous oxide.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 62,
+   "question": "62. Option (d) is correct. 10 m mol 10 m molFor irreversible isothermal expansion, W = – Pext ∆V CH3COONa + H2O = – Pext (V2 – V1) = – 2 (0.25 – 0.1) L bar = – 2 (0.15) L bar = – 0.3 L bar 0 10 m mol = – 0.3 × 100 J = – 30 J",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 63,
+   "question": "63. Which one is malachite from the following ? (a) Cu(OH)2 (c) CuCO3.Cu(OH)2 (d) CuFeS 2",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 64,
+   "question": "64. Option (d) is correct. Maximum boiling azeotrope is shown by solution which shows negative deviation from Raoult’s law. Except water + Nitric acid, all other mixtures show positive deviation.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 65,
+   "question": "65. The biodegradable polymer is Out of Syllabus (d) −=1 d[]HN23− 1 d[]H (a) nylon-2-nylon 6 (b) nylon-6 (c) Buna-S",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 66,
+   "question": "66. Which of the following series of transitions in the (a) Expansion of a gas at constant temperature spectrum of hydrogen atom falls in visible region ? (b) Sublimation of solid to gas (a) Balmer series (b) Paschen series (c) 2H(g) → H (c) Brackett series",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 67,
+   "question": "67. For an ideal solution, the correct option is 75. The correct order of the basic strength of methyl (a) ∆mix V ≠ 0 at constant T and P (b) ∆mix H = 0 at constant T and P (c) ∆mix G = 0 at constant T and P (d) ∆mix S = 0 at constant T and P",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 68,
+   "question": "68. Option (c) is correct. Be(OH)2 is an amphoteric hydroxide as it reacts with acid as well as base while others are basic hydroxide. Be(OH)2 + 2HCl → BeCl 2 + 2H2O Be(OH)2 + 2NaOH → Na 2 [Be(OH)4]",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 69,
+   "question": "69. If the rate constant for a first order reaction is k, the 2Fe3+(aq) + 2I –(aq) → 2Fe time (t ) required for the completion of 99% of the Ecell = 0.24 V at 298 K. The standard Gibbs energy reaction is given by (a) t = 6.909/k (c) t = 2.303/k",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 70,
+   "question": "70. Conjugate base for Bronsted acids H2O and HF are (c) 23.16 kJ mol–1 (a) H3O+ and F– , respectively. (b) OH– and F–, respectively. (c) H3O+ and H2F+, respectively. (d) OH– and H2F+, respectively.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 71,
+   "question": "71. Option (a) is correct. COOH COOH –2HO2 COOH COONH4– + +NH3 – + 297COOH COONH4 Ammonium Phthalate CONH2 /c68 –NH,3 –2HO2 Strong heating CONH2 Phthalamide O NH O Phthalimide",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 72,
+   "question": "72. The compound that is most difficult to protonate is Out of Syllabus O O (b) ozone. (a) HC H (b) HC CH 3 3 3 O (d) H H (b) 25 J (c) 30 J (d) – 30 JN2(g) + 3H2(g) ⇌ 2NH 3(g) the correct option is Out of Syllabus d[] []NNd H (b) Fe 3O4 (a) −=232 dt dt dt 2 dt d[]HNd[]H (c) 3223= dt dt 3 dt 2 dt (d) nylon-6, 6 74. In which case change in entropy is negative ? 2(g) (d) Lyman series (d) Evaporation of water substituted amines in aqueous solution is (a) (CH3)3N > CH3NH2 > (CH3)2NH (b) (CH3)3N > (CH3)2NH > CH3NH2 (c) CH3NH2 > (CH3)2NH > (CH3)3N 2+(aq) + I 2(aq) (∆ rG) of the cell reaction is (b) t = 4.606/k [Given that Faraday constant F = 96500 C mol–1] (d) t = 0.693/k (a) – 23.16 kJ mol–1 (b) 46.32 kJ mol –1 (d) – 46.32 kJ mol –1",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 73,
+   "question": "73. Option (b) is correct. Rate of the reaction can be written as : Decrease in the concentration of reactants or Rate = increase in the concentration of part Time taken d[] []NHNH1 d 1 d[] −=22 3−=+ dt 3 dt 2 dt",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 74,
+   "question": "74. Option (c) is correct.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 75,
+   "question": "75. Option (d) is correct. The basic strength of methyl substituted amines in aqueous form is together affected by inductive effect, solvation effect and steric hindrance. So, the correct order of basic strength will be : (CH3)2 NH > CH3NH2 > (CH3)3N",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 76,
+   "question": "76. Option (d) is correct. 2Fe3+ (aq) + 2I– (aq) → 2Fe2+ (aq) + I2 (aq) Here, n = 2 ∆G° = – nFE° = – 2 ×96500 × 0.24 = – 46320 J mol–1 = – 46.32 kJ mol–1",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 77,
+   "question": "77. What is the correct electronic configuration of the central atom in K4[Fe(CN)6] based on crystal field theory? (a) te60 (b)et3 3 (c) et4 2 (d) te42 2gg 2 2 2gg anions form hexagonal close packed (hcp) lattice strong heatingand the cations occupy 75% of octahedral voids. The formula of the compund is Out of Syllabus (a) C3A2 (b) C 3A4 (c) C4A3 (d) C 2A3",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 79,
+   "question": "79. The method used to remove temporary hardness of water is Out of Syllabus COOH (a) Clark’s method. (b) Ion-exchange method. NH2 (c) Synthetic resins method. (d) Calgon's method. NEET (UG) SOLVED PAPER : 2019",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 80,
+   "question": "80. The manganate and permanganate ions are tetrahedral, due to (a) there is no π-bonding. (b) the π-bonding involves overlap of p oxygen with p-orbitals of manganese. (c) the π-bonding involves overlap of d oxygen with d-orbitals of manganese. (b) 32 (d) the π-bonding involves overlap of p oxygen with d-orbitals of manganese.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 81,
+   "question": "81. Among the following, the reaction that pro ceeds through an electrophilic substitution, is (a) (b) (c) —CH2OH+HCl + Cu Cl22 (d) —N2Cl–",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 82,
+   "question": "82. Match the Xenon compounds in Column-I with its structure in Column-II and assign the correct code Column-I Column-II (a) XeF4 (i) pyramidal (b) XeF6 (ii) square planar (c) XeOF4 (iii) distorted octahedral (d) XeO3 (iv) square pyramidal Codes : (a) (ii) (b) (ii) (iii) (i) (iv) (c) (iii) (iv) (i) (d) (i) (ii) (iii) (iv)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 83,
+   "question": "83. Which of the following is incorrect statement ? (a) SiCl4 is easily hydrolysed. (b) GeX4 (X = F, Cl, Br, I) is more stable than GeX2. (c) SnF4 is ionic in nature. (d) PbF4 is covalent in nature.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 84,
+   "question": "84. An alkene ‘A’ on reaction with O3 and Zn–H2O gives propanone and ethanal in equimolar ratio. Addition solubility product (k of HCl to alkene ‘A’ gives ‘B’ as the major product. The (a) 0.25 × 10–10 structure of product ‘B’ is 281 CH2Cl (a) H3CCCH2 HCH3 -orbitals of CH 3 -orbitals of HC—CH—C—CH 3 -orbitals of Cl CH3 (c) HC3 —CH—CH +Cl2 AlCl3 —Cl + HCl Cl CH3 CH3 Cl Cl (d) Cl—CH22—CH—CH +Cl2 UV light Cl Cl CH3 Cl Cl 85. Which mixture of the solutions will lead to the formation of negatively charged colloidal [AgI]I– sol. ? heat (a) 50 mL of 1 M AgNO3 + 50 mL of 2 M KI (b) 50 mL of 2 M AgNO3 + 50 mL of 1.5 M KI (c) 50 mL of 0.1 M AgNO3 + 50 mL of 0.1 M I —CH C22l+H O (d) 50 mL of 1 M AgNO3 + 50 mL of 0.5 M KI",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 85,
+   "question": "85. Option (a) is correct. AgNO3 + KI → AgI + KNO 3 If KI is in excess then negatively charged colloid, [AgI] I– is formed. Whereas, if AgNO3 is in excess positively charged colloid AgI/Ag+ will form.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 86,
+   "question": "86. Match the following : Out of Syllabus Column-I Column-II —Cl+N 2 (a) Pure nitrogen (i) Chlorine (b) Haber process (ii) Sulphuric acid (c) Contact process (iii) Ammonia (d) Deacon’s process (iv) Sodium azide or Barium azide Which of the following is the correct option ? (a) (b) (c) (d) (a) (ii) (iv) (i) (iii) (b) (iii) (iv) (ii) (i) (c) (iv) (iii) (ii) (i) (a) (b) (c) (d) (d) (i) (ii) (iii) (iv) (iii) (iv) (i)87. Enzymes that utilize ATP in phosphate transfer require an alkaline earth metal (M) as the cofactor M is Out of Syllabus (i) (a) Mg (b) Ca (c) Sr (d) Be",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 87,
+   "question": "87. Out of Syllabus",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 88,
+   "question": "88. Out of Syllabus Electrophile Cl 89. Option (c) is correct. Due to presence of d-orbitals Si, Ge and Sn form species like SiF62–, [GeCl6]2–, [Sn(OH)2]2– respec tively. Due to small size of Si4+, six large chloride ions cannot be accommodated around Si4+.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 89,
+   "question": "89. Which of the following species is not stable? (a) [GeCl6]2– (b) [Sn(OH) 6]2– (c) [SiCl6]2– (d) [SiF 6]2–",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 90,
+   "question": "90. Option (d) is correct. Ca(OH)2 (s)  Ca2+ (aq) + 2OH – (aq) Given : pH = 9, pOH = 14 – 9 = 5 or [OH–] = 10–5 M 10−5 s = 2 (i) ksp =[]Ca OH22+−[] (iv) = S × (2s)2 = 4s3  −5 3 =⋅4 10 2   = 0.5 × 10–15 Propanone CH3 Cl [B] BIOLOGY",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 91,
+   "question": "91. What map unit (Cenimorgan) is adopted in the construction of genetic maps ? (a) A unit of distance between two expressed genes, representing 100% cross over (b) A unit of distance between genes on chro-mosomes, representing 1% cross over (c) A unit of distance between genes on chro mosomes, representing 50% cross over (d) A unit of distance between two expre ssed genes, representing 10% cross over",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 92,
+   "question": "92. Option (a) is correct. Biocontrol refers to the use of biological methods Frequency of dominant allele (say p for controlling plant diseases and pests. Bacillus thuriengiensis (Bt), Trichoderma sp. and Baculoviruses (sp.) genus Nucleopolyhedrovirus are used as biocontrol agents. Rhizobium, Nostoc, Azospirillum, and Oscillatoria are used as biofertilisers, which helps in making the soil fertile while Tobacco Mosaic virus is a pathogen that infects a wide range of plants and aphids are pest that harms crop plants.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 93,
+   "question": "93. The ciliated epithelial cells are required to move particles or mucus in a specific direction. In humans, 99. Grass leaves curl inwards during every dry weather. these cells are mainly present in (a) fallopian tubes and pancreatic duct. (b) eustachian and salivary duct. (c) bronchioles and fallopian tubes. (d) bile duct and bronchioles.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 94,
+   "question": "94. A gene locus has two alleles A, a. If the frequency 100. Concanavalin A is of dominant allele A is 0.4, then what will be the (a) an essential oil. frequency of homozygous dominant, heterozygous (c) a pigment. and homozygous recessive individuals in the population ? (a) 0.16 (AA); 0.24 (Aa); 0.36 (aa) (b) 0.16 (AA); 0.48 (Aa); 0.36 (aa) (c) 0.16 (AA); 0.36 (Aa); 0.48 (aa) (d) 0.36 (AA); 0.48 (Aa); 0.16 (aa)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 95,
+   "question": "95. Select the incorrect statement (a) Inbreeding is essential to evolve purelines in any animal. (b) Inbreeding selects harmful recessive genes that (a) Wildlife Sanctuary reduce fertility and prod uctivity. (c) Sacred Grove (c) Inbreeding helps in accumulation of superior genes and elimination of undesirable genes. (d) Inbreeding increases homozygosity.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 96,
+   "question": "96. Which of the following factors is responsible for the formation of concentrated urine ? (a) Maintaining hyperosmolarity towards inner medullary interstitium in the kidneys (b) Selection of erythropoetin by Juxtaglo-merular complex (c) Hydrostatic pressure during glomerular filtration (d) Low levels of antidiuretic hormone",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Chemistry",
+   "qnum": 97,
+   "question": "97. Match Column-I with Column-II. Column-I Column-II (a) Saprophyte (i) Symbiotic association of characteristics fungi with plant roots (a) Pila BIOLOGY (b) Parasite (ii) Decomposition of dead organic materials (c) Lichens (iii) Living on living plants or animals (d) Mycorrhiza (iv) Symbiotic association of algae and fungi Choose the correct answer from the options given below : (a) (b) (c) (d) (a) (iii) (ii) (i) (iv) (c) (ii) (iii) (iv) (i) (d) (i) (ii) (iii) (iv)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 5,
+   "question": "5. Option (d) is correct. Since, Red colour has least frequency. So, red has the F2 2 longest wavelength among the given colour. 10. Option (a) is correct. As,v =νλ",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 6,
+   "question": "6. A body weight 200 N on the surface of earth. How much will it weight half way down to the centre of increases the earth? (a) 200 N (b) 250 N (c) 100 N (d) 150 N (c) decreases as r increases for r < R and for r > R7. A small hole of area of cross-section 2 mm2 present (d) increases as r increases for r < R and for r > Rnear the bottom of a fully filled open tank of height -direction 2m. Taking g = 10 m/s2, the rate of flow of water in meter. Work done by through the open hole would be nearly = 0 to y = 1 m is(a) 8.9 × 10–6 m3/s (b) 2.23 × 10–6 m3/s (b) 25 J (c) 20 J (d) 30 J(c) 6.4 × 10–6 m3/s (d) 12.6 × 10–6 m3/s Six similar bulbs are connected as shown in the figure 8. A disc of radius 2 m and mass 100 kg rolls on a ? (b) 2 J (c) 1 J (d) 3 J",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 7,
+   "question": "7. Option (d) is correct. Since, the rate of flow liquid is given as : conductivity Q= =au ag2 h =⋅ ⋅⋅2102−62m = 2 × 2 × 3.14 × 10–6 m3/s =12.56 × 10–6 m3/s = 12.6 × 10–6 m3/s",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 8,
+   "question": "8. Option (d) is correct. Apply the law of conservation of energy, Work required = change in kinetic energy And, the final potential energy at height, h Since, final KE = 0 1 1 3 And, initialKE 2 2 4 4 Hence, change in KE, |∆ KE|= 3 J",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 9,
+   "question": "9. Option (a) is correct. L L L L /c109 = 1.5gair/c109 =g1.5g g 291 Equivalent focal length (in air)1112 F =+=1fff m510−2 When glycerin is filled inside, glycerin lens behaves ) 1111 F =+−fff = 1f 2 Now, F1 =1 From the given equation : 21/2 CD …(i)For the maximum percentage error,   ∆∆∆X A 1B A 2B× 100 = 2 × 100 + × 100 1 ∆∆CD +⋅3 100 3 100C+⋅D mg mg d′=−1R =⋅ +⋅ +⋅ +⋅21 1%%%%4 2 2 13 33 R   2 = +++2111%%% %2    = 16%",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 10,
+   "question": "10. In an experiment, the percentage of error occurred in the measurement of physical quantities A, B, C and D are 1%, 2%, 3% and 4% respectively. Then the maximum percentage of error in the measurement X, 21/2 where X AB=13 3/ , will be CD (b) – 10% 3 (d)  % 13  (a) J m–1 K–1 (b) W m K–1 (d) J m K–1 276Oswaal",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 11,
+   "question": "11. Option (c) is correct. From the expression for the coefficient of thermal ∴ K=ATdH ; Here, all alphabets are in their dt∆ m/s10 2⋅usual meaning. Unit of K = Wm–1 K–1",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 12,
+   "question": "12. The work done to raise a mass m from the surface of 20. A block of mass 10 kg is in contact against the inner the earth to a height h, which is equal to the radius of wall of a hollow cylindrical drum of radius 1 m. The the earth, is (a) 2 mgR (b) 2 mg (c) 3 mgR (d) mg 2",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 13,
+   "question": "13. In which of the following processes, heat is neither (a) 10 rad/s absorbed nor released by a system ? (a) adiabatic (b) isobaric (c) isochoric",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 14,
+   "question": "14. Option (a) is correct. 2 Apply coulomb’s law, F KQ=2 /c109 = 1.5 /c109 =1.5 r If 25% of charge of A transferred to B then after the /c109glycerine = 1.5 transformation of charge. 292 Oswaal NEET (UG) Year-wise Solved Papers qAQ=− =QQ3 and qB Q Q=− +=−3Q 4 4 New force, F = K ABqq 1 2r  3θ 2 ⇒ 1 r2 ⇒ F KQ=9 ⇒ F F=  1 916  r ",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 15,
+   "question": "15. The correct Boolean operation represented by the (c) 0.02 V circuit diagram drawn is 0 A 1 LED (Y) 0 B 1 (a) OR (b) NAND (c) NOR (d) AND 24. In total internal reflection when the angle of incidence",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 16,
+   "question": "16. Option (c) is correct. Fuse is the protective device because of low melting point of the wire that can save other device on Area of coil (a) = 0.05 m heating.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 17,
+   "question": "17. A copper rod of 88 cm and an aluminium rod of unknown length have their increase in length independent of increase in tem-perature. The length 25. An electron is accelerated through a potential of aluminium rod is (aCu = 1.7 × 10–5 K–1 and aAl = 2.2 × 10–5 K–1) (a) 113.9 cm (b) 88 cm (c) 68 cm",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 18,
+   "question": "18. A parallel plate capacitor of capacitance 20 mF is 26. A cylindrical conductor of radius R is carrying a being charged by a voltage source whose potential is changing at the rate of 3V/s. The conduction current through the connecting wires, and the displacement current through the plates of the capacitor, would be, respectively (a) 60 mA, 60 m A (c) zero, zero",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 19,
+   "question": "19. a-particale consists of (a) 2 electrons, 2 protons and 2 neutrons. (b) 2 electrons and 4 protons only. (c) 2 protons only. (d) 2 protons and 2 neutrons only. NEET (UG) Year-wise Solved Papers coefficient of friction between the block and the inner 1 wall of the cylinder is 0.1. The minimum angular velocity needed for the cylinder to keep the block stationary when the cylinder is vertical and rotating about its axis, will be (g = 10 m/s",
+   "options": {
+    "2": "(b) 10 rad/s 2π (c) 10 p rad/s (d) 10 rad/s (d) isothermal 21. Increase in temperture of a gas filled in a container would lead to (c) decrease in intermolecular distance. (d) increase in its mass."
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 20,
+   "question": "20. Option (b) is correct. 4 4 The limiting friction of the block at the point of equilibrium, FL ≥ mg ⇒ µN ≥ mg [Here, FL = µN] ⇒ µmrω 2 ≥ mg [Here, N = mrω 2] k  4 F=   or, ω ∝≥ gr 2 For minimum angular velocity 1 16 r2  2 ω ∝min = gr Here F KQ, =2 10 or, ωmin .= ⋅ =01 1 10",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 21,
+   "question": "21. Option (a) is correct. Since, the increase of temperature will increase the kinetic energy for the given gas. A B Y For the given ideal gas, F U = n2RT 1 0 1 F → no. of degree of freedom. 1 1 0 22. Option (c) is correct. Given : Magnetic field (b) = 5 × 10–5 T Number of turns in coil (N) = 800 2 Time taken to rotate (∆t) = 0.1 s Initial angle, θ1 = 0° Final angle, θ2= 90° Now the change in magnetic flux ∆φ in given as ∆φ = φ2 − φ1 ∆φ = NBA cos 90° – NBA cos 0° = – NBA [as cos 90° = 0] = – 800 × 5 × 10–5 × 0.05 Wb = – 2 × 10–3 Wb From Faraday’s second law of electromagnetic  dV V/s induction, ∆φ ()−− ⋅ =210−3 Wb e t== 2 ∆ 01 00. .s V",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 22,
+   "question": "22. A 800 turn coil of effective area 0.05 m2 is kept perpendicular to a magnetic filed 5 × 10–5 T. When the plane of the coil is rotated by 90° around any of its coplanar axis in 0.1 s, the emf induced in the coil will be (a) 0.2 V (b) 2 × 10–3 V (d) 2 V",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 23,
+   "question": "23. Two parallel infinite line charges with linear charge +6V densities +l C/m and –l C/m are placed at a distance of 2R in free space. What is the electric field mid-way between the two line charges ? 2λ λ (a) πε R N/C (b) πε0R N/C 0 (c) λ (d) zero 2 0R N/Cπε is equal to the critical angle for the pair of media in contact, what will be angle of refraction ? (a) 0° (d) conductor (b) equal to angle of incidence (c) 90° (d) 180° difference of 10,000 V. Its de-Broglie wavel-ength is (nearly) : (me = 9 × 10–31 kg) (a) 12.2 × 10–12 m (b) 12.2 × 10–14 m (d) 6.8 cm (c) 12.2 nm (d) 12.2 × 10–13 m constant current. The plot of the magnitude of the magnetic field. B with the distance d from the centre of the conductor, is correctly represented by the figure B (b) 60 mA, zero (d) zero, 60 mA (a) R d NEET (UG) SOLVED PAPER : 2019 (b) (c) of length L, the length of the wire becomes (L – l (d)",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 24,
+   "question": "24. Option (c) is correct. RA=+22BA+2cB os θ Let i Hence, at i = i So, angle of refraction is 90°.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 25,
+   "question": "25. Option (a) is correct. 30. Option (a) is correct. Expression for an electron accelerated through a In p-type semiconductor, an intrinsic semi-conductor potential V is given as − λ= V Å=",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 26,
+   "question": "26. Option (b) is correct. Eddy current effect is not used in case of electric B O R d Since, the magnetic field inside conductor is given as B=∝0i d 2πR2 or, Here, K= ∝0i 2πR2 If, straight line passing through origin, at surface VS (d = R) ∝ i ...(ii) B= 0 For the maximum B at outside surface (d > R)⇒ sin θ=12 B = ∝0i or, B∝ 1d",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 27,
+   "question": "27. Pick the wrong answer in the context with rainbow. (a)An observer can see a rainbow when his front is towards the sun. (b)Rainbow is a combined effect of dispersion refraction and reflection of sunlight. (c)When the light rays undergo two internal reflections in a water drop, a secondary rainbow is formed. (d)The order of colours is reversed in the secondary rainbow.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 28,
+   "question": "28. The total energy of an electron in an atom in an orbit is –3.4 eV. Its kinetic and potential energies are, respectively. (a) 3.4 eV, – 6.8 eV (c) – 3.4 eV, – 3.4 eV",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 29,
+   "question": "29. Option (a) is correct. From the given displacement y = A0 + A sin ωt + B cos ωt Resultant amplitude of the particle 0 c be the critical angle, c, refracted ray grazes with the surface.=+AB22,Here, θ = 90° is doped with trivalent impurities, that creates −10 12deficiencies of valence electrons called holes which ⋅ =⋅12 27 12 27 10. . .are majority charge carriers. m10000 12 27 10 31. Option (c) is correct. heater because it works on Joule's heating effect.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 30,
+   "question": "30. For a p-type semiconductor, which of the following another body B of mass 2m statements is true ?head on and elastic in nature. After the collision the (a)Holes are the majority carriers and trivalent atoms are the dopants. (b)Holes are the majority carriers and pentavalent 9 atoms are the dopants. (c)Electrons are the majority carriers and pentavalent (c) 9 atoms are the dopants. (d)Electrons are the majority carriers and trivalent atoms are the dopants. 277",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 31,
+   "question": "31. In which of the following devices, the eddy current effect is not used ? (a) magnetic braking in train (b) electromagnet (c) electric heater (d) induction furnace",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 32,
+   "question": "32. The speed of a swimmer in still water is 20 m/s. The speed of river water is 10 m/s and is flowing due east. If he is standing on the south bank and wishes to cross the river along the shortest path, the angle at which he should make his strokes w.r.t. north is given by (a) 0° (b) 60° west (c) 45° west (d) 30° west",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 33,
+   "question": "33. When a block of mass M is suspended by a long wire ). The elastic potential energy stored in the extended wire is (a)1 Mgl (b)1 g (c) Mgl (d) MgL 2 2 ML",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 34,
+   "question": "34. In the circuits shown below, the readings of voltmeters and the ammeters will be 10 /c87 i1 V1 A1 10 V Circuit 1 10 /c87 i2 10 /c87 V2 A2 (b) 3.4 eV, 3.4 eV (d) – 3.4 eV, – 6.8 eV 10 V Circuit 2 (a) V 1 = V2 and i 1 = i 2 1 > V2 and i 1 > i 2 (c) V 1 > V2 and i 1 = i 2 0 (d) V 1 = V2 and i 1 > i 2",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 35,
+   "question": "35. Body A of mass 4m moving with speed u collides with , at rest. The collision is fraction of energy lost by the colliding body A is 5 (a) 4 (b) 9 1 8 (d) 9 /arr∘wrightn∘sp",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 36,
+   "question": "36. A particle moving with velocity v is acted by three forces shown by the vector triangle PQR. The velocity of the particle will 278 Oswaal NEET (UG) Year-wise Solved Papers P R Q (a) decrease. (b) remain constant. (c) change according to the smallest force (d) increase.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 37,
+   "question": "37. The radius of circle, the period of revolution, initial (b) the mass is at the lowest point. position and sense of revolution are indicated in the (c) inclined at an angle of 60° from vertical. figure. y-projection of the radius vector of rotating particle P is 43. In a double slit experiment, when light of wavelength π wherei (a) yt   π wherei (b) yt  2  (c) yt   (d) yt() cos,=−32πtywhereinm",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 38,
+   "question": "38. Option (d) is correct. Apply work energy theorem. W =−1 ()ωω22 π ⇒ −=τθ The required torque is given as : 2π 2 2 24  60 ⇒τ=−   4π2 V10 10101010 −6 ⇒ τ= ⋅210 Nm V10 101010 10 39. Option (c) is correct. rB 1210 1Ω rA Since, the time period for both the particle in same = +()mm2 So, TA = TB = T 12 Angular velocity for A,()ω πA= 2T B π Angular velocity for B,()ωB= 2 TB ω T Now, the required ratio isA= B ωB T = TAT = 1 The radius for H-atom is given asr e=ρ H B  r = ρ F dvnet=m dtThe radius for α-particle is given asα2Be  Now, we shall find the ratio r ρ/eB ρ 2eB H ==⋅ rα ρ/2eeBBρ rH rα = 21",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 39,
+   "question": "39. Two particles A and B are moving in uniform circular Aω2 motion in concentric circles of radii r",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 40,
+   "question": "40. Ionized hydrogen atoms and α-particles with same momentum enters perpendicular to a constant magnetic field, B. The ratio of their radii of their paths rH : r α will be (a) 1 : 2 (b) 4 : 1 (c) 1 : 4 (d) 2 : 1 /c∘mbarr∘wextender/arr∘wrightn∘sp/c∘mbarr∘wextender/c∘mbarr∘wextender41. A mass m is attached to a thin wire and whirled in a QR.vertical circle. The wire is most likely to break when (a) the wire is horizontal. (d) the mass is at the highest point.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 41,
+   "question": "41. Option (b) is correct. T 42 Apply Newtons’s second law for equation of motion T −=mg mu2I [Here, a  = 3 m]T−+mg mu2I   The tension is maximum at the lowest position of mass, so the chance of breaking is maximum.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 42,
+   "question": "42. At a point A on the earth’s surface the angle of dip, δ = + 25°. At a point B on the earth's surface the angle of dip, δ = – 25°. We can interpret that Out of Syllabus (a)A is located in the southern hemisphere and B is located in the northern hemisphere. (b)A is located in the northern hemisphere and B is located in the southern hemisphere. (c)A and B are both located in the southern hemisphere. (d)A and B are both located in the northern hemisphere. 400 nm was used, the angular width of the first t() sin,= 4 2 ymnminima formed on a screen placed 1m away, was found to be 0.2°. What will be the angular width of the first minima, (m water = 4/3) if the entire experimental t() cos;= 3 3 ymnapparatus is immersed in water ? (a) 0.15° (b) 0.05° (c) 0.1° (d) 0.266° π wherei 44. When an object is shot from the bottom of a long t() cos,= 3 2 ymnsmooth inclined plane kept at an angle 60° with horizontal, it can travel a distance x 1 along the plane. But when the inclination is decreased to 30° and the same object is shot with the same velocity, it can travel (d)12: –3 N m (b) 12 × 10 –4 N m45. Average velocity of a particle executing SHM in one 6 N m (d) 2 × 10 –6 N mcomplete vibration is Aω A and r B with (a) Aω (b)2(c) zero (d)2 CHEMISTRY HC3 CH3 O O O O Br—Br—Br O– HH (a) O O– O– cis-2-butene O– (b) –O Br—Br—Br==O –O O O– NEET (UG) SOLVED PAPER : 2019 O O O – (c) O Br—Br—Br—O O O– O O O O (d) O Br—Br—Br O O O O",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 43,
+   "question": "43. Option (a) is correct. 2 fi Angular fringe width (in air),θair B=D Wi=⋅3 260rad/s Here, all alphabets are in their usual meaning θ = 2π revolution Angular fringe width (in water) = 2π × 2π = 4π 2 radθ ∝==Bθ water airD∝ ω1⋅−1mr i22 2()0 2 2 NEET (UG) SOLVED PAPER : 2019 = 02. .°=015 4  ",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 44,
+   "question": "44. Option (b) is correct. Let u be the initial velocity g sin Since, net displacement in complete cycle ∆ u 60° x 2 g",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 46,
+   "question": "46. The most suitable reagent for the following conversion is 47. The correct structure or tribromo octaoxide is HC33—C C—CH (a) H2, Pd/C, quinolineO (b) Zn/HClO (c) Hg2+/H+, HO 2 (d) Na/Liquid NH3 speed vA and v B respectively. Their time period of rotation is the same. The ratio of angular speed of A to that of B will be (a) vA : vB (b) rB : rA (c) 1 : 1 (d) rA : rB",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 47,
+   "question": "47. Option (d) is correct. Notice that the O, S or Br atom are +6, +4, +6 respectively.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Physics",
+   "qnum": 48,
+   "question": "48. Option (b) is correct. Given, E° cell = 0.59 V Ecell = E° − 2 303. logRTQ cell nF ⇒ Ecell = E° − 0 059. logQ (At equilibrium, Ecell = 0 and Q = Keq) ⇒ 0 = E° cell − 0 059. logK ⇒ log K=eq ⇒ K=10 eq 10 10 10 295 2 Moved distance, () sinx u1= °26g0  3 2 Moved distance,() sinx u2= °23g0 Now,x1= °sin3012 13 x2sin :60° = ⋅23⋅ = x1 60° s 60° g g co 45. Option (c) is correct. y = 0 So, Average velocity ==Displacement yy yfi− ==∆ 0 0= Timeinterval TTT ==Displacement yy yfi−==∆ 0 0= Timeinterval TTT g sin 30° ° u 30° g cos 30 CHEMISTRY",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Unknown",
+   "qnum": 1,
+   "question": "1. A hollow metal sphere of radius R is uniformly 5. Which colour of the light has the longest charged. The electric field due to the sphere at a wavelength? distance r from the centre (a) zero as r increases for r < R, decreases as r increases for r > (b) zero as r increases for r < R, increases as r for r >",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Unknown",
+   "qnum": 2,
+   "question": "2. A force F = 20 + 10y acts on a particle in y where F is in newton and y this force to move the particle from y (a) 5 J",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Unknown",
+   "qnum": 3,
+   "question": "3. with a DC source of emf E, and zero internal resistance. horizontal floor. Its centre of mass has speed of The ratio of power consumption by the bulbs when 20cm/s. How much work is needed to stop it (i) all are glowing and (ii) in the situation when two from section A and one from section B are glowing, (a) 30 kJ will be AB E (a)9: 4(b)1: 22: 1(c)(d)4: 9",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2019,
+   "subject": "Unknown",
+   "qnum": 4,
+   "question": "4. A soap bubble, having radius of 1 mm, is blown from (a)16% a detergent solution having a surface tension of 2.5 ×  10–2 N/m. The pressure inside the bubble equals at a (c)10% point Z0 below the free surface of water in a container. Taking g = 10 m/s 2, density of water = 103 kg/m3, the 11. The unit of thermal conductivity is value of Z0 is (a) 10 cm (b) 1 cm (c) 0.5 cm (d) 100 cm(c) W m–1 K–1 SOLVED PAPE 2019 Max. Marks : 720 PHYSICS (a)blue (b)green (c)violet (d)red",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  }
+ ]
+}
