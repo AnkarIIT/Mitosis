@@ -7,4 +7,6 @@ class Chats extends Table {
   BoolColumn get isUser => boolean()();
   DateTimeColumn get timestamp => dateTime()();
   TextColumn get sessionId => text().nullable()(); // To group conversations
+  TextColumn get groundedChapterKey => text().nullable()(); // NCERT chapter grounding
+  TextColumn get groundedUserPdfId => text().nullable()(); // User PDF grounding
 }
