@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'app_theme.dart';
 import 'tokens.dart';
 
@@ -62,11 +61,10 @@ class MitosSectionHeader extends StatelessWidget {
         children: [
           Text(
             title.toUpperCase(),
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
               color: AdaptiveColors.textSecondary(context),
-              letterSpacing: 1.2,
             ),
           ),
           ?trailing,
@@ -92,22 +90,29 @@ class MitosSubjectChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = SubjectColors.of(subject);
     return FilterChip(
       label: Text(label),
+      avatar: CircleAvatar(
+        backgroundColor: SubjectColors.of(subject),
+        radius: 4,
+      ),
       selected: selected,
       onSelected: onTap != null ? (_) => onTap!() : null,
-      backgroundColor: color.withValues(alpha: 0.08),
-      selectedColor: color.withValues(alpha: 0.2),
+      backgroundColor: AdaptiveColors.surface(context),
+      selectedColor: AdaptiveColors.primaryContainer(context),
       side: BorderSide(
-        color: selected ? color : color.withValues(alpha: 0.3),
+        color: selected
+            ? AdaptiveColors.primary(context)
+            : AdaptiveColors.outlineVariant(context),
         width: selected ? 1.5 : 1,
       ),
-      checkmarkColor: color,
-      labelStyle: GoogleFonts.inter(
+      checkmarkColor: AdaptiveColors.primary(context),
+      labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
         fontSize: 13,
         fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-        color: selected ? color : AdaptiveColors.textSecondary(context),
+        color: selected
+            ? AdaptiveColors.primary(context)
+            : AdaptiveColors.textPrimary(context),
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -202,7 +207,7 @@ class MitosEmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             Text(
               title,
-              style: GoogleFonts.inter(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
@@ -211,7 +216,7 @@ class MitosEmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               subtitle,
-              style: GoogleFonts.inter(
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontSize: 14,
                 color: AdaptiveColors.textSecondary(context),
               ),
