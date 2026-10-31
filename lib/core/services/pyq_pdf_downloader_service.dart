@@ -9,20 +9,18 @@ import 'package:path_provider/path_provider.dart';
 class PyqPdfDownloaderService {
   PyqPdfDownloaderService();
 
-  /// Verified sources for NEET Question Papers.
+  /// Verified sources for NEET question papers.
+  ///
+  /// Only direct PDF URLs belong here. The list used to also contain 11
+  /// `careers360.com/articles/...` HTML pages (2024, 2025, 2006-2014); those
+  /// downloaded an HTML page and saved it as `neet_<year>.pdf`, which the app
+  /// then reported as a successful download. They are dropped until someone
+  /// verifies an actual PDF for those years.
+  ///
+  /// `isOfficial` is only true for files hosted on a government domain
+  /// (`cdnbbsr.s3waas.gov.in` is the NIC S3 CDN). Coaching/aggregator mirrors
+  /// are third-party copies: fine for practice, not for redistribution.
   static const List<PdfSource> neetPdfSources = [
-    PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-2025-question-paper',
-      year: 2025,
-      label: 'NEET 2025 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url: 'https://medicine.careers360.com/articles/neet-2024-question-paper',
-      year: 2024,
-      label: 'NEET 2024 Question Paper',
-      isOfficial: true,
-    ),
     PdfSource(
       url:
           'https://static.collegedekho.com/media/uploads/2023/05/07/qs-and-ans_neet-2023_code-f1_final.pdf',
@@ -86,69 +84,6 @@ class PyqPdfDownloaderService {
       label: 'NEET 2015 Question Paper',
       isOfficial: false,
     ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2014,
-      label: 'AIPMT 2014 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2013,
-      label: 'AIPMT 2013 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2012,
-      label: 'AIPMT 2012 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2011,
-      label: 'AIPMT 2011 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2010,
-      label: 'AIPMT 2010 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2009,
-      label: 'AIPMT 2009 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2008,
-      label: 'AIPMT 2008 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2007,
-      label: 'AIPMT 2007 Question Paper',
-      isOfficial: false,
-    ),
-    PdfSource(
-      url:
-          'https://medicine.careers360.com/articles/neet-previous-year-question-papers',
-      year: 2006,
-      label: 'AIPMT 2006 Question Paper',
-      isOfficial: false,
-    ),
   ];
 
   Stream<PdfDownloadProgress>? progressStream;
@@ -194,17 +129,21 @@ class PyqPdfDownloaderService {
         await pdfDir.create(recursive: true);
       }
 
-      final fileName =
-          'neet_${source.year}_${source.isOfficial ? 'official' : 'aipmt'}.pdf';
+      final fileName = 'neet_${source.year}.pdf';
       final filePath = '${pdfDir.path}/$fileName';
       final file = File(filePath);
 
       if (await file.exists()) {
-        return PdfDownloadResult(
-          success: true,
-          filePath: filePath,
-          fromCache: true,
-        );
+        // A file written before the magic-byte check below may be an HTML page
+        // saved with a .pdf name; treat that as a cache miss.
+        if (_looksLikePdf(await file.readAsBytes())) {
+          return PdfDownloadResult(
+            success: true,
+            filePath: filePath,
+            fromCache: true,
+          );
+        }
+        await file.delete();
       }
 
       final response = await http
@@ -217,18 +156,29 @@ class PyqPdfDownloaderService {
           )
           .timeout(const Duration(seconds: 60));
 
-      if (response.statusCode == 200) {
-        await file.writeAsBytes(response.bodyBytes);
+      if (response.statusCode != 200) {
         return PdfDownloadResult(
-          success: true,
-          filePath: filePath,
-          sizeBytes: response.bodyBytes.length,
+          success: false,
+          error: 'HTTP ${response.statusCode}',
         );
       }
 
+      final bytes = response.bodyBytes;
+      if (!_looksLikePdf(bytes)) {
+        return PdfDownloadResult(
+          success: false,
+          error:
+              'Source did not return a PDF (Content-Type: '
+              '${response.headers['content-type'] ?? 'unknown'}). '
+              'It is probably an article page, not a file.',
+        );
+      }
+
+      await file.writeAsBytes(bytes);
       return PdfDownloadResult(
-        success: false,
-        error: 'HTTP ${response.statusCode}',
+        success: true,
+        filePath: filePath,
+        sizeBytes: bytes.length,
       );
     } catch (e) {
       return PdfDownloadResult(success: false, error: e.toString());
@@ -281,6 +231,16 @@ class PyqPdfDownloaderService {
 
   void cancel() {
     _isLoading = false;
+  }
+
+  /// An aggregator's "PDF not found" page comes back as HTTP 200, so the status
+  /// code alone is not enough. Every real PDF starts with the `%PDF` marker.
+  static bool _looksLikePdf(List<int> bytes) {
+    if (bytes.length < 5) return false;
+    return bytes[0] == 0x25 && // %
+        bytes[1] == 0x50 && // P
+        bytes[2] == 0x44 && // D
+        bytes[3] == 0x46; // F
   }
 
   int get availableYears => neetPdfSources.length;
