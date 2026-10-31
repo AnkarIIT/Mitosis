@@ -8,39 +8,41 @@ void main() {
       expect(service, isA<PyqPdfDownloaderService>());
     });
 
-    test('service should have sources for every year from 2006 to 2025', () {
-      expect(PyqPdfDownloaderService.neetPdfSources.length, equals(20));
-    });
-
-    test('service reports only sources explicitly marked official', () {
-      final service = PyqPdfDownloaderService();
-      expect(service.officialYears, equals(2));
-      expect(service.availableYears, equals(20));
-    });
-
-    test('sources should cover years 2006-2024', () {
-      final years = PyqPdfDownloaderService.neetPdfSources
-          .map((s) => s.year)
-          .toSet();
-
-      // Check that all years are covered
-      for (int year = 2006; year <= 2024; year++) {
+    test('only direct PDF sources are listed', () {
+      // The list used to hold 11 careers360 article pages, which `downloadPdf`
+      // saved as `neet_<year>.pdf` and reported as success.
+      expect(PyqPdfDownloaderService.neetPdfSources, isNotEmpty);
+      for (final source in PyqPdfDownloaderService.neetPdfSources) {
         expect(
-          years.contains(year),
-          isTrue,
-          reason: 'Year $year should be in sources',
+          source.url.toLowerCase(),
+          contains('.pdf'),
+          reason: '${source.year} points at a page, not a file',
         );
       }
     });
 
-    test('official sources should be marked correctly', () {
-      for (var source in PyqPdfDownloaderService.neetPdfSources) {
-        if (source.year == 2020 || source.year == 2024) {
-          expect(source.isOfficial, isTrue);
-        } else {
-          expect(source.isOfficial, isFalse);
+    test('counts reflect the verified source list', () {
+      final service = PyqPdfDownloaderService();
+      expect(service.availableYears, PyqPdfDownloaderService.neetPdfSources.length);
+      expect(
+        service.officialYears,
+        PyqPdfDownloaderService.neetPdfSources
+            .where((s) => s.isOfficial)
+            .length,
+      );
+    });
+
+    test('official sources are government-hosted only', () {
+      for (final source in PyqPdfDownloaderService.neetPdfSources) {
+        if (source.isOfficial) {
+          expect(source.url, contains('gov.in'), reason: '${source.year}');
         }
       }
+      // NEET 2024 was marked official while pointing at a careers360 article.
+      expect(
+        PyqPdfDownloaderService.neetPdfSources.any((s) => s.year == 2024),
+        isFalse,
+      );
     });
 
     test('download result class should work correctly', () {
@@ -56,11 +58,9 @@ void main() {
       expect(result.fromCache, isFalse);
     });
 
-    test('pdf file info should parse correctly', () {
-      // Note: This test would need an actual file in a real scenario
-      // Here we test the factory constructor with mock data
+    test('pdf source should parse correctly', () {
       final source = PdfSource(
-        url: 'https://example.com/',
+        url: 'https://example.com/paper.pdf',
         year: 2024,
         label: 'NEET 2024',
         isOfficial: true,
@@ -72,25 +72,19 @@ void main() {
     });
   });
 
-  group('Download Coverage Summary', () {
-    test('should identify download summary', () {
-      // This test documents what the service provides
-      final service = PyqPdfDownloaderService();
+  group('Download coverage', () {
+    test('the shipped years are exactly the verified PDFs', () {
+      final years = PyqPdfDownloaderService.neetPdfSources
+          .map((s) => s.year)
+          .toList();
+      expect(years.toSet(), {2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023});
+      expect(years.toSet().length, years.length);
+    });
 
-      // Total years covered: 2006-2025 = 20 years
-      final totalYears = 2025 - 2006 + 1;
-      expect(totalYears, equals(20));
-
-      // Only sources explicitly verified as official are counted as official.
-      final officialYears = 2;
-
-      // Pre-NEET AIPMT papers: 2006-2018 = 13 years
-      final aipmtYears = 2018 - 2006 + 1;
-      expect(aipmtYears, equals(13));
-
-      // Verify counts match
-      expect(service.availableYears, equals(totalYears));
-      expect(service.officialYears, equals(officialYears));
+    test('coverage is documented, not assumed', () {
+      // Anything outside 2015-2023 has no verified direct PDF yet. When a year
+      // is added, this count must change deliberately.
+      expect(PyqPdfDownloaderService.neetPdfSources.length, 9);
     });
   });
 }
