@@ -12,9 +12,9 @@ import '../../core/services/question_inventory_service.dart';
 import '../../core/services/test_analytics_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/theme/tokens.dart';
 
 import 'package:go_router/go_router.dart';
+import 'nta_palette.dart';
 import 'on_screen_calculator.dart';
 
 enum _SessionPhase { taking, break_ }
@@ -45,12 +45,10 @@ class CbtTestScreen extends ConsumerStatefulWidget {
 
 class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     with WidgetsBindingObserver {
-  static const _optionLabels = ['A', 'B', 'C', 'D'];
-
   Set<String>? _excludedIds;
 
   // Palette state colours (NTA-style).
-  static const Color _cMarked = SubjectColors.chemistry;
+  static const Color _cMarked = NtaPaletteColors.marked;
 
   late final String _attemptId;
   late final int _seed;
@@ -59,6 +57,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   late final List<Question> _questions;
   late final List<int> _sectionStart;
   final Map<int, String> _answers = {};
+  /// Options the candidate has clicked but not yet committed. NTA's CBT does
+  /// not record an answer on selection: the palette only turns green after
+  /// SAVE & NEXT or SAVE & MARK FOR REVIEW. Keeping the click here — instead
+  /// of writing straight into [_answers] — makes the app tell the truth about
+  /// what is stored, and trains the habit the real paper demands.
+  final Map<int, String> _drafts = {};
   final Set<int> _flagged = {};
   final Set<int> _visited = {};
   late final List<int> _secondsPerQuestion;
@@ -82,6 +86,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   bool _submitting = false;
   bool _submitted = false;
   bool _confirmDialogOpen = false;
+  bool _warningOpen = false;
+
+  /// NTA-style time warnings. Fired once each, only for full-length mocks and
+  /// only while the candidate is answering (never during a break).
+  bool _warned15 = false;
+  bool _warned5 = false;
 
   /// True once `_questions`/`_deadline` have been assigned. Question allocation
   /// needs an async read (recently-seen exclusion), so `build()` and the
@@ -93,6 +103,10 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   // integrity violation. Count persists across crashes via the checkpoint.
   int _violations = 0;
   bool _fullscreenOn = false;
+
+  /// Wide-layout state of the `>` handle between the question pane and the
+  /// palette panel — NTA's own collapse control.
+  bool _paletteCollapsed = false;
 
   bool get _checkpointable => widget.config.isFullLengthMock;
 
@@ -561,7 +575,69 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       await _advanceToSection(_currentSection + 1);
       return;
     }
+    _maybeWarnTimeLeft();
     setState(() {}); // repaint from wall clock — no arithmetic, no drift
+  }
+
+  /// 15-minute and 5-minute warnings, as NTA shows them. Only full mocks get
+  /// them: a 10-minute practice paper should not open with a "15 minutes left"
+  /// popup, and short drills are not the exam the warning prepares you for.
+  void _maybeWarnTimeLeft() {
+    if (!_checkpointable ||
+        _submitted ||
+        _submitting ||
+        _warningOpen ||
+        _confirmDialogOpen ||
+        _phase != _SessionPhase.taking) {
+      return;
+    }
+    final remaining = _remainingSeconds;
+    if (!_warned5 && remaining <= 300) {
+      _warned5 = true;
+      _warned15 = true;
+      _showTimeWarning(5);
+    } else if (!_warned15 && remaining <= 900) {
+      _warned15 = true;
+      _showTimeWarning(15);
+    }
+  }
+
+  Future<void> _showTimeWarning(int minutes) async {
+    if (!mounted) return;
+    _warningOpen = true;
+    final urgent = minutes <= 5;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return Theme(
+          data: _ntaTheme,
+          child: AlertDialog(
+            icon: Icon(
+              Icons.timer_outlined,
+              color: urgent ? NtaExamColors.danger : NtaExamColors.accent,
+            ),
+            title: Text('$minutes minutes remaining'),
+            content: Text(
+              urgent
+                  ? 'Only $minutes minutes are left. Save your answers now. '
+                        'The test is submitted automatically when the timer '
+                        'reaches zero.'
+                  : 'You have $minutes minutes left. Check the questions you '
+                        'marked for review before submitting.',
+              style: const TextStyle(fontSize: 13, height: 1.45),
+            ),
+            actions: [
+              FilledButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    _warningOpen = false;
   }
 
   void _accrueTimeOnLeave() {
@@ -588,14 +664,24 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   Future<void> _selectAnswer(String option) async {
     if (_locked) return;
     setState(() {
-      _answers[_currentIndex] = option;
+      _drafts[_currentIndex] = option;
     });
     await _saveCheckpoint();
+  }
+
+  /// Moves the pending selection into the answer sheet. Called by SAVE & NEXT
+  /// and SAVE & MARK FOR REVIEW, never by a plain click.
+  void _commitCurrent() {
+    final draft = _drafts.remove(_currentIndex);
+    if (draft != null) {
+      _answers[_currentIndex] = draft;
+    }
   }
 
   Future<void> _clearResponse() async {
     if (_locked) return;
     setState(() {
+      _drafts.remove(_currentIndex);
       _answers.remove(_currentIndex);
     });
     await _saveCheckpoint();
@@ -614,10 +700,33 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
   Future<void> _markForReviewAndNext() async {
     setState(() {
+      // MARK FOR REVIEW & NEXT flags without storing an answer.
+      _drafts.remove(_currentIndex);
       _flagged.add(_currentIndex);
     });
     await _saveCheckpoint();
     _advance();
+  }
+
+  /// SAVE & NEXT: store the pending selection, then move on.
+  Future<void> _saveAndNext() async {
+    if (_locked) return;
+    setState(_commitCurrent);
+    await _saveCheckpoint();
+    _advance();
+  }
+
+  /// SAVE & MARK FOR REVIEW: keeps whatever answer is selected and flags the
+  /// question, then stays on it. That "stays" is the whole difference from
+  /// MARK FOR REVIEW & NEXT, and it is what the real CBT does.
+  Future<void> _saveAndMarkForReview() async {
+    if (_locked) return;
+    setState(() {
+      _commitCurrent();
+      _flagged.add(_currentIndex);
+    });
+    await _saveCheckpoint();
+    _showNotice('Response saved and marked for review.');
   }
 
   Future<void> _goTo(int globalIndex) async {
@@ -630,14 +739,20 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
 
       // Cannot jump to B-block until A-block is explicitly advanced past
       if (_inABlock && targetBlock == 1 && !_isABlockLastQuestion) {
-        // Allow palette tap only within current block
+        // Never fail silently: a palette tap that does nothing reads as a bug.
+        _showNotice('Submit Section A to unlock Section B.');
         return;
       }
       // Once in B-block, cannot go back to A-block via palette
       if (_inBBlock && targetBlock == 0) {
+        _showNotice('Section A is closed once Section B has started.');
         return;
       }
     }
+
+    // The draft belongs to the question being left, so read it before the
+    // index moves.
+    final droppedDraft = _drafts.remove(_currentIndex) != null;
 
     setState(() {
       _currentIndex = globalIndex;
@@ -646,6 +761,12 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     });
     _questionEnteredAt = DateTime.now();
     await _saveCheckpoint();
+
+    if (droppedDraft) {
+      // Never lose a click silently: the real CBT drops unsaved selections,
+      // and a student who has only ever used this app needs to be told.
+      _showNotice('Answer not saved. Use SAVE & NEXT to store it.');
+    }
   }
 
   /// Save & Next / Next Section / Submit, depending on position.
@@ -887,27 +1008,155 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   }
 
   Future<void> _confirmSubmit() async {
-    if (_submitting || _submitted) return;
+    if (_submitting || _submitted || _warningOpen) return;
     _confirmDialogOpen = true;
+    final summary = _summaryFor(
+      List<int>.generate(_questions.length, (i) => i),
+    );
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Submit Test?'),
-        content: Text(
-          'You have answered ${_answers.length} of ${_questions.length} questions.\n\n'
-          'Once submitted, you cannot change your answers.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(false),
-            child: const Text('Keep Trying'),
-          ),
-          ElevatedButton(
-            onPressed: () => context.pop(true),
-            child: const Text('Submit'),
-          ),
-        ],
-      ),
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        var declared = false;
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            return Theme(
+              data: _ntaTheme,
+              child: AlertDialog(
+                title: const Text('Submit Test?'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Review your attempt before submitting. '
+                        'Answers cannot be changed afterwards.',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          height: 1.4,
+                          color: AdaptiveColors.textSecondary(dialogContext),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (_drafts.isNotEmpty) ...[
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3E0),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: const Color(0xFFE0A800)),
+                          ),
+                          child: Text(
+                            '${_drafts.length} selected '
+                            '${_drafts.length == 1 ? 'answer was' : 'answers were'} '
+                            'never saved and will be marked Not Answered. '
+                            'Close this and press SAVE & NEXT to keep '
+                            '${_drafts.length == 1 ? 'it' : 'them'}.',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              height: 1.35,
+                              color: Color(0xFF8A5B00),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      _summaryRow(
+                        dialogContext,
+                        'No. of Questions',
+                        summary.total,
+                        bold: true,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: NtaCountRow(
+                          state: NtaPaletteState.notVisited,
+                          count: summary.notVisited,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: NtaCountRow(
+                          state: NtaPaletteState.notAnswered,
+                          count: summary.notAnswered,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: NtaCountRow(
+                          state: NtaPaletteState.answered,
+                          count: summary.answered,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: NtaCountRow(
+                          state: NtaPaletteState.marked,
+                          count: summary.marked,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: NtaCountRow(
+                          state: NtaPaletteState.answeredMarked,
+                          count: summary.answeredMarked,
+                          note: 'will be considered for evaluation',
+                          fontSize: 12.5,
+                        ),
+                      ),
+                      const Divider(height: 24),
+                      InkWell(
+                        onTap: () => setDialogState(() => declared = !declared),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              value: declared,
+                              onChanged: (value) => setDialogState(
+                                () => declared = value ?? false,
+                              ),
+                            ),
+                            const Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 12),
+                                child: Text(
+                                  'I have read and understood the '
+                                  'instructions. I declare that I am not in '
+                                  'possession of, or indulging in, any unfair '
+                                  'means.',
+                                  style: TextStyle(fontSize: 12, height: 1.4),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: const Text('No, Go Back'),
+                  ),
+                  FilledButton(
+                    onPressed: declared
+                        ? () => Navigator.of(dialogContext).pop(true)
+                        : null,
+                    child: const Text('Yes, Submit'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
     _confirmDialogOpen = false;
     // The deadline may have fired (auto-submit) while the dialog was open.
@@ -915,6 +1164,55 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     if (confirmed == true) {
       await _submitTest();
     }
+  }
+
+  Widget _summaryRow(
+    BuildContext context,
+    String label,
+    int value, {
+    Color? color,
+    bool bold = false,
+    String? note,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              note == null ? label : '$label\n$note',
+              style: TextStyle(
+                fontSize: 12.5,
+                height: 1.3,
+                fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+                color: AdaptiveColors.textPrimary(context),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            constraints: const BoxConstraints(minWidth: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: color == null
+                  ? AdaptiveColors.surfaceContainerHighest(context)
+                  : color.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              '$value',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: color ?? AdaptiveColors.textPrimary(context),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _submitTest({bool auto = false}) async {
@@ -1038,6 +1336,17 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
   // UI
   // ─────────────────────────────────────────────────────────────
 
+  /// The NTA light theme used by the paper, its dialogs and its sheets. Kept in
+  /// one place so a dialog opened from the screen's own context (which sits
+  /// above the in-tree `Theme`) still matches the exam chrome in dark mode.
+  ThemeData get _ntaTheme => AppTheme.lightTheme.copyWith(
+    scaffoldBackgroundColor: NtaExamColors.page,
+    colorScheme: AppTheme.lightTheme.colorScheme.copyWith(
+      primary: NtaExamColors.accent,
+      surface: NtaExamColors.surface,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     if (!_ready) {
@@ -1064,302 +1373,1346 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        if (_phase == _SessionPhase.break_) {
-          _skipBreak();
-          return;
-        }
-        final exit = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Exit Test?'),
-            content: const Text(
-              'Your progress will not be saved and the attempt will be lost.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => context.pop(false),
-                child: const Text('Stay'),
-              ),
-              TextButton(
-                onPressed: () => context.pop(true),
-                child: const Text('Exit'),
-              ),
-            ],
-          ),
-        );
-        if (exit == true && context.mounted) {
-          _ticker?.cancel();
-          _autosaveTimer?.cancel();
-          await _clearCheckpoint();
-          if (context.mounted) context.pop();
-        }
+        await _requestExit();
       },
-      child: Scaffold(
-        backgroundColor: AdaptiveColors.surfaceWarm(context),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.close, color: AdaptiveColors.textPrimary(context)),
-            onPressed: () => Navigator.maybePop(context),
-          ),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.config.mode == ExamMode.neet
-                    ? 'NEET Mock Test'
-                    : 'CBT Practice',
-                style: TextStyle(
-                  color: AdaptiveColors.textPrimary(context),
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
+      child: Theme(
+        // The paper screen is deliberately NTA light even when the rest of the
+        // app is in dark mode: it is an exam interface, and candidates should
+        // see the same blue-on-white chrome they will meet on the real CBT.
+        // The app's font and text scale are preserved.
+        data: _ntaTheme,
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light,
+          child: Scaffold(
+            backgroundColor: NtaExamColors.surface,
+            body: Column(
+              children: [
+                // 1. Thin navy strip with the Home link.
+                Container(
+                  color: NtaExamColors.navy,
+                  child: SafeArea(bottom: false, child: _buildTopBar(context)),
                 ),
-              ),
-              Text(
-                widget.config.sectionLock
-                    ? 'Section ${_currentSection + 1} of '
-                          '${_sectionQuestions.length} • ${_activeSection.name}'
-                    : _activeSection.name,
-                style: TextStyle(
-                  color: AdaptiveColors.textSecondary(context),
-                  fontSize: 12,
+                // 2. White logo band.
+                _buildLogoBand(context),
+                // 3. Candidate strip: photo, identity, subject, clock.
+                _buildCandidateStrip(context),
+                // 4. Section tabs (an addition — the reference paper was a
+                //    single-section JEE paper, NEET needs them).
+                _buildSectionBar(context),
+                if (_violations > 0) _buildViolationBanner(context),
+                Expanded(
+                  child: _phase == _SessionPhase.break_
+                      ? _buildBreakView()
+                      : LayoutBuilder(
+                          builder: (context, constraints) => _buildQuestionArea(
+                            context,
+                            isWide: constraints.maxWidth >= 760,
+                          ),
+                        ),
                 ),
-              ),
-            ],
-          ),
-          centerTitle: true,
-          actions: [
-            if (!_submitting)
-              IconButton(
-                tooltip: 'Calculator',
-                icon: Icon(
-                  Icons.calculate_outlined,
-                  color: AdaptiveColors.textPrimary(context),
-                ),
-                onPressed: () => _openCalculator(),
-              ),
-            if (_submitting)
-              const Padding(
-                padding: EdgeInsets.only(right: 16),
-                child: Center(
-                  child: SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                // 5. Copyright strip.
+                Container(
+                  color: NtaExamColors.navy,
+                  child: SafeArea(
+                    top: false,
+                    minimum: const EdgeInsets.only(bottom: 2),
+                    child: _buildFooterBar(),
                   ),
                 ),
-              )
-            else
-              TextButton(
-                onPressed: _confirmSubmit,
-                child: const Text('Submit'),
-              ),
-          ],
-        ),
-        body: Column(
-          children: [
-            _buildTimerBar(),
-            Expanded(
-              child: _phase == _SessionPhase.break_
-                  ? _buildBreakView()
-                  : _buildQuestionView(),
+              ],
             ),
-            if (_phase != _SessionPhase.break_) _buildBottomControls(),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTimerBar() {
-    final remaining = _remainingSeconds;
-    final total = widget.config.totalDurationSeconds;
-    final progress = total <= 0 ? 1.0 : remaining / total;
-    final color = remaining < 300
-        ? AppColors.error
-        : remaining < 600
-        ? AppColors.warning
-        : AppColors.primary;
-
-    final sectionRemaining = _sectionRemainingSeconds;
-    final sectionDuration =
-        widget.config.sections[_currentSection].durationSeconds;
-
-    return Container(
-      color: AdaptiveColors.surface(context),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                sectionRemaining >= 0 ? 'Section Time' : 'Time Remaining',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AdaptiveColors.textSecondary(context),
-                ),
-              ),
-              Text(
-                sectionRemaining >= 0
-                    ? _formatTime(sectionRemaining)
-                    : _formatTime(remaining),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: sectionRemaining >= 0 && sectionRemaining < 120
-                      ? AppColors.error
-                      : color,
-                  fontWeight: FontWeight.bold,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-            ],
+  /// Exit confirmation, shared by the system back gesture (PopScope) and the
+  /// Home link in the top strip.
+  Future<void> _requestExit() async {
+    if (!_ready || _questions.isEmpty) {
+      if (mounted) Navigator.of(context).maybePop();
+      return;
+    }
+    if (_phase == _SessionPhase.break_) {
+      _skipBreak();
+      return;
+    }
+    final exit = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => Theme(
+        data: _ntaTheme,
+        child: AlertDialog(
+          title: const Text('Exit Test?'),
+          content: Text(
+            _checkpointable
+                ? 'Your answers are auto-saved. You can resume this attempt '
+                      'later from the mock test screen.'
+                : 'This practice paper is not saved. Leaving now loses the '
+                      'attempt.',
           ),
-          if (sectionRemaining >= 0 &&
-              sectionDuration != null &&
-              sectionDuration > 0) ...[
-            const SizedBox(height: 6),
-            LinearProgressIndicator(
-              value: sectionDuration <= 0
-                  ? 0.0
-                  : (sectionDuration - sectionRemaining) / sectionDuration,
-              minHeight: 4,
-              borderRadius: BorderRadius.circular(2),
-              backgroundColor: AdaptiveColors.divider(context),
-              valueColor: AlwaysStoppedAnimation(
-                sectionRemaining < 120 ? AppColors.error : AppColors.primary,
-              ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Stay'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Exit'),
             ),
           ],
-          if (_violations > 0) ...[
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppColors.warning.withValues(alpha: 0.5),
+        ),
+      ),
+    );
+    if (exit != true || !mounted) return;
+    _ticker?.cancel();
+    _autosaveTimer?.cancel();
+    await _clearCheckpoint();
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Exam chrome (NTA-style)
+  // ─────────────────────────────────────────────────────────────
+
+  /// 1. Thin navy strip. The reference page carries its Home link here, and it
+  /// is the only way out of a live paper, so it routes through the same
+  /// confirmation as the system back gesture.
+  Widget _buildTopBar(BuildContext context) {
+    return Container(
+      height: 30,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      color: NtaExamColors.navy,
+      child: Row(
+        children: [
+          if (_submitting)
+            const Padding(
+              padding: EdgeInsets.only(left: 6),
+              child: SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.gpp_maybe, size: 14, color: AppColors.warning),
-                  const SizedBox(width: 6),
-                  Text(
-                    _violations == 1
-                        ? 'Proctoring: You left the exam once'
-                        : 'Proctoring: You left the exam $_violations times',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AdaptiveColors.textPrimary(context),
-                      fontWeight: FontWeight.w600,
+            ),
+          const Spacer(),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _requestExit,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.person_outline, size: 12, color: Colors.white),
+                    SizedBox(width: 4),
+                    Text(
+                      'Home',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ],
-          const SizedBox(height: 6),
-          LinearProgressIndicator(
-            value: progress.clamp(0.0, 1.0),
-            minHeight: 6,
-            borderRadius: BorderRadius.circular(3),
-            backgroundColor: AdaptiveColors.divider(context),
-            valueColor: AlwaysStoppedAnimation(color),
           ),
         ],
       ),
     );
   }
 
+  /// 2. White logo band. A real CBT page carries the agency and ministry
+  /// lockups here; this app ships no government artwork, so the same two-block
+  /// composition is rebuilt from type.
+  Widget _buildLogoBand(BuildContext context) {
+    const agency = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'National Testing Agency',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 11.5,
+            height: 1.1,
+            fontWeight: FontWeight.w700,
+            color: NtaExamColors.navy,
+          ),
+        ),
+        Text(
+          'Excellence In Assessment',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 8.5,
+            height: 1.25,
+            color: NtaExamColors.green,
+          ),
+        ),
+      ],
+    );
+    const ministry = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Ministry of Education',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 10.5,
+            height: 1.1,
+            fontWeight: FontWeight.w700,
+            color: NtaExamColors.text,
+          ),
+        ),
+        Text(
+          'Government of India',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 8.5,
+            height: 1.25,
+            color: NtaExamColors.textMuted,
+          ),
+        ),
+      ],
+    );
+
+    return Container(
+      color: NtaExamColors.surface,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 520;
+          return Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: NtaExamColors.navy,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'NTA',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.6,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(child: agency),
+              if (wide) ...[
+                Container(
+                  width: 1,
+                  height: 30,
+                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                  color: NtaExamColors.border,
+                ),
+                const Expanded(child: ministry),
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// 3. Candidate strip: photo box, identity, exam, subject and the remaining
+  /// clock as a blue pill — the layout every NTA candidate knows.
+  Widget _buildCandidateStrip(BuildContext context) {
+    final auth = ref.watch(authProvider);
+    final user = auth.user;
+    final name = (user?.fullName?.trim().isNotEmpty ?? false)
+        ? user!.fullName!.trim()
+        : (user?.username ?? (auth.isGuest ? 'Guest Candidate' : 'Candidate'));
+    final examName = widget.config.mode == ExamMode.neet
+        ? 'NEET (UG) Mock Test'
+        : 'CBT Practice';
+    final subject = widget.config.subjectLabel.trim().isEmpty
+        ? widget.config.testType
+        : widget.config.subjectLabel.trim();
+    final remaining = _remainingSeconds;
+    final urgent = remaining <= 300;
+
+    return Container(
+      color: const Color(0xFFF4F6F9),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: NtaExamColors.surface,
+              border: Border.all(color: NtaExamColors.chromeBorder),
+              borderRadius: BorderRadius.circular(2),
+            ),
+            child: const Icon(Icons.person, size: 38, color: Color(0xFF8A9099)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _candidateRow(
+                  'Candidate Name',
+                  name,
+                  NtaExamColors.valueOrange,
+                ),
+                _candidateRow('Exam Name', examName, NtaExamColors.valueBlue),
+                _candidateRow(
+                  'Subject Name',
+                  subject,
+                  NtaExamColors.valueOrange,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 1),
+                  // Wrap, not Row: at 360px with 1.3x text the label plus the
+                  // pill can exceed the column, and a wrap drops the pill to
+                  // the next line instead of overflowing the strip.
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 2,
+                    runSpacing: 2,
+                    children: [
+                      _candidateLabel('Remaining Time'),
+                      const Text(
+                        ' : ',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: NtaExamColors.text,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: urgent
+                              ? NtaExamColors.danger
+                              : NtaExamColors.accent,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: Text(
+                          _formatClock(remaining),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            fontFeatures: [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 6),
+          ConstrainedBox(
+            // Capped so the identity labels always keep a usable width: the
+            // language box plus two icon buttons would otherwise take a third
+            // of a 360px strip and squeeze the values to an ellipsis.
+            constraints: const BoxConstraints(maxWidth: 104),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildLanguageBox(),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      tooltip: 'Calculator',
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      constraints: const BoxConstraints(
+                        minWidth: 40,
+                        minHeight: 34,
+                      ),
+                      icon: const Icon(
+                        Icons.calculate_outlined,
+                        size: 20,
+                        color: NtaExamColors.navy,
+                      ),
+                      onPressed: _openCalculator,
+                    ),
+                    IconButton(
+                      tooltip: 'Question palette',
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      constraints: const BoxConstraints(
+                        minWidth: 40,
+                        minHeight: 34,
+                      ),
+                      icon: Badge.count(
+                        count: _answers.length,
+                        isLabelVisible: _answers.isNotEmpty,
+                        backgroundColor: NtaPaletteColors.answered,
+                        child: const Icon(
+                          Icons.grid_view_rounded,
+                          size: 20,
+                          color: NtaExamColors.navy,
+                        ),
+                      ),
+                      onPressed: _showPaletteSheet,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _candidateRow(String label, String value, Color valueColor) {
+    // Wrap rather than Row: the label and the separator are fixed width, so on
+    // a narrow strip the value drops to its own line instead of overflowing.
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 2,
+        runSpacing: 0,
+        children: [
+          _candidateLabel(label),
+          const Text(
+            ' : ',
+            style: TextStyle(fontSize: 11, color: NtaExamColors.text),
+          ),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+              color: valueColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _candidateLabel(String label) => Text(
+    label,
+    maxLines: 1,
+    style: const TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+      height: 1.3,
+      color: NtaExamColors.text,
+    ),
+  );
+
+  Widget _buildLanguageBox() {
+    return Material(
+      color: NtaExamColors.surface,
+      borderRadius: BorderRadius.circular(3),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(3),
+        onTap: _showLanguageSheet,
+        child: Container(
+          height: 30,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: NtaExamColors.chromeBorder),
+            borderRadius: BorderRadius.circular(3),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  'English',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: NtaExamColors.text,
+                  ),
+                ),
+              ),
+              const Icon(
+                Icons.arrow_drop_down,
+                size: 16,
+                color: NtaExamColors.text,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The dropdown is kept because candidates look for it; it opens and says
+  /// plainly that this paper has one language rather than doing nothing.
+  void _showLanguageSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: NtaExamColors.surface,
+      builder: (sheetContext) => Theme(
+        data: _ntaTheme,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Language',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: NtaExamColors.text,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F0FB),
+                    border: Border.all(color: NtaExamColors.accent),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        size: 16,
+                        color: NtaExamColors.accent,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'English',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: NtaExamColors.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'This paper is available in English only.',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    height: 1.4,
+                    color: NtaExamColors.textMuted,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: 42,
+                  child: FilledButton(
+                    onPressed: () => Navigator.of(sheetContext).pop(),
+                    child: const Text('Close'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Navy copyright strip. The reference page credits the testing agency; this
+  /// app is not the agency, so the line carries the app's own name.
+  Widget _buildFooterBar() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      color: NtaExamColors.navy,
+      child: const Text(
+        '© All Rights Reserved - NEET Mitos',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 9.5,
+          letterSpacing: 0.2,
+          color: Colors.white70,
+        ),
+      ),
+    );
+  }
+
+  /// 4. Section tabs. The reference paper is a single-section JEE paper and has
+  /// no tabs, but NEET cannot be sat without them, so the strip is kept and
+  /// dressed in the same grey/blue tab chrome as the rest of the page.
+  Widget _buildSectionBar(BuildContext context) {
+    final sectionRemaining = _sectionRemainingSeconds;
+    final showTabs = _sectionQuestions.length > 1;
+    if (!showTabs && sectionRemaining < 0) return const SizedBox.shrink();
+    return Container(
+      decoration: const BoxDecoration(
+        color: NtaExamColors.surface,
+        border: Border(bottom: BorderSide(color: NtaExamColors.border)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showTabs) SizedBox(height: 42, child: _buildSectionTabs(context)),
+          if (sectionRemaining >= 0)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              color: sectionRemaining < 120
+                  ? const Color(0xFFFDECEC)
+                  : const Color(0xFFF4F7FB),
+              child: Text(
+                'Section time left : ${_formatTime(sectionRemaining)}',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: sectionRemaining < 120
+                      ? NtaExamColors.danger
+                      : NtaExamColors.textMuted,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTabs(BuildContext context) {
+    if (_sectionQuestions.length <= 1) return const SizedBox.shrink();
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
+      itemCount: _sectionQuestions.length,
+      separatorBuilder: (_, _) => const SizedBox(width: 4),
+      itemBuilder: (context, i) {
+        final isActive = i == _currentSection;
+        final isLocked = _isSectionLocked(i);
+        final start = _sectionStart[i];
+        final end = start + _sectionQuestions[i].length;
+        var answered = 0;
+        for (var q = start; q < end; q++) {
+          if (_answers.containsKey(q)) answered++;
+        }
+        final foreground = isActive
+            ? Colors.white
+            : (isLocked ? NtaExamColors.textMuted : NtaExamColors.text);
+        return Material(
+          color: isActive
+              ? NtaExamColors.accent
+              : (isLocked ? const Color(0xFFF1F4F8) : const Color(0xFFE8EDF4)),
+          borderRadius: BorderRadius.circular(3),
+          child: InkWell(
+            onTap: () => _jumpToSection(i),
+            borderRadius: BorderRadius.circular(3),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isLocked) ...[
+                    Icon(Icons.lock_outline, size: 12, color: foreground),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(
+                    widget.config.sections[i].name.toUpperCase(),
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
+                      color: foreground,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    '$answered/${_sectionQuestions[i].length}',
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      color: isActive
+                          ? Colors.white70
+                          : NtaExamColors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildViolationBanner(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      color: AdaptiveColors.warning(context).withValues(alpha: 0.12),
+      child: Row(
+        children: [
+          Icon(
+            Icons.gpp_maybe,
+            size: 14,
+            color: AdaptiveColors.warning(context),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              _violations == 1
+                  ? 'Proctoring: you left the exam once'
+                  : 'Proctoring: you left the exam $_violations times',
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: AdaptiveColors.textPrimary(context),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Section tab locks. NEET 2024 has two blocks: B stays sealed until A is
+  /// submitted, and A is closed once B has started. Section-locked papers
+  /// (per-section timing) lock every section except the active one.
+  bool _isSectionLocked(int index) {
+    if (index == _currentSection) return false;
+    if (_isNeet2024) {
+      if (_inABlock && index >= 4) return true;
+      if (_inBBlock && index < 4) return true;
+      return false;
+    }
+    return widget.config.sectionLock;
+  }
+
+  String get _lockedSectionMessage => _isNeet2024
+      ? (_inABlock
+            ? 'Submit Section A to unlock Section B.'
+            : 'Section A is closed once Section B has started.')
+      : 'This paper is section-locked. Finish the current section to continue.';
+
+  void _jumpToSection(int index) {
+    if (index == _currentSection) return;
+    if (_isSectionLocked(index)) {
+      _showNotice(_lockedSectionMessage);
+      return;
+    }
+    _goTo(_sectionStart[index]);
+  }
+
+  void _showNotice(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Question pane + palette. The palette is a fixed side panel on tablets and
+  /// desktop (NTA's own layout, complete with the `>` collapse handle between
+  /// the panes), and a bottom sheet on phones where 320px of side panel would
+  /// leave no room for the question itself.
+  Widget _buildQuestionArea(BuildContext context, {required bool isWide}) {
+    final questionPane = ColoredBox(
+      color: NtaExamColors.surface,
+      child: Column(
+        children: [
+          Expanded(child: _buildQuestionView()),
+          _buildActionBar(context),
+        ],
+      ),
+    );
+    if (!isWide) return questionPane;
+
+    return Row(
+      children: [
+        Expanded(child: questionPane),
+        Material(
+          color: NtaExamColors.navy,
+          child: InkWell(
+            onTap: () => setState(() => _paletteCollapsed = !_paletteCollapsed),
+            child: SizedBox(
+              width: 22,
+              child: Center(
+                child: Icon(
+                  _paletteCollapsed ? Icons.chevron_left : Icons.chevron_right,
+                  size: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (!_paletteCollapsed)
+          Container(
+            width: 320,
+            decoration: const BoxDecoration(
+              color: NtaExamColors.surface,
+              border: Border(left: BorderSide(color: NtaExamColors.border)),
+            ),
+            child: SafeArea(
+              top: false,
+              bottom: false,
+              child: NtaQuestionPalette(
+                sections: _paletteSections(),
+                answers: _answers,
+                marked: _flagged,
+                visited: _visited,
+                currentIndex: _currentIndex,
+                onJump: _goTo,
+                onSubmit: _confirmSubmit,
+                onShowPaper: _showQuestionPaper,
+                onShowInstructions: _showInstructionsSheet,
+                lockedMessage: _lockedSectionMessage,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _showPaletteSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: NtaExamColors.surface,
+      builder: (sheetContext) {
+        return Theme(
+          data: _ntaTheme,
+          child: SafeArea(
+            child: SizedBox(
+              height: MediaQuery.sizeOf(sheetContext).height * 0.78,
+              child: NtaQuestionPalette(
+                sections: _paletteSections(),
+                answers: _answers,
+                marked: _flagged,
+                visited: _visited,
+                currentIndex: _currentIndex,
+                onJump: (index) {
+                  Navigator.of(sheetContext).pop();
+                  _goTo(index);
+                },
+                onSubmit: () {
+                  Navigator.of(sheetContext).pop();
+                  _confirmSubmit();
+                },
+                onShowPaper: () {
+                  Navigator.of(sheetContext).pop();
+                  _showQuestionPaper();
+                },
+                onShowInstructions: () {
+                  Navigator.of(sheetContext).pop();
+                  _showInstructionsSheet();
+                },
+                lockedMessage: _lockedSectionMessage,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static const List<String> _examRules = [
+    'The Remaining Time in the candidate strip is the total time left. It does '
+        'not pause, even if you leave a question unanswered.',
+    'SAVE & NEXT stores an answer and moves on. CLEAR removes the selected '
+        'answer.',
+    'SAVE & MARK FOR REVIEW stores the answer and flags the question, keeping '
+        'you on it. MARK FOR REVIEW & NEXT flags without storing an answer and '
+        'moves on.',
+    'The palette colours show the status of every question: answered, not '
+        'answered, not visited, marked, and answered & marked.',
+    'You can answer questions in any order inside the open section. A section '
+        'showing a lock opens only after the previous section is submitted.',
+    'The test is submitted automatically when the timer reaches zero.',
+    'Do not switch apps, take screenshots or leave the exam. Violations are '
+        'recorded with the attempt.',
+  ];
+
+  /// NTA's "Instructions" action from the palette footer: a read-only reminder
+  /// of the rules, available without leaving the paper.
+  void _showInstructionsSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: NtaExamColors.surface,
+      builder: (sheetContext) {
+        return Theme(
+          data: _ntaTheme,
+          child: SafeArea(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.85,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Instructions',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: NtaExamColors.text,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Close',
+                          onPressed: () => Navigator.of(sheetContext).pop(),
+                          icon: const Icon(Icons.close, size: 18),
+                        ),
+                      ],
+                    ),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (var i = 0; i < _examRules.length; i++)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                      child: Text(
+                                        '${i + 1}.',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: NtaExamColors.accent,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _examRules[i],
+                                        style: const TextStyle(
+                                          fontSize: 12.5,
+                                          height: 1.45,
+                                          color: NtaExamColors.text,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      height: 42,
+                      child: FilledButton(
+                        onPressed: () => Navigator.of(sheetContext).pop(),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: NtaExamColors.accent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        child: const Text('Close'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// NTA's "Question Paper" action: the whole paper, read-only, with live
+  /// status chips. Tapping a row jumps to that question.
+  void _showQuestionPaper() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: NtaExamColors.surface,
+      builder: (sheetContext) {
+        return Theme(
+          data: _ntaTheme,
+          child: SafeArea(
+            child: SizedBox(
+              height: MediaQuery.sizeOf(sheetContext).height * 0.86,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Question Paper',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: NtaExamColors.text,
+                                ),
+                              ),
+                              Text(
+                                'View only · tap a question to jump to it',
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  color: NtaExamColors.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Close',
+                          onPressed: () => Navigator.of(sheetContext).pop(),
+                          icon: const Icon(Icons.close, size: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1, color: NtaExamColors.border),
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
+                      itemCount: _questions.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (context, i) {
+                        final question = _questions[i];
+                        final state = ntaPaletteStateFor(
+                          answered: _answers.containsKey(i),
+                          marked: _flagged.contains(i),
+                          visited: _visited.contains(i),
+                        );
+                        final locked = _isSectionLocked(_sectionOf(i));
+                        return Opacity(
+                          opacity: locked ? 0.5 : 1,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(sheetContext).pop();
+                              if (locked) {
+                                _showNotice(_lockedSectionMessage);
+                                return;
+                              }
+                              _goTo(i);
+                            },
+                            borderRadius: BorderRadius.circular(4),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: i == _currentIndex
+                                      ? NtaExamColors.accent
+                                      : NtaExamColors.border,
+                                ),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 26,
+                                    height: 26,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: NtaPaletteColors.fill(state),
+                                      borderRadius: BorderRadius.circular(3),
+                                      border: Border.all(
+                                        color:
+                                            state == NtaPaletteState.notVisited
+                                            ? NtaExamColors.border
+                                            : Colors.transparent,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${i + 1}',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: NtaPaletteColors.foreground(
+                                          state,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          question.questionText,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            height: 1.4,
+                                            color: NtaExamColors.text,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${question.subject} · '
+                                          '${NtaPaletteColors.label(state)}',
+                                          style: const TextStyle(
+                                            fontSize: 9.5,
+                                            color: NtaExamColors.textMuted,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  List<int> _indicesForSection(int s) => [
+    for (
+      var i = _sectionStart[s];
+      i < _sectionStart[s] + _sectionQuestions[s].length;
+      i++
+    )
+      i,
+  ];
+
+  List<NtaPaletteSection> _paletteSections() {
+    final List<NtaPaletteSection> sections;
+    if (_isNeet2024) {
+      final split = _sectionStart[4];
+      sections = [
+        NtaPaletteSection(
+          name: 'Section A · compulsory',
+          indices: [for (var i = 0; i < split; i++) i],
+          locked: _inBBlock,
+        ),
+        NtaPaletteSection(
+          name: 'Section B · attempt 10 of 15',
+          indices: [for (var i = split; i < _questions.length; i++) i],
+          locked: _inABlock,
+        ),
+      ];
+    } else {
+      sections = [
+        for (var s = 0; s < _sectionQuestions.length; s++)
+          NtaPaletteSection(
+            name: widget.config.sections[s].name,
+            indices: _indicesForSection(s),
+            locked: widget.config.sectionLock && s != _currentSection,
+          ),
+      ];
+    }
+    final nonEmpty = sections.where((s) => s.indices.isNotEmpty).toList();
+    return nonEmpty.isEmpty ? sections : nonEmpty;
+  }
+
+  NtaCountSummary _summaryFor(Iterable<int> indices) => NtaCountSummary.from(
+    indices: indices,
+    answers: _answers,
+    marked: _flagged,
+    visited: _visited,
+  );
+
   Widget _buildQuestionView() {
     final question = _questions[_currentIndex];
-    final selected = _answers[_currentIndex];
+    final selected = _drafts[_currentIndex] ?? _answers[_currentIndex];
+    final isFlagged = _flagged.contains(_currentIndex);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
+              Expanded(
+                child: Text(
+                  'Question ${_currentIndex + 1}:',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    height: 1.2,
+                    fontWeight: FontWeight.w700,
+                    color: NtaExamColors.text,
+                  ),
                 ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F4F8),
+                  borderRadius: BorderRadius.circular(3),
+                  border: Border.all(color: NtaExamColors.border),
+                ),
+                child: Text(
+                  'Marks: +${widget.config.marksPerCorrect} / '
+                  '${widget.config.marksPerWrong}',
+                  style: const TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w600,
+                    color: NtaExamColors.textMuted,
+                  ),
+                ),
+              ),
+              // Bookmark-style flag toggle: mark/unmark for review without
+              // leaving the question (the mark buttons below both advance).
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                tooltip: isFlagged ? 'Unmark for review' : 'Mark for review',
+                onPressed: _toggleFlag,
+                icon: Icon(
+                  isFlagged ? Icons.flag : Icons.flag_outlined,
+                  size: 18,
+                  color: isFlagged ? _cMarked : NtaExamColors.textMuted,
+                ),
+              ),
+              const SizedBox(width: 2),
+              // The reference page's blue circular arrow, which moves on.
+              Tooltip(
+                message: _isLastQuestionOverall
+                    ? 'Submit test'
+                    : 'Go to next question',
+                child: Material(
+                  color: NtaExamColors.accent,
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: _locked
+                        ? null
+                        : (_isLastQuestionOverall ? _confirmSubmit : _advance),
+                    child: const SizedBox(
+                      width: 34,
+                      height: 34,
+                      child: Icon(
+                        Icons.arrow_downward,
+                        size: 17,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const SizedBox(
+            height: 1,
+            width: double.infinity,
+            child: ColoredBox(color: NtaExamColors.hairline),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: _subjectColor(question.subject).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
                   question.subject,
                   style: TextStyle(
                     color: _subjectColor(question.subject),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 9.5,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  question.chapter,
+                  widget.config.sectionLock
+                      ? '${question.chapter} · ${_activeSection.name}'
+                      : question.chapter,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AdaptiveColors.textSecondary(context),
-                    fontSize: 12,
+                  style: const TextStyle(
+                    color: NtaExamColors.textMuted,
+                    fontSize: 10.5,
                   ),
-                ),
-              ),
-              Text(
-                'Q${_currentIndex + 1}/${_questions.length}',
-                style: TextStyle(
-                  color: AdaptiveColors.textSecondary(context),
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              // Bookmark-style flag toggle: mark/unmark for review without
-              // leaving the question (Mark & Next below both flags and advances).
-              IconButton(
-                visualDensity: VisualDensity.compact,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                tooltip: _flagged.contains(_currentIndex)
-                    ? 'Unmark for review'
-                    : 'Mark for review',
-                onPressed: _toggleFlag,
-                icon: Icon(
-                  _flagged.contains(_currentIndex)
-                      ? Icons.flag
-                      : Icons.flag_outlined,
-                  size: 18,
-                  color: _flagged.contains(_currentIndex)
-                      ? _cMarked
-                      : AdaptiveColors.textSecondary(context),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             question.questionText,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AdaptiveColors.textPrimary(context),
-              fontWeight: FontWeight.w600,
-              height: 1.4,
+            style: const TextStyle(
+              fontSize: 14.5,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+              color: NtaExamColors.text,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           ...List.generate(question.options.length, (i) {
             final option = question.options[i];
             final isSelected = selected == option;
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 10),
               child: _buildOptionTile(
-                label: i < _optionLabels.length ? _optionLabels[i] : '${i + 1}',
+                label: '${i + 1}',
                 option: option,
                 isSelected: isSelected,
                 onTap: () => _selectAnswer(option),
@@ -1371,76 +2724,79 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     );
   }
 
+  /// NTA option row: a plain radio, the option label, then the text. Selected
+  /// rows tint blue and thicken the border instead of growing a shadow.
   Widget _buildOptionTile({
     required String label,
     required String option,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    final borderColor = isSelected
-        ? AdaptiveColors.primary(context)
-        : AdaptiveColors.divider(context);
-    final bgColor = isSelected
-        ? AdaptiveColors.primary(context).withValues(alpha: 0.08)
-        : AdaptiveColors.surface(context);
-
     return Material(
-      color: bgColor,
-      borderRadius: BorderRadius.circular(12),
+      color: isSelected ? const Color(0xFFE8F0FB) : NtaExamColors.surface,
+      borderRadius: BorderRadius.circular(4),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(4),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: borderColor, width: 1.5),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+              color: isSelected ? NtaExamColors.accent : NtaExamColors.border,
+              width: isSelected ? 1.5 : 1,
+            ),
           ),
           child: Row(
             children: [
               Container(
-                width: 28,
-                height: 28,
-                alignment: Alignment.center,
+                width: 18,
+                height: 18,
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AdaptiveColors.primary(context)
-                      : AdaptiveColors.background(context),
                   shape: BoxShape.circle,
+                  color: NtaExamColors.surface,
                   border: Border.all(
                     color: isSelected
-                        ? AdaptiveColors.primary(context)
-                        : AdaptiveColors.divider(context),
+                        ? NtaExamColors.accent
+                        : NtaExamColors.textMuted,
+                    width: 1.5,
                   ),
                 ),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected
-                        ? Colors.white
-                        : AdaptiveColors.textSecondary(context),
-                  ),
+                child: isSelected
+                    ? Center(
+                        child: Container(
+                          width: 9,
+                          height: 9,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: NtaExamColors.accent,
+                          ),
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                '$label.',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: isSelected
+                      ? NtaExamColors.accent
+                      : NtaExamColors.textMuted,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   option,
-                  style: TextStyle(
-                    color: AdaptiveColors.textPrimary(context),
-                    fontSize: 14,
-                    height: 1.35,
+                  style: const TextStyle(
+                    color: NtaExamColors.text,
+                    fontSize: 13.5,
+                    height: 1.4,
                   ),
                 ),
               ),
-              if (isSelected)
-                Icon(
-                  Icons.check_circle,
-                  color: AdaptiveColors.primary(context),
-                  size: 20,
-                ),
             ],
           ),
         ),
@@ -1448,230 +2804,160 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
     );
   }
 
-  Widget _buildBottomControls() {
-    int visibleFrom;
-    int visibleTo;
+  /// NTA control rows, in the reference's own order and colours:
+  ///
+  ///   SAVE & NEXT (green) · CLEAR (white) · SAVE & MARK FOR REVIEW (orange) ·
+  ///   MARK FOR REVIEW & NEXT (blue)
+  ///
+  /// and beneath them the grey strip `<< BACK` · `NEXT >>` ... `SUBMIT`.
+  /// Wide panes fit the four in one row; phones get two rows of two, because
+  /// MARK FOR REVIEW & NEXT cannot share a 360px row with three siblings.
+  Widget _buildActionBar(BuildContext context) {
+    final hasAnswer =
+        _answers.containsKey(_currentIndex) ||
+        _drafts.containsKey(_currentIndex);
+    final canGoPrevious = _currentIndex > _navigationLowerBound;
 
-    if (_isNeet2024) {
-      // NEET 2024: palette shows only current block (A or B)
-      if (_inABlock) {
-        visibleFrom = 0;
-        visibleTo = _sectionStart[4]; // End of A-block
-      } else {
-        visibleFrom = _sectionStart[4]; // Start of B-block
-        visibleTo = _questions.length;
-      }
-    } else if (widget.config.sectionLock) {
-      visibleFrom = _sectionStart[_currentSection];
-      visibleTo =
-          _sectionStart[_currentSection] +
-          _sectionQuestions[_currentSection].length;
-    } else {
-      visibleFrom = 0;
-      visibleTo = _questions.length;
+    const buttonText = TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.2,
+    );
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(4),
+    );
+
+    FilledButton filled(String label, Color background, VoidCallback? onTap) {
+      return FilledButton(
+        onPressed: _locked ? null : onTap,
+        style: FilledButton.styleFrom(
+          backgroundColor: background,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: const Color(0xFFBFC7D2),
+          disabledForegroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          minimumSize: const Size(0, 42),
+          shape: shape,
+          textStyle: buttonText,
+        ),
+        child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      );
     }
 
-    final hasAnswer = _answers.containsKey(_currentIndex);
+    OutlinedButton outlined(String label, VoidCallback? onTap) {
+      return OutlinedButton(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          backgroundColor: NtaExamColors.surface,
+          foregroundColor: NtaExamColors.text,
+          disabledForegroundColor: const Color(0xFF9AA2AE),
+          side: const BorderSide(color: NtaExamColors.chromeBorder),
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          minimumSize: const Size(0, 42),
+          shape: shape,
+          textStyle: buttonText,
+        ),
+        child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      );
+    }
+
+    // Row 1 — the four answering controls.
+    final saveNext = filled(
+      'SAVE & NEXT',
+      NtaExamColors.saveGreen,
+      _saveAndNext,
+    );
+    final clear = outlined(
+      'CLEAR',
+      hasAnswer && !_locked ? _clearResponse : null,
+    );
+    final saveMark = filled(
+      'SAVE & MARK FOR REVIEW',
+      NtaExamColors.saveOrange,
+      _saveAndMarkForReview,
+    );
+    final markNext = filled(
+      'MARK FOR REVIEW & NEXT',
+      NtaExamColors.markBlue,
+      _markForReviewAndNext,
+    );
+
+    // Row 2 — plain navigation plus the always-reachable submit.
+    final back = outlined('<< BACK', canGoPrevious ? _previous : null);
+    final next = outlined('NEXT >>', _advance);
+    final submit = filled('SUBMIT', NtaExamColors.saveGreen, _confirmSubmit);
 
     return Container(
-      color: AdaptiveColors.surface(context),
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildPaletteLegend(),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 52,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: visibleTo - visibleFrom,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
-              itemBuilder: (context, i) {
-                final globalIndex = visibleFrom + i;
-                return _buildPaletteChip(globalIndex);
-              },
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: hasAnswer ? _clearResponse : null,
-                  icon: const Icon(Icons.backspace_outlined, size: 16),
-                  label: const Text('Clear', overflow: TextOverflow.ellipsis),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _markForReviewAndNext,
-                  icon: Icon(
-                    _flagged.contains(_currentIndex)
-                        ? Icons.flag
-                        : Icons.flag_outlined,
-                    size: 16,
-                    color: _cMarked,
-                  ),
-                  label: const Text(
-                    'Mark & Next',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              IconButton(
-                onPressed: _currentIndex > _navigationLowerBound
-                    ? _previous
-                    : null,
-                icon: const Icon(Icons.chevron_left),
-                tooltip: 'Previous',
-              ),
-              const Spacer(),
-              _buildPrimaryAdvanceButton(),
-            ],
-          ),
-        ],
+      decoration: const BoxDecoration(
+        color: NtaExamColors.surface,
+        border: Border(top: BorderSide(color: NtaExamColors.border)),
       ),
-    );
-  }
-
-  Widget _buildPrimaryAdvanceButton() {
-    if (_isLastQuestionOverall) {
-      return ElevatedButton.icon(
-        onPressed: _confirmSubmit,
-        icon: const Icon(Icons.check_circle_outline),
-        label: const Text('Submit'),
-      );
-    }
-    if (widget.config.sectionLock && _isLastQuestionInSection) {
-      final isBreak =
-          widget.config.breaksEnabled &&
-          _currentSection == widget.config.breakAfterSectionIndex;
-      return ElevatedButton(
-        onPressed: _goToNextSection,
-        child: Text(isBreak ? 'Break ▸' : 'Next Section ▸'),
-      );
-    }
-    return ElevatedButton.icon(
-      onPressed: _advance,
-      icon: const Icon(Icons.chevron_right),
-      label: const Text('Save & Next'),
-    );
-  }
-
-  Widget _buildPaletteLegend() {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 4,
-      alignment: WrapAlignment.center,
-      children: [
-        _legendDot(AppColors.success, 'Answered'),
-        _legendDot(AppColors.error, 'Not answered'),
-        _legendDot(_cMarked, 'Marked'),
-        _legendDot(AdaptiveColors.divider(context), 'Not visited'),
-      ],
-    );
-  }
-
-  Widget _legendDot(Color color, String label) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: AdaptiveColors.textSecondary(context),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPaletteChip(int globalIndex) {
-    final isCurrent = globalIndex == _currentIndex;
-    final isAnswered = _answers.containsKey(globalIndex);
-    final isFlagged = _flagged.contains(globalIndex);
-    final isVisited = _visited.contains(globalIndex);
-
-    // Five NTA-style states.
-    Color bg;
-    Color fg = Colors.white;
-    if (isAnswered && isFlagged) {
-      bg = AppColors.success; // answered + marked (badge added below)
-    } else if (isAnswered) {
-      bg = AppColors.success;
-    } else if (isFlagged) {
-      bg = _cMarked;
-    } else if (isVisited) {
-      bg = AppColors.error;
-    } else {
-      bg = AdaptiveColors.background(context);
-      fg = AdaptiveColors.textPrimary(context);
-    }
-
-    return InkWell(
-      onTap: () {
-        if (widget.config.sectionLock &&
-            _sectionOf(globalIndex) != _currentSection) {
-          return;
-        }
-        _goTo(globalIndex);
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isCurrent
-                    ? AdaptiveColors.primary(context)
-                    : AdaptiveColors.divider(context),
-                width: isCurrent ? 2.5 : 1,
-              ),
-            ),
-            child: Text(
-              '${globalIndex + 1}',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: fg,
-              ),
-            ),
-          ),
-          if (isAnswered && isFlagged)
-            Positioned(
-              right: -3,
-              top: -3,
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: _cMarked,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1),
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        minimum: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final oneRow = constraints.maxWidth >= 620;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (oneRow)
+                  Row(
+                    children: [
+                      Expanded(child: saveNext),
+                      const SizedBox(width: 8),
+                      Expanded(child: clear),
+                      const SizedBox(width: 8),
+                      Expanded(flex: 2, child: saveMark),
+                      const SizedBox(width: 8),
+                      Expanded(flex: 2, child: markNext),
+                    ],
+                  )
+                else ...[
+                  Row(
+                    children: [
+                      Expanded(child: saveNext),
+                      const SizedBox(width: 8),
+                      Expanded(child: clear),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(child: saveMark),
+                      const SizedBox(width: 8),
+                      Expanded(child: markNext),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: NtaExamColors.chrome,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: NtaExamColors.chromeBorder),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(flex: 2, child: back),
+                      const SizedBox(width: 8),
+                      Expanded(flex: 2, child: next),
+                      const SizedBox(width: 12),
+                      Expanded(flex: 2, child: submit),
+                    ],
+                  ),
                 ),
-                child: const Icon(Icons.flag, size: 10, color: Colors.white),
-              ),
-            ),
-        ],
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -1683,7 +2969,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.coffee, size: 64, color: AppColors.primary),
+            const Icon(Icons.coffee, size: 64, color: NtaExamColors.accent),
             const SizedBox(height: 20),
             Text(
               'Break Time',
@@ -1706,7 +2992,7 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
               _formatTime(_breakRemainingSeconds),
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AdaptiveColors.primary(context),
+                color: NtaExamColors.accent,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
@@ -1740,6 +3026,17 @@ class _CbtTestScreenState extends ConsumerState<CbtTestScreen>
       default:
         return AppColors.primary;
     }
+  }
+
+  /// NTA's total clock is always HH:MM:SS, even under an hour.
+  String _formatClock(int seconds) {
+    final safe = seconds < 0 ? 0 : seconds;
+    final h = safe ~/ 3600;
+    final m = (safe % 3600) ~/ 60;
+    final s = safe % 60;
+    return '${h.toString().padLeft(2, '0')}:'
+        '${m.toString().padLeft(2, '0')}:'
+        '${s.toString().padLeft(2, '0')}';
   }
 
   String _formatTime(int seconds) {
