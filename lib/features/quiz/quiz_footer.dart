@@ -93,19 +93,18 @@ class QuizFooter extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
 
-              // Mark for Review & Next
-              if (!isLastQuestion)
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: isAnswered ? onMarkForReviewAndNext : null,
-                    icon: const Icon(Icons.flag_rounded, size: 18),
-                    label: const Text('Mark & Next'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AdaptiveColors.warning(context),
-                      foregroundColor: Colors.white,
-                    ),
+              // Mark for Review & Next (always available)
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: isAnswered ? onMarkForReviewAndNext : null,
+                  icon: const Icon(Icons.flag_rounded, size: 18),
+                  label: const Text('Mark & Next'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AdaptiveColors.warning(context),
+                    foregroundColor: Colors.white,
                   ),
                 ),
+              ),
 
               // Next/Submit button
               Expanded(
