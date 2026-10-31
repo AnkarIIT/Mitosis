@@ -7,6 +7,17 @@ import 'gemini_proxy_service.dart';
 
 enum ChatMode { general, conceptExplanation, doubtSolving, quizHint }
 
+/// One previous exchange in a chat conversation, role-tagged. Used by
+/// [GeminiChatService.sendMessage] and [GeminiChatService.sendGrounded] to
+/// give the model multi-turn memory.
+class GeminiTurn {
+  final bool isUser;
+  final String text;
+
+  const GeminiTurn({required this.isUser, required this.text});
+}
+
+
 /// Manages the Gemini AI session and stores the API key in the OS secure
 /// keystore (Android Keystore / iOS Keychain) via [FlutterSecureStorage].
 class GeminiChatService {
@@ -17,8 +28,20 @@ class GeminiChatService {
     iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
   );
 
-  /// Current Gemini model to use. Update this when models are deprecated.
-  static const String _defaultModel = 'gemini-2.0-flash-exp';
+  /// Current Gemini model. `2.0-flash-exp` was experimental and is one
+  /// deprecation away from breaking every AI surface; 2.5 Flash is the stable
+  /// successor with the same 1M-token context (that context is what lets a
+  /// whole NCERT chapter be sent per grounded request without embeddings).
+  ///
+  /// Update this single constant when Google deprecates the model — other
+  /// surfaces must read [defaultModel], never hard-code a name.
+  static const String _defaultModel = 'gemini-2.5-flash';
+  /// Public so callers (tests, UI) can display or assert against it.
+  static String get defaultModel => _defaultModel;
+
+  /// How many conversation turns at most travel with each request, so a
+  /// long chat session cannot silently blow up the token cost.
+  static const maxHistoryTurns = 12;
 
   String? _apiKey;
   GenerativeModel? _model;
@@ -86,6 +109,28 @@ class GeminiChatService {
     return systemPrompt;
   }
 
+  /// System prompt for grounded mode: the answer must come from the injected
+  /// NCERT text only, and must cite the pages it used. This is the closest
+  /// honest approximation of NotebookLM's "grounded in your sources": we send
+  /// the real chapter text and require citations, but the model is still an
+  /// LLM, so the UI also says "verify in the NCERT PDF".
+  static String groundedSystemPrompt(String sourceLabel) {
+    return 'You are an expert NEET tutor. The student is studying the chapter "$sourceLabel".\n'
+        '\n'
+        'STRICT GROUNDING RULES:\n'
+        '1. Answer ONLY from the REFERENCE TEXT supplied in the conversation. '
+        'Do not use outside knowledge, even if you are confident.\n'
+        '2. If the answer is not contained in the reference text, say exactly '
+        'that and suggest which neighbouring chapter the student should open.\n'
+        '3. Cite every factual claim with the page it came from, written as [p.N] '
+        '(N = the PDF page number shown in the reference text markers).\n'
+        '4. Explain in simple language a Class 11/12 student understands: short '
+        'paragraphs, one idea at a time, define new words the first time they appear.\n'
+        '5. Keep mathematical/scientific terminology exact as written in the text.\n'
+        '6. Never invent page numbers — only cite [p.N] values that appeared in '
+        'the reference text.';
+  }
+
   // ---------------------------------------------------------------------------
   // Key management
   // ---------------------------------------------------------------------------
@@ -114,8 +159,17 @@ class GeminiChatService {
   Future<String> sendMessage(
     String text, {
     ChatMode mode = ChatMode.general,
+    List<GeminiTurn> history = const [],
   }) async {
-    if (_proxy.isConfigured) {
+    final lastN = history.length > maxHistoryTurns
+        ? history.sublist(history.length - maxHistoryTurns)
+        : history;
+
+    // NOTE: the shared proxy has no multi-turn contract, so any conversation
+    // that carries history deliberately goes to the student's own key. The
+    // proxy stays for single-shot calls (hints, flashcards) where its cache
+    // helps.
+    if (_proxy.isConfigured && lastN.isEmpty) {
       final result = await _proxy.generate(
         prompt: text,
         systemPrompt: _systemPromptFor(mode),
@@ -135,11 +189,47 @@ class GeminiChatService {
 
     // Fall back to the user's own Gemini key when the shared proxy isn't
     // enabled (or is unreachable), so the AI tutor works with just a key.
-    return _sendDirect(text, mode: mode);
+    return _sendDirect(text, mode: mode, history: lastN);
   }
 
+  /// Grounded mode: the whole NCERT chapter text travels as the first user
+  /// turn, the conversation continues on top of it, and the system prompt
+  /// forces citations ([p.N]).
+  ///
+  /// This always uses the student's own key — the grounded prompt is
+  /// token-heavy (a full chapter is ~40k tokens) and the shared proxy/cache
+  /// is meant for cheap generic calls. The student owns the trade-off:
+  /// higher token usage per message in exchange for answers tied to the
+  /// real NCERT text.
+  Future<String> sendGrounded({
+    required String prompt,
+    required String contextualText,
+    required String sourceLabel,
+    List<GeminiTurn> history = const [],
+  }) {
+    if (!isConfigured) {
+      return Future.value(
+        'Error: Gemini API Key is not configured. Please add it in Settings.',
+      );
+    }
+    return _sendDirect(
+      prompt,
+      history: [GeminiTurn(isUser: true, text: contextualText), ...history],
+      systemPrompt: groundedSystemPrompt(sourceLabel),
+    );
+  }
+
+// ---------------------------------------------------------------------------
+// Chat
+// ---------------------------------------------------------------------------
+
   /// Sends [text] directly to Gemini using the locally-stored API key.
-  Future<String> _sendDirect(String text, {ChatMode mode = ChatMode.general}) {
+  Future<String> _sendDirect(
+    String text, {
+    ChatMode mode = ChatMode.general,
+    List<GeminiTurn> history = const [],
+    String? systemPrompt,
+  }) {
     final key = _apiKey?.replaceAll('\n', '').replaceAll('\r', '').trim();
     if (key == null || key.isEmpty || !key.startsWith('AIzaSy')) {
       return Future.value(
@@ -147,13 +237,23 @@ class GeminiChatService {
       );
     }
     try {
+      // Ends with the model reply so the provider is unambiguous.
       final model = GenerativeModel(
         model: _defaultModel,
         apiKey: key,
-        systemInstruction: Content.system(_systemPromptFor(mode)),
+        systemInstruction: Content.system(
+          systemPrompt ?? _systemPromptFor(mode),
+        ),
       );
+      final contents = <Content>[
+        for (final turn in history.take(maxHistoryTurns))
+          turn.isUser
+              ? Content.text(turn.text)
+              : Content.model([TextPart(turn.text)]),
+        Content.text(text),
+      ];
       return model
-          .generateContent([Content.text(text)])
+          .generateContent(contents)
           .then(
             (response) =>
                 response.text ??
