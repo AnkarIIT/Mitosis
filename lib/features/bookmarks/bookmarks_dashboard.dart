@@ -127,24 +127,20 @@ class BookmarksDashboard extends ConsumerWidget {
         children: [
           // Header Summary Card
           Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF0B3538), Color(0xFF0E5B54)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
                 borderRadius: BorderRadius.circular(16),
+                color: AdaptiveColors.surface(context),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.auto_awesome, color: Colors.white, size: 32),
+                  Icon(
+                    Icons.bookmark_outline_rounded,
+                    color: AdaptiveColors.primary(context),
+                    size: 28,
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -152,19 +148,12 @@ class BookmarksDashboard extends ConsumerWidget {
                       children: [
                         Text(
                           '${questions.length} Questions Saved',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Tap questions below to reveal formulas, core concepts, and NCERT links.',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 12,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
                     ),
