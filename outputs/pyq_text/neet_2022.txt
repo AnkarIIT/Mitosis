@@ -1,0 +1,1636 @@
+                                                     NEET OFFICIAL-2022 PAPER CODE R6
+R6
+                         Section- A (Physics)                                             6.        Match List- Iwith List-I:
+                                                                                                              List-I                              List-II
+1.        Two resistors of resistance, 100     and 200     are                                       (Electromagnetic  waves)
+           connected in parallel in an electrical circuit.   The                                     (a)      AM radio waves                  (Wavelength) 10-1  m
+           ratio of the thermal energy developed in 100      to                                      (b)      Microwaves                             (i)    10-  m 102 m
+          that in  200 N in a  given time is:                                                        c)      Infrared radiations                     (ii)   10    m
+           (1)     4:1                                                                               (d)        X-rays                              (iv)
+            (2)     1:2                                                                             Choose the correct answer from the options given
+            3)        2:1                                                                           below:
+            (4)     1:4                                                                                                  (1)      (a)-(i), (b) - (ii), (c)-(iv), (d)-(i) (2)       (a)-(iv), (b)- (ii), (c) -(i), (d) - ()
+             Two hollow conducting spheres of radii R  and R2                                       (3)       (a)-(ii), (b) -(i), (¢)-(i), (4)-(iv)
+             (R>R)have equal charges.  The potential would                                          (4)      (a)-(ii), (b)-(iv), (¢)-(i), (d)-()
+             be:                                                                           7.       The ratio of the radius of gyration of a  thin uniform
+              (1)      dependent on the material property of the                                    disc about an axis passing through its centre and
+                       sphere                                                                       normal to its plane to the radius of gyration of the
+              (2)      more on bigger sphere                                                        disc about its diameter is
+              (3      more on smaller sphere                                                                 (1)    1:2
+               4)      equal on both the spheres                                                         (2) 2:1
+      3.                                                                                    4:1 When two monochromatic lights of frequency, v and )   :1
+                                                                                                    (4)
+               are 2                                                                                                                A biconvex lens has radii of curvature, 20 cm each. incident on a   photoelectric  metal,  their 8.
+                                                                                                    If the refractive index of the material of the lens is
+              stopping potential becomesand V                    V, respectively.                1.5, the power of the lens is :
+               The threshold frequency for this metal is:                                  +2D (1)           infinity
+                                                                                                    (2)
+                                                                                                    3)       +20 D
+               (1)                                                                                        +5D 2 (4)
+               (2)      2v                                                                9.       The graph which shows the variation of the de
+              3)       3v                                                                          Broglie wavelength (A) ofa particle and its associated
+              4)                                                                                   momentum  (p)is:
+
+
+
+
+     4.       As  the  temperature increases,  the electrical                                       (1)
+             resistance
+             (1)      semiconductors decreases for conductors but increases for
+
+             (2)      increases   for   both   conductors   and
+                      semiconductors                                                                                       (2)
+             (3)      decreases   for   both   conductors   and
+                      semiconductors                                                                                               P
+             (4)      increases for conductors but decreases for
+                      semiconductors
+                                                                                                    )
+            If the initial tension on a stretched string is doubled,
+            then the ratio of the initial and final speeds of a
+            transverse wave along the string is:                                                                                P
+            (1)       1:2
+            (2)       1:1                                                                                                                 (4)
+                      2:1
+            (4)   1: 2                                                                                                                 P
+
+===== PAGE BREAK =====
+
+                                                                                    3
+                                                                                                 Two  objects  of  mass 10  kg  and  20  kg  respectively are R6
+10.      When light propagates through a  material medium|  14.                                   connected  to  the  two  ends  of  a   rigid  rod  of  length
+         of relative permittivity e, and relative permeability                                    10m with negligible mass. The distance  of  the center
+         Hthe velocity of light, v is  given by:(c-velocity of                                    of mass of  the system from  the 10  kg mass is:
+          light in vacuum)
+
+                              C                                                                   (1)         5 m
+          1)                                                                                                    10
+           (2)                                                                                    (2)              3
+
+           3)                                                                                     3)           20 m
+                                                                                                  4)       10 m
+           4
+
+                                                                                         15.      The energy that will be ideally radiated by  a  100 kW
+ 11.     In the given nuclear reaction, the element X is:                                          transmitter in 1 hour is:
+            22                                                                                                                      (2)       36x107J 1)      1x105 J
+            1NaX+ e"+  v
+            (1)       Mg                                                                                                    (4)      36x (3) 36 x 104  J
+                                                                                                                   103 J
+            (2)      Na
+            )       Ne                                                                   16.       An electric  lift with a  maximum load  of  2000  kg
+                                                                                                   (lift + passengers)  is  moving up with  a  constant
+                                                                                                   speed of 1.5 ms. The  frictional  force  opposing
+            (4)         10Ne                                                                       the motion is 3000 N.  The minimum power delivered
+                                                                                                   by the motor to  the lift in watts is :(g=10 ms)
+
+  12.       Anideal gas undergoes four different processes from                                    (1)       23500
+            the same initial state as shown in the figure below.                                   (2)       23000
+            Those processes are adiabatic, isothermal, isobar
+            and  isochoric.   The curve which  represents  the                                     3)     20000
+            adiabatic process among 1, 2,3 and 4 is:                                                4)      34500
+
+
+
+                                                                                          17.       A  copper  wire  of  length  10  m  and  radius
+
+                                              3                                                     (10-2/VT) m has electrical resistance of 102. The
+                                            -2                                                      current density in the wire for an electric field
+                                                                                                    strength of 10 (V/m) is:
+                                                                                                    (1)         105 A/m2
+           1)                                                                                       (2)     10 A/m2
+           (2                                                                                                                                       100 A/m2
+           3)       2                                                                                                                     (4)      10-5 A/m2
+           (4)
+
+ 13.       The ratio of the distances travelled by a freely falling                        18.      If  a  soap bubble expands,  the pressure inside the
+           body in the 1st, 2nd, 3rd and 4th second                                                 bubble:
+           (1)     1:1:1:1                                                                           (1)        is equal to the atmospheric pressure
+           (2)     1:2:3:4                                                                           (2)       decreases
+           3)     1:4:9:16                                                                           3)      increases
+           (4)     1:3:5:7                                                                         4         remains the same
+
+===== PAGE BREAK =====
+
+ R6                                                                                            4
+19.      Given  below are two statements:                                                              voltage of the ac source is equal to :
+                                                                                  23.     The peak
+         Statement I: Biot-Savart's  law  gives  us  the 'expression  for  the             (1)    1/2 times the rms value of the ac source
+         magnetic  field strength of an infinitesimal current                              (2)       the value of voltage supplied to the circuit
+         element (Idl) of a  current carryinig conductor only.                             (3)       the rms value of the ac source
+          Statement II:
+          Biot-Savare's law is analogous to Coulomb's inverse                              (4)     2times the rms value of the ac source
+          square law of charge q, with the former being related
+          to the field produced  by  a  scalar source, Idl while                  24.       The dimensions [MLT-2A-2] belong to the:
+          the latter being produced by  a  vector source, q                                (1)       electric permittivity
+          In  light  of  above  statements choose  the most
+          appropriate  answer  from  the  options  given                                   (2)       magnetic flux
+          below:                                                                           (3)      self inductance
+          (1)      Statement I is  incorrect arnd  Statement II is                           magnetic permeability (4)
+                   correct
+          (2)       Both Statement I and Statement II are correct             The displacement-time  graphs  of two moving 25.
+                   Both  Statement I  and Statement II are                                 particles make angles of 30° and 45° with the
+                   incorrect                                                               x-axis as shown in the figure.   The ratio of their
+          (4)       Statement I  is correct and Statement II is                           respective velocity is
+                   incorrect
+
+ 20.        A shell of mass m is at rest initially. It explodes into
+          three fragments having mass in the ratio 2:2:1. If
+          the fragments  having  equal  mass fly  off along
+          mutually perpendicular directions with speed v, the
+          speed of the third (lighter) fragment is :                             30  45
+          (1)     3/2v                                                                                             time
+         (3)     2                                                                         ()     1: 3
+
+         (4)    2/2                                                                                                              (2)    3:1
+                                                                                           (3)      1:1
+21.                                                                                     1:2 A  spherical ball is dropped in a  long column of a (4)
+        highly viscous   liquid.   The çurve in the graph
+        shown, which represents the speed of the ball (v) as
+        a function of time (t) is:                                                 26.       PN   PINh
+
+                                                                                                          (a)
+                                    D                  PN   NP
+
+         (1)     D                                                                                        (b)
+         (2)      A                        NP                                                                  TNP
+         3)       B
+         4)       C                                                                                 ()
+
+ 22.      The angular speed of a   fly  wheel moving with                                  In the given circuits (a),  (b) and (c),  the potential are equal
+
+
+                                                                                                    across the two p-n junctions
+          uniform angular  acceleration changes  from 1200 Tpm to  3120  rpm in 16  seconds.The angular drop
+                                                                                           in:                                ()
+          acceleration in rad/s (1) 104T                                                                                                                (2)      Circuit is: (1)       Both circuits (a) and
+           (2)     2T                                                                                         (a) only
+            3)     4T                                                     ()     Circuit (b) only
+           4)      12T                                                                                                                  (4)       Circuit (c) only
+
+===== PAGE BREAK =====
+
+                                                                                                                                                                       R6
+                                                                                   5                                                  of an electron in the first
+                                                                                                                      the energy
+27.     he angle between the electric lines of force and the                         34     Let T, andT2 be
+                                                                                               and second excited states of hydrogen atom, an
+          equipotential surface is:                                                            respectively. According to the Bohr's model of T2is:
+          (1)       180°                                                                       atom, the ratio T:
+          (2)       0                                                                                                                (1) 9:4
+          (3)      45
+          (4)        0°                                                                                   (2)    1:4
+28.       Plane angle and solid angle have                                                     3)    4:1
+          (1)       Both units and dimensions                                                  (4)       4:9
+          (2        Units but no dimensions
+                    Dimensions but no units                                                    A long solenoid of radius 1 mm has 100 turns per 35.
+          (4      No units and no dimensions                                                    mm.   If 1  A  current flows in the solenoid, the
+29.      In  a   Young's  double slit experimènt,   a  student                                  magnetic field strength at the centre of the solenoid
+
+          observes 8  fringes in a  certain segment of  screen                                  is
+          when a  monochromatic light of 600  nm wavelength                                     (1)        6.28 x 104T
+          is used.   If the wavelength of light is  changed to
+          400 nm, then the number of fringes he would observe                                   (2)        6.28 x 10-2 T
+           in the same region of the screen is                                                           12.56x 10-2 T
+           (1)        12                                                                         (4)     12.56x 10-4 T
+           (2)       6
+            3)       8
+           (4)       9                                                                        Section   B (Physics)
+
+30.      Alight ray falls on a  glass surface of refractive index                       36.      Two pendulums of length 121 cm and 100 cm start
+           v3,at an angle 60°.  The angle between the refracted                                  vibrating in phase.  At some instant, the two are at
+           and reflected rays would be                                                           their mean position  in the  same  phase.   The
+           (1)       120                                                                                  pendulum after which the two are again in phase at minimum number  of vibrations  of the shorter
+           (2)       30°                                                                          the mean position is
+           (3)      60
+           4)    90                                                                                                    (1)        8
+31.                                                                                           )          9 In half wave rectification, if the input frequency is 11
+
+           60 Hz, then the output frequency would be:
+           (1)       120 Hz                                                                                 4)       10
+           (2)       zero
+           (3)       30 Hz                                                                                           37.       The volume occupied by the molecules contained in
+           (4)       60 Hz                                                                        4.5  kg  water  at STP,  if  the  intermolecular  forces
+
+32.                                                                                                                                                          (1)         5.6 m A body of mass 60 g experiences a gravitational force vanish away  is
+           of 3.0 N, when placed at a  particular point.  The
+           magnitude of the gravitational field intensity at that                                  (2)     5.6x 10    m3
+          point is: 180 N/kg                                                                       (3)      5.6x 103  m3
+           (1)         0.05 N/kg                                        4)    5.6x 10-3  m
+           (2        50 N/kg
+           (3)          20 N/kg
+           (4)                                                                                                                  38.      Two transparent media A and B are separated bya
+
+           A  square loop of side 1   m   and resistance 1   Q  is                                 plane boundary.  The speed of light in those media
+33.     placed in a  magnetic field of 0.5 T. f  the plane of                                       are 1.5x 10   m/s and 2.0x
+           loop is perpendicular to the direction of magnetic                                       he critical angle for  a  ray of light for these two media 108  m/s,  respectively
+                                                                loop is                             is
+           field, the magnetic flux through the                                                     (1)       tan-1  (0.750)
+                     zero weber
+           (1)       2 weber                                                                        (2)        sin-1(0.500)
+           (2)       0.5 weber                                                                   3)       sin-1(0.750)
+           (3)       1 weber                                                                  4)       tan-1(0.500)
+           (4)
+
+===== PAGE BREAK =====
+
+R6
+39.                                                                                  6
+
+                          -  I  with List  -1I:                                                Given
+         Match   List
+                   List-I                           List-II                             43.                below are two statements: One is labelled as
+         (a)       Gravitational    LT                                                            Assertion (A)  and the other is labelled as Reason
+                   constant (G)                          LPT-2                                    (R).
+          (b)                                                                                       Assertion (A): Gravitational i)     [M-113T*21
+                    potential energy Gravitational                                                           The stretching of a  spring is determined by the shear
+                    potential                    i)   [LT                                         modulus of the material of the spring.
+          (d)                                                                                     Reason (R): Gravitational (iv)      [MLPT-1
+          Choose the correct answer from the options gven intensity                               A  coil spring of copper has more tensile strength
+           below:                                                                                  than a steel spring of same dimensions.
+           (1)        (a)-  (iv),  (b)-  (i), (c) - (i),  (d)- (ii)                                In the light of the above statements, choose the most
+           (2)        (a)-(ii), (b)-(i), (c)-(iv), (d)-(ii)                                        appropriate answer from the options given below:
+           (3)        (a)-(iü), (b)-  (iv),  (c) -(), (d)- (ii)                                                  (1)         (A)  is false but (R)  is true
+           4)      (a)-(i), (b) -(iv),  (c)- (ii), (d)-()                                  2      Both (A) and (R) are true and (R) is the correct
+
+ 40.                                                                                                        explanation of (A) A  series  LCR circuit with  inductance 10  H,
+            capacitance 10 F, resistance 50 0  is connected to
+            an ac source of                                                                        (3)      Both (A)  and (R)  are true and (R)  is not the
+            resonant              voltage, V   =   200 sin(100 t) volt. If the                               correct explanation of (A)
+            frequency frequency of the LCR circuit is v, and the of the ac source is v,  then:
+                                                                                                    4)       (A) is true but (R) is false
+             (1)                                         Hz v    100 Hz; v. 100
+             (2)            Vo      =50 Hz                                                                 44          A
+            3)V.-v= Hz 50
+
+             (4       V    -Hz,v=50 Hz
+                                                                                                     B-
+    41.      A  ball is projected with a  velocity, 10 ms, at an                                     The truth table for the given logic circuit is
+             angle of 60° with the vertical direction. Its speed at
+             the highest point of its trajectory will be                                                          A
+             (1)      10 ms-1                                                                                  0
+             (2)      Zero                                                                                                                 (1)                           0          0 0          1          1
+             (3)     53 ms-1
+            (4)       5  ms-1                                                                   1
+
+  42.       From Ampere's circuital law for a  long straight wire                                                 A  BC
+            of circular cross-section carrying  a  steady current,                                                 0          1          1
+            the variation of magnetic  field in the inside and                                        (2)       01 1
+            outside region of the wire is:
+            (1)      a  linearly decreasing function of distanceupto
+                     the boundary of the wire and then a  linearly
+                     increasing one for the outside region.
+           (2)                                                                                                             3)        1         0          0 uniform and remains constant for both the                                                  1
+                     regions.
+           (3)                                                                                              1        1 a linearly increasing function of distance upto
+                     the boundary of the wire and then linearly
+                     decreasing for the outside region.
+           (4)                                                                                                  A    B      C a  linearly increasing function of distance r 1
+                     upto the boundary of the wire and then                                                          0          1          0
+                     decreasing one with 1/r dependence for the                                         4)               1                       1
+                     outside region.
+
+===== PAGE BREAK =====
+
+                                                                                        7                                                                                             R6
+        45.      A nucleus of mass number 189 splits into two nuclei                       49.      Two     int charges  -q and  +q  are  placed  at a
+                 having mass number 125 and 64.  The ratio of radius                                distance of L,  as shown in the figure.
+                 of two daughter nuclei respectively is:
+                 (1)        25:16                                                                                                       L              +q
+                 (2)         1:11                                                                    The magnitude of electric field intensity at
+                 3)     4:5                                                                         R (R>>L) varies as:                                       a  distance
+                4)     5:4                                                                                                         (1)    R 1
+
+
+       46.       Awheatstone bridge is used to determine the value                                  (2)         R
+                of unknown resistance X by adjusting the variable                                              1
+                resistance Y as shown in the figure.   For the most                                 3)        R3
+                precise measurement of X,  the resistances P and Q:
+                                                                                                    4)      R
+
+                                                                                           50.      A  capacitor  of capacitance  C=900  pF  is  charged
+                                                                                                    fully by 100 V battery Bas shown in figure (a).  Then
+                                                                                                    it is disconnected from the battery and connected to
+                                                                                                    another  uncharged  capacitor  of  capacitance
+                                                                                                    C=900 pF as shown in figure (b).  The electrostatic
+                               H                                                                    energy stored by the system (b) is;
+                                     E
+              (1)      do not play any significant role
+              (2)                                                                                                                         (a)                                            (b) should be approximately equal to 2X
+             )        should be approximately equal and are small                              100 V
+             (4)       should be very large and unequal                                                                            B
+                                                                                                    (1)     1.5x 106J
+  47.                                                                                                                                              (3)      3.25x 10-6 J The area of  a   rectangular  field  (in  m2)  of length (2)     4.5x 106J
+            55.3 m  and breadth 25 m   after rounding off the valuue
+            for correct significant digits is:                                                      4)      2.25x 106J
+            (1)      14x 102                                                               Section-A (Chemistry)
+           (2)       138 x  101                                                                          51.      Which
+           (3)       1382                                                                          (1)       Thermosetting polymers are reusable. statement regarding polymers is not correct?
+          (4)       1382.5                                                                         (2)       Elastomers have polymer chains held together
+                                                                                                             by weak intermolecular forces.
+                                                                                                   (3        Fibers possess high tensile strength.
+48.      A  big circular coil of 1000 turns and average radius                                     (4      Thermoplastic  polymers  are capable  of
+         10 m  is rotating about its horizontal diameter at                                                  repeatedly softening and hardening on
+         2  rad s1.  If the vertical component of earth's                                                    heating and cooling respectively.
+         magnetic field at that place is 2x10-5 T  and                                    52.      At298 K, the standard electrode potentials
+         electrical resistance of the coil is 12.56 0, then the                                    Cu, Zn2+/Zn, Fe2+/Fe and Agt/Ag are  0.34  V, of Cu-"7
+         maximum induced current in the coil will be:                                               -0.76 V, -0.44            and 0.80 V, respectively.
+                                                                                                   On the basis of standard V         electrode potential, predict
+         (1)          2  A                                                                         which of the following reaction can not occur?
+        (2)         0.25 A                                                                         (1)      2CuSO4(aq) +2Ag(s)->2Cu(s)+Ag,SOg(aq)
+     3         1.5 A                                                                               (2)      CuSO4laq) +Zn(s)ZnSO4(aq) + Cu(s)
+       (4)     1A                                                                                                   FeSO (aq)+Zn(s)->ZnSOg(aq) + 3) CuSO(aq) +Fe(s) >  FeSO4(aq) +Cu(s)
+                                                                                                   4)                                                        Fe(s)
+
+===== PAGE BREAK =====
+
+     R6
+   53                                                                                                 58. The 1UPACname of an element with atomic number Which amongst the following  is incorrect statement?
+             119 is
+             (1)      ununoctium                                                                                            (2) (1) o    ion is diamagnetic.
+             (2)      ununennium                                                                        The bond  orders  of  O,02,02  and O
+             3)                                                                                         are 2.5,2, 1.5 and 1,  respectively.
+             4)       unnilennium unununnium                                                   (3)      C2   molecule  has  four  electrons  in  its  two
+                                                                                                        degenerate  t   molecular orbitals.
+   54.      Given below are two statements:                                                    (4)      H   ion has one electron.
+            Statement I: In the coagulation of a  negative sol, the flocculating      59.      Amongst  the  following  which  one  will  have
+            power of the three given ions is in the order-                                     maximum 'lone pair  -lone pair electron  repulsions?
+                     A13+   >  Ba2+>  Na+                                                      (1)      XeF2
+                                                                                               (2)         CIF3
+            Statement In the coagulation of a  positive sol, the flocculatin8 II:              (3)     1F5
+            power of the three given salts is in the order -                                   (4)          SF4
+                     NaCl> Na,SO4  >  Na,PO4                                          60.      Choose the correct statement:
+            In the light of the above statements, choose the most                              (1)     Both diamond and graphite  are used as dry
+            appropriate answer from the options given below:                                            lubricants.
+            (1)      Statement I  is  incorrect but Statement II is                            (2)        Diamond and graphite have two dimensional
+                     correct.                                                                          network.
+            (2)       Both Statement I and Statement II are correct.              4)       Diamond  is  sps  hybridised  and graphite  is 3)      Diamond is covalent and graphite is ionic.
+           3)     Both Statement  I  and  Statement II  are                         sphybridized.
+                     incorrect.
+           (4)       Statement  I  is  correct but Statement II  is     61.                   Given  below are two statements: one is labelledlas
+                    incorrect.                                                                 Assertion (A)  and the other is labelled as Reason
+ 55.       Which of the following statement                                                    R).
+           diborane?                                    is not correct about                  Assertion  (A):
+           (1)       Both the Boron atoms are sp2hybridised.                                  In  a   particular  point  defect,  an ionic  solid  is
+           (2)       There are                                                                electrically  neutral,  even if  few  of  its  cations  are
+           3)      The four terminal B-H bonds are two centre two3-centre-2-electron  bonds.  missing from  its unit cells.
+                    two electron bonds.                                                       Reason (R): In  an ionic  solid,  Frenkel  defect arises  due  to
+          4)        The four terminal Hydrogen  atoms and the                                  dislocation of cation from its lattice site to interstitial
+                    two Boron atoms lie in one plane.                                          site, maintaining overall electrical neutrality.
+                                                                                              In the light of the above statements, choose the most
+56.        RMgX +  CO2              dry                                                        appropriate answer from the options given below
+                                   ether Y-H0+                                                        (1) (A)  is not correct but (R) is correct
+                                                             RCOOH                             (2)      Both  (A)  and  (R)  are correct and (R)  is  the
+          What is Y in the above reaction?                                                              correct explanation of (A)
+          (1)         RCOO)MMg                                                                 (3)      Both (A)  and (R) are correct but (R)  is not the
+         (2)       RCOO-MgtX                                                                                  (4) correct explanation of (A)
+         (3)    RCO   Mg*X                                                                              (A)  is correct but (R) is not correct
+         (4)       RCOO X+                                                           62.      Match List- I with List
+
+
+
+
+
+                                                                                                                               -  II.
+57.      What mass of 95%  pure CaCO    will be required to                                       List-I                           List-II
+         neutralise 50 mL of0.5 M HCl solution according to                                    (a)        Li              absorbent for carbon dioxide
+         the following reaction?                                                               (b)      Na      (i)       electrochemical cells
+                                                                                               ()        KOH  (i)     coolant in fast breeder reactors (d)       Cs      iv)      photoelectric cell
+        CaCO3(+2HClag)CaCl2(aq) +CO2()t2H,O) [Calculate upto second place of decimal point]   Choose the correct answer from the options  given
+        (1)       9.50  g                                                                     below
+        (2)1.25g                                                                               (1)      (a)-(i), (b) -   (ii), (c) -   (i),  (d)- (iv)
+        3)       1.32 8                                                                        (2)      (a)-(iv), (b)- (i), (c)-(ii), (d)- (i)
+        (4)      3.65 g                                                                                              (4)     a)-),(6)-(i), 3) (a)-(ii), (b)- (iv),  (¢)-(üi),  (d) - (6)
+                                                                                                                              ()-(iv), (d)-(i)
+
+===== PAGE BREAK =====
+
+               63.      Given below are half cell reactions:                                   66.      Match List -  I with List - II.                                 R6
+ent?                   MnO+8H+5e    Mn+4 H2O,                                                                      List- I                                     List-II
+                       EMn2/MnOg            -1.510 V                                                             (Drug class)                           (Drug molecule)
+
+wo                    O2 +2H+ 2e> H,O,                                                                  (a)       Antacids                             Salvarsan
+                       2                                                                                (b)       Antihistamines        (i)        Morphine
+                      Fo2/H,o=+ 1.223 V                                                                 (c)        Analgesics          ii)     Cimetidine
+                      Will the permanganate ion, MnO    liberate O, from
+ve                    water in the presence of an acid?                                                 (d)       Antimicrobials          (iv)       Seldane
+s?              (          No, because Ecell-2.733 V                                    below Choose  the correct answer from the options  given
+
+                             Yes, because Ecell  =+0.2877V                         ()      (a)-(iv), (b)-(i), (¢)-),.d)-(i)
+                              No, because Ecell   =  -0.287V
+                      (4)        Yes, because Ecell  =+2.733 V                                           ()    (a)-(i), (6)- (i), (¢)-(iv), (d)-()
+                                                                                                         )      (a)-ii),(b)- (iv), (©)-(i), (d)-6)
+             64      Match List -  I with List - II.                                                     (4)      (a)-(, (6)-(iv),(¢)-(ti), (d)- (ii)
+                              List-I                          List-II                              67.       The incorrect statement regarding enzymes  is
+                              (Hydrides)                           (Nature)                                             (1)        Enzymes  are very  specific  for   a   particular
+                     Mg2                               Electron precise
+                     (b)        GeH4             i)      Electron deficient                                        reaction and substrate.
+                     ()                                                   Electron rich BH               ii)                                                                   Enzymes are biocatalysts.
+                     ()     HF                                     Ionic (iv)                             ()       Like chemical catalysts  enzymes  reduce the
+                     Choose the correct answer from the options  given                                             activation energy of bio processes.
+                     below:                                                                                                                              (4)        Enzymes are polysaccharides.
+                     (1)      a)-(i), (b)-(ii), (©)-(iv), (d) -()
+                     (2)       (a)-(iv), (b)-()-(i), (d)- (ii)                                   68.       Identify the incorrect statement from the following.
+                     (3)      (a)-(i), (b)-(9.(©)-(i), (d)-(iv)                                           (1)       The  shapes  of d    dz   and  dzx  orbitals  are
+                     (4)       (a)-(i), (6)-6i),(©-(iv), (d)-(qi)                                                  similar  to each other  ; and d2-2  and  d2
+                                                                                                                    are similar to each other.
+            65.       Given  below are two statements:                                                     (2)      All the five  5d  orbitals  are different in size
+                    Statement I:                                                                                    when compared to the respective 4d orbitals.
+                     The acidic strength of monosubstituted nitrophenol                                    3)     All the five 4d orbitals have shapes similar to
+                     is  higher  than  phenol  because  of  electron                                                the respective 3d orbitals.
+                     withdrawing nitro group.                                                             (4        Inan atom, all the five 3d orbitals are equal in
+                    Statement II:                                                                                   energy in free state.
+                    0-nitrophenol, m-nitrophenol and p-nitrophenol will
+                    have same acidic strength  as they  have one nitro                            69.      The incorrect statement regarding chirality is :
+                    group attached to the phenolic ring.
+                    In the light of the above statements, choose the most                                  (1)       A  racemic mixture shows zero optical
+                    appropriate answer from the options given below:                                                rotation.
+                     (1)      Statement I is incorrect but Statement II is                                  (2)       SNl  reaction yields 1: 1 mixture  of  both
+                              correct.                                                                               enantiomers.
+                     (2)       Both Statement I and Statement II are correct.                               3)       The product obtained  by  SN2  reaction of
+                                                                                                                     haloalkane having chirality at the reactive site
+                     (3)      Both Statement I  and  Statement II  are                                               shows inversion of configuration.
+                              incorrect.
+                     (4)      Statement I  is  correct but Statement II  is                                 (4)      Enantiomers are superimposable mirror
+                               incorrect.                                                                            images on each other.
+
+===== PAGE BREAK =====
+
+                                                                             9                                                                                                         R6
+                                                                                 66.     Match List- I  with List- II.
+63.     Given below are half cell reactions
+        MnO+8H+5e    Mnt+ 4 H20,                                                                                             List-II List-I
+                                                                                                   (Drug class)                          (Drug molecule)
+         EMn2/MOa =-1.510   V                                                             (a)      Antacids
+        O2 +2H+2e"  >   H,O,                                                                                                            Salvarsan
+        2                                                                                  b)Antihistamines i)  Morphine
+        Eo2/Ho =+1.223 V                                                                   ()       Analgesics                  (ii)      Cimetidine
+        Will the permanganate ion, MnO   liberate O, from                                  (d)      Antimicrobials       iv)      Seldane
+        water in the presernce of an acid?
+                                                       V                                   below: Choose the correct answer from the options  given
+        (1)      No, because Ecell      -2.733
+        (2)       Yes, because Ecell     +0.287 V                                                  (1)       (a)-(iv), (b)-(ii), ()-).(d)-(i)
+        3)      No, because Ecell     -0.287 V                                                   (2)       (a)-(ii), (b)-(ü), ()-(iv),(d)-(6)
+        (4)       Yes, because Ecell     +2.733 V                                           (3)   -(i), (b)- (iv), (©)-(), (d)-()
+
+                          with List - II.                                                   (4)     a)-(),6)-(v),()-(Gi), (d)-()
+64.     Match List-I
+                 List-I                          List-II                              The incorrect
+                 (Hydrides)                           (Nature)                                          (1) 67.  statement regarding enzymes is:
+         (a)                                  )        Electron precise Mgha                          Enzymes  are very specific  for   a   particular
+         b)                                  (i)     Electron GeH4 deficient                          reaction and substrate.
+         BH6                     (ii)                                                                     (2)      Enzymes are Electron rich biocatalysts.
+         (d)     HF                                  (iv)      Ionic                        3          Like chemical catalysts enzymes reduce the
+         Choose the correct answer from the options given                                              activation energy of bio processes.
+        below                                                                                 4)      Enzymes are polysaccharides.
+         (1)       (a)-(ii), (6)-(ii), (c)-(iv), (d)-)
+         1)
+         (2)     (a)-(iv), (b)-(i), (¢)-(i), (d) -(ii)                               68.      Identify the incorrect statement from the following
+         3)     (a)-ii), (b)-(), (c)-(i), (d) -(iv)                                            (1)      The shapes of d     d     and dz orbitals are
+         4        (a)-i), (b)-(i), (c)-(iv), (d)-(ii)                                                   similar to each other ; and d2-2  and d,2
+                                                                                                        are similar to each other.
+ 65.      Given below are two statements:                                                            (2) All the five 5d orbitals are different in size orbitals.
+                                                                                                         when compared to the respective 4d
+         StatementI:
+          The acidic strength of monosubstituted                                                3)    Allthe five 4d orbitals haveshapes similar to
+          is  higher  than  phenol  because  of  electron nitrophenol                                    the respective 3d orbitals.
+          withdrawing nitro group.                                                                                        all the five 3d orbitals are equal in
+                                                                                                (4)      In an atom,
+          StatementII:                                                                             energy in free state.
+          0-nitrophenol, 1-nitrophenol and p-nitrophenol will                                                                                              is
+          have same acidic strength as they  have one nitroo                                                         statement regarding chirality
+          group attached to the phenolic ring.                                          59.      The incorect
+         In the lightof the above statements, choose the most                                    (1)      A   racemic mixture shows zero optical
+          appropriate answer from the options given  below:                                                rotation.                            mixture of both
+                                                                                                                                             1
+                                                                                                                  reaction yields 1:
+          1)        Statement I  is incorrect but Statement II is                    (2)                   SN1
+                    correct.                                                                               enantiomers.                               reaction ot
+
+                                                                                                                               obtained by SN2                  site
+                                                                                                                                                      reactive
+           (2       Both Statement I and Statement Il are correct.              3                          The product               chirality at the
+                                                                                                           haloalkane having configuration.
+                    Both Statement I  and Statement II  are                                                                        of                       mirror
+                                                                                                                     inversion
+                                                                                                           shows
+
+
+
+
+
+
+
+
+
+                                                                                                                                     superimposable
+                     incorrect.
+
+                                                                                                                                are
+                                                                                                            Enantiomers
+            (4)      Statement I  is correct but Statement II is                    (4)                                    each other.
+                     incorrect.                                                                             Images on
+
+===== PAGE BREAK =====
+
+    R6                                                                                                                 73.       Given  below are two statements 0
+    70.     Which compound amongstthe following is not an
+           aromatic compound?                                                            StatementI:
+
+           (1)                                                                                Primary  aliphatic  amines react with HNO2 to give
+                                                                                              unstable diazonium salts.
+                                                                                              Statement II:
+           (2)                                                                                Primary aromatic amines react with HNO, to  form
+                                                                                              diazonium salts which are stable even above 300 K.
+                                                                                              In the light of the above statements, choose the most
+           )                                                                                                                                       (1)       Statement I  is incorrect but Statement II  is appropriate answer from the options given  below;
+
+
+                                                                                                       correct.
+           4)                                                                               (          Both Statement I and Statement l  are
+                                                                                                                                                        correct
+  71.                                                                                                                              incorrect. The given graph is a representation of kinetics of a 3)      Both Statement  I  and Statement II  are
+          reaction.
+                Constant temperature T                                                       (4)       Statement I  is  correct but Statement  II  is
+                                                                                                      incorrect.
+
+
+                                                                                    74      Identify the incorrect statement from the following
+                                                                                             (1)      Lithium is the strongest reducing agent among
+         The y andx axes for zero and first order reactions,                                          the alkali metals.
+         respectively are                                                                    (2)        hydroxides. Alkali metals react with water to form their
+         (1)      zero order (y=rate  and x= concentration),
+                 first order (y=rate and x = t)                                                                                                      is  +4.
+         2)                                                                              )        The oxidation number of K in KO, zero order (y=concentration andx= time),
+                 first order (y=t, andr=concentration)                                       (4)       Ionisationenthalpy of alkali metals decreases
+         (3)      zero order (y=concentration andx= time),                                            from top to bottom in the groupP.
+                  first   order   (y=rate   constant   and
+                  =concentration)                                                              75.      The IUPAC name of the
+         (4      zero order (y=rate and x=concentration),                                                                    complex-
+                 first order (y=t, andx=concenration)                  AgH%lAg(CN),] is:
+
+72.      Which one is not correctmathematical equationfor                                    (1)       diaquasilver() dicyanidoargentate()
+         Dalton's Law of partial pressure?  Here p=total                                    (2)       dicyanidosilver() diaquaargentate(1)
+        pressure of gaseous mixture
+         (1)    PXP, where xmole                                                            )         diaquasilver(1) dicyanidoargentate()
+                                                         fraction offth                     (4)      dicyanidosilver() diaquaargentate()D
+                                             gas in gaseous mixture
+                                             Ppressure of ith gas
+                                            in pure state                                The pH of the solution containing 50  mL each of 76.
+                p  P1tP2tP3                                                                 0.10 M sodium acetate and 0.01 M acetic acid is
+       P=n+n2+n *       V                                                                   Given pk, of CH,COOH =457]
+        (4)        P      XP,   where       Pipartial pressure of                           1)      2.57
+                                             h  gas                                         (2       5.57
+                                            X=mole fraction of ith                          (3)       3.57
+                                            gas in gaseous
+                                            mixture                                         (4)       4.57
+
+===== PAGE BREAK =====
+
+                                                                                  11                                                                                                   R6
+77.                                                                                              79.                                                                                ctions  is Which of the following p-V curve represents Which of the follow        sequence  of  reactio
+        maximum work done?                                                                       suitable to synthesize chlorobenzene ?
+                                                                                                                          NH2
+                             Isothermal                                                                               (1)                               , HCL, Heating
+
+                   P
+         (1)                                                                                                                                  (3)      Phenol, NaNO, (2)       Benzene, Cl2 anhydrous FeCl,
+                                                                                                                                    HCI, CuCI
+
+
+                                Isothermal                                                      ()          HCI
+
+         (2)           P                                                                        80. The Kjeldah>'s method for the estimation of nitrogen
+                                                                                                  can be used to estimate the amount of  nitrogen in
+                                                                                                  which one of the following compounds?
+
+                                V                                                            -N=N-
+                                                                                                   (1)
+                              Isothermal
+                    P                                                                                             NO2
+
+                                                                                                   (2)
+
+
+                                 Isothermal
+         (4         P                                                                               3)     =
+
+                                                                                                                   NH2
+
+
+                                 V                                                                                                   (4)
+
+
+
+78.      Match List-I with List-II                                                     Given below
+                                                                                           81.                           are two statements
+         List-I                          List-II                                                     Statement I:
+                                                                                                     The boiling points of aldehydes and ketones are
+         (Products formed)            (Reaction of carbonyl                                          higher than hydrocarbons of comparable molecular
+                                                 compound with)                                      masses because of weak molecular association in
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                  -   dipole
+          (a)       Cyanohydrin                    NHOH                                              aldehydes  and ketones due to dipole
+                                                                                                     interactions.
+                   Acetal                    (i)       RNH2                                 Statement II:
+                   Schiffs base          (ii)     alcohol                                             The boiling points of aldehydes  and ketones are molecular masses
+                                                                                                      lower than the alcohols of similar
+          (d)        Oxime                            (iv)      HCN                                   due to the absence of H-bonding.                            themost
+                                                                                                      In the              the above statements, choose
+          Choose the correct answer from the options given                                                     light of              from the options given below:
+          below:                                                                                   Statement aPpropriate answer                           Statement II is
+                                                                                                      1)                         I is incorrect but
+          (1)       (a)-(iv),(b)-(ii), (o)-(i),                                                                 correct.                                      lare correct
+                                                           (d)-()                                      (2)       Both Statement I and Statement Statement II are
+           (2)     a)-(i), (b)-(v).¢)-(i), (d)-()                                                      3)        Both Statement I  and
+                                                                                                                                                                            is
+           3)     (a-(i), (b)- (äi), ()-(v), (d)-()                                                  (4)         incorrect.                              Statement II
+
+                                                                                                                 Statement I  is correct but
+           4)     (a)-(), (b)- (ii), ()-i), (d)-(iv)                                                             incorrect.
+
+===== PAGE BREAK =====
+
+R6                                                                                  12
+82.     Given  below are two statements                                              Section  B (Chemistry)
+        Statement I:                                                                                 Compound Xon reaction  with O, followed  by Zn 86.
+         The boiling points of the following hydrides of group
+         16 elements increases in the order                                               H,O  gives  formaldehyde  and 2-methyl propanal  as products.  The compound X is
+                  HO<HS<HSe< H,Te.                                                         (1)        3-Methylbut-1-ene Pent-2-ene
+          StatementII:                                                                       3)        2-Methylbut-2-ene (2)        2-Methylbut-1-ene
+          The boiling  points of  these hydrides  increase with                4)
+          increase in molar mass.
+          In the light of the above statements, choose the most                         87.       For   a   first  order  reaction  A  >    Products,  initial
+          appropriate answer from the options given below:                                        concentration of  A is  0.1  M, which becomes 0.001  M
+           (1)       Statement I is  incorrect but Statement II  is                 min         is after  5 minutes.    Rate  constant  for  the  reaction  in
+                    correct                                                                    1)
+           2)        Both StatementI and Statement II are correct                               1.3818 0.2303
+                    Both  Statement  I  and  Statement  II  are                                   (2)
+                    incorrect                                                                     (3)      0.9212
+           4)        Statement  I  is  correct but Statement  II  is                In the  neutral or faintly  alkaline  medium,  KMnO4 (4) 0.4606
+
+                     incorrect                                                          88.
+                                                                                                 oxidises iodide into iodate.  The change in oxidation
+  83.      In one molal  solution  that contains  0.5  mole  of  a                       +6 to+5 state of manganese in this reaction is  from
+            solute, there is                                                                     (1)
+            (1)        1000 g of solvent                                                         (2)       +7 to+4
+                                                                                                 (3)       +6 to+4
+            (2)         500 mL of  solvent                                                       (4)      +7 to+3
+            )           500 g of solvent                                                                   A  10.0  L  flask  contains  64  g  of  oxygen  at 27°C. 89.
+            4         100 mL of solvent                                                          (Assume O2gas  is behaving ideally).  The pressure
+                                                                                                 inside  the flask in baris
+  84.      Given below are two statements: one is labelled as                                    (Given R= 0.0831  L barK-lmol-)
+            Assertion  (A)  and the other  is  labelled as Reason                                (1)      4.9
+           (R)                                                                                   (2)       2.5
+           Assertion (A):ICl is more reactive than I                                             3)       498.6
+           Reason (R):1Clbond is weaker than -I bond.                                            4)       49.8
+
+           In the light of the above statements, choose the most                        90.      Given  below are two statements
+           appropriate answer from the options given  below:                                    Statement I:
+           (1)       (A)  is not correct but (R)  is correct.                                    In Lucas  test,  primary,  secondary  and  tertiary
+           (2)      Both  (A)  and (R)  are correct and  (R)  is  the                            alcohols  are  distinguished  on the  basis  of  their
+                    correct                                                                      reactivity with conc. HCl+ZnCl2, known as Lucas
+                               explanation of (A).                                               Reagent.
+           )        Both (A) and (R)  are correct but (R)  is not the                            Statement II:
+                    correct explanation of (A).                                                  Primary alcohols are most reactive and immediately
+          4         (A)  is correct but (R) is not correct.                                       produce turbidity at room temperature on reaction
+                                                                                                  with Lucas Reagent.
+                                                                                                 In the light of the above statements, choose the most
+85.      Gadolinium  has  a  low value  of third  ionisation                      (1) appropriate answer from the options given below:
+          enthalpy because of                                                                              Statement I is  incorrect but Statement II  is
+          (1)        high basic character                                                                            (2)        Both Statement I and Statement II are correct. Correct.
+          (2)       small size                                                                    3)      Both  Statement I  and Statement II  are
+          3)       high exchange enthalpy                                                                  (4)      Statement I  is  correct but Statement II   15 incorrect.
+          (4)        high electronegativity                                                                      incorrect.
+
+===== PAGE BREAK =====
+
+                                                                                          13                                                                                               R6
+                                                                                               96.        The order of energy absorbed which is  responsib
+91.                                                                                                 for the color of 30p(g)= 20,(8) complexes
+          for the above reaction at 298 K,  K, is found to be                                             (A)      [Ni(HO)2(en)]2+
+          3.0x 10-, If the concentration of O, at equilibrium                                             (B)       [Ni(H,O)4(en)]2+    and
+          is 0.040 M  then concentration of Og in Mis                                                     )          Ni(en),12+*
+          (1)      4.38 x 10-32                                                                is 1.2x 1021
+          (2)      1.9x 10-63                                                                                        (B)>(A)>() (1)
+          (3)     2.4x 1031                                                                            (A)>(B)> (2)                  ()
+          (4)                                                                        3)       (C)> (B)> (A)
+
+                                        List - II.                                                        (4)     (C)>(A)> (B)
+92.      Match List-Iwith
+                    List-I                           List-II                               which one of  the following  is  not formed  when
+                    (Ores)                                    (Composition)                     97.
+                    Haematite                                                                              acetone reacts with 2-pentanone in the presence of
+          a)        Magnetite                                 Fe O4                                        dilute NaOH followed by heating?
+          b)       Calamine                         (i)        Fe2Og ZnCO                                                                  CH3
+          ()                                        (ii)     [AlOH)4 SiOsl
+          )         Kaolinite                      (iv)                                                                                                       CH3 CHa
+          Choose the correct answer from the options given                                                 (1)
+         below (1)      (a)-(), (b)-(ii), (¢)-(iü), (d)- (iv)                                                                    CH           CHa
+
+          (2)       (a)-(9,5)-(i), (a)-(ii), (b)-(),()-(), ()-(ii), (d)-(iv) (d)- (iv)
+          3)      (a)-(ii), (b)-),()-(iv), (d)-(ü)                                                     (2)     HC                   CH
+          4)                                                                                                                                                                                                     CHa
+
+93.                                                                                                                                                                              CHa Copper crystallises in fcc  unit cell with cell edge is
+          length of 3.608 x  108 cm. The density of copper                                                             CHs
+          8.92 g cm-s, Calculate the atomic mass of copper.                                                 (3)
+          (1)       65 u                                                                                                                                                                    CH3
+          (2)       63.1  u                                                                                                                   CHa
+        3)          31.55 u                                                                                                             (4)     CH
+          4         60 u                                                                                                                                                                                           CH3
+
+94.       The correct IUPACname of the following compound      98.    If radius of second Bohr orbit of the Hetion is 105.8
+          is                                                                                                pm, what is the radius of third Bohr orbit of Li2*
+               CI          QH                                                                               ion?
+                                                                                                             (1)        158.7 Å
+                                                                                                             (2)        158.7 pm
+          (1)       6-bromo-4-methy1-2-chlorohexan-4ol                                    (4)        1.587 pm 3)       15.87 pm
+          (2)      1-bromo-5-chloro-4-methylhexan-3-ol
+          )        6-bromo-2-chloro-4-methylhexan-4-ol                  99.                                  The pollution due to oxides of sulphur gets
+          (4)       1-bromo-4-methyl-5-chlorohexan-3-ol                                                      enhanced due to the presence of:
+          Find the emf of the cell in which the following                                                    a)         particulate matter
+95.                                                                                                     ozone ()
+          reaction takes place at 298 K                                                                                 hydrocarbons
+          Nis)+2Ag* (0.001 M)> N* (0.001 M) +2Ag(s)                                                                     hydrogen peroxide
+                                                           2.303 RT        =  0.059  at                                                                           answer from tne
+           (Given  that   Ecell    10.5 V,         F                                                         Choose the most appropriate
+           298 K)                                                                                            options given below :
+           (1)       1.05 V                                                                                   (1)        (a), (c), (d) only
+           (2)       1.0385 V                                                                                                   (3)      b), (2)        (a), (a) (a), (b), (d) only only
+                     1.385 V
+            4)        0.9615 V                                                                                                 (4) (), (d) only
+
+===== PAGE BREAK =====
+
+   R6
+  100    The  product formea rom tne following  reaction  I 104.                                            carrageen is obtained from
+          sequence is                                                              Hydrocolloid
+                        CN     ()LiAlIH,
+                                                  HO                                                      (1)       Phaeophyceae only (2)      Chlorophyceae and Phaeophyceae
+                                   (i)  NaNO,+HC1                                                    (3) Phaeophyceae and Rhodophyceae
+                                  (ii)  H_O                                                      4)       Rhodophyceae only
+
+                                                                                                  the following sta tements about the vascular
+                                    OH                                                   105. ead bundles
+          (1)                                                                                                                              (a)
+                                                                                                  ln roots, xylem and phloem in a   vascular in an alternate manner
+                                                                                                  bundle are arranged radii.
+                                                                                                  along the different
+                                     NH2                                                  (b)     Conjoint closed vascular bundles do not
+          (2)                                                                                     possess cambium
+                                                                                                            vascular bundles, cambium is present
+                                                                                          (c      In open
+                                                                                                  in between xylem and phloem
+                                     NCI                                                 (d)      The vascular bundles of dicotyledonous stem
+                                                                                                  possess endarch protoxylem
+                                                                                                  In monocotyledonous root, usually there are
+                                   a                                                              more than six xylem bundles present
+         (4)                                                                             Choose the correct answer from the options given
+                                                                                         below:
+                                                                                         (1)      (a)(c), (d) and (e) Only
+               Section-A (Biology: Botany)                                              (2)       (a),(b)and (d) Only
+101.    Which  of the following  is  not observed  during                                )       (b),() (d) and (e)Only
+        apoplastic pathway?                                                              (4)       (a),(b), () and (d) Only
+         (1)      Apoplast is continuous and does not provide
+                  any barrier to water movement.                                106.    DNA polymorphism forms the basis of:
+         (2)      Movement  of  water  occurs  through                                   (1)     Translation
+                  intercellular spaces and wall of the cells.                            (2)     Genetic mapping
+         3)      The movement does not involve crossing of                                       DNA finger  printing
+                  cell membrane                                                                                 (4)      Both  genetic  mapping  and DNA finger
+         (4)      The movement is  aided  by  cytoplasmic streaming                              printing
+
+                                                                                107.    Given below are two statements: one is labelled as
+102.    The device which can remove particulate matter                                  Assertion  (A)  and the other is labelled as Reason
+         present in the exhaust from a thermal power plant                              (R)
+         is                                                                             Assertion (A):
+         (1)       Catalytic Convertor                                                  Polymerase  chain  reaction  is  used in DNA
+         (2)       STP                                                                  amplification
+                 Incinerator                                                           Reason(R)
+         (4       Electrostatic Precipitator                                            The ampicillin resistant gene  is used as a  selectable
+                                                                                        marker to check transformation
+103.    Which one of the following never occurs during                                  In the lightof the above statements, choose the correct
+        mitotic cell division?                                                          answer from  the options given  below:
+         (1)     Coiling and condensation of the chromatids                             (1)          (A)  is not correct but  (R)  is  correct
+         2)       Spindle  fibres attach to kinetochores  of chromosomes                                                                              (2)        Both  (A)  and  (R)  are correct  and  (R)  is  the
+        (3)      poles Movement of centrioles towards opposite                          )Both correct expBanation  of  (A)
+                                                                                                       (A)  and  (R)  are correct but (R)  is not the
+        (4)      Pairing of homologous chromosomes                                       correct explanation of  (A) (A)  is  correct but (R)  is not
+                                                                                                                                    correct
+
+===== PAGE BREAK =====
+
+                                                                                                                         séel
+                                                                                                                      of      attack dil
+                                                                                                               part                           their
+
+
+
+
+                                                                                                                      insect
+                                                                                                     greater                            and
+                                                                                                 the              to metabolities
+                                                                                                      resistant
+                                                                      15                  trees
+                                                                                  In old         and                         vessels.
+
+
+                                                                                        brown            secondary
+                                                                                                                                           tannins
+108.   homologous  chromosomes  during  meiosis The appearance of recombination nodules on11 dark                        of
+
+
+
+
+
+
+
+
+
+                                                                                                                lumen
+                                                                                   dark browr                                        like
+                                                                                          secretion of
+                                                                                                        in the       compounds stem.
+        characterizes:                                                            (a)     deposition                              of
+                                                                                                          organic        layers        aromatic
+                                                                                                       of
+                                                                                                               central
+
+
+
+
+                                                                                          deposition
+                                                                                                       in the                 and
+        (1)      Terminalization                                                                     (b)     and resins suberin    stem.
+                                                                                                                        layer of               anda
+
+                                                                                          deposition  of outer                        resin
+        (2)       Synaptonemal complex                               ()                                 in the              gum,            layers
+                                                                                          substances
+
+
+
+
+
+
+                                                                                                               tannins,
+
+
+
+
+
+
+
+
+
+                                                                                                                             peripheral
+        )        Bivalent                                                                                               the
+
+
+
+
+                                                                                          deposition of              in
+                                                                                                      substances
+        (4)       Sites at which crossing over occurs                                     (d) aromatic                              functionally
+
+                                                                                          of stem.                          cells,        oils.
+
+
+
+
+
+
+                                                                                                          parenchyma
+
+
+                                                                                                                             essential
+                                                                                                      of               and
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                          presence         elements                          given
+109.   The flowers are Zygomorphic in:                                            (e)     active xylem               from the options
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                           answer
+
+
+                                                                                                 correct
+        (a)      Mustard                                                                    the
+                                                                                  Choose
+        (b     Gulmohar                                                           below:                Only
+                                                                                              and (d)
+                 Cassia                                                           (1)      (b) (a) and (b) Only
+        (d)      Datura                                                           (2)               (4)Only
+                                                                                   (3)    ()and and (e) Only
+         (e)        Chilly                                                         (4)      (d)                                    matched?
+         Choose the correct answer from the options given                                                       is incorrectly
+         below:                                                                       113.   Which of thefollowing
+                                                                                           Volvox -  Starch
+         (1)     ((d), (e) Only                                                    (1)     Ectocarpus-Fucoxanthin
+
+
+
+
+                                                                                  (3)     UlothrixMannitol
+         (2)       (a), (b), ()Only                                                                              (2)  Starch
+
+
+
+
+
+
+
+
+
+                                                                                                      -  Floridian
+         (3)     (b)(c) Only                                                       4)     Porphyra
+                                                                                                                                               show
+         (4)                                                                                  Which one of (d), ()Only the following plants does not
+                                                                           114.
+                                             increased manifold in                 plasticity?
+                           Cucumber has
+         Production of                              of the following                       Maize
+ 110.                                       which                                  (1)
+         recent years. Applicationof in this increased yield                       (2)      Cotton
+                              has resulted                    flowers
+         phytohormones                     produce female
+                 hormone is known to                                                       Coriander
+         as the
+         in the plants :                                                           (4)      ButtercuP
+         (1)      Cytokinin                                                                                                and choose the set of
+                                                                                              following statements
+
+                  ABA                                                                 115.   Read the
+          (2)                                                                     correct statements:
+
+         )          Gibberellin                                                                                           packed chromatin
+                                                                                   (a)      Euchromatin is loosely transcriptionally active
+         4)     Ethylene                                                           b)Heterochromatin is
+                                                                                           Histone octomer is wrapped by negatively
+
+                                             statement is not true                         charged DNA in nucleosome
+
+          Which one of the following          technique ?                          (d)     Histones are rich in lysine and arginine
+                           electrophoresis
+  111.                 gel
+          regarding                                   of DNA can be                         A  typical nucleosome contains 400 bp of
+                          orange coloured bands
+          (1)     Bright        the gelwhenexposedto UV light                              DNA helix
+                  observedin                                     DNNA
+                                 of extraction of separated                        Choose the correct answer from the options given
+          (2)     The process          is called elution.                          below:
+                  strands from gel
+                       separated DNA fragments are stainedby                        (1)        (a), (), (e) Only
+                   The
+                   using ethidium bromide.                                          (       (b),(d), ()Only
+
+                   The presence of chromogenic substrate gives                      )        (a),(c) (d) Only
+           (4)    blue coloured DNA bands on the gel.                                   (4)      (b.(e)Only
+
+===== PAGE BREAK =====
+
+    R6
+   116.     Which one of the following produces nitrogen fixing 16
+            nodules on the roots  of Alnus?                                            121.    Given below are two statements
+            (1)        Beijernickia                                                          Statement I
+           (2)        Rhizobium                                                               Cleistogamous flowers are invariably autogamous
+           3)        Frankia                                                                 Statement II:
+           (4)        Rhodospirillum                                                          Cleistogamy  is  disadvantageous  as  there  is   no
+                                                                                              chance for cross pollination
+                                                                                              Inthe lightof the above statements, choose the correct
+  117.    Identify   the  incorrect  statement  related   to                          Statement I is  incorrect but Statement II is answer from the options given below:
+           Pollination:                                                                       (1)
+           ()       Moths and butterflies are the most dominant                               Both Statement I and Statement II are correct
+                    pollinating  agents  among  insects                                            Both  Statement  I  and  Statement  II  are (2)       correct
+           (2)        Pollination by water is quite rare in                                   (3)
+                   plants                                                                                 4)       Statement  I  is  correct but Statement II  is flowering incorrect
+           (3)        Pollination by wind is more common amongst abiotic  pollination                 incorrect
+
+          (4)        Flowers  produce  foul odours  to  attract flies                StatementI: 122.     Given below are two statements
+                   and beetles to get pollinated                                    The  primary  CO    acceptor  in  C4   plants   is
+
+
+ 118.     Which  of  the  following  is  not a  method  of  ex  situ                         phosphoenolpyruvate   and   is   found   in   the
+          conservation?                                                                      mesophyll cells.
+          (1)       Cryopreservation                                                         Statement II:
+          (2)         In vitro fertilization                                                 Mesophyll cells of C4 plants lack RuBisCo enzyme.
+                                                                                             Inthe lightof the above statements, choose the correct
+          3)       National Parks                                                                                     (1) answer from the options given below:
+          4)       Micropropagation                                                                   Statement I is  incorrect but Statement II is
+                                                                                                      correct
+                                                                                             (2)        Both Statement I and Statement Il are correct
+119.    Which one of the following is not true regarding the                                 3)       Both  Statement  I  and  Statement II  are
+         release  of energy  during  ATP synthesis  through                                           incorrect
+         chemiosmosis? It involves:                                                        4          Statement  I  is  correct but Statement  II  is
+         (1)       Reduction  of NADP  to  NADPH2  on the                                             incorrect
+                   stroma side of the membrane                                      123.     Identify the correct set
+         (2)       Breakdown of proton gradient                                              (a)     The  leaflets are modified into pointed hard of statements:
+         3)       Breakdown of electron gradient                                                    (b) thorns in Citrus  and  Bougainvillea
+         4        Movement of protons across the membrane                                             Axillary buds form slender and spirally coiled
+                  to the stroma                                                                       tendrils in cucumber and pumpkin
+                                                                                                     Stem  is  flattened  and  fleshy  in Opuntia  and
+120.    Which one of the following  statements cannot be                                              modified to perform the function of leaves
+         connected to Predation?                                                             (d)      Rhizophora shows vertically upward growing
+                                                                                                      roots that help to get oxygen for  respiration
+         (1)      It is necessitated by nature to maintain the                                       Subaerially  growing  stems  in  grasses  and
+                  ecological balance                                                                 strawberry help  in vegetative propagation
+         (2)      It helps in maintaining species diversity in a                             Choose  the  correet  answer from  the  options  given
+                  community                                                                  below:
+         3)      It might lead to extinction of a species                                    (1)        (a),(b),  (H)and (e) Only
+                                                                                             (2)         (b) and (c)Only
+         (4)       Both the interacting species are negatively                               and (d)  Only
+                  impacted                                                                   4)      b).c), (d)  and (e) Only
+
+===== PAGE BREAK =====
+
+                                                                                 17
+
+
+
+                                                                                                                                -  II.                                      R6
+124.   The gaseous plant growth regulator is used in plants                           130.    Match List- I with List
+
+         to:                                                                                     List-I                           List-II
+         (1)       kill dicotyledonous weeds in the fields
+         (2)                                                                                                                   )       Activates  the enzyme speed up the malting process                                           (a)   Manganese catalase
+         (3)      promote root growth and roothair formation
+                  to increase the absorption surface                                            (b)   Magnesium             (ii)    Required for  pollen
+         (4)                                                                                                                                      (ii)   Activates enzymes of help overcome apical dominance germination
+                                                                                                ()Boron
+125.     Which one of the following plants shows vexillary.                                                                        respiration
+         aestivation and diadelphous stamens?                                                   (d)   Iron                  (iv)   Functions in splitting  of
+          (1)      Solanum nigrum                                                                                                  water during
+          (2)      Colchicum autumnale                                                                                             photosynthesis
+          )        Pisum sativum                                                             Choose the correct answer from the options  given
+          (4)       Allium cepa                                                              below:
+
+ 126.     XO type of sex determination can be found in :                                         (1)       (a)-(ii), (6)-(9,(©)-(i), (d)- (iv)
+           (1)      Monkeys                                                                      (2)      (a)-(i), (b)-(iv), (©)-(), (d)-Gi)
+           (2)      Drosophila                                                                    (3)       (a)-(iv), (6)- (ti), ¢)-(), (a)-(G
+           (3)      Birds                                                                         (4      (a)-iv), (b)-(), (¢)-(), (a)- (i)
+           (4)      Grasshoppers
+
+ 127.   What amount of energy is released from glucose                                   131.   Habitat loss and fragmentation, over exploitation,
+           during lactic acid fermentation?                                                       alien species invasion and co-extincion are causes
+            (1)      Less than 7%                                                                 for
+           (2)       Approximately 15%                                                            (1)       Natality
+            3)       More than 18%                                                                                       (2) Population explosioni
+            4)       About 10%                                                                                              (3)      Competition
+
+
+  128.    Given below are two statements:                                                            (4)      Biodiversity loss
+            Statement I:
+            Decomposition is a  process in which the detritus is
+            degraded into simpler substances by microbes.           132.   The process of translation of mRNA to proteins begins as soon as
+            Statement II:                                                                                                                         the
+            Decomposition is faster if the detritus is rich in lignin                               (1)      The tRNA is activated and                larger subunit
+            and chitin                                                                                       of ribosome encounters mRNA
+             In the light of the above statements, choose the correct                               (2       The small subunit of ribosome encounters
+
+             answer from the options given below:                                                             mRNA
+             (1)                                                                        3) Statement I  is incorrect but Statement II is The larger subunit of ribosome encounters
+                       correct                                                                                mRNA
+             (2)      Both Statement I and StatementII are correct                                                                           together to bind with
+                       Both Statement I  and Statement II are                                                 Both the subunits join
+              3)                                                                   4)                         mRNA
+                       incorrect
+              (4       Statement I  is correct but Statement II is                                                                                                Plant
+                        incorrect                                                           133.   "Girdlin   Experiment" was performed by
+
+      129.   What is the net gain of ATP when each molecule of                                       hysiologists to identify the plant tissue througn
+               glucose is converted to two molecules of pyruvic                                      which
+                                                                                                               osmosis is observed
+               acid?                                                                                  (1)
+                (1)       Eight                                                                                                         (2)      water is transported
+                (2)      Four                                                                              )        food is transported         transportation
+                3)       Six                                                                                                water and food
+                 (4)     Two                                                              (4                    for both
+
+===== PAGE BREAK =====
+
+   R6
+  134.     Exoskeleton of arthropods is composed of:                              o18
+           (1)       Glucosamine                                                       138.     The  anatomy of springwood shows some  peculiar features.  Identify the correct set
+           (2)       Cutin                                                                                                                     of statements about
+                   Cellulose                                                                                         (a)       It is  also  called as the earlywood springwood.
+          (4)       Chitin                                                                                                       (b)       In spring season cambium produces  xylem
+
+ 135.     Given below are two statements:              Itis elements with narrow vessels
+          Statement I:                                                                                                  (d) lighter in colour
+          Mendel studied seven pairs  of  contrasting traits  in                                           The  springwood  along  with  autumnwood
+          pea  plants  and proposed the Laws  of Inheritance                                              annual rings shows  alternate  concentric  rings  forming
+          Statement II:                                                         e        It has lower  density
+          Seven  characters  examined  by  Mendel  in his                                         Choose  the correct answer from  the  options  given
+          experimernt  on pea  plants  were  seed  shape  and                                    below
+          colour, flower  colour, pod shape and colour, flower
+          position and stem height                                                                (1)    d)and (e)Only
+          In the light of the above statements, choose the correct                                (2)    (),).
+          answer from the options given  below:                                                                      (d)  and (e) Only
+          (1)       Statement I  is  incorrect but Statement II is                               (          (a),  (b)  and (d)Only (),)(d) (d)  and (e) Only
+                   correct
+          (2        Both StatementI and Statement Il are correct      139.    Which  one  of  the  following  will  accelerate
+          3)       Both  Statement  I  and  Statement  II  are
+                   incorrect                                                                     phosphorus  cycle ?
+          4)       Statement  I  is  correct  but  Statement  II  is                (2       Burning of fosil fuels (1)        Rain fall  and storms
+                   incorrect
+                 Section B  (Biology :                                                            3)       Volcanic activity
+                                                     Botany)                                      (4)       Weathering of rocks
+136.     Which part of  the fruit, labelled in the  given figure
+          makes it a  false fruit ?                                                               140.     The entire fleetof buses in Delhi were converted to
+                       C                                                                         CNG  from diesel.  In reference to this, which one of
+                    D                                                                            the following  statements is
+                                                                                                 (1)       It can not                  false?
+                                                                                                                        be adulterated like  diesel
+                                                                                                  (2)        CNG burns more efficiently than diesel
+                                                                                                  3)        The same diesel engine is  used in CNG buses
+                                                                                                           making  the cost of conversion low
+          (1)     DSeed                                                                           (4)       It is  cheaper  than diesel
+          (2)     A- Mesocarp                                                           141.     What is  the role  of large bundle shealth cells found
+          (3)       B Endocarp                                                                    around the vascular bundles in CA  plants?
+          (4      CThalamus                                                                                       (1)        To protect the vascular tissue from high light
+
+137.    Addition of more solutes in a  given                                                               intensity
+                                                              solution wil:                              pathway (2        To  provide  the  site  for  photorespiratory
+          (1)       not affect the water potential at all                                3)        To increase the number of chloroplast for  the
+          (2)       raise its water potential                                                                operation of Calvin cycle
+          3)       lower its water potential                                                                         (4)        To   enable   the  plant  to  tolerate   high
+         4)    make its water potential zero                                                               temperature
+
+===== PAGE BREAK =====
+
+                                                                              19                                                                                          R6
+         Which of the following occurs due to the presence   |   146.   Match the plant With the kind of lifa
+142.                                                                                                                                                     eit of autosome linked dominant trait? exhibits
+
+                                                                                                    List-I                   List-II
+         (1)      Thalessemia
+         (2)      Sickle cell anaemia                                                       (a)    Spirogyra    ()     Dominant diploid sporophyte vascular  plant,  with  highly
+         (3)        Myotonic dystrophy                                                                                  reduced   male   or   female
+         (4)       Haemophilia                                                                                                               gametophyte
+
+                                                                                            (b)   Fern            (ii)    Dominant haploid free-living
+ 143.                                                                                                                       (ii)  Dominant Read the following statements on lipids and find gametophyte
+         out correct set of statements:                                                     (c)Funaria                                 diploid sporophyte
+         (a)      Lecithin found in the plasma membrane is a                                                             alternating  with  reduced
+                  glycolipid                                                                                             gametophyte called prothallus
+          (6)                                                                                                                  (d)    Cycas Saturated fatty acids possess one or more (iv)  Dominant  haploid   leafy
+                  c=cbonds                                                                                               gametophyte alternating with
+                  Gingely  oil has lower melting point, hence                                                            partially multicellular sporophyte dependent
+
+                  remains as oil in winter
+                                                                                            Choose the correct answer from the options given
+                  Lipids  are generally insoluble in water but
+                   soluble in some organic solvents                              below:
+          (e      When fatty acid is esterified with glycerol,                     (1)     (a)-i), (b)-(iv), (o)-(), (d)-(i)
+                  monoglycerides are formed                                                        (2)       (a)-(iv), (b)-), ()-(i), (d) -(i)
+          Choose the correct answer from the options given                                                                        (iv).(4)-()
+         below                                                           3)   )-), (3)                          6)- (i), ()-
+
+          (1)     ().(b) and (d) only                                                       (4)      (a)-(ii), (b)-(iv), ()-0,(d)-()
+            b)and   and () only
+          )           (a),(cd) and (e) only                                         147.   While explaining interspecific interaction of
+          (4)     ()(d) and (e) only                                                         Population, (+) sign is assigned for beneficial
+                                                                                             interaction, (-) sign is assigned for detrimental
+                                                                                             interaction and (0) for neutral interaction. Which of
+  144.    Ifa geneticist uses the blind approach for sequencing                              the following interactions can be assigned (+) for
+          the whole genome of an organism, followed by                                      one species and (-) for another species involved in
+          assignment of function to different segments, the                                  the interaction?
+          methodology adopted by him is called as :                                          (1)      Competition
+           (1)       Bioinformatics                                                (2      Predation
+           (2)      Sequence annotation                                                                    (3)      Amensalism
+                   Gene mapping
+          (4)      Expressed sequence tags                                                   4)      Commensalism
+
+
+   145.   In the following palindromic base sequences of                            148,   Transposons can be used during which one of tne
+           DNA, which one can be cut easily by particular                                    following?
+           restriction enzyme ?
+            (1)     5GTATTC3'; 3  CATAAG5'                                                    (1)      Gene sequencing
+            (2       GATACT3; 3CTATGA5                                   (2)       Polymerase Chain Reaction
+            )      5GAATTC3; 3CTTAAG5                                 (3)      Gene silencing
+            (4)       5 CTCAGT3;  3GAGTCA5                                   (4)       Autoradiography
+
+===== PAGE BREAK =====
+
+    R6                                                                          20
+                              with List-II.
+    149.   Match List-I                       List-II
+                    List-I                                                                           152.    Regarding  Meiosis,  which of the statements is incorrect?
+
+            (a)   Metacentric        ()    Centromere situated close                                Four haploid cells are formed at the end of
+                                           to the end forming one                           ()
+
+                 chromosome                                                                         Meiosis-II
+                                           extremely short and one
+                                           very long arms                                   (2)     There are two stages in Meiosis, Meiosis-I
+                                                                                                    and II
+           b)Acrocentric(i)   Centromere at end                                                      DNA  replication occurs  in  S  phase of the terminal 3)
+                 chromosome
+                                    (ii)  Centromere in the middle                                  Meiosis-II
+           (C)    Sub-
+                 metacentric              forming two equal arms of
+                                          chromosomes                                                   (4)       Pairing  of homologous  chromosomes and recombination occurs in Meiosis-I
+
+           (d)   Telocentric        (iv)   Centromere slightly away
+                chromosome                from the middle forming          153.    Given below are two statements:
+                                          one shorter arm and one
+                                          longer arm                                    Statement I:
+          Choose the correct answer from the options given                                The coagulum is formed of network of threads called
+          below:                                                                          thrombins.
+          (1)      (a)-9,(b)-(ü), ()-(i), (d)-(iv)                                       Statement I1:
+          2)    (a)-(i),(6)-),()-(iv), (d)-(i)                                            Spleen is the graveyard of erythrocytes.
+          (3)     (a)-9b)-Gi), (©)-(),(d)-(iv)                                            In the light of the above statements, choose the most
+          4)     (a-(i),6)-Gi), (c)-(iv), (d)-)                                          appropriate answer from the options given below:
+                                                                                         (1)      Statement I is incorrect but Statement II is
+ 150.    Given below are two statements: one is labelled as                        correct
+          Assertion (A)  and the other is labelled as Reason                (2       Both Statement I and Statement II are correct
+         R).                                                                                     Both Statement I  and Statement II are
+        Assertion (A):                                                                   3)      incorrect
+         Mendel's law of Independent assortment does not
+         hold good for the genes that are located closely on                             4)     Statement I  is correct but Statement I   is
+         the same chromosome.                                                                    incorrect
+         Reason(R):
+        Closely located genes assort independently.                             154.     Given below are two statements
+        Inthe lightof the above statements, choose the correct                         Statement I:
+        answer from the options given below                                             Restriction endonucleases  recognise  specific
+        1)       (A) is not correct but (R) is correct                                  sequence to  cut DNA known as  palindromic
+        (2)      correct Both (A) and (R) are correct and (R) is the                    nucleotide sequence.
+                          explanation of (A)                                                          Il:
+        3)      correct Both (A) and (R) are correct but (R) is not the             Statement Restrictionendonucleases cut the DNA strand a little
+                          explanation of (A)                                            away from the centre of the palindromic site.
+        4                                                                                        In the light of the above statements, choose the most (A) is correct but (R) is not correct
+
+             Section-A (Biology: Zoology)                                                (1)       Statement I is  incorrect but Statement II is appropriate answer from the options  given below:
+
+151.                                                                                                             correct Which of the following statements with respect to
+        Endoplasmic  Reticulum is incorrect?
+        (1)                                                                           3        Both  Statement  I  and  Statement  II  are SER are the sites for lipid synthesis                                        (2)        Both StatementI and Statement Il are correct
+        (2      RER has ribosomes attached to ER                                               incorrect
+        (3)        SER is devoid of ribosomes                                   4        Statement  I is correct but  Statement  II  is
+        (4)      In prokaryotes onlyRERare present                                       incorrect
+
+===== PAGE BREAK =====
+
+                                                                                                                                                  R6
+                                                                        21                                                 a  connective tissue?
+155.    Identify  the  asexual reproductive  structure                      161.   Which of the following IS not
+        associated with Penicillium:                                                (1)     Neuroglia
+        (1)     Buds                                                                                  Blood (2)      Adipose
+        (2)     Zoospores                                                                                           (3) tissue
+        (3)     Conidia                                                                                                   (4)      Cartilage
+        (4)     Gemmules
+                                                                                                                                       is labelled as
+156.    Nitrogenous waste is excreted in the form of pellet                 162.    Given below are two statements: one
+                                                                                     Assertion (A) and the other is labelled as Reason
+       or paste by:                                                                R
+        1)       Pavo                                                                Assertion (A):
+        (2)        Ornithorhynchus                                                   Osteoporosis is characterised by decreased bone
+        3)       Salamandra                                                          mass and increased chances of fractures.
+        (4)        Hippocampus                                                       Reason(R):
+                                                                                     Common cause of osteoporosis is increased levels
+157.    Which of the following is  present between the                               of estrogen.
+        adjacent bones of the vertebral column?                                      In the light of the above stat ments, choose the most
+        (1)      Smooth muscle                                                       appropriate answer from the options given below:
+        (2       Intercalated discs                                                                                   (A) is not correct but (R) is correct
+        3)      Cartilage                                                   1) (2)      correct Both (A) and (R) are correct and (R) is the
+        (4)      Areolar tissue                                                                         explanation of (A)
+                                                                                      (3)      correct Both (A) and (R) are correct but (R) is not the
+158.    Given below are two statements : one is labelled as                                             explanation of (A)
+        Assertion (A) and the other is labelled as Reason                             (4)     (A) is correct but (R) is not correct
+        (R)
+        Assertion  (A):                                                      163.     Which  of the following  statements  are  true
+        All vertebrates are chordates but all chordates are                           for spermatogenesis but do not hold true for
+        not vertebrates.
+        Reason (R)                                                                    Oogenesis?
+        Notochord is replaced by vertebral column in the                              (a)      It results in the formation of haploid gametes
+        adult vertebrates                                                             b)      Differentiation of gamete occurs after the
+        In the light of the above statements, choose the most                                  completion of meiosis
+        appropriate answer from the options given below:                                       Meiosis occurs continuously in a mitotically
+        (1)      (A) is not correct but (R) is correct                                         dividing stem cell population
+        (2)      correct Both (A) and (R)  are correct and (R)  is the            (d)          It is controlled by the Luteinising hormone
+                           explanation of (A)                                                  (LH) and Follicle Stimulating Hormone (FSHI)
+        3)     correct Both (A) and (R) are correct but (R) is not the                         secreted by the anterior pituitary
+                           explanation of (A)                                          (eItisinitiated at puberty
+        (4)      (A) is correct but (R) is not correct                                 Choose the most appropriate answer from the
+
+159.    Lippe's loop is a  type                                                        options given below:
+                                     of contraceptive used as:                         (1)      b),(c)and  (e) only
+        1)     Copper releasing IUD                                                    2)     ()and (e) only
+        (2)      Cervical barrier                                                      )           (b) and
+         3)      Vault barrier                                                                             () only
+         (4)      Non-Medicated  IUD                                                   4)(b),(d) and (e) only
+
+ 160.    At which  stage  of  life the  oogenesis  process is      164.                enydration reaction links two glucose molecules is
+         initiated?                                                                    to produce  maltose.  If the formula for glucose
+        (1)      Adult                                                                 6120%then what is the formula for maltose?
+         (2)        Puberty                                                             1)       Ci2H2011
+         )       Embryonic development stage
+         (4)                                                    Ci2H20010 Birth         3)       Ci2H24O12
+                                                                                        (4)       C2H22011
+
+===== PAGE BREAK =====
+
+  R6
+ 165.    Breeding crops with higher  levels of vitamins and  171.    Given 22
+           minerals  or higher  proteins  and healthier  fats  is                                        below are two statements:
+           called                                                                                Statement I:                           seminiferous tubules
+                                                                                                The release of sperms into the
+           (1)        Bio-accumulation                                                          is called spermiation.
+           (2)        Bio-magrnification                                                        Statement II:                         of formation of sperms
+           )          Bio-remediation                                                           Spermiogenesis is the process
+                                                                                                 from spermatogonia.                                    the most
+          4)       Bio-fortification                                                             In the light of the above statements, choose given below:
+                                                                                                 appropriate answer from the options
+166.    Identify the                                                                             (1)      Statement I  is incorrect but Statement I   is
+          the production of an microorganism which is responsible for                                    correct                     Statement II are correct
+                                                                                                         Both Statement I and                                  are
+          cyclosporin  A:                 immunosuppressive molecule                             (2      Both Statement I  and Statement II.
+                                                                                                 (3)       incorrect
+          (1)         Streptococcus cerevisiae                                                                          (4)      Statement I  is correct but Statement II is
+          (2)         Trichoderma  polysporum                                                         incorrect
+          (3)         Clostridium butylicum                                            172.      Which of the following functions is not performed
+           (4)        Aspergillus niger                                                                                         (1) by secretions from salivary glands?
+                                                                                                         Digestion of disaccharides                mouth
+                                                                                                                    bacterial population in
+                                                                                                 (2)      Control      of complex carbohydrates
+167.    Tegmina in cockroach, arises from                                                  Digestion (3)                 of oral cavity
+           (1)       Prothorax and Mesothorax                                                    (4)      Lubrication
+          (2)      Prothorax                                                             173.    In-situ conservation refers to: Conserve only extinct species
+                                                                                                 (1)      Protect                         whole ecosystem
+           3)      Mesothorax                                                                                              (2)      Conserve only and conserve the
+                                                                                                                             high risk species
+           (4)       Metathorax                                                                         Conserve (4    only endangered species
+
+
+                                                                                        174.   In gene therapy of Adenosine Deaminase (ADA) infusionof
+168.   Detritivores breakdown detritus into smaller                                              deficiency, the patient requires periodic because:
+           particles.  This process is called                                                    genetically  engineered lymphocytes
+                                                                                                 (1)      immortal Genetically engineered lymphocytes are not
+           (1)      Decomposition                                                                                     cells.
+           ()     Catabolism                                                                                             (2)      lymphocytes. Retroviral vector is introduced into these
+           (3)      Fragmentation                                                       (3      ADA is introduced into cells at embryonic Geneisolated from marrow cells producing
+
+           (4)      Humification
+                                                                               '80                        stages
+                                                           population of                          (4)      in Lymphocytes from patiene's blood are grown
+                                    in a  laboratory         in the population                               culture, outside the body.
+169.       If '8' Drosophila              the death rate                    week.
+           died during a  week,                         Drosophila per
+
+                                individuals per
+          is                                                                             175.    Given below are two statements:
+                                                                                                 StatementI:
+
+                     zero
+           (1)                                                                                   Mycoplasma can pass through less than 1 micron
+                     0.1                                                                         filter size.
+           (2)                                                                                                  Statement II:
+           3)        10                                                                           Mycoplasma are bacteria with cell wall
+                     1.0                                                                          In the lightof the above statements, choose the most
+           (4)                                                                tract              appropriate answer from the options given below:
+                                                                digestive
+                                                    animals,                                                                                                      15
+                                                                     gizzard ?                    (1)                                           Statement II
+                                    following                  and                                        Statement I  is incorrect but
+                              the                like crop                                                correct
+               which of           chambers
+          In
+
+
+
+
+                 additional
+170.                                                                                                          Both Statement I and Statement II are (2)      Both Statement I and Statement II are correct
+                     Pavo, Psittacula, Corvus
+          has                                                                                     3)
+
+
+
+
+                     Corvus, Columba, Chameleon
+           (1)                                                                                            incorrect
+
+
+
+
+                     Brufo, Balaenoptera, Bangarus                                                (4)     Statement I  is correct but Statement II 5
+           (2)                                                                                            incorrect
+
+
+
+
+
+
+
+
+
+                     Catla, Columba, Crocodilus
+           )
+           (4)
+
+===== PAGE BREAK =====
+
+                                                                                            23                                                                               R6
+               176.    Which  of the  following  is  not the  function  of                     180       In an E.coi strain i gene gets mutated and its
+ules                     conducting part of respiratory system ?                                         can not bind the inducer  molecule   TeOduct
+                       (1)       Provides surface for diffusion of O2 and CO2              outcome? medium is provided with lactose, what will be the
+rms                               Inhaled air is humidified (2) It clears inhaled air from foreign particles
+                       )                                                                                                                              (1) 4)        Temperature of inhaled air is brought to body                      (2) RNA  polymerase  wil bind the  promoter
+aost                                  temperature                                                                  region
+OW                                                                                                                 Only z gene will get transcribed
+Il   is        177.    In the  taxonomic  categories  which hierarchial                                   (3)      z, y, a genes will be transcribed
+Tect                      animals ? arrangement in ascending order is correct in case of                  (4)        z, y,  a  genes will not be translated
+are                                (1)       Genus, Species Kingdom,  Order,  Phylum,  Class,  Family,               mitosis : 181.    Select  the  incorrect  statement with reference  to
+I is                    (2)        Genus, Species Kingdom,  Phylum,  Class,  Order,  Family,                      (1)       Splitting of centromere occurs at
+                                                                                                           (2)        All  the  chromosomes  lie  at the  equator  at anaphase.
+ned                     3)       Genus, Species Kingdom,  Class,  Phylum,  Family,  Order,                           metaphase.
+                                Kingdom,  Order,  Class,  Phylum,  Family,                                 3)       Spindle  fibres  attach  to  centromere  of chromosomes.
+                                Genus, Species                                                             4         Chromosomes decondense at
+
+               178.     Given below are two statements :                                                                                                         telophase.
+                       StatementI:                                                               182.    Which of the following is a  correct match for  disease
+                       Fatty  acids  and glycerols  cannot be absorbed into                                and its symptoms ?
+                       the blood.                                                                          (1)       Muscular  dystrophy                -   An  auto  immune
+n
+                       Statement II: Specialized  lymphatic  capillaries  called  lacteals                           skeletal muscle disorder causing progressive degeneration of
+
+                       carry  chylomicrons  into lymphatic  vessels  and                                    (2)       Arthritis- Inflammed joints
+DA)                    ultimately into the blood.                                                                    Tetany      high  Ca2*  level  causing  rapid
+n of                   In the light of the above statements, choose the most                                         spasms.
+                       appropriate answer from the options  given below:                                    4
+
+
+
+                                                                                                                                                       -    Genetic  disorder
+not                    1)       Statement  I  is  incorrect but Statement II is                                      Myasthenia  gravis
+                                correct                                                                               resulting  in weakening  and  paralysis  of skeletal muscle
+ese                                   Both  Statement  I  and  Statement  II  are (2) Both StatementI and Statement II are correct                Natural selection where more individuals acquire
+                        )                                                                         183.
+ing                     (4      incorrect                                                                   specific  character  value  other  than  the  mean
+onic                                Statement  I  is  correct but Statement  II is                          character value, leads to:
+                                incorrect                                                                   (1)
+wn                 179.    Given below are two statements:                                            3)       Directional change Random change
+                                                                                                             2        Stabilising  change
+                        StatementI:                                                                   4)       Disruptive change
+                        Autoimmune  disorder  is   a  condition where  body
+                        defense  mechanism  recognizes  its  own cells  as
+ron
+                        foreign  bodies. Statement II:                                             184.    Under  normal physiological conditions in human
+                        Rheumatoid arthritis is  a  conditionwhere body  does                                being every 100 mlof oxygenated blood can deliver
+nost                    not attack self  cells.                                                                                        (1) ml of O, to the tissues.
+ow:                     In the light of the  above statements, choose the most                                         10 ml
+II  S                                   Statement I  is  incorrect but Statement I   is                 4)         4mnl appropriate answer  from the options  given below   :. (2) 2 ml
+                         4)                                                                                   3)        5 ml
+rrect                                              2)        Both Statement I and Statement II are correct correct
+
+ are                                         3)       Both  Statement  I  and  Statement  II  are          wl
+                                                                                                    185.      If  the length of  a  DNA     lecule
+    15                           4)       Statement  I  is  correct but  Statement  II  is incorrect                                                          is 1.1 metres, what
+                                                                                                                     be the approximate number of base pairs ?
+                                  incorrect                                                                   (1)       6.6x 10   bp
+                                                                                                              (2)      3.3x10 bp
+                                                                                                              3)        6.6x 10° bp
+                                                                                                               (4)     3.3x 106 bp
+
+===== PAGE BREAK =====
+
+   R6                                                                                                        24
+                  Section-B (Biology: Zoology)                           190.    Statements related to human Insulin are given below
+   186.    Select  the  incorrect statement with respect  to               Which statement(s) is/are correct about genetically
+           acquired immunity.                                                                 engineered Insulin?
+           (1)        defense present at the time of birth. Acquired  immunity  is  non-specific  type  of (a) Pro-hormone insulin contain extra stretchof
+
+                                                                                                    Cpeptide
+           (2)     Primary response is produced when our body                                       A-peptide and B-peptide chains of insulin
+                   encounters a  pathogen for the first time.                                       were produced separately in E.coli, extracted
+           ()      Anamnestic   response   is   elicited   on                                       and combined by creating disulphide bond
+                   subsequent  encounters  with  the  same                                          between them.
+                   pathogen.                                                                        Insulin used for  treating Diabetes was
+           4       Anamnestic response is due to memory of first                       Pro-hormone Insulin needs to be processed extracted from Cattles and Pigs.
+                   encounter.                                                              (d)
+                                                                                                    for converting into a  mature and functional
+ 187.   Match List- I with List -II.                                                                hormone.
+                                                                                                    Some patients develop allergic reactions to
+                List-I                     List-II                                                  the foreign insulin.
+          (a)Bronchioles          )      Dense Regular                                     Choose thee  most appropriate answer from the
+                                                Connective Tissue               (d) options given below: (1) and (e) only
+          6)   Goblet cell                                                                                                     (2) (i)    Loose Connective (a), (b) and (d) only
+                                                Tissue                                     3)       (b)  only
+          ()Tendons                       ii) Glandular Tissue                             (4)    )and (d) only
+          (d)    Adipose Tissue           (iv)   Ciliated Epithelium
+          Choose the correct answer from the options given                         191.   Ifa colour blind female marries a manwhose mother
+         below                                                                             was also colour blind, what are the chances of her
+          (1)       (a)-(ii), (b)-(iv), (c)- (i), (d)-()                                                     100% progeny having colour blindness?
+          (2)        (a)-(iv), (b)-                                                        (1)      25%
+                                     (ii), (¢)-),(G)-(i)                                   (2)
+          )       (a)-), 6)-(i),()-(ii), (d)- (iv)                                         (3)      50%
+          (4)      (a)-i), (b)-),)-(iv), (d)-(ii)                                                           75% (4)
+
+                                                                                   192.    Which  of the  following  are not the  effects  of
+188.   The recombination frequency between the genes a                                    Parathyroid  hormone?
+          &  c  is 5%,  b  &  c  is 15%,  b  &  d  is 9%,  a  &bis 20%,                             Stimulates the process of bone
+         c& d  is 24%  and a  &  d  is 29%.  What will be the                    (a) (b       Decreases Ca2t  level in                       resorption
+         sequence of these genes on a linear chromosome ?             ()       Reabsorption of Ca2+  by renal tubules blood
+         (1)    a,c,b, d                                                                            Decreases  the  absorption  of  Ca2+   from
+         (2)      a,d, b,c                                                                          digested food
+         (3)      d,b, a, c                                                                         Increases metabolism of carbohydrates
+         (4)        a, b, c,d                                                              Choose  the  most appropriate  answer  from  the
+                                                                                           options given below :
+                                                                                           )       b) and (c) only
+189.   Which one of the following statements is correct?                                   (2)         (a)  and () only
+         (1)      Increased ventricular pressure causes closing                            3       b)(d)  and (e) only
+                  of the semilunar valves.                                                 (4)         (a) and (e)  only
+         (2)      The atrio-ventricular node (AVN) generates                      193.     Ten  E.coli  cells with l5N    -  dsDNA are
+                  an action potential to stimulate atrial                                  medium  containing   14N   nucleotide.    After   60
+                  contraction                                                              minutes, how many  E.colicells will have DNA totally incubated in
+         3)      due  to  the  pressure  exerted  by  the The tricuspid and the bicuspid valves open free from15N?
+                                                         the atria                         (1)      80 cells
+                  simultaneous contraction of
+         (4)      duringjoint Blood moves freely from atrium to the ventricle                     (2)         20  cells 3)        40  cells
+                                   diastole.                                                 4          60  cells
+
+===== PAGE BREAK =====
+
+ 194.     Select the  incorrect statement regarding  synapses
+           (1)       Impulse  transmission  across   a   chemical 25                                                                                        R6
+                                                                                     198.    Match List - I with List- il with respect to methods
+                    synapse  is always  faster  than  that across  an                        of Contraception and their respective actions
+           (2)                                                                                                                          (a)    Diaphragms   () electrical synapse. List-I List- II
+                    The   membranes    of    presynaptic   and                                                               Inhibit ovulation and
+                    postsynaptic neurons  are in close  proximity                                                            Implantation
+                    in an electrical synapse.                                                Contraceptive (i)   Increase phagocytosis of
+           3)        Electrical current can flow  directly  from  one                              Pills                      sperm within Uterus
+                    neuron  into  the  other  acro[s  the'electrical                         (cIntra Uterine   (ii) Absence of Menstrual cycle
+           (4)        Chemical synapses use neurotransmitters synapse.                             Devices                 and ovulation following parturition
+
+
+                                                                                             (d)   Lactational          (iv)   They cover the cervix
+195.    Given  below  are two statements:                                            Choose the correct answer from the options  given Amenorrhea blocking the entry  of
+                                                                                                                              sperms
+          Statement I:                                                                      below:
+          Ina scrubber the exhaust from the thermal plant is                                  (1)       (a)-(ii), (b)-(i), ()-0.(d)-(v)
+          particles.                                                                                                                  (2)      (a)-iv),(b)-), (¢)-(ii), (d)- passed through the electric wires to charge the dust (i)
+          Statement II:                                                                       )(a)-(v), (b)-(), (¢)-(i), (a)- (ii
+          Particulate matter (PM  2.5) can not                                                (4)       (a)-(ii), (b)-(iv), (©)-(), (d)-(ii)
+          scrubber  but can be removed  by  an electrostatic be removed by
+          precipitator.                                                                  199.   Match List- I with List - II.
+          In the lightof the above statements, choose                                         List-I                          List-II
+          appropriate answer from the options given below:                 (Biological Molecules)      (Biological functions) the most
+          (1)       Statement I  is incorrect but Statement II is                b)       Globulin                (i)       Biocatalyst (a)        Glycogen                               Hormone
+                    correct
+          (2)       Both StatementI and Statement II are correct                                                         (iv Steroids (ii)      Antibody
+          (3)       Both Statement  I  and  Statement II  are                                          Thrombin                           Storage product
+                    incorrect                                                                          below Choose the correct answer from the options  given
+          (4)       Statement I  is  correct  but Statement II is                             (1)      a)-(iv), (b)-   (ii),
+                    incorrect                                                                 (2      (a)-(ii), (6)-(i),()-(iv),(d)- (e)-(),(a)-(i)
+                                                                                              )         (a)-(iv), (b)-(i), ()-(),(d)-(i)
+196.    Which of the following is not a desirable feature of a                                4)      (a)-(), (b)-(iv), (e)-(ii),
+         cloning vector?                                                                                                                 (d)-)
+         (1)      Presence of two or morerecognition sites                            200.    Which of the following is a  correct statement ?
+         (2)      Presence of origin of replication                                            (1)       Mycoplasma have DNA, Ribosome and cell
+         (3)       Presence of a marker gene                                                           wall
+                   Presence of single restriction enzyme site                                  (2)     Cyanobacteria  are  a group  of  autotrophic
+         (4)                                                                                           Organisms  classified  under   Kingdom
+                                                                                                       Monera.
+197.    Which of the following statements is not true?                                        6)       5acteria are  exclusively  heterotrophic
+
+                   Flippers of penguins and dolphins are a pair                                        organismns.
+         1)        of homologous organs                                                        (4      Slime  moulds  are  saprophytic  organisms
+
+
+                   Analogous  structures  are   a   result  of                                         classified under Kingdom Monera.
+          (2)      convergent evolution
+
+                                         and potato 1S  an example of
+          (3)      Sweet potato                                                                                        -     o  O o
+                   analogy
+                   Homology indicates common ancestry
+          (4)
