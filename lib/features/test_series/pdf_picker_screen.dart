@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/services/pdf_service.dart';
 import '../../core/database/question_repository.dart';
 import '../../core/models/question_model.dart';
@@ -231,7 +230,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                   Text(
                     _status,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AdaptiveColors.textPrimary(context),
                     ),
@@ -245,7 +244,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                     ElevatedButton.icon(
                       onPressed: _pickFile,
                       icon: const Icon(Icons.picture_as_pdf),
-                      label: const Text("UPLOAD NCERT BOOK"),
+                      label: const Text('Choose an NCERT PDF'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -268,7 +267,7 @@ class _PdfPickerScreenState extends ConsumerState<PdfPickerScreen> {
                 children: [
                   Text(
                     "Extracted Chapters",
-                    style: GoogleFonts.poppins(
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AdaptiveColors.textPrimary(context),
