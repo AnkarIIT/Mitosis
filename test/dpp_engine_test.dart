@@ -351,6 +351,39 @@ void main() {
       expect(refreshed.set.isCompleted, isFalse);
       // The refreshed paper must still be addressable by today's lookup.
       expect(refreshed.requestedQuestions, 10);
+      final stored = await database.getDppQuestions(refreshed.set.id);
+      expect(stored.length, 10);
+      expect(stored.every((q) => q.dppSetId == refreshed.set.id), isTrue);
+      final sets = await database.getDppSets();
+      expect(
+        sets.where((s) => s.userId == 1 && s.subject == 'Physics'),
+        hasLength(1),
+      );
+    });
+
+    test('same-day cache does not reuse a different requested count', () async {
+      final questions = [
+        for (int i = 0; i < 25; i++) _q('p_$i', 'Physics', 'Medium'),
+      ];
+      final database = await _createTestDatabase(questions);
+      final engine = DppEngine(
+        database,
+        QuestionRepository(database),
+        QuestionHistoryService(database),
+        MasteryService(database, Future.value(questions)),
+        random: Random(42),
+        userId: 1,
+      );
+
+      await engine.generate(
+        DppConfig.single(subject: 'Physics', totalQuestions: 10),
+      );
+      final result = await engine.generate(
+        DppConfig.single(subject: 'Physics', totalQuestions: 15),
+      );
+
+      expect(result.questions, hasLength(15));
+      expect(result.requestedQuestions, 15);
     });
   });
 
