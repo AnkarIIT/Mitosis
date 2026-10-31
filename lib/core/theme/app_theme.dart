@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'app_colors.dart';
 import 'tokens.dart';
 
@@ -78,59 +80,84 @@ class AdaptiveColors {
 
 class AppTheme {
   static TextTheme _textTheme(Color primary, Color subtle) {
-    return GoogleFonts.interTextTheme().copyWith(
-      displayLarge: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.5,
-      ),
-      displayMedium: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.4,
-      ),
-      displaySmall: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w700,
-      ),
-      headlineLarge: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w700,
-      ),
-      headlineMedium: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w700,
-      ),
-      headlineSmall: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w600,
-      ),
-      titleLarge: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w600,
-      ),
-      titleMedium: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w600,
-      ),
-      titleSmall: GoogleFonts.inter(
-        color: primary,
-        fontWeight: FontWeight.w500,
-      ),
-      bodyLarge: GoogleFonts.inter(color: primary, height: 1.5),
-      bodyMedium: GoogleFonts.inter(color: primary, height: 1.5),
-      bodySmall: GoogleFonts.inter(color: subtle, height: 1.45),
-      labelLarge: GoogleFonts.inter(color: subtle, fontWeight: FontWeight.w600),
-      labelMedium: GoogleFonts.inter(
-        color: subtle,
-        fontWeight: FontWeight.w500,
-      ),
-      labelSmall: GoogleFonts.inter(
-        color: subtle,
-        fontWeight: FontWeight.w500,
-        letterSpacing: 0.4,
-      ),
-    );
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    return Typography.material2021(platform: defaultTargetPlatform).black
+        .copyWith(
+          displayLarge: TextStyle(
+            color: primary,
+            fontSize: isIOS ? 34 : 40,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
+          displayMedium: TextStyle(
+            color: primary,
+            fontSize: 36,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.4,
+          ),
+          displaySmall: TextStyle(
+            color: primary,
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+          ),
+          headlineLarge: TextStyle(
+            color: primary,
+            fontSize: isIOS ? 34 : 32,
+            fontWeight: FontWeight.w700,
+          ),
+          headlineMedium: TextStyle(
+            color: primary,
+            fontSize: isIOS ? 22 : 28,
+            fontWeight: FontWeight.w600,
+          ),
+          headlineSmall: TextStyle(
+            color: primary,
+            fontSize: isIOS ? 20 : 24,
+            fontWeight: FontWeight.w600,
+          ),
+          titleLarge: TextStyle(
+            color: primary,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+          ),
+          titleMedium: TextStyle(
+            color: primary,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+          titleSmall: TextStyle(
+            color: primary,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+          bodyLarge: TextStyle(color: primary, fontSize: 18, height: 1.55),
+          bodyMedium: TextStyle(
+            color: primary,
+            fontSize: isIOS ? 17 : 16,
+            height: 1.5,
+          ),
+          bodySmall: TextStyle(
+            color: subtle,
+            fontSize: isIOS ? 15 : 14,
+            height: 1.45,
+          ),
+          labelLarge: TextStyle(
+            color: subtle,
+            fontSize: isIOS ? 17 : 14,
+            fontWeight: FontWeight.w600,
+          ),
+          labelMedium: TextStyle(
+            color: subtle,
+            fontSize: isIOS ? 15 : 13,
+            fontWeight: FontWeight.w500,
+          ),
+          labelSmall: TextStyle(
+            color: subtle,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.4,
+          ),
+        );
   }
 
   static const _lightScheme = ColorScheme(
@@ -155,7 +182,9 @@ class AppTheme {
     onSurface: AppColors.textDark,
     surfaceContainerHighest: AppColors.surfaceWarm,
     onSurfaceVariant: AppColors.textSubtle,
-    outline: Color(0xFFAAB9C9),
+    // Interactive outlines meet 4.5:1 against white; decorative dividers use
+    // outlineVariant and never serve as the only control boundary.
+    outline: Color(0xFF71817A),
     outlineVariant: AppColors.divider,
     shadow: Color(0xFF0F172A),
     scrim: Color(0xFF0F172A),
@@ -168,12 +197,12 @@ class AppTheme {
     brightness: Brightness.dark,
     primary: AppColors.primaryDark,
     onPrimary: AppColors.brandNavy,
-    primaryContainer: Color(0xFF123353),
-    onPrimaryContainer: Color(0xFFB9EFE9),
-    secondary: Color(0xFFBAC8D7),
-    onSecondary: Color(0xFF12243A),
-    secondaryContainer: Color(0xFF213B55),
-    onSecondaryContainer: Color(0xFFDFEAF4),
+    primaryContainer: Color(0xFF17483F),
+    onPrimaryContainer: Color(0xFFD0EAE2),
+    secondary: Color(0xFFC2CDC8),
+    onSecondary: Color(0xFF14221E),
+    secondaryContainer: Color(0xFF263C35),
+    onSecondaryContainer: Color(0xFFE0EAE5),
     tertiary: Color(0xFF34D399),
     onTertiary: Color(0xFF022C22),
     tertiaryContainer: Color(0xFF065F46),
@@ -186,12 +215,12 @@ class AppTheme {
     onSurface: AppColors.textLight,
     surfaceContainerHighest: AppColors.surfaceMutedDark,
     onSurfaceVariant: AppColors.textSubtleDark,
-    outline: Color(0xFF73869B),
+    outline: Color(0xFF81948D),
     outlineVariant: AppColors.dividerDark,
     shadow: Color(0xFF000000),
     scrim: Color(0xFF000000),
-    inverseSurface: Color(0xFFE8EEEC),
-    onInverseSurface: Color(0xFF152024),
+    inverseSurface: Color(0xFFE7EFEB),
+    onInverseSurface: Color(0xFF172724),
     inversePrimary: AppColors.primary,
   );
 
@@ -213,9 +242,16 @@ class AppTheme {
       scaffoldBackgroundColor: bg,
       colorScheme: scheme,
       textTheme: textTheme,
+      fontFamily: defaultTargetPlatform == TargetPlatform.iOS ? null : 'Roboto',
+      fontFamilyFallback: defaultTargetPlatform == TargetPlatform.iOS
+          ? null
+          : const ['NotoSansDevanagari'],
       cardColor: card,
       dividerColor: divider,
       splashFactory: InkRipple.splashFactory,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {TargetPlatform.iOS: CupertinoPageTransitionsBuilder()},
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: bg,
         foregroundColor: scheme.onSurface,
@@ -225,9 +261,9 @@ class AppTheme {
         systemOverlayStyle: isDark
             ? SystemUiOverlayStyle.light
             : SystemUiOverlayStyle.dark,
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: TextStyle(
           color: scheme.onSurface,
-          fontSize: 20,
+          fontSize: defaultTargetPlatform == TargetPlatform.iOS ? 22 : 20,
           fontWeight: FontWeight.w600,
         ),
         iconTheme: IconThemeData(color: scheme.onSurface),
@@ -249,14 +285,17 @@ class AppTheme {
           disabledBackgroundColor: scheme.primary.withValues(alpha: 0.4),
           disabledForegroundColor: scheme.onPrimary.withValues(alpha: 0.7),
           elevation: 0,
-          minimumSize: const Size(48, 48),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
+          minimumSize: const Size(48, 52),
+          padding: EdgeInsets.symmetric(
+            horizontal: defaultTargetPlatform == TargetPlatform.iOS ? 20 : 24,
+            vertical: 14,
           ),
-          textStyle: GoogleFonts.inter(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          textStyle: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 15,
+            fontSize: defaultTargetPlatform == TargetPlatform.iOS ? 17 : 16,
           ),
         ),
       ),
@@ -264,14 +303,17 @@ class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
-          minimumSize: const Size(48, 48),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
+          minimumSize: const Size(48, 52),
+          padding: EdgeInsets.symmetric(
+            horizontal: defaultTargetPlatform == TargetPlatform.iOS ? 20 : 24,
+            vertical: 14,
           ),
-          textStyle: GoogleFonts.inter(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          textStyle: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 15,
+            fontSize: defaultTargetPlatform == TargetPlatform.iOS ? 17 : 16,
           ),
         ),
       ),
@@ -279,43 +321,40 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: scheme.primary,
           side: BorderSide(color: scheme.primary.withValues(alpha: 0.45)),
-          minimumSize: const Size(48, 48),
+          minimumSize: const Size(48, 52),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
-          textStyle: GoogleFonts.inter(
+          textStyle: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 15,
+            fontSize: defaultTargetPlatform == TargetPlatform.iOS ? 17 : 15,
           ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: scheme.primary,
-          textStyle: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
+          textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
       ),
       dividerTheme: DividerThemeData(color: divider, thickness: 1, space: 24),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? AppColors.surfaceMutedDark : AppColors.surfaceWarm,
-        hintStyle: GoogleFonts.inter(color: scheme.onSurfaceVariant),
-        labelStyle: GoogleFonts.inter(color: scheme.onSurfaceVariant),
+        hintStyle: TextStyle(color: scheme.onSurfaceVariant),
+        labelStyle: TextStyle(color: scheme.onSurfaceVariant),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide(color: divider),
+          borderSide: BorderSide(color: scheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide(color: divider),
+          borderSide: BorderSide(color: scheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -337,7 +376,7 @@ class AppTheme {
         height: 68,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return GoogleFonts.inter(
+          return TextStyle(
             fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
             fontSize: 12,
             color: selected ? scheme.primary : scheme.onSurfaceVariant,
@@ -360,7 +399,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.full),
         ),
-        labelStyle: GoogleFonts.inter(
+        labelStyle: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
           color: scheme.onSurface,
@@ -373,7 +412,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
         elevation: 8,
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: scheme.onSurface,
@@ -385,7 +424,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        contentTextStyle: GoogleFonts.inter(fontSize: 14, color: Colors.white),
+        contentTextStyle: TextStyle(fontSize: 14, color: Colors.white),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: card,
