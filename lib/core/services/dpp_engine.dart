@@ -277,6 +277,41 @@ class DppEngine {
     return 'Medium'; // default fallback
   }
 
+  static String _normalizeSubject(String subject) {
+    final value = subject.trim().toLowerCase();
+    if (value == 'botany' || value == 'zoology' || value == 'biology') {
+      return 'biology';
+    }
+    return value;
+  }
+
+  static bool _matchesSubject(String actual, String requested) =>
+      _normalizeSubject(actual) == _normalizeSubject(requested);
+
+  static bool _matchesWeightedSubject(String actual, String requested) {
+    final a = actual.trim().toLowerCase();
+    final r = requested.trim().toLowerCase();
+    if (r == 'botany' || r == 'zoology') return a == r;
+    return _matchesSubject(actual, requested);
+  }
+
+  bool _matchesRequestedPaper(List<db.DppQuestion> saved, DppConfig config) {
+    if (saved.length != config.totalQuestions || saved.isEmpty) return false;
+    for (final row in saved) {
+      if (!config.subjects.any((s) => _matchesSubject(row.subject, s)))
+        return false;
+      if (config.chapterId != null &&
+          config.chapterId!.isNotEmpty &&
+          row.chapter != config.chapterId)
+        return false;
+      if (config.topicId != null &&
+          config.topicId!.isNotEmpty &&
+          row.topicId != config.topicId)
+        return false;
+    }
+    return true;
+  }
+
   /// Returns topic IDs sorted by ascending mastery (weakest first) for the
   /// given subjects, using the [MasteryService].
   Future<List<String>> _getWeakTopicIds(List<String> subjects) async {
@@ -293,7 +328,10 @@ class DppEngine {
     final existing = await _db.getTodayDppSet(primarySubject, userId: _userId);
     if (existing != null && !forceRefresh) {
       final savedQuestions = await _db.getDppQuestions(existing.id);
-      if (savedQuestions.isNotEmpty) {
+      if (_matchesRequestedPaper(savedQuestions, config)) {
+        // A day holds a single paper per subject. Reuse it (completed or not)
+        // when the same paper is requested — regenerating would just churn the
+        // row without giving the candidate anything new.
         final questions = savedQuestions
             .map(
               (q) => Question(
@@ -345,29 +383,36 @@ class DppEngine {
           ? const Value.absent()
           : Value<String?>(config.topicId!),
     );
-    final setId = await _db.insertDppSet(companion);
-
-    final dppQuestions = selected
-        .map(
-          (q) => db.DppQuestionsCompanion.insert(
-            userId: _userId,
-            dppSetId: Value<int?>(setId),
-            questionId: q.id,
-            subject: q.subject,
-            chapter: q.chapter,
-            topic: q.topic,
-            topicId: q.topicId,
-            difficulty: q.difficulty,
-            questionText: q.questionText,
-            options: jsonEncode(q.options),
-            correctAnswer: q.correctAnswer,
-            explanation: Value(q.explanation),
-            year: Value(q.year),
-          ),
-        )
-        .toList();
-
-    await _db.insertDppQuestions(dppQuestions);
+    late int setId;
+    await _db.transaction(() async {
+      // One set per (user, day, subject). A refresh — or a different paper on
+      // the same day — replaces today's set; leaving the old row behind would
+      // make `getTodayDppSet`'s single-row lookup throw.
+      if (existing != null) {
+        await _db.deleteDppSet(existing.id);
+      }
+      setId = await _db.insertDppSet(companion);
+      final dppQuestions = selected
+          .map(
+            (q) => db.DppQuestionsCompanion.insert(
+              userId: _userId,
+              dppSetId: Value<int?>(setId),
+              questionId: q.id,
+              subject: q.subject,
+              chapter: q.chapter,
+              topic: q.topic,
+              topicId: q.topicId,
+              difficulty: q.difficulty,
+              questionText: q.questionText,
+              options: jsonEncode(q.options),
+              correctAnswer: q.correctAnswer,
+              explanation: Value(q.explanation),
+              year: Value(q.year),
+            ),
+          )
+          .toList();
+      await _db.insertDppQuestions(dppQuestions);
+    });
 
     final savedSet = db.DppSet(
       id: setId,
@@ -400,16 +445,13 @@ class DppEngine {
     Set<String> excludedIds,
   ) async {
     final all = await _questionRepo.getAllQuestionsFromDb();
-    var pool = all.where((q) {
-      if (config.subjects.contains(q.subject)) return true;
-      final subject = q.subject.toLowerCase();
-      return config.subjects.any(
-        (requested) =>
-            (requested.toLowerCase() == 'botany' ||
-                requested.toLowerCase() == 'zoology') &&
-            subject == 'biology',
-      );
-    }).toList();
+    var pool = all
+        .where(
+          (q) => config.subjects.any(
+            (requested) => _matchesSubject(q.subject, requested),
+          ),
+        )
+        .toList();
 
     // Exclude recently seen questions (full history).
     if (excludedIds.isNotEmpty) {
@@ -425,13 +467,28 @@ class DppEngine {
     // If too few unseen questions remain, relax the exclusion to avoid
     // an empty pool (but keep cooldown).
     if (pool.length < config.totalQuestions ~/ 2) {
-      pool = all.where((q) => config.subjects.contains(q.subject)).toList();
+      pool = all
+          .where(
+            (q) => config.subjects.any(
+              (requested) => _matchesSubject(q.subject, requested),
+            ),
+          )
+          .toList();
       if (excludedIds.isNotEmpty) {
         pool = pool.where((q) => !excludedIds.contains(q.id)).toList();
       }
       if (cooldownIds.isNotEmpty) {
         pool = pool.where((q) => !cooldownIds.contains(q.id)).toList();
       }
+    }
+
+    // Apply chapter/topic restrictions after relaxation so a recovery path can
+    // never leak questions from outside the requested drill.
+    if (config.chapterId != null && config.chapterId!.isNotEmpty) {
+      pool = pool.where((q) => q.chapter == config.chapterId).toList();
+    }
+    if (config.topicId != null && config.topicId!.isNotEmpty) {
+      pool = pool.where((q) => q.topicId == config.topicId).toList();
     }
 
     // Apply chapter frequency weighting (NEET PYQ-based boost).
@@ -453,14 +510,6 @@ class DppEngine {
         others.shuffle(_random);
         pool = [...weak, ...others];
       }
-    }
-
-    // Filter by chapter/topic if specified.
-    if (config.chapterId != null && config.chapterId!.isNotEmpty) {
-      pool = pool.where((q) => q.chapter == config.chapterId).toList();
-    }
-    if (config.topicId != null && config.topicId!.isNotEmpty) {
-      pool = pool.where((q) => q.topicId == config.topicId).toList();
     }
 
     return pool;
@@ -513,7 +562,7 @@ class DppEngine {
     }
 
     for (final attempt in attempts) {
-      if (!subjects.contains(attempt.subject)) continue;
+      if (!subjects.any((s) => _matchesSubject(attempt.subject, s))) continue;
       final raw = attempt.questionIds;
       if (raw == null || raw.isEmpty) continue;
       try {
@@ -634,18 +683,16 @@ class DppEngine {
   ) {
     final weights = config.subjectWeights!;
     final picked = <Question>[];
+    final pickedIds = <String>{};
     final usedConcepts = <String>{};
     final subjectPools = <String, List<Question>>{};
     final subjectPickedCount = <String, int>{};
 
     // Group pool by subject
     for (final subject in config.subjects) {
-      subjectPools[subject] = pool.where((q) {
-        if (q.subject == subject) return true;
-        final requested = subject.toLowerCase();
-        return (requested == 'botany' || requested == 'zoology') &&
-            q.subject.toLowerCase() == 'biology';
-      }).toList();
+      subjectPools[subject] = pool
+          .where((q) => _matchesWeightedSubject(q.subject, subject))
+          .toList();
       subjectPickedCount[subject] = 0;
     }
 
@@ -710,12 +757,14 @@ class DppEngine {
         var taken = 0;
         for (final q in buckets[i]) {
           if (taken >= targetsPerDiff[i]) break;
+          if (pickedIds.contains(q.id)) continue;
           // Concept deduplication
           if (config.deduplicateConcepts &&
               _hasConceptOverlap(q, usedConcepts)) {
             continue;
           }
           picked.add(q);
+          pickedIds.add(q.id);
           _addQuestionConcepts(q, usedConcepts);
           taken++;
           subjectPickedCount[subject] = (subjectPickedCount[subject] ?? 0) + 1;
@@ -726,18 +775,20 @@ class DppEngine {
       final currentSubjectCount = subjectPickedCount[subject] ?? 0;
       if (currentSubjectCount < target) {
         final remaining = subjectPool
-            .where((q) => !picked.contains(q))
+            .where((q) => !pickedIds.contains(q.id))
             .toList();
         remaining.shuffle(_random);
         final needed = target - currentSubjectCount;
         var backfillTaken = 0;
         for (final q in remaining) {
           if (backfillTaken >= needed) break;
+          if (pickedIds.contains(q.id)) continue;
           if (config.deduplicateConcepts &&
               _hasConceptOverlap(q, usedConcepts)) {
             continue;
           }
           picked.add(q);
+          pickedIds.add(q.id);
           _addQuestionConcepts(q, usedConcepts);
           backfillTaken++;
         }
@@ -747,7 +798,7 @@ class DppEngine {
 
     // If still short overall, backfill from all subjects
     if (picked.length < totalCount) {
-      final remaining = pool.where((q) => !picked.contains(q)).toList();
+      final remaining = pool.where((q) => !pickedIds.contains(q.id)).toList();
       remaining.shuffle(_random);
       for (final q in remaining) {
         if (picked.length >= totalCount) break;
@@ -755,6 +806,7 @@ class DppEngine {
           continue;
         }
         picked.add(q);
+        pickedIds.add(q.id);
         _addQuestionConcepts(q, usedConcepts);
       }
     }
