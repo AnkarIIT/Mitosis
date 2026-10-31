@@ -1,5 +1,3 @@
-library chapter_landing_screen;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -52,14 +50,7 @@ class ChapterLandingScreen extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        _subjectColor(chapter.subject).withValues(alpha: 0.9),
-                        _subjectColor(chapter.subject).withValues(alpha: 0.7),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: const BorderRadius.vertical(
                       bottom: Radius.circular(32),
                     ),
@@ -78,9 +69,9 @@ class ChapterLandingScreen extends ConsumerWidget {
                                   'Progress',
                                   style: Theme.of(context).textTheme.labelLarge
                                       ?.copyWith(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.8,
-                                        ),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimaryContainer,
                                       ),
                                 ),
                                 const SizedBox(height: 4),
@@ -90,7 +81,9 @@ class ChapterLandingScreen extends ConsumerWidget {
                                       .textTheme
                                       .headlineSmall
                                       ?.copyWith(
-                                        color: Colors.white,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimaryContainer,
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
@@ -111,16 +104,21 @@ class ChapterLandingScreen extends ConsumerWidget {
                                   child: CircularProgressIndicator(
                                     value: progressFraction,
                                     strokeWidth: 6,
-                                    backgroundColor: Colors.white24,
-                                    valueColor: const AlwaysStoppedAnimation(
-                                      Colors.white,
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer
+                                        .withValues(alpha: .18),
+                                    valueColor: AlwaysStoppedAnimation(
+                                      AdaptiveColors.primary(context),
                                     ),
                                   ),
                                 ),
                                 Text(
                                   '${(progressFraction * 100).round()}%',
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -137,17 +135,22 @@ class ChapterLandingScreen extends ConsumerWidget {
                         child: LinearProgressIndicator(
                           value: progressFraction,
                           minHeight: 8,
-                          backgroundColor: Colors.white24,
-                          valueColor: const AlwaysStoppedAnimation(
-                            Colors.white,
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer
+                              .withValues(alpha: .18),
+                          valueColor: AlwaysStoppedAnimation(
+                            AdaptiveColors.primary(context),
                           ),
                         ),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         '$completedCount/${chapter.lessons.length} lessons',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
@@ -157,16 +160,19 @@ class ChapterLandingScreen extends ConsumerWidget {
                       Row(
                         children: [
                           _buildMetaChip(
+                            context,
                             Icons.timer_outlined,
                             '${chapter.totalEstimatedMinutes} min',
                           ),
                           const SizedBox(width: 12),
                           _buildMetaChip(
+                            context,
                             Icons.menu_book_outlined,
                             '${chapter.lessons.length} lessons',
                           ),
                           const SizedBox(width: 12),
                           _buildMetaChip(
+                            context,
                             Icons.quiz_outlined,
                             '${chapter.summaryQuiz.length} quiz Qs',
                           ),
@@ -211,8 +217,8 @@ class ChapterLandingScreen extends ConsumerWidget {
                       icon: const Icon(Icons.quiz_outlined),
                       label: const Text('Take Chapter Quiz'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _subjectColor(chapter.subject),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AdaptiveColors.primary(context),
+                        foregroundColor: AdaptiveColors.onPrimary(context),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -235,23 +241,25 @@ class ChapterLandingScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetaChip(IconData icon, String label) {
+  Widget _buildMetaChip(BuildContext context, IconData icon, String label) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
+          color: Theme.of(
+            context,
+          ).colorScheme.onPrimaryContainer.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 18),
+            Icon(icon, color: AdaptiveColors.primary(context), size: 18),
             const SizedBox(width: 6),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
               ),
@@ -354,20 +362,5 @@ class ChapterLandingScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Color _subjectColor(String subject) {
-    switch (subject.toLowerCase()) {
-      case 'physics':
-        return const Color(0xFF1E88E5);
-      case 'chemistry':
-        return const Color(0xFFE53935);
-      case 'biology':
-      case 'botany':
-      case 'zoology':
-        return const Color(0xFF009688);
-      default:
-        return const Color(0xFF1E88E5);
-    }
   }
 }
