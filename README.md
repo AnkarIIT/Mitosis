@@ -9,7 +9,7 @@ NEET Mitos helps you practice for the NEET-UG exam with Daily Practice Papers (D
 ## Features
 
 - **Offline-first**: quizzes, DPPs, exams, and flashcards work 100% offline using a local Drift (SQLite) database.
-- **Full-length NEET mocks**: NTA-compliant 180-question / 180-minute simulation with per-section timing, optional Section-B, and checkpoint/resume.
+- **Full-length NEET-style practice mocks**: 180-question / 180-minute simulations with per-section timing, optional Section-B, and checkpoint/resume.
 - **Daily Practice Papers**: difficulty-normalized, weak-topic-biased sampling with deterministic daily seeding.
 - **Adaptive quiz engine**: option shuffling, visited/flagged palette, hint system, and short-answer AI evaluation.
 - **Spaced repetition**: SM-2 based flashcards and error-book review.
