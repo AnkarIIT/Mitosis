@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/providers/providers.dart';
+import '../../../core/models/learning_recommendation.dart';
 import '../../../core/services/exam_engine_service.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/tokens.dart';
 
@@ -18,15 +18,22 @@ class HomeTab extends ConsumerWidget {
     final rawName = (user?.fullName ?? user?.username ?? 'Student').trim();
     final name = rawName.isEmpty ? 'Student' : rawName.split(' ').first;
     final stats = ref.watch(overallStatsProvider);
-    final streak = ref.watch(
-      userProgressProvider.select((s) => s.currentStreak),
-    );
+    final attempted = (stats['totalAttempted'] as num).toInt();
+    final recommendations = ref.watch(learningRecommendationsProvider);
+    final recommendation = attempted == 0 || recommendations.isEmpty
+        ? null
+        : recommendations.first;
     final dailyGoal = ref.watch(dailyGoalProvider);
+    final hasChosenDailyCommitment = ref
+        .watch(userPreferencesProvider)
+        .dailyCommitmentMinutes != null;
     final dueCount = ref.watch(dueCardsProvider).valueOrNull?.length ?? 0;
     final completed = dailyGoal['completed'] as int;
-    final target = dailyGoal['target'] as int;
+    final target = hasChosenDailyCommitment
+        ? dailyGoal['target'] as int
+        : null;
+    final subjects = ref.watch(subjectsProvider);
     final accuracy = (stats['accuracy'] as num).toDouble();
-    final attempted = stats['totalAttempted'];
     final hour = DateTime.now().hour;
     final greeting = hour < 12
         ? 'Good morning'
@@ -37,106 +44,142 @@ class HomeTab extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AdaptiveColors.background(context),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        greeting,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AdaptiveColors.textSecondary(context),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              greeting,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: AdaptiveColors.textSecondary(
+                                      context,
+                                    ),
+                                  ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              name,
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        name,
-                        style: Theme.of(context).textTheme.headlineMedium,
+                      IconButton(
+                        tooltip: 'Your profile',
+                        onPressed: () => context.go('/you'),
+                        icon: const Icon(Icons.person_outline_rounded),
                       ),
                     ],
                   ),
-                ),
-                IconButton(
-                  tooltip: 'Your profile',
-                  onPressed: () => context.go('/you'),
-                  icon: const Icon(Icons.person_outline_rounded),
-                ),
-              ],
-            ),
-            const SizedBox(height: 22),
-            _TodayActionCard(
-              completed: completed,
-              target: target,
-              onTap: () => context.push('/study-plan'),
-            ),
-            if (dueCount > 0) ...[
-              const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.replay_rounded),
-                  title: Text('$dueCount cards ready to review'),
-                  subtitle: const Text('A quick review helps it stick.'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.go('/study'),
-                ),
-              ),
-            ],
-            const SizedBox(height: 12),
-            const _ResumeMockCard(),
-            const SizedBox(height: 24),
-            Text(
-              'A little progress adds up.',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.show_chart_rounded),
-                title: Text(
-                  '${accuracy.toStringAsFixed(0)}% practice accuracy',
-                ),
-                subtitle: Text(
-                  '$attempted questions attempted · $streak day streak',
-                ),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => context.go('/you'),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Featured Subjects',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            for (final subject in const [
-              (name: 'Physics', id: 'phys', color: SubjectColors.physics),
-              (name: 'Chemistry', id: 'chem', color: SubjectColors.chemistry),
-              (
-                name: 'Biology (Botany)',
-                id: 'bot',
-                color: SubjectColors.biology,
-              ),
-              (
-                name: 'Biology (Zoology)',
-                id: 'zoo',
-                color: SubjectColors.biologyDark,
-              ),
-            ])
-              Card(
-                child: ListTile(
-                  leading: Icon(Icons.science, size: 24, color: subject.color),
-                  title: Text(subject.name),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push(
-                    '/subjects/${subject.id}?subjectName=${subject.name}',
+                  const SizedBox(height: 28),
+                  _TodayActionCard(
+                    completed: completed,
+                    target: target,
+                    title: recommendation == null
+                        ? attempted == 0
+                              ? 'Start with one question'
+                              : 'Choose your next study session'
+                        : '${recommendation.primaryAction == LearningActionType.revise ? 'Revise' : 'Practice'} ${recommendation.topicName}',
+                    supportingText: recommendation == null
+                        ? target == null
+                              ? 'Pick a subject and study at your own pace.'
+                              : '$completed of $target questions practiced today'
+                        : '${recommendation.subject} · Suggested from your practice history',
+                    actionLabel: recommendation == null
+                        ? 'Browse subjects'
+                        : recommendation.primaryAction ==
+                              LearningActionType.revise
+                        ? 'Open revision'
+                        : 'Practice this topic',
+                    onTap: () {
+                      if (recommendation == null) {
+                        context.go('/study');
+                      } else if (recommendation.primaryAction ==
+                          LearningActionType.revise) {
+                        context.push(
+                          '/resources/notes?chapterId='
+                          '${Uri.encodeComponent(recommendation.chapterId)}',
+                        );
+                      } else {
+                        context.push(
+                          '/quiz?topicId=${Uri.encodeComponent(recommendation.topicId)}'
+                          '&topicName=${Uri.encodeComponent(recommendation.topicName)}'
+                          '&subject=${Uri.encodeComponent(recommendation.subject)}',
+                        );
+                      }
+                    },
                   ),
-                ),
+                  if (dueCount > 0) ...[
+                    const SizedBox(height: 12),
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.replay_rounded),
+                        title: Text('$dueCount cards ready to review'),
+                        subtitle: const Text('A quick review helps it stick.'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.go('/study?section=review'),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  const _ResumeMockCard(),
+                  if (attempted == 0) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      'Start with a subject',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        for (var index = 0;
+                            index < subjects.length && index < 3;
+                            index++) ...[
+                          if (index > 0) const SizedBox(width: 8),
+                          Expanded(
+                            child: _QuickStartSubjectButton(
+                              name: subjects[index].name,
+                              subjectId: subjects[index].id,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ] else ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      'Your progress',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.insights_outlined),
+                        title: Text(
+                          '${accuracy.toStringAsFixed(0)}% practice accuracy',
+                        ),
+                        subtitle: Text('All time · Across $attempted questions'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.go('/you'),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-          ],
+            ),
+          ),
         ),
       ),
     );
@@ -145,69 +188,82 @@ class HomeTab extends ConsumerWidget {
 
 class _TodayActionCard extends StatelessWidget {
   final int completed;
-  final int target;
+  final int? target;
+  final String title;
+  final String supportingText;
+  final String actionLabel;
   final VoidCallback onTap;
 
   const _TodayActionCard({
     required this.completed,
     required this.target,
+    required this.title,
+    required this.supportingText,
+    required this.actionLabel,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final progress = target <= 0 ? 0.0 : (completed / target).clamp(0.0, 1.0);
+    final progress = target == null || target! <= 0
+        ? 0.0
+        : (completed / target!).clamp(0.0, 1.0);
     return Material(
-      color: AppColors.brandNavy,
-      borderRadius: BorderRadius.circular(AppRadius.xl),
+      color: AdaptiveColors.primary(context),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: InkWell(
-        borderRadius: BorderRadius.circular(AppRadius.xl),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'YOUR NEXT STEP',
-                style: TextStyle(
-                  color: Color(0xFF9CCBCB),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+              Text(
+                'Your next step',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: AdaptiveColors.onPrimary(context).withValues(alpha: 0.8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 1,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                "Today's study plan",
-                style: TextStyle(
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.white,
                   fontSize: 20,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                '$completed of $target minutes completed',
-                style: const TextStyle(color: Color(0xFFD5E1EA), fontSize: 14),
-              ),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.full),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 6,
-                  backgroundColor: Colors.white.withValues(alpha: .18),
-                  color: AppColors.brandTeal,
+                supportingText,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AdaptiveColors.onPrimary(context).withValues(alpha: 0.88),
                 ),
               ),
-              const SizedBox(height: 16),
-              const Row(
+              if (target != null) ...[
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppRadius.full),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: Colors.white.withValues(alpha: .18),
+                    color: AdaptiveColors.onPrimary(context),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
-                    'Start studying',
+                    actionLabel,
                     style: TextStyle(
-                      color: Color(0xFF082B3C),
+                      color: AdaptiveColors.onPrimary(context),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -215,7 +271,7 @@ class _TodayActionCard extends StatelessWidget {
                   Icon(
                     Icons.arrow_forward_rounded,
                     size: 18,
-                    color: Color(0xFF082B3C),
+                    color: AdaptiveColors.onPrimary(context),
                   ),
                 ],
               ),
@@ -225,6 +281,33 @@ class _TodayActionCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _QuickStartSubjectButton extends StatelessWidget {
+  final String name;
+  final String subjectId;
+
+  const _QuickStartSubjectButton({required this.name, required this.subjectId});
+
+  @override
+  Widget build(BuildContext context) => OutlinedButton(
+    onPressed: () => context.push(
+      '/subjects/$subjectId?subjectName=${Uri.encodeComponent(name)}',
+    ),
+    style: OutlinedButton.styleFrom(
+      minimumSize: const Size(0, 48),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+    ),
+    child: Text(
+      name,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: Theme.of(context).textTheme.labelMedium,
+    ),
+  );
 }
 
 class _ResumeMockCard extends ConsumerWidget {
