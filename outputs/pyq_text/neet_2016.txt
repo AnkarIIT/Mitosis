@@ -1,0 +1,2472 @@
+                          NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                          Paper - 2016 (Code AA)
+
+                                                         NEET 2 - 2016
+                                            (Physics, Chemistry and Biology)
+                                                             Code AA
+
+               Time: 3 hrs                                                                     Total Marks: 720
+
+               General Instructions:
+               1.    The Answer Sheet is inside this Test Booklet. When you are directed to open
+                     the Test Booklet, take out the Answer Sheet and fill in the particulars on Side-
+                     1 and Side-2 carefully with blue/black ballpoint pen only.
+               2.    The test is of 3 hours duration and Test Booklet contains 180 questions. Each
+                     question carries 4 marks. For each correct response, the candidate will get 4
+                     marks. For each incorrect response, one mark will be deducted from the total
+                     score. The maximum marks are 720.
+               3.    Use   Blue/Black  Ballpoint  Pen            only  for  writing  particulars  on  this
+                     page/ marking responses.
+               4.    Rough work       is to be done on the space provided for this purpose in the
+                     Test Booklet only.
+               5.    On completion of the test, the candidate must hand over the Answer Sheet to
+                     the Invigilator before leaving the Room/Hall. The candidates are allowed to
+                     take away Test Booklet only with them.
+               6.    The CODE for this Test Booklet is AA. Make sure that the CODE printed on
+                     Side-2 of the Answer Sheet is the same as that on this Test Booklet. In case
+                     of discrepancy, the candidate should immediately report the matter to the
+                     Invigilator for replacement of both the Test Booklet and the Answer Sheet.
+               7.    The candidate should ensure that the Answer Sheet is not folded. Do not
+                     make any stray marks on the Answer Sheet. Do not write your Roll No.
+                     anywhere else except in the specified space in the Test Booklet/Answer Sheet.
+               8.    Use of white fluid for correction is not permissible on the Answer Sheet.
+               9.    Each candidate must show on demand his/her Admit Card to the Invigilator.
+               10.   No   candidate,   without   special   permission   of   the   Superintendent   or
+                     Invigilator, would leave his/her seat.
+               11.   The candidates should not leave the Examination Hall without handing over
+                     their Answer Sheet to the Invigilator on duty and sign the Attendance Sheet
+                     twice. Cases where a candidate has not signed the Attendance Sheet second
+                     time will be deemed not to have banded over the Answer Sheet and dealt
+                     with as an unfair means case.
+               12.   Use of Electronic/Manual Calculator is prohibited.
+               13.   The candidates are governed by all Rules and Regulations of the Board with
+                     regard to their conduct in the Examination Hall. All cases of unfair means will
+                     be dealt with as per Rules and Regulations of the Board.
+               14.   No part of the Test Booklet and Answer Sheet shall be detached under any
+                     circumstances.
+
+
+
+===== PAGE BREAK =====
+
+                             NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper - 2016 (Code AA)
+
+
+                 15.    The candidates will write the correct Test Booklet Code as given in the Test
+                        Booklet/Answer Sheet in the Attendance Sheet.
+
+
+
+                                                                     Physics
+                      1. Planck’s constant (h), speed of light in vacuum (c) and Newton’s gravitational
+                          constant  (G)  are  three  fundamental  constants.  Which  of  the  following
+                          combinations of these has the dimension of length?
+                           (1)    hG
+
+
+                               c3 / 2
+                                   hG
+
+
+
+
+
+
+                           (2)   5 / 2
+                               c
+                           (3)   hc
+                                   G
+
+
+                                   Gc
+
+
+
+
+                           (4)    h3 / 2
+                      2. Two cars P and Q start from a point at the same time in a straight line and                          their
+                          positions are represented by xP(t) = at + bt2 and xQ(t) = ft  t2. At what
+                          time do the cars have the same velocity?
+                          (1) a  f
+                               1  b
+                                 a  f
+
+
+                          (2)  2 b  1 
+                                 
+                                 a  f
+
+
+                          (3)  2 1  b 
+                                 
+                                 f  a
+
+
+                          (4)  2 1  b
+                                      
+                      3. In the given figure, a = 15 m/s            2 represents the total acceleration of a particle
+                          moving in the clockwise direction in a circle of radius R = 2.5 m at a given
+                          instant of time. The speed of the particle is
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                            NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                            Paper - 2016 (Code AA)
+
+
+                        (1) 4.5 m/s
+                        (2) 5.0 m/s
+                        (3) 5.7 m/s
+                        (4) 6.2 m/s
+
+
+                    4.  A rigid ball of mass m strikes a rigid wall at 60               and gets reflected without
+                        loss of speed as shown in the figure below. The value of impulse imparted by
+                        the wall on the ball will be
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        (1) mV
+                        (2) 2mV
+                        (3) mV
+                                  2
+                        (4) mV
+                                  3
+
+                    5.  A bullet of mass 10 g moving horizontally with a velocity of 400 m s-1 strikes
+                        a  wooden  block  of  mass  2  kg  which  is  suspended  by  a  light  inextensible
+                        string of length 5 m. As a result, the centre of gravity of the block is found to
+                        rise a vertical distance of 10 cm. The speed of the bullet after it emerges out
+                        horizontally from the block will be
+                        (1) 100 m s-1
+                        (2) 80 m s-1
+                        (3) 120 m s-1
+                        (4) 160 m s-1
+
+                    6.  Two  identical  balls  A  and  B  having  velocities  of  0.5  m/s  and               0.3  m/s,
+                        respectively  collide  elastically  in  one  dimension.  The  velocities  of  B  and  A
+                        after the collision respectively will be
+                        (1) 0.5 m/s and 0.3 m/s
+                        (2) 0.5 m/s and 0.3 m/s
+                        (3) 0.3 m/s and 0.5 m/s
+                        (4) 0.3 m/s and 0.5 m/s
+
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                    7.  A particle moves from a point 2iˆ  5jˆ to 4jˆ  3kˆ when a force of 4iˆ  3jˆ
+                        N is applied. How much work has been done by the force?
+                        (1) 8 J
+                        (2) 11 J
+                        (3) 5 J
+                        (4) 2 J
+
+                    8.  Two rotating bodies A and B of masses m and 2m with moments of inertia IA
+                        and IB (IB > IA) have equal kinetic energy of rotation. If LA and LB be their
+                        angular momenta respectively, then
+                        (1) L     L  B
+                             A      2
+                        (2) LA = 2LB
+                        (3) LB > LA
+                        (4) LA > LB
+
+                    9.  A solid sphere of mass m and radius R is rotating about its diameter. A solid
+                        cylinder of the same mass and same radius is also rotating about its
+                        geometrical axis with an angular speed twice that of the sphere. The ratio of
+                        their kinetic energies of rotation (Esphere / Ecylinder) will be
+                        (1) 2:3
+                        (2) 1:5
+                        (3) 1:4
+                        (4) 3:1
+
+                    10.   A light rod of length l has two masses m1 and m2 attached to its two ends.
+                          The moment of inertia of the system about an axis perpendicular to the rod
+                          and passing through the centre of mass is
+                          (1) m1m2 l2
+                              mm1  mm2
+                          (2)    1 m  m  2
+                                l2  1   2
+                          (3) m1  m2 l2
+
+                          (4)   m1m2 l2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                               NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                               Paper - 2016 (Code AA)
+
+
+                       11.    Starting  from  the  centre  of  the  Earth  having  radius  R,  the  variation  of  g
+                              (acceleration due to gravity) is shown by
+                              (1)
+
+
+
+
+
+                              (2)
+
+
+
+
+
+                              (3)
+
+
+
+
+
+                              (4)
+
+
+
+
+
+
+
+
+
+
+
+                       12.    A satellite of mass m is orbiting the Earth (of radius R) at a height h from
+                              its  surface.  The  total  energy  of  the  satellite  in  terms  of  g0,  the  value                       of
+                              acceleration due to gravity at the Earth's surface, is2
+                                    mg R
+                              (1)    0
+                                   2 R  h
+                               (2)    mg R2
+
+
+
+                                    2 R   h
+                                            0
+                                             
+                               (3) 2mg R2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                             R  h
+                                          0
+                               (4)  2,g R2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                          R  h
+                                           0
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                    13.   A rectangular film of liquid is extended from (4 cm                  2 cm) to (5 cm         4
+                          cm). If the work done is 3  104 J, the value of the surface tension of the
+                          liquid is
+                          (1) 0.250 Nm-1
+                          (2) 0.125 Nm-1
+                          (3) 0.2 Nm-1
+                          (4) 8.0 Nm-1
+
+                    14.   Three liquids of densities 1, 2  and 3 (with 1 > 2 > 3), having the same
+                          value  of  surface  tension  T,  rise  to  the  same  height  in  three  identical
+                          capillaries. The angles of contact 1, 2 and 3 obey
+                          (1)                0
+                               2       1     2     3
+                          (2) 0               
+                                    1     2      3    2
+                          (3)                    
+                               2        1      2       3
+                          (4)      
+                                    1     2    3    2
+
+
+                    15.   Two  identical  bodies  are  made  of  a  material  for  which  the  heat  capacity
+                          increases with temperature. One of these is at 100 °C, while the other one
+                          is at 0 °C. If the two bodies are brought into contact, then, assuming no
+                          heat loss, the final common temperature is
+                          (1) 50 C
+                          (2) More than 50 C
+                          (3) Less than 50 C but greater than 0 C
+                          (4) 0 C
+
+                    16.   A  body  cools  from  a  temperature  3T  to  2T  in  10  minutes.  The  room
+                          temperature is T. Assume that Newton’s law of cooling is applicable. The
+                          temperature of the body at the end of next of 10 minutes will be
+                          (1) 7     T
+                                 4
+                          (2)    3 T
+                               2
+                          (3)    4 T
+                               3
+                          (4) T
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+
+                    17.  One mole of an ideal monatomic gas undergoes a process described by the
+                          equation PV3 = constant. The heat capacity of the gas during this process is
+                          (1)   3 R
+                              2
+                          (2) 5    R
+                                2
+                          (3) 2R
+                          (4) R
+
+                    18.  The temperature inside a refrigerator is t2 °C and the room temperature is
+                          t1 °C. The amount of heat delivered to the room for each joule of electrical
+                          energy consumed ideally will be
+                                 t1
+                           (1) t  t
+                               1     2
+                          (2) t1  273
+                               t1  t2
+                          (3) t 2  273
+                               t1  t2
+                          (4) t1  t2
+
+                              t1  273
+                    19.   A given sample of an ideal gas occupies a volume V at a pressure P and
+
+                          absolute temperature T. The mass of each molecule of the gas is m. Which
+                          of the following gives the density of the gas?
+                          (1)  P
+                                  kT    
+                          (2) Pm
+                                   kT
+                          (3) P kTV
+
+                          (4) mkT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+
+                    20.   A body of mass m is attached to the lower end of a spring whose upper end
+                          is fixed. The spring has negligible mass. When the mass m is slightly pulled
+                          down and released, it oscillates with a time period of 3 s. When the mass m
+                          is increased by 1 kg, the time period of oscillations becomes 5 s. The value
+                          of m in kg is :
+                          (1) 3
+                                4
+                          (2)   4
+                              3
+                          (3) 16
+                                  9
+                          (4)     9
+                              16
+
+                    21.   The second overtone of an open organ pipe has the same frequency as the
+                          first overtone of a closed pipe L meter long. The length of the open pipe will
+                          be
+                          (1) L
+                          (2) 2L
+                          (3) L
+                                2
+                          (4) 4L
+
+                    22.  Three sound waves of equal amplitudes have frequencies (n – 1), n, (n +
+                          1).  They  superimpose  to  give  beats.  The  number  of  beats  produced  per
+                          second will be
+                          (1) 1
+                          (2) 4
+                          (3) 3
+                          (4) 2
+
+                    23.   An electric dipole is placed at an angle of 30° with an electric field intensity
+                          2 × 105    N/C. It experiences a torque equal to 4 Nm. The charge on the
+                          dipole, if the dipole length is 2 cm, is
+                          (1) 8 mC
+                          (2) 2 mC
+                          (3) 5 mC
+                          (4) 7 C
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                             NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper - 2016 (Code AA)
+
+
+                     24.   A parallel- plate capacitor of area A, plate separation d and capacitance C is
+                           filled with four dielectric materials having dielectric constant k1, k2, k3 and
+                           k4 as shown in the figure below. If a single dielectric material is to be used
+                           to have the same capacitance C in this capacitor, then its dielectric constant
+                           k is given by
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                           (1) k = k1 + k2 + k3 + 3k4
+                           (2) k  2      k    k     k     2k
+                                       3     1     2      3         4
+                            (3) 2         3         1
+
+                                k    k    k   k      k
+                                       1     2     3     4
+                            (4) 1    1   1   1   3
+
+                                k      k   k     k     2k
+                                       1      2    3       4
+
+                     25.   The potential difference (VA – VB) between the points A and B in the given
+                           figure is
+
+
+
+
+                           (1) 3 V
+                           (2) +3 V
+                           (3) +6 V
+                           (4) +9 V
+
+                     26.   A filament bulb (500 W, 100 V) is to be used in a 230 V main supply. When
+                           a  resistance  R  is  connected  in  series,  it  works  perfectly  and  the  bulb
+                           consumes 500 W. The value of R is
+                           (1) 230 
+                           (2) 46 
+                           (3) 26 
+                           (4) 13 
+
+
+
+===== PAGE BREAK =====
+
+                            NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                            Paper - 2016 (Code AA)
+
+
+                    27.   A long wire carrying a steady current is bent into a circular loop of one turn.
+                           The  magnetic  field  at  the  centre  of  the  loop  is  B.  It  is  then  bent  into  a
+                           circular  coil  of  n  turns.  The  magnetic  field  at  the  centre  of  this  coil  of  n
+                           turns will be
+                           (1) nB
+                           (2) n2B
+                           (3) 2nB
+                           (4) 2n2B
+
+
+                    28.   A  bar  magnet  is  hung  by  a  thin  cotton  thread  in  a  uniform  horizontal
+                           magnetic field and is in equilibrium state. The energy required to rotate it
+                           by  60°  is  W.  Now  the  torque  required  to  keep  the  magnet  in  this  new
+                           position is
+                           (1) W
+                                   3
+
+                           (2)   3W
+                           (3)    3 W
+                               2W2
+
+                           (4)
+                                  3
+
+                    29.    An electron is moving in a circular path under the influence of a transverse
+                           magnetic field of 3.57 × 10–2 T. If the value of e/m is 1.76 × 1011                       C/kg,
+                           the frequency of revolution of the electron is
+                           (1) 1 GHz
+                           (2) 100 MHz
+                           (3) 62.8 MHz
+                           (4) 6.28 MHz
+
+                    30.    Which of the following combinations should be selected for better tuning of
+                           an L-C-R circuit used for communication?
+                           (1) R = 20 , L = 1.5 H, C = 35 F
+                           (2) R = 25 , L = 2.5 H, C = 45 F
+                           (3) R = 15 , L = 3.5 H, C = 30 F
+                           (4) R = 25 , L = 1.5 H, C = 45 F
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper - 2016 (Code AA)
+
+
+                      31.   A  uniform  magnetic  field  is  restricted  within  a  region  of  radius  r.  The
+                            magnetic field changes with time at a rate dB                         . Loop 1 of radius R > r
+                                                                                              dt
+                            encloses  the  region  r  and  loop  2  of  radius  R  is  outside  the  region  of
+                            magnetic field as shown in the figure below. Then the e.m.f. generated is
+
+
+
+
+
+
+
+
+
+
+
+                            (1) Zero in loop 1 and zero in loop 2
+                            (2)    dB        ( r 2 ) in loop 1 and  dB           ( r 2 ) in loop 2
+                                         dt                                     dt
+                            (3)    dB        ( R 2 ) in loop 1 and zero in loop 2
+                                         dt
+                                     dB            2
+                            (4)         dt ( r     ) in loop 1 and zero in loop 2
+
+
+
+                      32.   The potential differences across the resistance, capacitance and inductance
+                            are 80 V, 40 V and 100 V respectively in an L-C-R circuit. The power factor
+                            of this circuit is
+                            (1) 0.4
+                            (2) 0.5
+                            (3) 0.8
+                            (4) 1.0
+
+                      33.    A 100       resistance and a capacitor of 100                 reactance are connected in
+                            series across a 220 V source. When the capacitor is 50% charged, the peak
+                            value of the displacement current is
+                            (1) 2.2 A
+                            (2) 11 A
+                            (3) 4.4 A
+                            (4) 11      2 A
+
+                                                               3 
+
+                      34. Two identical glass            g  equiconvex lenses of focal length f each are
+                                                                   
+                                                               2 
+                            kept    in  contact. The             space between the two lenses  is filled  with water
+                                   4 
+
+                                   . The focal length of the combination is
+                                w      
+                                   3 
+
+
+===== PAGE BREAK =====
+
+                               NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                               Paper - 2016 (Code AA)
+
+
+                              (1)     f
+                                    3
+                              (2) f
+                                    4f
+                              (3)       3
+                              (4)   3f
+                                       4
+
+                       35.    An  air  bubble  in  a  glass  slab  with  refractive  index  1.5  (near  normal
+                              incidence)  is  5  cm  deep  when  viewed  from  one  surface  and  3  cm  deep
+                              when viewed from the opposite face. The thickness (in cm) of the slab is
+                              (1) 8
+                              (2) 10
+                              (3) 12
+                              (4) 16
+
+                       36.     The interference pattern is obtained with two coherent light sources ofi             i
+                              intensity ratio n. In the interference pattern, the ratio,                       max    min  will be
+
+                                                                                                              i     i
+                                                                                                              max     min
+
+                                      n
+
+
+
+
+                              (1) n  1
+
+
+
+
+                              (2) 2    n
+
+
+                                   n  1
+
+                                         n
+
+
+
+
+                              (3)          
+
+                                     n 2 n1 2
+                              (4)
+                                   n  12
+
+
+                       37.    A person can see clearly objects only when they lie between 50 cm and 400
+                              cm from his eyes. In order to increase the maximum distance of distinct
+                              vision to infinity, the type and power of the correcting lens, the person has
+                              to use, will be
+                              (1) Convex, + 2.25 diopter
+                              (2) Concave, – 0.25 diopter
+                              (3) Concave, – 0.2 diopter
+                              (4) Convex, + 0.15 diopter
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                    38.   A linear aperture whose width is 0.02 cm is placed immediately in front of a
+                          lens  of  focal  length  60  cm.  The  aperture  is  illuminated  normally  by  a
+                          parallel  beam  of  wavelength  5  ×  10-5          cm.  The  distance  of  the  first  dark
+
+                          band of the diffraction pattern from the centre of the screen is
+                          (1) 0.10 cm
+                          (2) 0.25 cm
+                          (3) 0.20 cm
+                          (4) 0.15 cm
+
+                    39.   Electrons of mass m with de-Broglie wavelength  fall on the target in an X-
+                          ray tube. The cutoff wavelength (0) of the emitted X-ray is :-
+                          (1)  0  2mc2 h
+
+
+                          (2)            2h
+                                 0     mc
+                                        2m2 c2 3
+                          (3)     0     2
+                                        h
+                          (4) 0
+
+                    40.   Photons  with  energy  5  eV  are  incident  on  a  cathode  C  in  a photoelectric
+                          cell. The maximum energy of emitted photoelectrons is 2 eV. When photons
+                          of energy 6 eV are incident on C, no photoelectrons will reach the anode A,
+                          if the stopping potential of A relative to C is:-
+                          (1) +3 V
+                          (2) +4 V
+                          (3) -1 V
+                          (4) -3 V
+
+                    41.   If an electron in a hydrogen atom jumps from the 3rd orbit to the 2nd orbit,
+                          it emits a photon of wavelength  . When it jumps from the 4th orbit to the
+                          3rd orbit, the corresponding wavelength of the photon will be :-
+                               16
+                          (1)      25 
+                          (2)      9 
+                               16
+                               20
+                          (3)      7 
+                          (4)      20 
+                               13
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                    42.   The half-life of a radioactive substance is 30 minutes. The time (in minutes)
+                          taken  between  40%  decay  and  85%  decay  of  the  same  radioactive
+                          substance is :-
+                          (1) 15
+                          (2) 30
+                          (3) 45
+                          (4) 60
+
+                    43.    For  CE  transistor  amplifier,  the  audio  signal  voltage  across  the  collector
+                           resistance of 2k is 4 V. If the current amplification factor of the transistor
+                           is 100 and the base resistance is 1 k, then the input signal voltage is :-
+                          (1) 10mV
+                          (2) 20mV
+                          (3) 30mV
+                          (4) 15mV
+
+
+                    44.    The given circuit has two ideal diodes connected as shown in the figure
+                           below. The current flowing through the resistance R1 will be
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                          (1) 2.5 A
+                          (2) 10.0 A
+                          (3) 1.43 A
+                          (4) 3.13 A
+
+                    45.    What is the output Y in the following circuit, when all the three inputs A, B,
+                           C are first 0 and then 1?
+
+
+
+
+                          (1) 0, 1
+                          (2) 0, 0
+                          (3) 1, 0
+                          (4) 1, 1
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+
+                                                             Chemistry
+                46.   Which one of the following compounds shows the presence of intramolecular
+                      hydrogen bond?
+                      (1)   H2O2
+                      (2)   HCN
+                      (3)   Cellulose
+                      (4)   Concentrated acetic acid
+
+                47.   The  molar  conductivity  of  a  0.5  mol/dm3         solution  of  AgNO3      with  electrolytic
+                      conductivity of 5.76 × 10–3 S cm–1 at 298 K is
+                      (1)   2.88 S cm2/mol
+                      (2)   11.52 S cm2/mol
+                      (3)   0.086 S cm2/mol
+                      (4)   28.8 S cm2/mol
+                48.   The decomposition of phosphine (PH3) on tungsten at low pressure is a first-
+                      order reaction. It is because the
+                      (1)   rate is proportional to the surface coverage
+                      (2)   rate is inversely proportional to the surface coverage
+                      (3)   rate is independent of the surface coverage
+                      (4)   rate of decomposition is very slow
+
+                49.   The coagulation values in millimoles per litre of the electrolytes used for the
+                      coagulation of As2S3 are given below:
+                      a.    (NaCl) = 52,
+                      b.      II. (BaCl2) = 0.69,
+                      c.      (MgSO4) = 0.22
+                      The correct order of their coagulating power is
+                      (1)   I > II > III
+                      (2)   II > I > III
+                      (3)   III > II > I
+                      (4)   III > I > II
+
+                50.   During the electrolysis of molten sodium chloride, the time required to produce
+                      0.10 mol of chlorine gas using a current of 3 amperes is
+                      (1)   55 minutes
+                      (2)   110 minutes
+                      (3)   220 minutes
+                      (4)   330 minutes
+
+                51.   How many electrons can fit in the orbital for which n = 3 and l = 1?
+                      (1)   2
+                      (2)   6
+                      (3)   10
+                      (4)   14
+
+
+===== PAGE BREAK =====
+
+                             NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper - 2016 (Code AA)
+
+
+
+                 52.    For a sample of perfect gas when its pressure is changed isothermally from pi
+                        to pf, the entropy change is given by
+                                              p f    
+                         (1)   S  nR ln        
+
+                                              pi   
+
+                                              p  
+                                                i
+                               S  nR ln        
+                                             pf   
+                         (2)
+                                                 p 
+                               S  nRT ln       f 
+
+                                                 pi
+                         (3)                       
+                                              p  
+                               S  RT ln     i  
+
+
+                                             pf  
+                         (4)
+
+                 53.   The van't Hoff factor (i) for a dilute aqueous solution of the strong electrolyte
+                        barium hydroxide is
+                        (1)   0
+                        (2)   1
+                        (3)   2
+                        (4)   3
+
+                 54.   The percentage of pyridine (C5H5N) that forms pyridinium ion (C5H5N+H) in a
+                        0.10 M aqueous pyridine solution (K                for C  H   N = 1.7 × 10–9) is
+                                                                        b        5  5
+                        (1)   0.0060%
+                        (2)   0.013%
+                        (3)   0.77%
+                        (4)   1.6%
+
+                 55.   In calcium fluoride, having the fluorite structure, the coordination numbers for
+                        calcium ion (Ca2+) and fluoride ion (F–) are
+
+                        (1)   4 and 2
+                        (2)   6 and 6
+                        (3)   8 and 4
+                        (4)   4 and 8
+
+                 56.   If the E°cell for a given reaction has a negative value which of the following
+                        gives the correct relationships for the values of G° and Keq?
+                        (1)   ∆G° > 0; Keq < 1
+                        (2)   ∆G° > 0; Keq > 1
+                        (3)   ∆G° < 0; Keq > 1
+                        (4)   ∆G° < 0; Keq < 1
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                57.   Which one of the following is incorrect for ideal solution?
+                      (1)   ∆Hmix = 0
+                      (2)   ∆Umix = 0
+                      (3)   ∆P = Pobs – Pcalculated by Raoult’s law = 0
+                      (4)   ∆Gmix = 0
+
+                58.   The  solubility  of  AgCl(s)     with  solubility  product  1.6  ×  10–10        in  0.1  M  NaCl
+
+                      solution would be
+                      (1)   1.25 × 10-5 M
+                      (2)   1.6 × 10-9 M
+                      (3)   1.6 × 10-11 M
+                      (4)   zero
+
+                59.   Suppose the elements X and Y combine to form two compounds XY2 and
+                      X3Y2. When 0.1 mole of XY2 weighs 10 g and 0.05 mole of X3Y2 weighs 9 g,
+                      the atomic weights of X and Y are
+                      (1)   40, 30
+                      (2)   60, 40
+                      (3)   20, 30
+                      (4)   30, 20
+
+                60.   The number of electrons delivered at the cathode during electrolysis by a –19
+                      current of 1 ampere in 60 seconds is (charge on electron = 1.60 ×1023                   C)
+                      (1)   6 × 1020
+                      (2)   6 × 10       20
+                      (3)   3.75 × 10
+                      (4)   7.48 × 1023
+
+                61.   Boric acid is an acid because its molecule
+                      (1)   contains replaceable H+ ion
+                      (2)   gives up a proton
+                      (3)   accepts OH– from water releasing proton
+                      (4)   combines with proton from water molecule
+
+
+                62.   AlF3 is soluble in HF only in presence of KF. It is due to the formation of
+                      (1)   K3[AlF3H3]
+                      (2)   K3[AlF6]
+                      (3)   AlH3
+                      (4)   K[AlF3H]
+
+                63.   Zinc can be coated on iron to produce galvanized iron but the reverse is not
+                      possible. It is because
+                      (1)   zinc is lighter than iron
+                      (2)   zinc has lower melting point than iron
+                      (3)   zinc has lower negative electrode potential than iron
+                      (4)   zinc has higher negative electrode potential than iron
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+
+                64.   The suspension of slaked lime in water is known as
+                      (1)   Lime water
+                      (2)   Quicklime
+                      (3)   Milk of lime
+                      (4)   Aqueous solution of slaked lime
+
+                65.   The  hybridizations  of  atomic  orbitals  of  nitrogen  in  NO           +,  NO   - and  NH     +
+                                                                                              2         3            4
+                      respectively are
+                      (1)   sp, sp3 and sp2
+                      (2)   sp2, sp3 and sp
+                      (3)   sp, sp2 and sp3
+                      (4)   sp2, sp and sp3
+                66.   Which of the following fluoro-compounds is most likely to behave as a Lewis
+                      base?
+                      (1)   BF3
+                      (2)   PF3
+                      (3)   CF4
+                      (4)   SiF4
+
+                67.   Which of the following pairs of ions is isoelectronic and isostructural?
+                      (1)   CO32-, NO3-
+                      (2)   ClO3-, CO32-
+                      (3)   SO32-,NO3-
+                      (4)   ClO  -, SO   2-
+                                3       3
+
+                68.   In context with beryllium, which one of the following statements is incorrect?
+                      (1)   It is rendered passive by nitric acid.
+                      (2)   It forms Be2C.
+                      (3)   Its salts rarely hydrolyze
+                      (4)   Its hydride is electron-deficient and polymeric.
+
+                69.   Hot concentrated sulphuric acid is a moderately strong oxidizing agent. Which
+                      of the following reactions does not show oxidizing behavior?
+                      (1)   Cu + 2H2SO4 → CuSO4 + SO2 + 2H2O
+                      (2)   3S + 2H2SO4 → 3SO2 + 2H2O
+                      (3)   C + 2H2SO4 → CO2 + 2SO2 + 2H2O
+                      (4)   CaF2 + H2SO4 → CaSO4 + 2HF
+
+                70.   Which of the following pairs of d-orbitals will have electron density along the
+                      axes?
+                      (1)   dz2,dxz
+                      (2)   dxz, dyz
+                      (3)   d z2 , dx2-y2
+                      (4)   dxy , dx2-y2
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+
+                71.   The correct geometry and hybridization for XeF4 are :
+                      (1)   Octahedral, sp3d2
+                      (2)   Trigonal bipyramidal, sp3d
+                      (3)   Planar triangle, sp3d3
+                      (4)   Square planar, sp3d2
+
+                72.   Among the following which one is a wrong statement?
+                      (1)   PH5 and BiCl5 do not exist
+                      (2)   pπ-dπ bonds are present in SO2
+                      (3)   SeF4 and CH4 have same shape
+                      (4)   I3+ has bent geometry
+
+                73.   The correct increasing order of trans–––     -effect of the following species is :
+                      (1)   NH–3 > CN     > Br–   > C–6H5
+                      (2)   CN   > C6H5      > Br   > NH3
+                      (3)   Br– > CN– > NH3 > C6H5–
+                      (4)   CN– > Br– > C6H5– >NH3
+
+                74.   Which one of the followng statements related to lanthanons is incorrect?
+                      (1)   Europium shows +2 oxidation state.
+                      (2)   The basicity decreases as the ionic radius decreases from Pr to Lu.
+                      (3)   All the lanthanons are much more reactive than aluminium
+                      (4)   Ce(+4) solutions are widely used as oxidizing agent in volumetric analysis
+
+                75.   Jahn-Teller effect not observed in high spin complexes of :7            -
+                      (1)   d8
+                      (2)   d4
+                      (3)   d
+                      (4)   d9
+
+                76.     Which  of  the  following  can  be  used  as  halide  component  for  Friedel-Crafts
+                    reaction?
+                    (1) Chlorobenzene
+                    (2) Bromobenzene
+                    (3) Chloroethene
+                    (4) Isopropyl chloride
+
+                77.     In which of the following molecules, atoms are coplanar?
+                    (1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                             NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper - 2016 (Code AA)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                     (2)
+
+
+
+
+
+
+                     (3)
+
+
+
+
+
+
+                     (4)
+
+
+
+
+
+
+
+                 78.      Which one of the following structures represents nylon 6,6 polymer?
+                     (1)
+
+
+
+
+
+
+
+
+                     (2)
+
+
+
+
+
+
+
+
+                     (3)
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                            NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                            Paper - 2016 (Code AA)
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    (4)
+
+
+
+
+
+
+
+
+
+
+
+                79.      In pyrrole
+
+
+
+
+
+
+
+
+
+
+
+                    the electron density is maximum on
+                    (1) 2 and 3
+                    (2) 3 and 4
+                    (3) 2 and 4
+                    (4) 2 and 5
+
+                80.      Which of the following compounds shall not produce propene by reaction with
+                    HBr followed by elimination or direct only elimination reaction?
+(1)
+
+
+
+
+
+                    (2)
+
+
+                    (3)
+
+                    (4)
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                81. Which one of the following nitro-compounds does not react with nitrous acid?
+
+                    (1)
+
+
+
+
+
+
+                    (2)
+
+
+
+
+
+
+                    (3)
+
+
+
+
+
+
+
+                    (4)
+
+
+
+
+
+
+
+
+
+
+                82.     The central dogma of molecular genetics states that the genetic information
+                    flows from
+                    (1) Amino acids → Proteins → DNA
+                    (2) DNA → Carbohydrates → Proteins
+                    (3) DNA → RNA → Proteins
+                    (4) DNA → RNA → Carbohydrates
+
+                83.     The    correct     corresponding   order   of   names   of   following   aldoses   with
+                    configuration given below
+
+
+
+
+
+
+
+
+
+
+
+                    respectively, is
+
+
+
+
+
+===== PAGE BREAK =====
+
+                                 NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+
+                            Paper - 2016 (Code AA)
+
+
+
+                     (1) L-erythrose, L-threose, L-erythrose, D-threose
+                     (2) D-threose, D-erythrose, L-threose, L-erythrose
+                     (3) L-erythrose, L-threose, D-erythrose, D-threose
+                     (4) D-erythrose, D-threose, L-erythrose, L-threose
+
+                 84.     In the given reaction
+
+
+
+
+
+
+
+
+
+
+                     (1)
+
+
+
+
+
+
+
+
+
+
+
+                     (2)
+
+
+
+
+
+
+
+
+
+
+
+                     (3)
+
+
+
+
+
+
+
+
+
+
+
+                     (4)
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                          NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                          Paper - 2016 (Code AA)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+               85. A given nitrogen containing aromatic compound aromatic A reacts with Sn/HCl,
+                   followed by HNO2 to give an unstable compound B. B, on treatment with phenol,
+                   forms a beautiful coloured compound C with the molecular formula C12H10N 2O.
+                   The structure of the compound A is
+                   (1)
+
+
+
+
+
+
+
+                   (2)
+
+
+
+
+
+
+
+                   (3)
+
+
+
+
+
+
+
+                   (4)
+
+
+
+
+
+
+
+
+               86.     Consider the reaction
+                       CH3-CH2-CH2-Br + NaCN → CH3 –CH2 – CH2 –CN + NaBr
+                   The reaction will be the fastest in
+                   (1) ethanol
+                   (2) methanol
+                   (3) N, N’ –dimethylformamide (DMF)
+
+
+===== PAGE BREAK =====
+
+                             NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper - 2016 (Code AA)
+
+
+                     (4) water
+
+                 87.     The correct structure of the product A formed in the reaction
+
+
+
+
+
+
+
+
+
+
+                     (1)
+
+
+
+
+
+
+
+
+
+
+                     (2)
+
+
+
+
+
+
+
+
+
+
+                     (3)
+
+
+
+
+
+
+
+
+
+
+                     (4)
+
+
+
+
+
+
+
+
+
+
+
+                 88.     Which among the given molecules can exhibit tautomerism?
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                            NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                            Paper - 2016 (Code AA)
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    (1) III only
+                    (2) Both I and III
+                    (3) Both I and II
+                    (4) (Both II and III
+
+                89.     The correct order of the strengths of the carboxylic acids
+
+
+
+
+
+                    (1) I> II >III
+                    (2) II > III > I
+                    (3) III > II > I
+                    (4) II > I > II
+
+                90.     The  compound  that  will  react  most  readily  with  gaseous  bromine  has  the
+                    formula?
+                    (1) C3H6
+                    (2) C2H2
+                    (3) C4H10
+                    (4) C2H4
+
+                                                                 Biology
+                    91.    Which one of the following is wrong for fungi?
+                           (5) They are eukaryotic.
+                           (6) All fungi possess a purely cellulosic cell wall.
+                           (7) They are heterotrophic.
+                           (8) They are both unicellular and multicellular.
+
+                    92.    Methanogens belong to
+                           (1) Eubacteria
+                           (2) Archaebacteria
+                           (3) Dinoflagellates
+                           (4) Slime moulds
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                    93.   Select the wrong statement.
+                          (1) The walls of diatoms are easily destructible.
+                          (2) ‘Diatomaceous earth’ is formed by the cell wall of diatoms.
+                          (3) Diatoms are chief producers in the ocean.
+                          (4) Diatoms are microscopic and float passively in water.
+
+                    94.   The label of a herbarium sheet does not carry information on
+                          (1) date of collection
+                          (2) name of collector
+                          (3) local names
+                          (4) height of the plant
+
+                    95.   Conifers are adapted to tolerate extreme environmental conditions because
+                          of
+                          (1) broad hardy leaves
+                          (2) superficial stomata
+                          (3) thick cuticle
+                          (4) presence of vessels
+
+                    96.   Which one of the following statements is wrong?
+                          (1) Algae   increase   the   level   of   dissolved   oxygen   in   the
+                              immediate environment.
+                          (2) Algin is obtained from red algae, and carrageenan from brown algae.
+                          (3) Agar-agar is obtained from Gelidium and Gracilaria.
+                          (4) Laminaria and Sargassum are used as food.
+
+                    97.   The term 'polyadelphous' is related to
+                          (1) gynoecium
+                          (2) androecium
+                          (3) corolla
+                          (4) calyx
+
+                    98.     How many plants among Indigofera, Sesbania, Salvia, Allium, Aloe,
+                            mustard, groundnut, radish, gram and turnip have stamens with
+                            different lengths in their flowers?
+                            (1) Three
+                            (2) Four
+                            (3) Five
+                            (4) Six
+
+                    99.     Radial symmetry is found in the flowers of
+                            (1) Brassica
+                            (2) Trifolium
+                            (3) Pisum
+                            (4) Cassia
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                    100.    Free-central placentation is found in
+                            (1) Dianthus
+                            (2) Argemone
+                            (3) Brassica
+                            (4) Citrus
+
+                    101.    Cortex is the region found between
+                            (1) epidermis and stele
+                            (2) pericycle and endodermis
+                            (3) endodermis and pith
+                            (4) endodermis and vascular bundle
+
+                    102.    The balloon-shaped structures called tyloses
+                            (1) lysozyme
+                            (2) ribozyme
+                            (3) ligase
+                            (4) deoxyribonuclease
+
+                    103.    A non-proteinaceous enzyme is
+                            (1) Stroma
+                            (2) Lumen of thylakoids
+                            (3) Inter membrane space
+                            (4) Antennae complex
+
+                    104.    Select the mismatch.
+                            (1) Gas vacuoles - Green bacteria
+                            (2) Large central vacuoles - Animal cells
+                            (3) Protists - Eukaryotes
+                            (4) Methanogens - Prokaryotes
+
+                    105.    Select the wrong statement.
+                            (1) Bacterial cell wall is made up of peptidoglycan.
+                            (2) Pili and fimbriae are mainly involved in motility of bacterial cells.
+                            (3) Cyanobacteria lack flagellated cells.
+                            (4) Mycoplasma is a wall-less microorganism.
+
+                    106.    A cell organelle containing hydrolytic enzymes is
+                            (1) lysosome
+                            (2) microsome
+                            (3) ribosome
+                            (4) mesosome
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                    107.    During cell growth, DNA synthesis takes place in
+                            (1) S Phase
+                            (2) G1 phase
+                            (3) G2 phase
+                            (4) M phase
+
+                    108.    Which   of   the   following   biomolecules   is   common   to   respiration-
+                            mediated breakdown of fats, carbohydrates and proteins?
+                            (1) Glucose-6-phosphate
+                            (2) Fructose 1,6-bisphosphate
+                            (3) Pyruvic acid
+                            (4) Acetyl CoA
+
+                    109.    A few drops of sap were collected by cutting across a plant stem by
+                            a suitable method. The sap was tested chemically. Which one of the
+                            following test results indicates that it is phloem sap?
+                            (1) Acidic
+                            (2) Alkaline
+                            (3) Low refractive index
+                            (4) Absence of sugar
+
+                    110.    You  are  given  a  tissue  with  its  potential  for  differentiation  in  an
+                            artificial culture. Which of the following pairs of hormones would you
+                            add to the medium to secure shoots as well as roots?
+                            (1) IAA and gibberellins
+                            (2) Auxin and cytokinin
+                            (3) Auxin and abscisic acid
+                            (4) Gibberellin and abscisic acid
+
+                    111.    Phytochrome is a
+                            (1) flavoprotein
+                            (2) glycoprotein
+                            (3) lipoprotein
+                            (4) chromoprotein
+
+                    112.    Which is essential for the growth of root tip?
+                            (1) Zn
+                            (2) Fe
+                            (3) Ca
+                            (4) Mn
+
+                    113.    The process which makes major difference between C3 and C4 plants is
+                            (1) glycolysis
+                            (2) Calvin cycle
+                            (3) photorespiration
+                            (4) respiration
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                    114.    Which one of the following statements is not correct?
+                            (1) Offspring produced by the asexual reproduction are called clone.
+                            (2) Microscopic,   motile   asexual   reproductive   structures   are
+                                called zoospores.
+                            (3) In potato, banana and ginger, the plantlets arise from the internodes
+                                present in the modified stem.
+                            (4) Water  hyacinth,  growing  in  the  standing  water,  drains  oxygen
+                                from water that leads to the death of fishes.
+
+                    115.    Which one of the following generates new genetic combinations leading
+                            to variation?
+                            (1) Vegetative reproduction
+                            (2) Parthenogenesis
+                            (3) Sexual reproduction
+                            (4) Nucellar polyembryony
+
+                    116.    Match    Column-I       with   Column-II       and  select  the  correct  option  using
+                            the codes given below:
+                                                Column-I                                 Column-II
+                                  a.  Pistils fused together                      (i) Gametogenesis
+                                  b.  Formation of gametes                        (ii) Pistillate
+                                  c.  Hyphae of higher ascomycetes                (iii) Syncarpous
+                                  d.  Unisexual female flower                     (iv) Dikaryotic
+
+                            Codes:
+                                  a     b     c     d
+                            (1) (iv)  (iii)  (i)  (ii)
+                            (2) (ii)  (i)  (iv)  (iii)
+                            (3) (i)  (ii)  (iv)  (iii)
+                            (4) (iii)  (i)  (iv)  (ii)
+
+                    117.    In majority of angiosperms
+                            (1) egg has a filiform apparatus
+                            (2) there are numerous antipodal cells
+                            (3) reduction division occurs in the megaspore mother cells
+                            (4) a small central cell is present in the embryo sac
+
+                    118.    Pollination in water hyacinth and water lily is brought about by the agency
+                            of
+                            (1) water
+                            (2) insects or wind
+                            (3) birds
+                            (4) bats
+
+                    119.    The ovule of an angiosperm is technically equivalent to
+                            (1) megasporangium
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                           (2) megasporophyll
+                           (3) megaspore mother cell
+                           (4) megaspore
+
+                   120.    Taylor conducted the experiments to prove semiconservative mode of
+                           chromosome replication on
+                           (1) Vinca rosea
+                           (2) Vicia faba
+                           (3) Drosophila melanogaster
+                           (4) E. coli
+
+                   121.    The mechanism that causes a gene to move from one linkage group to
+                           another is called
+                           (1) Inversion
+                           (2) Duplication
+                           (3) Translocation
+                           (4) Crossing over
+
+                   122.    The equivalent of a structural gene is
+                           (1) Mutation
+                           (2) Cistron
+                           (3) Operon
+                           (4) Recon
+
+                   123.    A true breeding plant is
+                           (1) One that is able to breed on its own
+                           (2) Produced due to cross pollination among unrelated plants
+                           (3) Near homozygous and produces offspring of its own kind
+                           (4) Always homozygous recessive in its genetic constitution
+
+                   124.    Which of the following rRNAs acts as structural RNA as well as ribozyme
+                           in bacteria?
+                           (1) 5S rRNA
+                           (2) 18S rRNA
+                           (3) 23S rRNA
+                           (4) 5.8S rRNA
+
+                   125.    Stirred tank bioreactors have been designed for
+                           (1) Purification of product
+                           (2) Addition of preservatives to the product
+                           (3) Availability of oxygen throughout the process
+                           (4) Ensuring anaerobic conditions in the culture vessel
+
+                   126.    A  foreign  DNA  and  plasmid  cut  by  the  same  restriction  endonuclease
+                           can be joined to form a recombinant plasmid using
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                            (1) Eco R1
+                            (2) Taq Polymerase
+                            (3) Polymerase III
+                            (4) ligase
+
+                    127.    Which of the following is not a component of downstream processing?
+                            (1) Separation
+                            (2) Purification
+                            (3) Preservation
+                            (4) Expression
+
+                    128.    Which of the following restriction enzymes produce blunt ends?
+                            (1) Sal I
+                            (2) Eco RV
+                            (3) Xho I
+                            (4) Hind III
+
+                    129.    Which kind of therapy was given in 1990 to a four year old girl with
+                            adenosine deaminase (ADA) deficiency?
+                            (1) Gene therapy
+                            (2) Chemotherapy
+                            (3) Immunotherapy
+                            (4) Radiation therapy
+                    130.    How many hot spots of biodiversity in the world have been identified till
+                            date by Norman Myers?
+                            (1) 17
+                            (2) 25
+                            (3) 34
+                            (4) 43
+
+                    131.    The primary producers of deep-sea hydrothermal vent ecosystem are
+                            (1) Green algae
+                            (2) Chemosynthetic bacteria
+                            (3) Blue green algae
+                            (4) Coral reefs
+
+                    132.    Which of the following is corrent for r-selected species?
+                            (1) Large number of progeny with small size
+                            (2) Large number of progeny with large size
+                            (3) Small number of progeny with small size
+                            (4) Small number of progeny with large size
+
+                    133.    If ‘+’ sign is assigned to beneficial interactions, ‘-’ sign to detrimental and
+                            ‘0’ sign to neutral interactions, then the population interaction
+                            represented by ‘+’ ‘-’ refers to
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                            (1) Mutualism
+                            (2) Amensalism
+                            (3) Commensalism
+                            (4) Parasitism
+
+                    134.    Which of the following is correctly matched?
+                            (1) Aerenchyma – Opuntia
+                            (2) Age pyramid – Biome
+                            (3) Parthenium hysterophorus – Threat to biodiversity
+                            (4) Stratification – population
+
+                    135.    Red list contains data or information on
+                            (1) all economically important plants
+                            (2) Plants whose products are in international trade
+                            (3) threatened species
+                            (4) marine vertebrates only
+
+                    136.    Which of the following sets of diseases is caused by bacteria?
+                           (1)  Cholera and tetanus
+                           (2)  Typhoid and smallpox
+                           (3)  Tetanus and mumps
+                           (4)  Herpes and influenza
+
+
+                137.    Match Column-I with Column-II for housefly classification and select the
+                      correct option using the codes given below:
+                                         Column I                                          Column II
+                           a.  Family                                       (i)   Diptera
+                           b.  Order                                        (ii)  Arthropoda
+                           c.  Class                                        (iii) Muscidae
+                           d.  Phylum                                       (iv)  Insecta
+
+                               a     b      c       d
+                       (1)    (iii) (i)    (iv)    (ii)
+                       (2)    (iii) (ii)   (iv)    (i)
+                       (3)    (iv)  (iii)  (ii)    (i)
+                       (4)    (iv)  (ii)   (i)   (iii)
+
+                138.    Choose the correct statement
+                         (1)  All mammals are viviparous
+                         (2) All cyclostomes do not possess jaws and paired fins
+                         (3) All reptiles have a three chambered heart
+                         (4) All Pisces have gills covered by an operculum
+
+                139.    Study the four statements (A-D) given below and select the two correct ones
+                      out of them:
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                      A.  Definition of biological species was given by Ernst Mayr
+                      B.  Photoperiod does not affect reproduction in plants
+                      C.  Binomial nomenclature system was given by R. H. Whittaker
+                      D.  In   unicellular   organisms,   reproduction   is   synonymous   with
+                          growth The two correct statements are
+
+                         (1) B and C
+                         (2) C and D
+                         (3) A and D
+                         (4) A and B
+
+                140.    In male cockroaches, sperms are stored in which part of the reproductive
+                      system?
+                         (1) Seminal vesicles
+                         (2) Mushroom glands
+                         (3) Testes
+                         (4) Vas deferens
+
+                141.    Smooth muscles are
+                         (1) Involuntary, fusiform, non-striated
+                         (2) Voluntary, multinucleate, cylindrical
+                         (3) Involuntary, cylindrical, striated
+                         (4) Voluntary, spindle shaped, uninucleate
+
+
+                142.    Oxidative phosphorylation is
+                         (1) Formation of ATP by transfer of phosphate group from a substrate to ADP
+                         (2) Oxidation of phosphate group in ATP
+                         (3) Addition of phosphate group to ATP
+                         (4) Formation  of  ATP  by  energy  released  from  electrons  removed
+                             during substrate oxidation
+
+                143.    Which  of  the  following  is  the  least  likely  to  be  involved  in  stabilizing         the
+                      three dimensional folding of most proteins?
+                         (1) Hydrogen bonds
+                         (2) Electrostatic interaction
+                         (3) Hydrophobic interaction
+                         (4) Ester bonds
+
+                144.    Which of the following describes the given graph correctly?
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                            NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                            Paper - 2016 (Code AA)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         (1) Endothermic reaction with energy A in presence of enzyme and B
+                              in absence of enzyme
+                         (2) Exothermic reaction with energy A in presence of enzyme and B
+                              in absence of enzyme
+                         (3) Endothermic reaction with energy A in absence of enzyme and B
+                              in presence of enzyme
+                         (4) Exothermic reaction with energy A in absence of enzyme and B
+                              in presence of enzyme
+
+                145.    When cell has stalled DNA replication fork, which checkpoint should be
+                      predominantly activated?
+                         (1) G1/S
+                         (2) G2/M
+                         (3) M
+                         (4) Both G2/M and M
+
+                146.    Match the stages of meiosis in column I to their characteristic feature
+                      in column II and select the correct option using the codes given below:
+                                               Column I                        Column II
+
+
+
+
+                                       a.  Pachytene                   i.  Paring of
+                                                                           homologous
+                                                                           chromosomes
+                                       b.  Metaphase I                 ii. Termination of
+                                                                           chiasmata
+                                       c.  Diakinesis                  iii. Crossing over takes
+                                                                           place
+                                       d.  Zygotene                    iv. Chromosomes align
+                                                                           at equatorial plate
+
+                      Codes:
+                              a      b      c       d
+                      (1)    (iii)  (iv)   (ii)    (i)
+                      (2)     (i)   (iv)   (ii)   (iii)
+                      (3)    (ii)   (iv)  (iii)    (i)
+                      (4)    (iv)  (iii)   (ii)   (i)
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+
+                147.    Which hormones do stimulate the production of pancreatic juice and
+                      bicarbonate?
+                      (1) Angiotensin and epinephrine
+                      (2) Gastrin and insulin
+                      (3) Cholecystokinin and secretin
+                      (4) Insulin and Glucagon
+
+                148.    The partial pressure of oxygen in the alveoli of the lungs is
+                      (1)  equal to that in the blood
+                      (2)  more than that in the blood
+                      (3)  less than that in the blood
+                      (4)  less than that of the carbon dioxide
+
+                 149. Choose the correct statement.
+                      (1)  Nociceptors respond to changes in pressure
+                      (2)  Meissner’s  corpuscles are thermoreceptors
+                      (3)  Photoreceptors  in  the  human  eye  are  depolarized  during  darkness
+                           and become hyperpolarized in response to the light stimulus
+                      (4)  Receptors do not produce graded potentials
+
+                   150.    Grave’s disease is caused due to
+                      (1)  hyposecretion of thyroid gland
+                      (2)  hypersecretion of thyroid gland
+                      (3)  hyposecretion of adrenal gland
+                      (4)  hypersecretion of adrenal gland
+
+                151.   Name  the  ion  responsible  for  unmasking  of  active  sites  for  myosin  for
+                       cross-bridge activity during muscle contraction.
+                            (1) Calcium
+                            (2) Magnesium
+                            (3) Sodium
+                            (4) Potassium
+
+                152.   Name the blood cells, whose reduction in number can cause clotting disorder,
+                       leading to excessive loss of blood from the body.
+                         (1)    Erythrocytes
+                          (2) Leucocytes
+                          (3) Neutrophils
+                          (4) Thrombocytes
+
+                153.   Name  a  peptide  hormone  which  acts  mainly  on  hepatocytes,  adipocytes
+                       and enhances cellular glucose uptake and utilization.
+                          (1) Insulin
+                          (2) Glucagon
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                          (3) Secretin
+                          (4) Gastrin
+
+                154.   Osteoporosis, age-related disease of skeletal system, may occur due to
+                          (1) immune disorder affecting neuro-muscular junction leading to fatigue
+                          (2) high concentration of Ca++ and Na+
+                          (3) decreased level of estrogen
+                          (4) accumulation of uric acid leading to inflammation of joints
+
+                155.   Serum differs from blood in
+                          (1) lacking globulins
+                          (2) lacking albumins
+                          (3) lacking clotting factors
+                          (4) lacking antibodies
+
+                156.   Lungs  do  not  collapse  between  breaths  and  some  air  always  remains  in
+                       the lungs which can never be expelled because
+                          (1) there is a negative pressure in the lungs
+                          (2) there is negative intrapleural pressure pulling at the lung walls
+                          (3) there is a positive intrapleural pressure
+                          (4) pressure in the lungs is higher than the atmospheric pressure
+
+                157.   The posterior pituitary gland is not a ‘true’ endocrine gland because
+                          (1) it is provided with a duct
+                          (2) it only stores and release hormones
+                          (3) it is under the regulation of hypothalamus
+                          (4) it secretes enzymes
+
+                158.   The part of nephron involved in active reabsorption of sodium is
+                          (1) distal convoluted tubule
+                          (2) proximal convoluted tubule
+                          (3)   Bowman’s capsule
+                          (4) descending limb of Henle’s loop
+
+                159.   Which of the following is hormone-releasing IUD?
+                          (1) LNG-20
+                          (2) Multiload 375
+                          (3) Lippes loop
+                          (4) Cu7
+
+                160.   Which of following incorrect regarding vasectomy?
+                          (1) No sperm occurs in seminal fluid
+                          (2) No sperms occurs in epididymis
+                          (3) Vasa deferentia is cut and died
+                          (4) Irreversible sterility
+
+
+===== PAGE BREAK =====
+
+                            NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                            Paper - 2016 (Code AA)
+
+
+
+                161.    Embryo with more than 16 blastomeres formed due to in vitro fertilization
+                        is transferred into
+                           (1) uterus
+                           (2) fallopian tube
+                           (3) fimbriae
+                           (4) cervix
+
+                162.    Which of the following depicts the correct pathway of transport of sperms?
+                           (1) Rete testis  Efferent ductules  Epididymis  Vas deferens
+                                                                              
+                           (2) Rete testis  Epididymis       Efferent ductules    Vas deferens
+                           (3) Rete testis     Vas deferens     Efferent ductules     Epididymis
+                           (4) Efferent ductules  Rete testis  Vas deferens  Epididymis
+
+                163.    Match  Column-I  with  Column-II  and  select  the  correct  option  using  the
+                        codes given below:
+                                           Column I                                            Column II
+                            a.  Mons pubis                                      (i)   Embryo formation
+                            b.  Antrum                                          (ii)  Sperm
+                            c.  Trophectoderm                                   (iii) Female external genitalia
+                            d.  Nebenkern                                       (iv) Graafian follicle
+
+                                a     b        c      d
+                        (1)    (iii) (iv)    (ii)    (i)
+                        (2)    (iii) (iv)     (i)    (ii)
+                       (3)     (iii)   (i)   (iv)  (ii)
+                       (4)     (i)   (iv)  (iii)  (iii)
+
+                164.    Several hormones likes hCG, hPL, estrogen, progesterone are produced by
+                           (1) Ovary
+                           (2) Placenta
+                           (3) Fallopian tube
+                           (4) Pituitary
+
+                165.    If  a  colour-blind  man  marries  a  woman  who  is  homozygous  for  normal
+                        vision, the probability of their son being colour blind is
+                           (1) 0
+                           (2) 0.5
+                           (3) 0.75
+                           (4) 1
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                            NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                            Paper - 2016 (Code AA)
+
+
+                166.   Genetic drift operates in:
+                          (1) Small isolated population
+                          (2) Large isolated population
+                          (3) Non-reproductive population
+                          (4) Slow reproductive population
+
+                167.   In Hardy-Weinberg equation, the frequency of heterozygous individuals
+                       is represented by
+                          (1) p2
+                          (2) 2pq
+                          (3) pq
+                          (4) q2
+
+                168.   The chronological order of human evolution from early to the recent is
+                          (1) Australopithecus       Ramapithecus        Homo habilis      Homo erectus
+                          (2)  Ramapithecus  Australopithecus       Homo habilis  Homo erectus
+                          (3)  Ramapithecus      Homo habilis     Australopithecus     Homo erectus
+                          (4) Australopithecus  Homo habilis  Ramapithecus  Homo erectus
+
+                169.   Which of the following is the correct sequence of events in the origin of life?
+                          I.  Formation of protobionts
+                          II. Synthesis of organic monomers
+                        III.  Synthesis of organic polymers
+                         IV.  Formation of DNA-based genetic systems
+
+                          (1) I, II, III, IV
+                          (2) I, III, II, IV
+                          (3) II, III, I, IV
+                          (4) II, III, IV, I
+
+                170.   A  molecule  that  can  act  as  a  genetic  material  must  fulfill  the  traits
+                       given below, except
+                          (1) It should be able to express itself in the form of ‘Mendelian characters’
+                          (2) It should be able to generate its replica
+                          (3) It should be unstable structurally and chemically
+                          (4) It should provide the scope for slow changes that are required for
+                               evolution
+
+                171.   DNA-dependent  RNA  polymerase  catalyzes  transcription  on  one  strand  of
+                       the DNA which is called the
+                          (1) template strand
+                          (2) coding strand
+                          (3) alpha strand
+                          (4) antistrand
+
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+
+                172.   Interspecific hybridization is the mating of
+                          (1) animals within same breed without having common ancestors
+                          (2) two different related species
+                          (3) superior males and females of different breeds
+                          (4) more closely related individuals within same breed for 4—6 generations
+
+                173.   Which of the following is correct regarding AIDS causative agent HIV?
+                          (1) HIV is enveloped virus containing one molecule of single-stranded RNA
+                              and one molecule of reverse transcriptase
+                          (2) HIV  is  enveloped  virus  that  contains  two  identical  molecules  of
+                              single-stranded RNA and two molecules of reverse transcriptase
+                          (3) HIV is unenveloped virus
+                          (4) HIV does not escape but attacks the acquired immune response
+
+                174.   Among  the  following  edible  fishes,        which  one  is  a  marine  fish  having
+                       rich source of omega-3 fatty acids?
+                          (1) Mystus
+                          (2) Mangur
+                          (3) Mrigala
+                          (4) Mackerel
+
+                175.   Match  Column-I  with  Column-II  and  select  the  correct  option  using  the
+                       codes given below:
+                                         Column I                                          Column II
+                           a.  Citric acid                                  (i)   Trichoderma
+                           b.  Cyclosporin A                                (ii)  Clostridium
+                           c.  Statins                                      (iii) Apsergillus
+                           d.  Butyric acid                                 (iv)  Monascus
+
+                                   a          b          c         d
+                        (1)       (iii)       (i)       (ii)      (iv)
+                        (2)       (iii)       (i)       (iv)       (ii)
+                        (3)        (i)       (iv)       (ii)      (iii)
+                       (4)         (iii)(iv)(i)(ii)
+
+                176.   Biochemical Oxygen Demand (BOD) may not be a good index for pollution
+                       for water bodies receiving effluents from
+                          (1) Domestic sewage
+                          (2) Dairy industry
+                          (3) Petroleum industry
+                          (4) Sugar industry
+
+                177.   The principle of competitive exclusion was stated by
+                          (1) C. Darwin
+                          (2) G. F. Gause
+
+
+===== PAGE BREAK =====
+
+                           NEET│ PHYSICS, CHEMISTRY AND BIOLOGY
+                           Paper - 2016 (Code AA)
+
+
+                          (3) MacArthur
+                          (4) Verhulst and Pearl
+
+                178.   Which of the following National Parks is home to the famous musk deer or
+                       hangul?
+                          (1) Keibul Lamjao National Park, Manipur
+                          (2) Bandhavgarh National Park, Madhya Pradesh
+                          (3) Eaglenest Wildlife Sanctuary, Arunachal Pradesh
+                          (4) Dachigam National Park, Jammu & Kashmir
+
+                179.    A lake which is rich in organic waste may result in
+                          (1) Increased population of aquatic organisms due to minerals
+                          (2) Drying of the lake due to algal bloom
+                          (3) Increased population of fish due to lots of nutrients
+                          (4) Mortality of fish due to lack of oxygen
+
+                180.   The highest DDT concentration in aquatic food chain shall occur in
+                          (1) Phytoplankton
+                          (2) Seagull
+                          (3) Crab
+                          (4) Eel
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
