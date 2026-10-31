@@ -28,7 +28,7 @@ class SubjectsTab extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // TODO: subject search
+              context.push('/subjects/bio');
             },
           ),
         ],
