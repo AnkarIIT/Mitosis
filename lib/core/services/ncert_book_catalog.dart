@@ -24,36 +24,77 @@ class NcertBookEntry {
 class NcertBookCatalog {
   static const String _base = 'assets/ncert_books';
 
+  /// Maps app chapter ids -> bundled PDF.
+  ///
+  /// IMPORTANT: the PDF filenames follow NCERT's *rationalised* numbering
+  /// (2023 onwards), while the app chapter ids follow the older numbering.
+  /// Chapters that the rationalisation removed have no PDF at all, and later
+  /// chapters therefore point at a lower file number than their id: app
+  /// chapter 13 (Photosynthesis) is `kebo111.pdf`, because Transport in Plants
+  /// (old ch 11) and Mineral Nutrition (old ch 12) no longer exist.
+  ///
+  /// Every entry is checked by `scripts/verify_ncert_mapping.py`, which reads
+  /// the real title out of each PDF and fails on a mismatch.
   static const Map<String, String> _appChapterPdf = {
-    // Biology Class 11
+    // ---- Biology Class 11 (rationalised: old ch 11-12 removed) ----
     'bio_ch1': '$_base/biology/Biology_Class_11/kebo101.pdf',
     'bio_ch2': '$_base/biology/Biology_Class_11/kebo102.pdf',
     'bio_ch3': '$_base/biology/Biology_Class_11/kebo103.pdf',
     'bio_ch4': '$_base/biology/Biology_Class_11/kebo104.pdf',
+    'bio_ch5': '$_base/biology/Biology_Class_11/kebo105.pdf',
+    'bio_ch6': '$_base/biology/Biology_Class_11/kebo106.pdf',
+    'bio_ch7': '$_base/biology/Biology_Class_11/kebo107.pdf',
     'bio_ch8': '$_base/biology/Biology_Class_11/kebo108.pdf',
     'bio_ch9': '$_base/biology/Biology_Class_11/kebo109.pdf',
     'bio_ch10': '$_base/biology/Biology_Class_11/kebo110.pdf',
     'bio_ch13': '$_base/biology/Biology_Class_11/kebo111.pdf',
     'bio_ch14': '$_base/biology/Biology_Class_11/kebo112.pdf',
-    // Biology Class 12
-    'bio_ch3_12': '$_base/biology/Biology_Class_12/lebo103.pdf',
-    'bio_ch5_12': '$_base/biology/Biology_Class_12/lebo105.pdf',
-    'bio_ch6_12': '$_base/biology/Biology_Class_12/lebo106.pdf',
-    'bio_ch7_12': '$_base/biology/Biology_Class_12/lebo107.pdf',
-    'bio_ch8_12': '$_base/biology/Biology_Class_12/lebo108.pdf',
-    'bio_ch11_12': '$_base/biology/Biology_Class_12/lebo111.pdf',
-    'bio_ch13_12': '$_base/biology/Biology_Class_12/lebo113.pdf',
-    'bio_ch14_12': '$_base/biology/Biology_Class_12/lebo114.pdf',
-    'bio_ch15_12': '$_base/biology/Biology_Class_12/lebo115.pdf',
-    // Chemistry Class 11
+    'bio_ch15': '$_base/biology/Biology_Class_11/kebo115.pdf',
+    'bio_ch17': '$_base/biology/Biology_Class_11/kebo117.pdf',
+    'bio_ch18': '$_base/biology/Biology_Class_11/kebo118.pdf',
+    'bio_ch19': '$_base/biology/Biology_Class_11/kebo119.pdf',
+    // ---- Biology Class 12 (rationalised: old ch 1 removed) ----
+    'bio_ch2_12': '$_base/biology/Biology_Class_12/lebo101.pdf',
+    'bio_ch3_12': '$_base/biology/Biology_Class_12/lebo102.pdf',
+    'bio_ch4_12': '$_base/biology/Biology_Class_12/lebo103.pdf',
+    'bio_ch5_12': '$_base/biology/Biology_Class_12/lebo104.pdf',
+    'bio_ch6_12': '$_base/biology/Biology_Class_12/lebo105.pdf',
+    'bio_ch7_12': '$_base/biology/Biology_Class_12/lebo106.pdf',
+    'bio_ch8_12': '$_base/biology/Biology_Class_12/lebo107.pdf',
+    'bio_ch10_12': '$_base/biology/Biology_Class_12/lebo108.pdf',
+    'bio_ch11_12': '$_base/biology/Biology_Class_12/lebo109.pdf',
+    'bio_ch12_12': '$_base/biology/Biology_Class_12/lebo110.pdf',
+    'bio_ch13_12': '$_base/biology/Biology_Class_12/lebo111.pdf',
+    'bio_ch14_12': '$_base/biology/Biology_Class_12/lebo112.pdf',
+    'bio_ch15_12': '$_base/biology/Biology_Class_12/lebo113.pdf',
+    // ---- Chemistry Class 11 ----
     'chem_ch1': '$_base/chemistry/Chemistry_Class_11_Part_1/kech101.pdf',
     'chem_ch2': '$_base/chemistry/Chemistry_Class_11_Part_1/kech102.pdf',
-    // Physics Class 11
-    'phys_ch2': '$_base/physics/Physics_Class_11_Part_1/keph102.pdf',
-    'phys_ch3': '$_base/physics/Physics_Class_11_Part_1/keph103.pdf',
+    // ---- Physics Class 11 (rationalised: Physical World removed) ----
+    'phys_ch2': '$_base/physics/Physics_Class_11_Part_1/keph101.pdf',
+    'phys_ch3': '$_base/physics/Physics_Class_11_Part_1/keph102.pdf',
+    // Intentionally absent (no PDF exists for these chapters):
+    //   bio_ch1_12  Reproduction in Organisms        - removed from syllabus
+    //   bio_ch9_12  Strategies for Enhancement ...    - removed from syllabus
+    //   bio_ch20..22 placeholders, no content yet
   };
 
   static final List<NcertBookEntry> _entries = _buildEntries();
+
+  /// Chapter key -> entry, for UI surfaces that drive grounded AI or PDF
+  /// navigation by chapter key (the chat's NCERT ribbon, citation chips).
+  static Map<String, NcertBookEntry> get allByChapterKey {
+    final byKey = <String, NcertBookEntry>{};
+    for (final entry in _entries) {
+      final key = _chapterKeyByAssetPath[entry.assetPath];
+      if (key != null) byKey[key] = entry;
+    }
+    return byKey;
+  }
+
+  static final Map<String, String> _chapterKeyByAssetPath = {
+    for (final entry in _appChapterPdf.entries) entry.value: entry.key,
+  };
 
   /// All known NCERT book entries in chapter order.
   static List<NcertBookEntry> get allEntries => List.unmodifiable(_entries);
@@ -247,13 +288,15 @@ class NcertBookCatalog {
     );
 
     // ---- Biology Class 12 ----
+    // Numbers/titles reflect the rationalised edition, i.e. what is actually
+    // inside lebo101..lebo113 (see _appChapterPdf for the id -> file mapping).
     add(
       'Biology',
       'Class 12',
       'Biology_Class_12',
       'lebo101.pdf',
       1,
-      'Reproduction in Organisms',
+      'Sexual Reproduction in Flowering Plants',
     );
     add(
       'Biology',
@@ -261,7 +304,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo102.pdf',
       2,
-      'Sexual Reproduction in Flowering Plants',
+      'Human Reproduction',
     );
     add(
       'Biology',
@@ -269,7 +312,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo103.pdf',
       3,
-      'Human Reproduction',
+      'Reproductive Health',
     );
     add(
       'Biology',
@@ -277,7 +320,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo104.pdf',
       4,
-      'Reproductive Health',
+      'Principles of Inheritance and Variation',
     );
     add(
       'Biology',
@@ -285,7 +328,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo105.pdf',
       5,
-      'Principles of Inheritance and Variation',
+      'Molecular Basis of Inheritance',
     );
     add(
       'Biology',
@@ -293,7 +336,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo106.pdf',
       6,
-      'Molecular Basis of Inheritance',
+      'Evolution',
     );
     add(
       'Biology',
@@ -301,7 +344,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo107.pdf',
       7,
-      'Evolution',
+      'Human Health and Disease',
     );
     add(
       'Biology',
@@ -309,7 +352,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo108.pdf',
       8,
-      'Human Health and Disease',
+      'Microbes in Human Welfare',
     );
     add(
       'Biology',
@@ -317,7 +360,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo109.pdf',
       9,
-      'Strategies for Enhancement in Food Production',
+      'Biotechnology: Principles and Processes',
     );
     add(
       'Biology',
@@ -325,7 +368,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo110.pdf',
       10,
-      'Microbes in Human Welfare',
+      'Biotechnology and its Applications',
     );
     add(
       'Biology',
@@ -333,7 +376,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo111.pdf',
       11,
-      'Biotechnology: Principles and Processes',
+      'Organisms and Populations',
     );
     add(
       'Biology',
@@ -341,7 +384,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo112.pdf',
       12,
-      'Biotechnology and its Applications',
+      'Ecosystem',
     );
     add(
       'Biology',
@@ -349,7 +392,7 @@ class NcertBookCatalog {
       'Biology_Class_12',
       'lebo113.pdf',
       13,
-      'Organisms and Populations',
+      'Biodiversity and Conservation',
     );
 
     // ---- Chemistry Class 11 ----
@@ -509,13 +552,15 @@ class NcertBookCatalog {
     );
 
     // ---- Physics Class 11 ----
+    // Rationalised edition: "Physical World" was removed, so keph101 is
+    // chapter 1 (Units and Measurements) and keph107 is Gravitation.
     add(
       'Physics',
       'Class 11',
       'Physics_Class_11_Part_1',
       'keph101.pdf',
       1,
-      'Physical World',
+      'Units and Measurements',
     );
     add(
       'Physics',
@@ -523,7 +568,7 @@ class NcertBookCatalog {
       'Physics_Class_11_Part_1',
       'keph102.pdf',
       2,
-      'Units and Measurements',
+      'Motion in a Straight Line',
     );
     add(
       'Physics',
@@ -531,7 +576,7 @@ class NcertBookCatalog {
       'Physics_Class_11_Part_1',
       'keph103.pdf',
       3,
-      'Motion in a Straight Line',
+      'Motion in a Plane',
     );
     add(
       'Physics',
@@ -539,7 +584,7 @@ class NcertBookCatalog {
       'Physics_Class_11_Part_1',
       'keph104.pdf',
       4,
-      'Motion in a Plane',
+      'Laws of Motion',
     );
     add(
       'Physics',
@@ -547,7 +592,7 @@ class NcertBookCatalog {
       'Physics_Class_11_Part_1',
       'keph105.pdf',
       5,
-      'Laws of Motion',
+      'Work, Energy and Power',
     );
     add(
       'Physics',
@@ -555,7 +600,7 @@ class NcertBookCatalog {
       'Physics_Class_11_Part_1',
       'keph106.pdf',
       6,
-      'Work, Energy and Power',
+      'System of Particles and Rotational Motion',
     );
     add(
       'Physics',
@@ -563,7 +608,7 @@ class NcertBookCatalog {
       'Physics_Class_11_Part_1',
       'keph107.pdf',
       7,
-      'System of Particles and Rotational Motion',
+      'Gravitation',
     );
     add(
       'Physics',
@@ -732,7 +777,12 @@ class NcertBookCatalog {
   }
 
   /// Resolves the official NCERT PDF for an app chapter.
+  ///
+  /// Returns null for chapters the rationalised syllabus removed: the name
+  /// fallback below would otherwise happily match a same-titled chapter from a
+  /// different book and serve the wrong PDF.
   static NcertBookEntry? entryFor(Chapter chapter) {
+    if (chapter.isRemovedFromSyllabus) return null;
     final direct = _appChapterPdf[chapter.id];
     if (direct != null) {
       return _entries.where((e) => e.assetPath == direct).firstOrNull;
