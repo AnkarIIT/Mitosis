@@ -1,0 +1,2478 @@
+{
+ "year": 2016,
+ "total_parsed": 180,
+ "complete": 154,
+ "sections_reported": [
+  [
+   "Physics",
+   50
+  ],
+  [
+   "Chemistry",
+   50
+  ],
+  [
+   "Botany",
+   50
+  ],
+  [
+   "Zoology",
+   30
+  ]
+ ],
+ "questions": [
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 1,
+   "question": "Planck’s constant (h), speed of light in vacuum (c) and Newton’s gravitational constant (G) are three fundamental constants. Which of the following combinations of these has the dimension of length?",
+   "options": {
+    "1": "hG c3 / 2 hG",
+    "2": "5 / 2 c",
+    "3": "hc G Gc",
+    "4": "h3 / 2"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 2,
+   "question": "Two cars P and Q start from a point at the same time in a straight line and their positions are represented by xP(t) = at + bt2 and xQ(t) = ft  t2. At what time do the cars have the same velocity?",
+   "options": {
+    "1": "a  f 1  b a  f",
+    "2": "2 b  1   a  f",
+    "3": "2 1  b   f  a",
+    "4": "2 1  b  "
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 3,
+   "question": "In the given figure, a = 15 m/s moving in the clockwise direction in a circle of radius R = 2.5 m at a given instant of time. The speed of the particle is 2 represents the total acceleration of a particle",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 4,
+   "question": "A rigid ball of mass m strikes a rigid wall at 60 and gets reflected without loss of speed as shown in the figure below. The value of impulse imparted by the wall on the ball will be",
+   "options": {
+    "1": "mV",
+    "2": "2mV",
+    "3": "mV 2",
+    "4": "mV 3"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 5,
+   "question": "A bullet of mass 10 g moving horizontally with a velocity of 400 m s-1 strikes a wooden block of mass 2 kg which is suspended by a light inextensible string of length 5 m. As a result, the centre of gravity of the block is found to rise a vertical distance of 10 cm. The speed of the bullet after it emerges out horizontally from the block will be",
+   "options": {
+    "1": "100 m s-1",
+    "2": "80 m s-1",
+    "3": "120 m s-1",
+    "4": "160 m s-1"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 6,
+   "question": "Two identical balls A and B having velocities of 0.5 m/s and 0.3 m/s, respectively collide elastically in one dimension. The velocities of B and A after the collision respectively will be",
+   "options": {
+    "1": "0.5 m/s and 0.3 m/s",
+    "2": "0.5 m/s and 0.3 m/s",
+    "3": "0.3 m/s and 0.5 m/s",
+    "4": "0.3 m/s and 0.5 m/s"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 7,
+   "question": "The candidate should ensure that the Answer Sheet is not folded. Do not make any stray marks on the Answer Sheet. Do not write your Roll No. anywhere else except in the specified space in the Test Booklet/Answer Sheet.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 8,
+   "question": "Two rotating bodies A and B of masses m and 2m with moments of inertia IA and IB (IB > IA) have equal kinetic energy of rotation. If LA and LB be their angular momenta respectively, then",
+   "options": {
+    "1": "L  L B A 2",
+    "2": "LA = 2LB",
+    "3": "LB > LA",
+    "4": "LA > LB"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 9,
+   "question": "A solid sphere of mass m and radius R is rotating about its diameter. A solid cylinder of the same mass and same radius is also rotating about its geometrical axis with an angular speed twice that of the sphere. The ratio of their kinetic energies of rotation (Esphere / Ecylinder) will be",
+   "options": {
+    "1": "2:3",
+    "2": "1:5",
+    "3": "1:4",
+    "4": "3:1"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 10,
+   "question": "A light rod of length l has two masses m1 and m2 attached to its two ends. The moment of inertia of the system about an axis perpendicular to the rod and passing through the centre of mass is",
+   "options": {
+    "1": "m1m2 l2 mm1  mm2",
+    "2": "1 m m 2 l2 1 2",
+    "3": "m1  m2 l2",
+    "4": "m1m2 l2"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 11,
+   "question": "The candidates should not leave the Examination Hall without handing over their Answer Sheet to the Invigilator on duty and sign the Attendance Sheet twice. Cases where a candidate has not signed the Attendance Sheet second time will be deemed not to have banded over the Answer Sheet and dealt with as an unfair means case.",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 12,
+   "question": "A satellite of mass m is orbiting the Earth (of radius R) at a height h from its surface. The total energy of the satellite in terms of g0, the value of acceleration due to gravity at the Earth's surface, is2 mg R",
+   "options": {
+    "1": "0 2 R  h",
+    "2": "mg R2  2 R  h 0  ",
+    "3": "2mg R2 R  h 0",
+    "4": " 2,g R2 R  h 0"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 13,
+   "question": "A rectangular film of liquid is extended from (4 cm  2 cm) to (5 cm  4 cm). If the work done is 3  104 J, the value of the surface tension of the liquid is",
+   "options": {
+    "1": "0.250 Nm-1",
+    "2": "0.125 Nm-1",
+    "3": "0.2 Nm-1",
+    "4": "8.0 Nm-1"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 14,
+   "question": "Three liquids of densities 1, 2 and 3 (with 1 > 2 > 3), having the same value of surface tension T, rise to the same height in three identical capillaries. The angles of contact 1, 2 and 3 obey",
+   "options": {
+    "1": "     0 2 1 2 3",
+    "2": "0      1 2 3 2",
+    "3": "     2 1 2 3",
+    "4": "    1 2 3 2"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 15,
+   "question": "Two identical bodies are made of a material for which the heat capacity increases with temperature. One of these is at 100 °C, while the other one is at 0 °C. If the two bodies are brought into contact, then, assuming no heat loss, the final common temperature is",
+   "options": {
+    "1": "50 C",
+    "2": "More than 50 C",
+    "3": "Less than 50 C but greater than 0 C",
+    "4": "0 C"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 16,
+   "question": "A body cools from a temperature 3T to 2T in 10 minutes. The room temperature is T. Assume that Newton’s law of cooling is applicable. The temperature of the body at the end of next of 10 minutes will be",
+   "options": {
+    "1": "7 T 4",
+    "2": "3 T 2",
+    "3": "4 T 3",
+    "4": "T"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 17,
+   "question": "One mole of an ideal monatomic gas undergoes a process described by the equation PV3 = constant. The heat capacity of the gas during this process is",
+   "options": {
+    "1": "3 R 2",
+    "2": "5 R 2",
+    "3": "2R",
+    "4": "R"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 18,
+   "question": "The temperature inside a refrigerator is t2 °C and the room temperature is t1 °C. The amount of heat delivered to the room for each joule of electrical energy consumed ideally will be t1",
+   "options": {
+    "1": "t  t 1 2",
+    "2": "t1  273 t1  t2",
+    "3": "t 2  273 t1  t2",
+    "4": "t1  t2 t1  273"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 19,
+   "question": "A given sample of an ideal gas occupies a volume V at a pressure P and absolute temperature T. The mass of each molecule of the gas is m. Which of the following gives the density of the gas?",
+   "options": {
+    "1": "P kT ",
+    "2": "Pm kT",
+    "3": "P kTV",
+    "4": "mkT"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 20,
+   "question": "A body of mass m is attached to the lower end of a spring whose upper end is fixed. The spring has negligible mass. When the mass m is slightly pulled down and released, it oscillates with a time period of 3 s. When the mass m is increased by 1 kg, the time period of oscillations becomes 5 s. The value of m in kg is :",
+   "options": {
+    "1": "3 4",
+    "2": "4 3",
+    "3": "16 9",
+    "4": "9 16"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 21,
+   "question": "The second overtone of an open organ pipe has the same frequency as the first overtone of a closed pipe L meter long. The length of the open pipe will be",
+   "options": {
+    "1": "L",
+    "2": "2L",
+    "3": "L 2",
+    "4": "4L"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 22,
+   "question": "Three sound waves of equal amplitudes have frequencies (n – 1), n, (n + 1). They superimpose to give beats. The number of beats produced per second will be",
+   "options": {
+    "1": "1",
+    "2": "4",
+    "3": "3",
+    "4": "2"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 23,
+   "question": "An electric dipole is placed at an angle of 30° with an electric field intensity 2 × 105 N/C. It experiences a torque equal to 4 Nm. The charge on the dipole, if the dipole length is 2 cm, is",
+   "options": {
+    "1": "8 mC",
+    "2": "2 mC",
+    "3": "5 mC",
+    "4": "7 C"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 24,
+   "question": "A parallel- plate capacitor of area A, plate separation d and capacitance C is filled with four dielectric materials having dielectric constant k1, k2, k3 and k4 as shown in the figure below. If a single dielectric material is to be used to have the same capacitance C in this capacitor, then its dielectric constant k is given by",
+   "options": {
+    "1": "k = k1 + k2 + k3 + 3k4",
+    "2": "k  2 k  k  k   2k 3 1 2 3 4",
+    "3": "2  3  1 k k  k  k k 1 2 3 4",
+    "4": "1  1  1  1  3 k k k k 2k 1 2 3 4"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 25,
+   "question": "The potential difference (VA – VB) between the points A and B in the given figure is",
+   "options": {
+    "1": "3 V",
+    "2": "+3 V",
+    "3": "+6 V",
+    "4": "+9 V"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 26,
+   "question": "A filament bulb (500 W, 100 V) is to be used in a 230 V main supply. When a resistance R is connected in series, it works perfectly and the bulb consumes 500 W. The value of R is",
+   "options": {
+    "1": "230 ",
+    "2": "46 ",
+    "3": "26 ",
+    "4": "13 "
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 27,
+   "question": "A long wire carrying a steady current is bent into a circular loop of one turn. The magnetic field at the centre of the loop is B. It is then bent into a circular coil of n turns. The magnetic field at the centre of this coil of n turns will be",
+   "options": {
+    "1": "nB",
+    "2": "n2B",
+    "3": "2nB",
+    "4": "2n2B"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 28,
+   "question": "A bar magnet is hung by a thin cotton thread in a uniform horizontal magnetic field and is in equilibrium state. The energy required to rotate it by 60° is W. Now the torque required to keep the magnet in this new position is",
+   "options": {
+    "1": "W 3",
+    "2": "3W",
+    "3": "3 W 2W2",
+    "4": "3"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 29,
+   "question": "An electron is moving in a circular path under the influence of a transverse magnetic field of 3.57 × 10–2 T. If the value of e/m is 1.76 × 1011 C/kg, the frequency of revolution of the electron is",
+   "options": {
+    "1": "1 GHz",
+    "2": "100 MHz",
+    "3": "62.8 MHz",
+    "4": "6.28 MHz"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 30,
+   "question": "Which of the following combinations should be selected for better tuning of an L-C-R circuit used for communication?",
+   "options": {
+    "1": "R = 20 , L = 1.5 H, C = 35 F",
+    "2": "R = 25 , L = 2.5 H, C = 45 F",
+    "3": "R = 15 , L = 3.5 H, C = 30 F",
+    "4": "R = 25 , L = 1.5 H, C = 45 F"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 31,
+   "question": "A uniform magnetic field is restricted within a region of radius r. The magnetic field changes with time at a rate dB . Loop 1 of radius R > r dt encloses the region r and loop 2 of radius R is outside the region of magnetic field as shown in the figure below. Then the e.m.f. generated is",
+   "options": {
+    "1": "Zero in loop 1 and zero in loop 2",
+    "2": " dB ( r 2 ) in loop 1 and  dB ( r 2 ) in loop 2 dt dt",
+    "3": " dB ( R 2 ) in loop 1 and zero in loop 2 dt dB 2",
+    "4": " dt ( r ) in loop 1 and zero in loop 2"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 32,
+   "question": "The potential differences across the resistance, capacitance and inductance are 80 V, 40 V and 100 V respectively in an L-C-R circuit. The power factor of this circuit is",
+   "options": {
+    "1": "0.4",
+    "2": "0.5",
+    "3": "0.8",
+    "4": "1.0"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 33,
+   "question": "A 100  resistance and a capacitor of 100  reactance are connected in series across a 220 V source. When the capacitor is 50% charged, the peak value of the displacement current is",
+   "options": {
+    "1": "2.2 A",
+    "2": "11 A",
+    "3": "4.4 A",
+    "4": "11 2 A  3 "
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 34,
+   "question": "Two identical glass g equiconvex lenses of focal length f each are   2  kept in contact. The space between the two lenses is filled with water  4    . The focal length of the combination is w   3 ",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 35,
+   "question": "An air bubble in a glass slab with refractive index 1.5 (near normal incidence) is 5 cm deep when viewed from one surface and 3 cm deep when viewed from the opposite face. The thickness (in cm) of the slab is",
+   "options": {
+    "1": "8",
+    "2": "10",
+    "3": "12",
+    "4": "16"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 36,
+   "question": "The interference pattern is obtained with two coherent light sources ofi  i intensity ratio n. In the interference pattern, the ratio, max min will be i  i max min n",
+   "options": {
+    "1": "n  1",
+    "2": "2 n n  1 n",
+    "3": "  n 2 n1 2",
+    "4": "n  12"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 37,
+   "question": "A person can see clearly objects only when they lie between 50 cm and 400 cm from his eyes. In order to increase the maximum distance of distinct vision to infinity, the type and power of the correcting lens, the person has to use, will be",
+   "options": {
+    "1": "Convex, + 2.25 diopter",
+    "2": "Concave, – 0.25 diopter",
+    "3": "Concave, – 0.2 diopter",
+    "4": "Convex, + 0.15 diopter"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 38,
+   "question": "A linear aperture whose width is 0.02 cm is placed immediately in front of a lens of focal length 60 cm. The aperture is illuminated normally by a parallel beam of wavelength 5 × 10-5 cm. The distance of the first dark band of the diffraction pattern from the centre of the screen is",
+   "options": {
+    "1": "0.10 cm",
+    "2": "0.25 cm",
+    "3": "0.20 cm",
+    "4": "0.15 cm"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 39,
+   "question": "Electrons of mass m with de-Broglie wavelength  fall on the target in an X- ray tube. The cutoff wavelength (0) of the emitted X-ray is :-",
+   "options": {
+    "1": " 0  2mc2 h",
+    "2": "  2h 0 mc 2m2 c2 3",
+    "3": " 0  2 h",
+    "4": "0"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 40,
+   "question": "Photons with energy 5 eV are incident on a cathode C in a photoelectric cell. The maximum energy of emitted photoelectrons is 2 eV. When photons of energy 6 eV are incident on C, no photoelectrons will reach the anode A, if the stopping potential of A relative to C is:-",
+   "options": {
+    "1": "+3 V",
+    "2": "+4 V",
+    "3": "-1 V",
+    "4": "-3 V"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 41,
+   "question": "If an electron in a hydrogen atom jumps from the 3rd orbit to the 2nd orbit, it emits a photon of wavelength  . When it jumps from the 4th orbit to the 3rd orbit, the corresponding wavelength of the photon will be :- 16",
+   "options": {
+    "1": "25 ",
+    "2": "9  16 20",
+    "3": "7 ",
+    "4": "20  13"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 42,
+   "question": "The half-life of a radioactive substance is 30 minutes. The time (in minutes) taken between 40% decay and 85% decay of the same radioactive substance is :-",
+   "options": {
+    "1": "15",
+    "2": "30",
+    "3": "45",
+    "4": "60"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 43,
+   "question": "For CE transistor amplifier, the audio signal voltage across the collector resistance of 2k is 4 V. If the current amplification factor of the transistor is 100 and the base resistance is 1 k, then the input signal voltage is :-",
+   "options": {
+    "1": "10mV",
+    "2": "20mV",
+    "3": "30mV",
+    "4": "15mV"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 44,
+   "question": "The given circuit has two ideal diodes connected as shown in the figure below. The current flowing through the resistance R1 will be",
+   "options": {
+    "1": "2.5 A",
+    "2": "10.0 A",
+    "3": "1.43 A",
+    "4": "3.13 A"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 45,
+   "question": "What is the output Y in the following circuit, when all the three inputs A, B, C are first 0 and then 1?",
+   "options": {
+    "1": "0, 1",
+    "2": "0, 0",
+    "3": "1, 0",
+    "4": "1, 1"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 46,
+   "question": "Which one of the following compounds shows the presence of intramolecular hydrogen bond?",
+   "options": {
+    "1": "H2O2",
+    "2": "HCN",
+    "3": "Cellulose",
+    "4": "Concentrated acetic acid"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 47,
+   "question": "The molar conductivity of a 0.5 mol/dm3 solution of AgNO3 with electrolytic conductivity of 5.76 × 10–3 S cm–1 at 298 K is",
+   "options": {
+    "1": "2.88 S cm2/mol",
+    "2": "11.52 S cm2/mol",
+    "3": "0.086 S cm2/mol",
+    "4": "28.8 S cm2/mol"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 48,
+   "question": "The decomposition of phosphine (PH3) on tungsten at low pressure is a first- order reaction. It is because the",
+   "options": {
+    "1": "rate is proportional to the surface coverage",
+    "2": "rate is inversely proportional to the surface coverage",
+    "3": "rate is independent of the surface coverage",
+    "4": "rate of decomposition is very slow"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 49,
+   "question": "The coagulation values in millimoles per litre of the electrolytes used for the coagulation of As2S3 are given below: a. (NaCl) = 52, b. II. (BaCl2) = 0.69, c. (MgSO4) = 0.22 The correct order of their coagulating power is",
+   "options": {
+    "1": "I > II > III",
+    "2": "II > I > III",
+    "3": "III > II > I",
+    "4": "III > I > II"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Physics",
+   "qnum": 50,
+   "question": "During the electrolysis of molten sodium chloride, the time required to produce 0.10 mol of chlorine gas using a current of 3 amperes is",
+   "options": {
+    "1": "55 minutes",
+    "2": "110 minutes",
+    "3": "220 minutes",
+    "4": "330 minutes"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 51,
+   "question": "How many electrons can fit in the orbital for which n = 3 and l = 1?",
+   "options": {
+    "1": "2",
+    "2": "6",
+    "3": "10",
+    "4": "14"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 52,
+   "question": "For a sample of perfect gas when its pressure is changed isothermally from pi to pf, the entropy change is given by  p f  ",
+   "options": {
+    "1": "S  nR ln     pi    p   i S  nR ln     pf  ",
+    "2": " p  S  nRT ln  f   pi",
+    "3": "  p   S  RT ln  i    pf ",
+    "4": ""
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 53,
+   "question": "The van't Hoff factor (i) for a dilute aqueous solution of the strong electrolyte barium hydroxide is",
+   "options": {
+    "1": "0",
+    "2": "1",
+    "3": "2",
+    "4": "3"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 54,
+   "question": "The percentage of pyridine (C5H5N) that forms pyridinium ion (C5H5N+H) in a 0.10 M aqueous pyridine solution (K for C H N = 1.7 × 10–9) is b 5 5",
+   "options": {
+    "1": "0.0060%",
+    "2": "0.013%",
+    "3": "0.77%",
+    "4": "1.6%"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 55,
+   "question": "In calcium fluoride, having the fluorite structure, the coordination numbers for calcium ion (Ca2+) and fluoride ion (F–) are",
+   "options": {
+    "1": "4 and 2",
+    "2": "6 and 6",
+    "3": "8 and 4",
+    "4": "4 and 8"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 56,
+   "question": "If the E°cell for a given reaction has a negative value which of the following gives the correct relationships for the values of G° and Keq?",
+   "options": {
+    "1": "∆G° > 0; Keq < 1",
+    "2": "∆G° > 0; Keq > 1",
+    "3": "∆G° < 0; Keq > 1",
+    "4": "∆G° < 0; Keq < 1"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 57,
+   "question": "Which one of the following is incorrect for ideal solution?",
+   "options": {
+    "1": "∆Hmix = 0",
+    "2": "∆Umix = 0",
+    "3": "∆P = Pobs – Pcalculated by Raoult’s law = 0",
+    "4": "∆Gmix = 0"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 58,
+   "question": "The solubility of AgCl(s) with solubility product 1.6 × 10–10 in 0.1 M NaCl solution would be",
+   "options": {
+    "1": "1.25 × 10-5 M",
+    "2": "1.6 × 10-9 M",
+    "3": "1.6 × 10-11 M",
+    "4": "zero"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 59,
+   "question": "Suppose the elements X and Y combine to form two compounds XY2 and X3Y2. When 0.1 mole of XY2 weighs 10 g and 0.05 mole of X3Y2 weighs 9 g, the atomic weights of X and Y are",
+   "options": {
+    "1": "40, 30",
+    "2": "60, 40",
+    "3": "20, 30",
+    "4": "30, 20"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 60,
+   "question": "The number of electrons delivered at the cathode during electrolysis by a –19 current of 1 ampere in 60 seconds is (charge on electron = 1.60 ×1023 C)",
+   "options": {
+    "1": "6 × 1020",
+    "2": "6 × 10 20",
+    "3": "3.75 × 10",
+    "4": "7.48 × 1023"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 61,
+   "question": "Boric acid is an acid because its molecule",
+   "options": {
+    "1": "contains replaceable H+ ion",
+    "2": "gives up a proton",
+    "3": "accepts OH– from water releasing proton",
+    "4": "combines with proton from water molecule"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 62,
+   "question": "AlF3 is soluble in HF only in presence of KF. It is due to the formation of",
+   "options": {
+    "1": "K3[AlF3H3]",
+    "2": "K3[AlF6]",
+    "3": "AlH3",
+    "4": "K[AlF3H]"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 63,
+   "question": "Zinc can be coated on iron to produce galvanized iron but the reverse is not possible. It is because",
+   "options": {
+    "1": "zinc is lighter than iron",
+    "2": "zinc has lower melting point than iron",
+    "3": "zinc has lower negative electrode potential than iron",
+    "4": "zinc has higher negative electrode potential than iron"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 64,
+   "question": "The suspension of slaked lime in water is known as",
+   "options": {
+    "1": "Lime water",
+    "2": "Quicklime",
+    "3": "Milk of lime",
+    "4": "Aqueous solution of slaked lime"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 65,
+   "question": "The hybridizations of atomic orbitals of nitrogen in NO +, NO - and NH + 2 3 4 respectively are",
+   "options": {
+    "1": "sp, sp3 and sp2",
+    "2": "sp2, sp3 and sp",
+    "3": "sp, sp2 and sp3",
+    "4": "sp2, sp and sp3"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 66,
+   "question": "Which of the following fluoro-compounds is most likely to behave as a Lewis base?",
+   "options": {
+    "1": "BF3",
+    "2": "PF3",
+    "3": "CF4",
+    "4": "SiF4"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 67,
+   "question": "Which of the following pairs of ions is isoelectronic and isostructural?",
+   "options": {
+    "1": "CO32-, NO3-",
+    "2": "ClO3-, CO32-",
+    "3": "SO32-,NO3-",
+    "4": "ClO -, SO 2- 3 3"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 68,
+   "question": "In context with beryllium, which one of the following statements is incorrect?",
+   "options": {
+    "1": "It is rendered passive by nitric acid.",
+    "2": "It forms Be2C.",
+    "3": "Its salts rarely hydrolyze",
+    "4": "Its hydride is electron-deficient and polymeric."
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 69,
+   "question": "Hot concentrated sulphuric acid is a moderately strong oxidizing agent. Which of the following reactions does not show oxidizing behavior?",
+   "options": {
+    "1": "Cu + 2H2SO4 → CuSO4 + SO2 + 2H2O",
+    "2": "3S + 2H2SO4 → 3SO2 + 2H2O",
+    "3": "C + 2H2SO4 → CO2 + 2SO2 + 2H2O",
+    "4": "CaF2 + H2SO4 → CaSO4 + 2HF"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 70,
+   "question": "Which of the following pairs of d-orbitals will have electron density along the axes?",
+   "options": {
+    "1": "dz2,dxz",
+    "2": "dxz, dyz",
+    "3": "d z2 , dx2-y2",
+    "4": "dxy , dx2-y2"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 71,
+   "question": "The correct geometry and hybridization for XeF4 are :",
+   "options": {
+    "1": "Octahedral, sp3d2",
+    "2": "Trigonal bipyramidal, sp3d",
+    "3": "Planar triangle, sp3d3",
+    "4": "Square planar, sp3d2"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 72,
+   "question": "Among the following which one is a wrong statement?",
+   "options": {
+    "1": "PH5 and BiCl5 do not exist",
+    "2": "pπ-dπ bonds are present in SO2",
+    "3": "SeF4 and CH4 have same shape",
+    "4": "I3+ has bent geometry"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 73,
+   "question": "The correct increasing order of trans––– -effect of the following species is :",
+   "options": {
+    "1": "NH–3 > CN > Br– > C–6H5",
+    "2": "CN > C6H5 > Br > NH3",
+    "3": "Br– > CN– > NH3 > C6H5–",
+    "4": "CN– > Br– > C6H5– >NH3"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 74,
+   "question": "Which one of the followng statements related to lanthanons is incorrect?",
+   "options": {
+    "1": "Europium shows +2 oxidation state.",
+    "2": "The basicity decreases as the ionic radius decreases from Pr to Lu.",
+    "3": "All the lanthanons are much more reactive than aluminium",
+    "4": "Ce(+4) solutions are widely used as oxidizing agent in volumetric analysis"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 75,
+   "question": "Jahn-Teller effect not observed in high spin complexes of :7 -",
+   "options": {
+    "1": "d8",
+    "2": "d4",
+    "3": "d",
+    "4": "d9"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 76,
+   "question": "Which of the following can be used as halide component for Friedel-Crafts reaction?",
+   "options": {
+    "1": "Chlorobenzene",
+    "2": "Bromobenzene",
+    "3": "Chloroethene",
+    "4": "Isopropyl chloride"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 77,
+   "question": "In which of the following molecules, atoms are coplanar?",
+   "options": {
+    "1": ""
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 78,
+   "question": "Which one of the following structures represents nylon 6,6 polymer?",
+   "options": {
+    "1": "",
+    "2": "",
+    "3": ""
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 79,
+   "question": "In pyrrole the electron density is maximum on",
+   "options": {
+    "1": "2 and 3",
+    "2": "3 and 4",
+    "3": "2 and 4",
+    "4": "2 and 5"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 80,
+   "question": "Which of the following compounds shall not produce propene by reaction with HBr followed by elimination or direct only elimination reaction?",
+   "options": {
+    "2": "",
+    "3": "",
+    "4": ""
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 81,
+   "question": "Which one of the following nitro-compounds does not react with nitrous acid?",
+   "options": {
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": ""
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 82,
+   "question": "The central dogma of molecular genetics states that the genetic information flows from",
+   "options": {
+    "1": "Amino acids → Proteins → DNA",
+    "2": "DNA → Carbohydrates → Proteins",
+    "3": "DNA → RNA → Proteins",
+    "4": "DNA → RNA → Carbohydrates"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 83,
+   "question": "The correct corresponding order of names of following aldoses with configuration given below respectively, is",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 84,
+   "question": "In the given reaction",
+   "options": {
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": ""
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 85,
+   "question": "A given nitrogen containing aromatic compound aromatic A reacts with Sn/HCl, followed by HNO2 to give an unstable compound B. B, on treatment with phenol, forms a beautiful coloured compound C with the molecular formula C12H10N 2O. The structure of the compound A is",
+   "options": {
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": ""
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 86,
+   "question": "Consider the reaction CH3-CH2-CH2-Br + NaCN → CH3 –CH2 – CH2 –CN + NaBr The reaction will be the fastest in",
+   "options": {
+    "1": "ethanol",
+    "2": "methanol",
+    "3": "N, N’ –dimethylformamide (DMF)"
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 87,
+   "question": "The correct structure of the product A formed in the reaction",
+   "options": {
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": ""
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 88,
+   "question": "Which among the given molecules can exhibit tautomerism?",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 89,
+   "question": "The correct order of the strengths of the carboxylic acids",
+   "options": {
+    "1": "I> II >III",
+    "2": "II > III > I",
+    "3": "III > II > I",
+    "4": "II > I > II"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 90,
+   "question": "The compound that will react most readily with gaseous bromine has the formula?",
+   "options": {
+    "1": "C3H6",
+    "2": "C2H2",
+    "3": "C4H10",
+    "4": "C2H4 Biology"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 91,
+   "question": "Which one of the following is wrong for fungi?",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 92,
+   "question": "Methanogens belong to",
+   "options": {
+    "1": "Eubacteria",
+    "2": "Archaebacteria",
+    "3": "Dinoflagellates",
+    "4": "Slime moulds"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 93,
+   "question": "Select the wrong statement.",
+   "options": {
+    "1": "The walls of diatoms are easily destructible.",
+    "2": "‘Diatomaceous earth’ is formed by the cell wall of diatoms.",
+    "3": "Diatoms are chief producers in the ocean.",
+    "4": "Diatoms are microscopic and float passively in water."
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 94,
+   "question": "The label of a herbarium sheet does not carry information on",
+   "options": {
+    "1": "date of collection",
+    "2": "name of collector",
+    "3": "local names",
+    "4": "height of the plant"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 95,
+   "question": "Conifers are adapted to tolerate extreme environmental conditions because of",
+   "options": {
+    "1": "broad hardy leaves",
+    "2": "superficial stomata",
+    "3": "thick cuticle",
+    "4": "presence of vessels"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 96,
+   "question": "Which one of the following statements is wrong?",
+   "options": {
+    "1": "Algae increase the level of dissolved oxygen in the immediate environment.",
+    "2": "Algin is obtained from red algae, and carrageenan from brown algae.",
+    "3": "Agar-agar is obtained from Gelidium and Gracilaria.",
+    "4": "Laminaria and Sargassum are used as food."
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 97,
+   "question": "The term 'polyadelphous' is related to",
+   "options": {
+    "1": "gynoecium",
+    "2": "androecium",
+    "3": "corolla",
+    "4": "calyx"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 98,
+   "question": "How many plants among Indigofera, Sesbania, Salvia, Allium, Aloe, mustard, groundnut, radish, gram and turnip have stamens with different lengths in their flowers?",
+   "options": {
+    "1": "Three",
+    "2": "Four",
+    "3": "Five",
+    "4": "Six"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 99,
+   "question": "Radial symmetry is found in the flowers of",
+   "options": {
+    "1": "Brassica",
+    "2": "Trifolium",
+    "3": "Pisum",
+    "4": "Cassia"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Chemistry",
+   "qnum": 100,
+   "question": "Free-central placentation is found in",
+   "options": {
+    "1": "Dianthus",
+    "2": "Argemone",
+    "3": "Brassica",
+    "4": "Citrus"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 101,
+   "question": "Cortex is the region found between",
+   "options": {
+    "1": "epidermis and stele",
+    "2": "pericycle and endodermis",
+    "3": "endodermis and pith",
+    "4": "endodermis and vascular bundle"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 102,
+   "question": "The balloon-shaped structures called tyloses",
+   "options": {
+    "1": "lysozyme",
+    "2": "ribozyme",
+    "3": "ligase",
+    "4": "deoxyribonuclease"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 103,
+   "question": "A non-proteinaceous enzyme is",
+   "options": {
+    "1": "Stroma",
+    "2": "Lumen of thylakoids",
+    "3": "Inter membrane space",
+    "4": "Antennae complex"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 104,
+   "question": "Select the mismatch.",
+   "options": {
+    "1": "Gas vacuoles - Green bacteria",
+    "2": "Large central vacuoles - Animal cells",
+    "3": "Protists - Eukaryotes",
+    "4": "Methanogens - Prokaryotes"
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 105,
+   "question": "Select the wrong statement.",
+   "options": {
+    "1": "Bacterial cell wall is made up of peptidoglycan.",
+    "2": "Pili and fimbriae are mainly involved in motility of bacterial cells.",
+    "3": "Cyanobacteria lack flagellated cells.",
+    "4": "Mycoplasma is a wall-less microorganism."
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 106,
+   "question": "A cell organelle containing hydrolytic enzymes is",
+   "options": {
+    "1": "lysosome",
+    "2": "microsome",
+    "3": "ribosome",
+    "4": "mesosome"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 107,
+   "question": "During cell growth, DNA synthesis takes place in",
+   "options": {
+    "1": "S Phase",
+    "2": "G1 phase",
+    "3": "G2 phase",
+    "4": "M phase"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 108,
+   "question": "Which of the following biomolecules is common to respiration- mediated breakdown of fats, carbohydrates and proteins?",
+   "options": {
+    "1": "Glucose-6-phosphate",
+    "2": "Fructose 1,6-bisphosphate",
+    "3": "Pyruvic acid",
+    "4": "Acetyl CoA"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 109,
+   "question": "A few drops of sap were collected by cutting across a plant stem by a suitable method. The sap was tested chemically. Which one of the following test results indicates that it is phloem sap?",
+   "options": {
+    "1": "Acidic",
+    "2": "Alkaline",
+    "3": "Low refractive index",
+    "4": "Absence of sugar"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 110,
+   "question": "You are given a tissue with its potential for differentiation in an artificial culture. Which of the following pairs of hormones would you add to the medium to secure shoots as well as roots?",
+   "options": {
+    "1": "IAA and gibberellins",
+    "2": "Auxin and cytokinin",
+    "3": "Auxin and abscisic acid",
+    "4": "Gibberellin and abscisic acid"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 111,
+   "question": "Phytochrome is a",
+   "options": {
+    "1": "flavoprotein",
+    "2": "glycoprotein",
+    "3": "lipoprotein",
+    "4": "chromoprotein"
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 112,
+   "question": "Which is essential for the growth of root tip?",
+   "options": {
+    "1": "Zn",
+    "2": "Fe",
+    "3": "Ca",
+    "4": "Mn"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 113,
+   "question": "The process which makes major difference between C3 and C4 plants is",
+   "options": {
+    "1": "glycolysis",
+    "2": "Calvin cycle",
+    "3": "photorespiration",
+    "4": "respiration"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 114,
+   "question": "Which one of the following statements is not correct?",
+   "options": {
+    "1": "Offspring produced by the asexual reproduction are called clone.",
+    "2": "Microscopic, motile asexual reproductive structures are called zoospores.",
+    "3": "In potato, banana and ginger, the plantlets arise from the internodes present in the modified stem.",
+    "4": "Water hyacinth, growing in the standing water, drains oxygen from water that leads to the death of fishes."
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 115,
+   "question": "Which one of the following generates new genetic combinations leading to variation?",
+   "options": {
+    "1": "Vegetative reproduction",
+    "2": "Parthenogenesis",
+    "3": "Sexual reproduction",
+    "4": "Nucellar polyembryony"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 116,
+   "question": "Match Column-I with Column-II and select the correct option using the codes given below: Column-I Column-II a. Pistils fused together (i) Gametogenesis b. Formation of gametes (ii) Pistillate c. Hyphae of higher ascomycetes (iii) Syncarpous d. Unisexual female flower (iv) Dikaryotic Codes: a b c d",
+   "options": {
+    "1": "(iv) (iii) (i) (ii)",
+    "2": "(ii) (i) (iv) (iii)",
+    "3": "(i) (ii) (iv) (iii)",
+    "4": "(iii) (i) (iv) (ii)"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 117,
+   "question": "In majority of angiosperms",
+   "options": {
+    "1": "egg has a filiform apparatus",
+    "2": "there are numerous antipodal cells",
+    "3": "reduction division occurs in the megaspore mother cells",
+    "4": "a small central cell is present in the embryo sac"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 118,
+   "question": "Pollination in water hyacinth and water lily is brought about by the agency of",
+   "options": {
+    "1": "water",
+    "2": "insects or wind",
+    "3": "birds",
+    "4": "bats"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 119,
+   "question": "The ovule of an angiosperm is technically equivalent to",
+   "options": {
+    "1": "megasporangium"
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 120,
+   "question": "Taylor conducted the experiments to prove semiconservative mode of chromosome replication on",
+   "options": {
+    "1": "Vinca rosea",
+    "2": "Vicia faba",
+    "3": "Drosophila melanogaster",
+    "4": "E. coli"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 121,
+   "question": "The mechanism that causes a gene to move from one linkage group to another is called",
+   "options": {
+    "1": "Inversion",
+    "2": "Duplication",
+    "3": "Translocation",
+    "4": "Crossing over"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 122,
+   "question": "The equivalent of a structural gene is",
+   "options": {
+    "1": "Mutation",
+    "2": "Cistron",
+    "3": "Operon",
+    "4": "Recon"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 123,
+   "question": "A true breeding plant is",
+   "options": {
+    "1": "One that is able to breed on its own",
+    "2": "Produced due to cross pollination among unrelated plants",
+    "3": "Near homozygous and produces offspring of its own kind",
+    "4": "Always homozygous recessive in its genetic constitution"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 124,
+   "question": "Which of the following rRNAs acts as structural RNA as well as ribozyme in bacteria?",
+   "options": {
+    "1": "5S rRNA",
+    "2": "18S rRNA",
+    "3": "23S rRNA",
+    "4": "5.8S rRNA"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 125,
+   "question": "Stirred tank bioreactors have been designed for",
+   "options": {
+    "1": "Purification of product",
+    "2": "Addition of preservatives to the product",
+    "3": "Availability of oxygen throughout the process",
+    "4": "Ensuring anaerobic conditions in the culture vessel"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 126,
+   "question": "A foreign DNA and plasmid cut by the same restriction endonuclease can be joined to form a recombinant plasmid using",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 127,
+   "question": "Which of the following is not a component of downstream processing?",
+   "options": {
+    "1": "Separation",
+    "2": "Purification",
+    "3": "Preservation",
+    "4": "Expression"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 128,
+   "question": "Which of the following restriction enzymes produce blunt ends?",
+   "options": {
+    "1": "Sal I",
+    "2": "Eco RV",
+    "3": "Xho I",
+    "4": "Hind III"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 129,
+   "question": "Which kind of therapy was given in 1990 to a four year old girl with adenosine deaminase (ADA) deficiency?",
+   "options": {
+    "1": "Gene therapy",
+    "2": "Chemotherapy",
+    "3": "Immunotherapy",
+    "4": "Radiation therapy"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 130,
+   "question": "How many hot spots of biodiversity in the world have been identified till date by Norman Myers?",
+   "options": {
+    "1": "17",
+    "2": "25",
+    "3": "34",
+    "4": "43"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 131,
+   "question": "The primary producers of deep-sea hydrothermal vent ecosystem are",
+   "options": {
+    "1": "Green algae",
+    "2": "Chemosynthetic bacteria",
+    "3": "Blue green algae",
+    "4": "Coral reefs"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 132,
+   "question": "Which of the following is corrent for r-selected species?",
+   "options": {
+    "1": "Large number of progeny with small size",
+    "2": "Large number of progeny with large size",
+    "3": "Small number of progeny with small size",
+    "4": "Small number of progeny with large size"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 133,
+   "question": "If ‘+’ sign is assigned to beneficial interactions, ‘-’ sign to detrimental and ‘0’ sign to neutral interactions, then the population interaction represented by ‘+’ ‘-’ refers to",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 134,
+   "question": "Which of the following is correctly matched?",
+   "options": {
+    "1": "Aerenchyma – Opuntia",
+    "2": "Age pyramid – Biome",
+    "3": "Parthenium hysterophorus – Threat to biodiversity",
+    "4": "Stratification – population"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 135,
+   "question": "Red list contains data or information on",
+   "options": {
+    "1": "all economically important plants",
+    "2": "Plants whose products are in international trade",
+    "3": "threatened species",
+    "4": "marine vertebrates only"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 136,
+   "question": "Which of the following sets of diseases is caused by bacteria?",
+   "options": {
+    "1": "Cholera and tetanus",
+    "2": "Typhoid and smallpox",
+    "3": "Tetanus and mumps",
+    "4": "Herpes and influenza"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 137,
+   "question": "Match Column-I with Column-II for housefly classification and select the correct option using the codes given below: Column II (i) Diptera (ii) Arthropoda (iii) Muscidae (iv) Insecta a b c d",
+   "options": {
+    "1": "(iii) (i) (iv) (ii)",
+    "2": "(iii) (ii) (iv) (i)",
+    "3": "(iv) (iii) (ii) (i)",
+    "4": "(iv) (ii) (i) (iii)"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 138,
+   "question": "Choose the correct statement",
+   "options": {
+    "1": "All mammals are viviparous",
+    "2": "All cyclostomes do not possess jaws and paired fins",
+    "3": "All reptiles have a three chambered heart",
+    "4": "All Pisces have gills covered by an operculum"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 139,
+   "question": "Study the four statements (A-D) given below and select the two correct ones out of them:",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 140,
+   "question": "In male cockroaches, sperms are stored in which part of the reproductive system?",
+   "options": {
+    "1": "Seminal vesicles",
+    "2": "Mushroom glands",
+    "3": "Testes",
+    "4": "Vas deferens"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 141,
+   "question": "Smooth muscles are",
+   "options": {
+    "1": "Involuntary, fusiform, non-striated",
+    "2": "Voluntary, multinucleate, cylindrical",
+    "3": "Involuntary, cylindrical, striated",
+    "4": "Voluntary, spindle shaped, uninucleate"
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 142,
+   "question": "Oxidative phosphorylation is",
+   "options": {
+    "1": "Formation of ATP by transfer of phosphate group from a substrate to ADP",
+    "2": "Oxidation of phosphate group in ATP",
+    "3": "Addition of phosphate group to ATP",
+    "4": "Formation of ATP by energy released from electrons removed during substrate oxidation"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 143,
+   "question": "Which of the following is the least likely to be involved in stabilizing the three dimensional folding of most proteins?",
+   "options": {
+    "1": "Hydrogen bonds",
+    "2": "Electrostatic interaction",
+    "3": "Hydrophobic interaction",
+    "4": "Ester bonds"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 144,
+   "question": "Which of the following describes the given graph correctly?",
+   "options": {},
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 145,
+   "question": "When cell has stalled DNA replication fork, which checkpoint should be predominantly activated?",
+   "options": {
+    "1": "G1/S",
+    "2": "G2/M",
+    "3": "M",
+    "4": "Both G2/M and M"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 146,
+   "question": "Match the stages of meiosis in column I to their characteristic feature in column II and select the correct option using the codes given below: Column I Column II a. Pachytene i. Paring of homologous chromosomes b. Metaphase I ii. Termination of chiasmata c. Diakinesis iii. Crossing over takes place d. Zygotene iv. Chromosomes align at equatorial plate Codes: a b c d",
+   "options": {
+    "1": "(iii) (iv) (ii) (i)",
+    "2": "(i) (iv) (ii) (iii)",
+    "3": "(ii) (iv) (iii) (i)",
+    "4": "(iv) (iii) (ii) (i)"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 147,
+   "question": "Which hormones do stimulate the production of pancreatic juice and bicarbonate?",
+   "options": {
+    "1": "Angiotensin and epinephrine",
+    "2": "Gastrin and insulin",
+    "3": "Cholecystokinin and secretin",
+    "4": "Insulin and Glucagon"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 148,
+   "question": "The partial pressure of oxygen in the alveoli of the lungs is",
+   "options": {
+    "1": "equal to that in the blood",
+    "2": "more than that in the blood",
+    "3": "less than that in the blood",
+    "4": "less than that of the carbon dioxide"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 149,
+   "question": "Choose the correct statement.",
+   "options": {
+    "1": "Nociceptors respond to changes in pressure",
+    "2": "Meissner’s corpuscles are thermoreceptors",
+    "3": "Photoreceptors in the human eye are depolarized during darkness and become hyperpolarized in response to the light stimulus",
+    "4": "Receptors do not produce graded potentials"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Botany",
+   "qnum": 150,
+   "question": "Grave’s disease is caused due to",
+   "options": {
+    "1": "hyposecretion of thyroid gland",
+    "2": "hypersecretion of thyroid gland",
+    "3": "hyposecretion of adrenal gland",
+    "4": "hypersecretion of adrenal gland"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 151,
+   "question": "Name the ion responsible for unmasking of active sites for myosin for cross-bridge activity during muscle contraction.",
+   "options": {
+    "1": "Calcium",
+    "2": "Magnesium",
+    "3": "Sodium",
+    "4": "Potassium"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 152,
+   "question": "Name the blood cells, whose reduction in number can cause clotting disorder, leading to excessive loss of blood from the body.",
+   "options": {
+    "1": "Erythrocytes",
+    "2": "Leucocytes",
+    "3": "Neutrophils",
+    "4": "Thrombocytes"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 153,
+   "question": "Name a peptide hormone which acts mainly on hepatocytes, adipocytes and enhances cellular glucose uptake and utilization.",
+   "options": {
+    "1": "Insulin",
+    "2": "Glucagon"
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 154,
+   "question": "Osteoporosis, age-related disease of skeletal system, may occur due to",
+   "options": {
+    "1": "immune disorder affecting neuro-muscular junction leading to fatigue",
+    "2": "high concentration of Ca++ and Na+",
+    "3": "decreased level of estrogen",
+    "4": "accumulation of uric acid leading to inflammation of joints"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 155,
+   "question": "Serum differs from blood in",
+   "options": {
+    "1": "lacking globulins",
+    "2": "lacking albumins",
+    "3": "lacking clotting factors",
+    "4": "lacking antibodies"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 156,
+   "question": "Lungs do not collapse between breaths and some air always remains in the lungs which can never be expelled because",
+   "options": {
+    "1": "there is a negative pressure in the lungs",
+    "2": "there is negative intrapleural pressure pulling at the lung walls",
+    "3": "there is a positive intrapleural pressure",
+    "4": "pressure in the lungs is higher than the atmospheric pressure"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 157,
+   "question": "The posterior pituitary gland is not a ‘true’ endocrine gland because",
+   "options": {
+    "1": "it is provided with a duct",
+    "2": "it only stores and release hormones",
+    "3": "it is under the regulation of hypothalamus",
+    "4": "it secretes enzymes"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 158,
+   "question": "The part of nephron involved in active reabsorption of sodium is",
+   "options": {
+    "1": "distal convoluted tubule",
+    "2": "proximal convoluted tubule",
+    "3": "Bowman’s capsule",
+    "4": "descending limb of Henle’s loop"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 159,
+   "question": "Which of the following is hormone-releasing IUD?",
+   "options": {
+    "1": "LNG-20",
+    "2": "Multiload 375",
+    "3": "Lippes loop",
+    "4": "Cu7"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 160,
+   "question": "Which of following incorrect regarding vasectomy?",
+   "options": {
+    "1": "No sperm occurs in seminal fluid",
+    "2": "No sperms occurs in epididymis",
+    "3": "Vasa deferentia is cut and died",
+    "4": "Irreversible sterility"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 161,
+   "question": "Embryo with more than 16 blastomeres formed due to in vitro fertilization is transferred into",
+   "options": {
+    "1": "uterus",
+    "2": "fallopian tube",
+    "3": "fimbriae",
+    "4": "cervix"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 162,
+   "question": "Which of the following depicts the correct pathway of transport of sperms?",
+   "options": {
+    "1": "Rete testis  Efferent ductules  Epididymis  Vas deferens   ",
+    "2": "Rete testis  Epididymis  Efferent ductules  Vas deferens",
+    "3": "Rete testis Vas deferens Efferent ductules Epididymis",
+    "4": "Efferent ductules  Rete testis  Vas deferens  Epididymis"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 163,
+   "question": "Match Column-I with Column-II and select the correct option using the codes given below: Column II (i) Embryo formation (ii) Sperm (iii) Female external genitalia (iv) Graafian follicle a b c d",
+   "options": {
+    "1": "(iii) (iv) (ii) (i)",
+    "2": "(iii) (iv) (i) (ii)",
+    "3": "(iii) (i) (iv) (ii)",
+    "4": "(i) (iv) (iii) (iii)"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 164,
+   "question": "Several hormones likes hCG, hPL, estrogen, progesterone are produced by",
+   "options": {
+    "1": "Ovary",
+    "2": "Placenta",
+    "3": "Fallopian tube",
+    "4": "Pituitary"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 165,
+   "question": "If a colour-blind man marries a woman who is homozygous for normal vision, the probability of their son being colour blind is",
+   "options": {
+    "1": "0",
+    "2": "0.5",
+    "3": "0.75",
+    "4": "1"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 166,
+   "question": "Genetic drift operates in:",
+   "options": {
+    "1": "Small isolated population",
+    "2": "Large isolated population",
+    "3": "Non-reproductive population",
+    "4": "Slow reproductive population"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 167,
+   "question": "In Hardy-Weinberg equation, the frequency of heterozygous individuals is represented by",
+   "options": {
+    "1": "p2",
+    "2": "2pq",
+    "3": "pq",
+    "4": "q2"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 168,
+   "question": "The chronological order of human evolution from early to the recent is",
+   "options": {
+    "1": "Australopithecus  Ramapithecus  Homo habilis  Homo erectus",
+    "2": "Ramapithecus  Australopithecus  Homo habilis  Homo erectus",
+    "3": "Ramapithecus Homo habilis Australopithecus Homo erectus",
+    "4": "Australopithecus  Homo habilis  Ramapithecus  Homo erectus"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 169,
+   "question": "Which of the following is the correct sequence of events in the origin of life? I. Formation of protobionts II. Synthesis of organic monomers III. Synthesis of organic polymers IV. Formation of DNA-based genetic systems",
+   "options": {
+    "1": "I, II, III, IV",
+    "2": "I, III, II, IV",
+    "3": "II, III, I, IV",
+    "4": "II, III, IV, I"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 170,
+   "question": "A molecule that can act as a genetic material must fulfill the traits given below, except",
+   "options": {
+    "1": "It should be able to express itself in the form of ‘Mendelian characters’",
+    "2": "It should be able to generate its replica",
+    "3": "It should be unstable structurally and chemically",
+    "4": "It should provide the scope for slow changes that are required for evolution"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 171,
+   "question": "DNA-dependent RNA polymerase catalyzes transcription on one strand of the DNA which is called the",
+   "options": {
+    "1": "template strand",
+    "2": "coding strand",
+    "3": "alpha strand",
+    "4": "antistrand"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 172,
+   "question": "Interspecific hybridization is the mating of",
+   "options": {
+    "1": "animals within same breed without having common ancestors",
+    "2": "two different related species",
+    "3": "superior males and females of different breeds",
+    "4": "more closely related individuals within same breed for 4—6 generations"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 173,
+   "question": "Which of the following is correct regarding AIDS causative agent HIV?",
+   "options": {
+    "1": "HIV is enveloped virus containing one molecule of single-stranded RNA and one molecule of reverse transcriptase",
+    "2": "HIV is enveloped virus that contains two identical molecules of single-stranded RNA and two molecules of reverse transcriptase",
+    "3": "HIV is unenveloped virus",
+    "4": "HIV does not escape but attacks the acquired immune response"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 174,
+   "question": "Among the following edible fishes, which one is a marine fish having rich source of omega-3 fatty acids?",
+   "options": {
+    "1": "Mystus",
+    "2": "Mangur",
+    "3": "Mrigala",
+    "4": "Mackerel"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 175,
+   "question": "Match Column-I with Column-II and select the correct option using the codes given below: Column II (i) Trichoderma (ii) Clostridium (iii) Apsergillus (iv) Monascus a b c d",
+   "options": {
+    "1": "(iii) (i) (ii) (iv)",
+    "2": "(iii) (i) (iv) (ii)",
+    "3": "(i) (iv) (ii) (iii)",
+    "4": "(iii)(iv)(i)(ii)"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 176,
+   "question": "Biochemical Oxygen Demand (BOD) may not be a good index for pollution for water bodies receiving effluents from",
+   "options": {
+    "1": "Domestic sewage",
+    "2": "Dairy industry",
+    "3": "Petroleum industry",
+    "4": "Sugar industry"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 177,
+   "question": "The principle of competitive exclusion was stated by",
+   "options": {
+    "1": "C. Darwin",
+    "2": "G. F. Gause"
+   },
+   "incomplete": true,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 178,
+   "question": "Which of the following National Parks is home to the famous musk deer or hangul?",
+   "options": {
+    "1": "Keibul Lamjao National Park, Manipur",
+    "2": "Bandhavgarh National Park, Madhya Pradesh",
+    "3": "Eaglenest Wildlife Sanctuary, Arunachal Pradesh",
+    "4": "Dachigam National Park, Jammu & Kashmir"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 179,
+   "question": "A lake which is rich in organic waste may result in",
+   "options": {
+    "1": "Increased population of aquatic organisms due to minerals",
+    "2": "Drying of the lake due to algal bloom",
+    "3": "Increased population of fish due to lots of nutrients",
+    "4": "Mortality of fish due to lack of oxygen"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  },
+  {
+   "year": 2016,
+   "subject": "Zoology",
+   "qnum": 180,
+   "question": "The highest DDT concentration in aquatic food chain shall occur in",
+   "options": {
+    "1": "Phytoplankton",
+    "2": "Seagull",
+    "3": "Crab",
+    "4": "Eel"
+   },
+   "incomplete": false,
+   "correctAnswer": null
+  }
+ ],
+ "questions_shipped": 154
+}
