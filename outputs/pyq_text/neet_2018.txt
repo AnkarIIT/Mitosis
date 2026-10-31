@@ -1,0 +1,1251 @@
+                                                         ALHCA                                         Test Booklet Code
+                                                                                     *0ZZ*
+                                          This Booklet contains 24 pages.
+                                                                                                             ZZ
+                            Do not open this Test Booklet until you are asked to do so.
+
+Read carefully the Instructions on the Back Cover of this Test Booklet.
+ Important Instructions :
+ 1.  The Answer Sheet is inside this Test Booklet. When you are directed to open the Test Booklet,
+     take  out  the  Answer  Sheet  and  fill  in  the  particulars  on           Side-1    and   Side-2    carefully  with
+     blue/black ball point pen only.
+ 2.  The  test  is of  3  hours    duration  and this      Test  Booklet  contains 180        questions.    Each question
+     carries 4 marks. For each correct response, the candidate will get 4 marks. For each incorrect
+     response, one mark will be deducted from the total scores. The maximum marks are 720.
+ 3.  Use Blue/Black Ball Point Pen only for writing particulars on this page/marking responses.
+ 4.  Rough work is to be done on the space provided for this purpose in the Test Booklet only.
+ 5.  On  completion  of  the  test,  the  candidate  must  hand  over  the  Answer  Sheet  to  the
+     Invigilator     before  leaving       the  Room/Hall.        The  candidates  are  allowed  to  take  away
+     this Test Booklet with them.
+ 6.  The CODE for this Booklet is ZZ. Make sure that the CODE printed on Side-2 of the Answer
+     Sheet  is  the  same  as  that  on  this     Test   Booklet.  In  case  of  discrepancy,  the  candidate  should
+     immediately report the matter to the Invigilator for replacement of both the Test Booklet and
+     the Answer Sheet.
+ 7.  The  candidates  should  ensure  that  the  Answer  Sheet  is  not  folded.  Do  not  make  any  stray
+     marks on the Answer Sheet. Do not write your Roll No. anywhere else except in the specified
+     space in the Test Booklet/Answer Sheet.
+ 8.  Use of white fluid for correction is not permissible on the Answer Sheet.
+
+
+Name of the Candidate (in Capitals) : _____________________________________________________________________
+
+Roll Number : in figures _________________________________________________________________________________
+
+               : in words __________________________________________________________________________________
+
+Centre of Examination (in Capitals) : _____________________________________________________________________
+
+Candidate’s Signature : __________________________ Invigilator’s Signature : ________________________________
+
+Facsimile signature stamp of
+Centre Superintendent : ________________________________________________________________________________
+
+ALHCA/ZZ/Page 1                                  SPACE FOR ROUGH WORK                                                   English
+
+===== PAGE BREAK =====
+
+1.     A  tuning  fork  is  used  to  produce  resonance  in  a            5.      Current sensitivity of a moving coil galvanometer
+        glass tube. The length of the air column in  this                          is  5  div/mA  and  its  voltage  sensitivity  (angular
+        tube  can  be  adjusted  by  a  variable  piston.  At                      deflection  per  unit  voltage  applied)  is  20  div/V.
+        room    temperature    of    27C           two    successive              The resistance of the galvanometer is
+        resonances are produced at 20 cm  and 73 cm of
+        column length. If the frequency of the tuning fork                         (1)    40 
+        is 320 Hz, the velocity of sound in air at 27C is                         (2)    25 
+       (1)     330 m/s                                                             (3)    500 
+       (2)     339 m/s                                                             (4)    250 
+       (3)     300 m/s                                                     6.      A   thin   diamagnetic   rod   is   placed   vertically
+       (4)     350 m/s                                                             between the poles of an electromagnet. When the
+2.     An  electron  falls  from  rest  through  a  vertical                       current in the electromagnet is switched on, then
+        distance  h  in  a  uniform  and  vertically  upward                       the  diamagnetic  rod  is  pushed  up,  out  of  the
+        directed electric field E. The direction of electric                       horizontal  magnetic  field.  Hence  the  rod  gains
+        field is now reversed, keeping its magnitude the                           gravitational     potential     energy.     The     work
+        same.  A  proton  is  allowed  to  fall  from  rest  in  it                required to do this comes from
+        through the same vertical distance h. The time of
+        fall of the electron, in comparison to the time of                         (1)    the current source
+        fall of the proton is                                                      (2)    the magnetic field
+       (1)     smaller                                                             (3)    the    induced    electric    field    due    to    the
+       (2)     5 times greater                                                            changing magnetic field
+       (3)     equal                                                               (4)    the  lattice  structure  of  the  material  of  the
+       (4)     10 times greater                                                           rod
+
+3.     A   pendulum   is   hung   from   the   roof   of   a               7.      An  inductor  20       mH,  a  capacitor  100        F  and  a
+        sufficiently high building and is moving freely  to                        resistor  50        are  connected  in  series  across  a
+        and  fro  like  a  simple  harmonic  oscillator.  The                      source of emf, V = 10 sin 314 t. The power loss in
+        acceleration   of   the   bob   of   the   pendulum   is                   the circuit is
+        20  m/s2    at  a  distance  of  5  m  from  the  mean                     (1)    0·79 W
+        position. The time period of oscillation is                                (2)    0·43 W
+       (1)     2 s                                                                (3)    1·13 W
+       (2)      s                                                                 (4)    2·74 W
+       (3)     1 s
+       (4)     2 s                                                         8.       A    metallic    rod    of    mass    per    unit    length
+                                                                                   0·5  kg  m–1      is  lying  horizontally  on  a  smooth
+4.     The    electrostatic  force  between  the  metal  plates                    inclined plane which makes an angle of 30 with
+        of an isolated parallel plate capacitor C having a                         the  horizontal.  The  rod  is  not  allowed  to  slide
+        charge Q and area A, is                                                    down  by  flowing  a  current  through  it  when  a
+       (1)     independent  of  the  distance  between  the                        magnetic field of induction 0·25 T is acting on it
+               plates.                                                             in  the  vertical  direction.  The  current  flowing  in
+       (2)     linearly    proportional    to    the    distance                   the rod to keep it stationary is
+               between the plates.                                                 (1)    7·14 A
+       (3)     inversely    proportional    to    the    distance                  (2)    5·98 A
+               between the plates.
+       (4)     proportional   to   the       square   root   of   the              (3)    11·32 A
+               distance between the plates.                                        (4)    14·76 A
+
+ALHCA/ZZ/Page 2                                          SPACE FOR ROUGH WORK                                                                English
+
+===== PAGE BREAK =====
+
+9.     A carbon resistor of (47  4·7) k is to be marked                  12.     In Young’s double slit experiment the separation
+        with     rings     of     different     colours     for     its            d between the slits is 2 mm, the wavelength  of
+        identification. The colour code sequence will be                           the light used is 5896 Å and distance D between
+       (1)     Violet –  Yellow –  Orange –  Silver                                the screen and slits is 100 cm. It is found that the
+       (2)     Yellow –  Violet – Orange – Silver                                  angular width of the fringes is 0·20. To increase
+       (3)     Green –  Orange –  Violet –  Gold                                   the  fringe  angular  width  to  0·21          (with  same     
+       (4)     Yellow –  Green – Violet – Gold                                     and D) the separation between the slits needs to
+10.    A set of ‘n’ equal resistors, of value ‘R’ each, are                        be changed to
+        connected  in  series  to  a  battery  of  emf  ‘E’  and                   (1)    1·8 mm
+        internal  resistance  ‘R’.      The  current  drawn  is  I.                (2)    1·9 mm
+        Now, the ‘n’ resistors are  connected in parallel to
+        the  same  battery.  Then  the  current  drawn  from                       (3)    1·7 mm
+        battery becomes 10 I. The value of ‘n’ is                                  (4)    2·1 mm
+       (1)     10
+       (2)     11                                                          13.     An  astronomical  refracting  telescope  will  have
+       (3)     9                                                                   large  angular  magnification  and  high  angular
+       (4)     20                                                                  resolution, when it has an objective lens of
+
+11.    A  battery  consists  of  a  variable  number  ‘n’  of                      (1)    small focal length and large diameter
+        identical   cells   (having   internal   resistance   ‘r’                  (2)    large focal length and small diameter
+        each)    which    are    connected    in    series.    The                 (3)    small focal length and small diameter
+        terminals  of  the  battery  are  short-circuited  and                     (4)    large focal length and large diameter
+        the  current  I  is  measured.  Which  of  the  graphs
+        shows the correct relationship between I and n ?
+                                                                           14.     Unpolarised light is incident from air on a plane
+                                                                                   surface of a material of refractive index ‘’. At a
+                                                                                   particular  angle  of  incidence  ‘i’,  it  is  found  that
+                                                                                   the      reflected      and      refracted      rays      are
+                                                                                   perpendicular   to   each   other.   Which   of   the
+                                                                                   following options is correct for this situation ?
+
+                                                                                   (1)    Reflected light is polarised          with its electric
+                                                                                          vector parallel to the plane of incidence
+
+                                                                                   (2)    Reflected light is polarised with its electric
+                                                                                          vector    perpendicular    to    the    plane    of
+                                                                                          incidence
+
+                                                                                   (3)    i = tan–1
+
+
+                                                                                   (4)    i = sin–1
+
+
+ALHCA/ZZ/Page 3                                          SPACE FOR ROUGH WORK                                                                English
+
+===== PAGE BREAK =====
+
+15.    An em wave is propagating in a medium with a                        19.     For     a     radioactive        material,     half-life     is
+        velocity        = V    . The instantaneous oscillating                     10 minutes. If  initially  there are 600 number of
+                                                                                   nuclei,   the   time   taken   (in   minutes)   for   the
+        electric  field  of  this  em  wave  is  along  +y  axis.                  disintegration of 450 nuclei is
+        Then the direction of oscillating magnetic field of                        (1)    20
+        the em wave will be along                                                  (2)    10
+       (1)     – z direction                                                       (3)    15
+       (2)     + z direction                                                       (4)    30
+
+       (3)     – x direction                                               20.     The ratio of kinetic energy to the total energy of
+       (4)     – y direction                                                       an electron in a Bohr orbit of the hydrogen atom,
+                                                                                   is
+16.    The refractive index of the material of a prism is                          (1)    1 : 1
+             and the angle of the prism is 30. One of the                         (2)    1 : – 1
+        two    refracting  surfaces  of  the  prism  is  made  a                   (3)    1 : – 2
+        mirror  inwards,  by  silver  coating.  A  beam  of                        (4)    2 : – 1
+        monochromatic light entering the prism from the
+        other  face  will  retrace  its  path  (after  reflection          21.     An  electron  of  mass  m  with  an  initial  velocity
+        from the silvered surface) if its angle of incidence                           = V0      (V0  >  0)    enters    an    electric    field
+        on the prism is                                                                 = – E0      (E0 = constant > 0) at t = 0. If 0 is
+       (1)     60                                                                 its   de-Broglie   wavelength   initially,   then   its
+       (2)     45                                                                 de-Broglie wavelength at time t is
+       (3)     zero
+       (4)     30                                                                 (1)
+
+
+17.    An object is placed at a distance of 40 cm from a
+        concave mirror of focal length 15 cm. If the object                        (2)    
+        is displaced through a distance of 20 cm towards                                    0
+
+        the mirror, the displacement of the image will be                          (3)    0
+       (1)     30 cm away from the mirror                                          (4)       t
+       (2)     36 cm away from the mirror                                                   0
+                                                                           22.     When  the  light  of  frequency  2v0            (where     v0   is
+       (3)     36 cm towards the mirror                                            threshold   frequency),   is   incident   on   a   metal
+       (4)     30 cm towards the mirror                                            plate, the maximum velocity of electrons emitted
+                                                                                   is   v1.   When   the   frequency   of   the   incident
+18.    The magnetic potential energy stored in a certain                           radiation   is   increased   to   5v0,   the   maximum
+        inductor   is   25   mJ,  when   the   current   in   the                  velocity of electrons emitted from the same plate
+        inductor is 60 mA. This inductor is of inductance                          is v2. The ratio of v1 to v2 is
+       (1)     0·138 H                                                             (1)    1 : 2
+       (2)     138·88 H                                                            (2)    1 : 4
+       (3)     13·89 H                                                             (3)    2 : 1
+       (4)     1·389 H                                                             (4)    4 : 1
+
+ALHCA/ZZ/Page 4                                          SPACE FOR ROUGH WORK                                                               English
+
+===== PAGE BREAK =====
+
+23.    In  the  combination  of  the  following  gates  the                26.     A   solid   sphere   is   rotating   freely   about   its
+        output Y can be written in terms of inputs A and                           symmetry  axis  in  free  space.  The  radius  of  the
+        B as                                                                       sphere   is   increased   keeping   its   mass   same.
+                                                                                   Which of the following physical quantities would
+                                                                                   remain constant for the sphere ?
+                                                                                   (1)    Angular velocity
+                                                                                   (2)    Moment of inertia
+                                                                                   (3)    Angular momentum
+                                                                                   (4)    Rotational kinetic energy
+
+       (1)                                                                 27.     The  kinetic  energies  of  a  planet  in  an  elliptical
+                                                                                   orbit about the Sun, at positions A, B  and C are
+       (2)     A .     +      . B                                                  KA,    KB    and  KC,  respectively.  AC  is  the  major
+       (3)                                                                         axis   and   SB   is   perpendicular   to   AC   at   the
+                                                                                   position  of  the  Sun  S  as  shown  in  the  figure.
+       (4)             + A . B                                                     Then
+
+24.    In  the  circuit  shown  in  the  figure,  the  input
+        voltage  Vi    is  20  V,  VBE    =  0  and   VCE    =  0.  The
+        values of IB, IC and  are given by
+                                                                                   (1)    KA < KB < KC
+
+                                                                                   (2)    KA > KB > KC
+
+                                                                                   (3)    KB > KA > KC
+
+                                                                                   (4)    KB < KA < KC
+
+                                                                           28.     If  the  mass  of  the  Sun  were  ten  times  smaller
+                                                                                   and  the  universal  gravitational  constant  were
+                                                                                   ten  times  larger  in  magnitude,  which  of  the
+                                                                                   following is not correct ?
+                                                                                   (1)    Raindrops will fall faster.
+       (1)     IB = 40 A,  IC = 10 mA,   = 250                                   (2)    Walking on the ground would become more
+                                                                                          difficult.
+       (2)     IB = 25 A,  IC = 5 mA,   = 200                                    (3)    ‘g’ on the Earth will not change.
+
+       (3)     IB = 40 A,  IC = 5 mA,   = 125                                    (4)    Time  period  of  a  simple  pendulum  on  the
+       (4)     I  = 20 A,  I      = 5 mA,   = 250                                       Earth would decrease.
+                B               C
+                                                                           29.     A  solid  sphere  is  in  rolling  motion.  In  rolling
+25.    In  a  p-n  junction  diode,  change  in  temperature                       motion  a  body  possesses  translational   kinetic
+        due to heating                                                             energy  (Kt)  as  well  as  rotational  kinetic  energy
+       (1)     affects only reverse resistance                                     (Kr) simultaneously. The ratio Kt : (Kt + Kr) for
+       (2)     affects only forward resistance                                     the sphere is
+                                                                                   (1)    7 : 10
+       (3)     affects  the  overall  V     –  I  characteristics  of              (2)    5 : 7
+               p-n junction                                                        (3)    2 : 5
+       (4)     does not affect resistance of p-n junction                          (4)    10 : 7
+
+ALHCA/ZZ/Page 5                                          SPACE FOR ROUGH WORK                                                               English
+
+===== PAGE BREAK =====
+
+30.    A  small  sphere  of  radius  ‘r’  falls  from  rest  in  a         34.    At   what   temperature   will   the   rms   speed   of
+        viscous liquid. As a result, heat is produced due                          oxygen   molecules   become   just   sufficient   for
+        to  viscous  force.  The  rate  of  production  of  heat                   escaping from the Earth’s atmosphere ?
+        when the sphere attains its terminal velocity, is                         (Given :
+        proportional to                                                           Mass of oxygen molecule (m) = 2·76  10–26 kg
+       (1)    r3                                                                                                                  –23       –1
+                2                                                                 Boltzmann’s constant kB = 1·38  10                  J K    )
+       (2)    r                                                                                        4
+       (3)    r4                                                                   (1)    2·508  10     K
+                5                                                                  (2)    8·360  104 K
+       (4)    r                                                                                        4
+                                                                                   (3)    1·254  10     K
+31.    A sample of 0·1 g of water at 100C and normal                              (4)    5·016  104 K
+        pressure  (1·013        105   Nm–2)  requires  54  cal  of
+        heat energy to convert to steam at 100C. If the                   35.    The volume (V) of  a monatomic gas varies with
+        volume  of  the  steam  produced  is  167·1  cc,  the                      its temperature (T), as shown in the graph. The
+        change in internal energy of the sample, is                                ratio   of   work   done   by   the   gas,   to   the   heat
+       (1)    104·3 J                                                              absorbed by it, when it undergoes a change from
+       (2)    208·7 J                                                              state A to state B, is
+
+       (3)    84·5 J
+       (4)    42·2 J
+32.    Two  wires  are  made  of  the  same  material  and
+        have   the   same   volume.   The   first   wire   has
+        cross-sectional  area  A  and  the  second  wire  has
+        cross-sectional area 3A. If the length of the first
+        wire  is  increased  by       l  on  applying  a  force  F,               (1)
+        how  much  force  is  needed  to  stretch  the  second
+        wire by the same amount ?                                                  (2)
+       (1)    9 F
+       (2)    6 F                                                                  (3)
+       (3)    F
+       (4)    4 F                                                                  (4)
+
+33.    The  power  radiated  by  a  black  body  is  P  and  it
+        radiates  maximum  energy  at  wavelength,                0.  If  36.    The  fundamental  frequency  in  an  open  organ
+                                                                                   pipe  is  equal  to  the  third  harmonic  of  a  closed
+        the   temperature   of   the   black   body   is   now                     organ pipe. If the length of the closed organ pipe
+        changed  so  that  it  radiates  maximum  energy  at                       is 20 cm, the length of the open organ pipe is
+        wavelength          0,   the   power   radiated   by   it                 (1)    13·2 cm
+        becomes nP. The value of n is                                              (2)    8 cm
+                                                                                   (3)    16 cm
+       (1)                                                                         (4)    12·5 cm
+                                                                           37.    The  efficiency  of  an  ideal  heat  engine  working
+       (2)                                                                         between  the      freezing  point  and  boiling  point  of
+                                                                                   water, is
+       (3)                                                                         (1)    26·8%
+                                                                                   (2)    20%
+       (4)                                                                         (3)    12·5%
+                                                                                   (4)    6·25%
+ALHCA/ZZ/Page 6                                          SPACE FOR ROUGH WORK                                                               English
+
+===== PAGE BREAK =====
+
+38.    A   body   initially   at   rest   and   sliding   along   a         42.     A block of mass m is placed on a smooth inclined
+        frictionless  track  from  a  height  h  (as  shown  in                     wedge  ABC  of  inclination              as  shown  in  the
+        the  figure)  just  completes  a  vertical  circle  of                      figure.  The  wedge  is  given  an  acceleration  ‘a’
+        diameter AB = D. The height h is equal to                                   towards the right. The relation between a and                    
+                                                                                    for the block to remain  stationary on the wedge
+                                                                                    is
+
+
+
+
+
+       (1)        D
+       (2)     D                                                                    (1)    a =
+
+
+       (3)        D                                                                 (2)    a =
+
+       (4)        D                                                                 (3)    a = g tan 
+                                                                                    (4)    a = g cos 
+39.    Three  objects,  A  :  (a  solid  sphere),  B  :  (a  thin           43.     A  toy  car  with  charge  q  moves  on  a  frictionless
+        circular disk) and C : (a circular ring), each have                         horizontal plane surface under the influence of a
+        the  same  mass  M  and  radius  R.  They  all  spin                        uniform  electric  field          .  Due  to  the  force  q
+        with the same angular speed  about their own                               its  velocity  increases  from  0  to  6  m/s  in  one
+        symmetry   axes.   The   amounts   of   work   (W)                          second duration. At that instant the direction of
+        required to bring them to rest, would satisfy the                           the  field  is  reversed.  The  car  continues  to  move
+        relation
+       (1)     W    > W     > W                                                     for two more seconds under the influence of this
+                  C      B       A                                                  field. The average velocity and the average speed
+       (2)     WA > WB > WC                                                         of   the   toy   car   between   0   to   3   seconds   are
+       (3)     WA > WC > WB                                                         respectively
+       (4)     W    > W     > W                                                     (1)    2 m/s,  4 m/s
+                  B      A       C                                                  (2)    1 m/s,  3 m/s
+40.    Which    one    of       the    following    statements    is                (3)    1·5 m/s,  3 m/s
+        incorrect ?                                                                 (4)    1 m/s,  3·5 m/s
+                                                                            44.     The moment of the force,               = 4     + 5     – 6     at
+       (1)     Rolling   friction   is   smaller   than   sliding                   (2, 0, – 3), about the point (2, – 2, – 2), is given by
+               friction.                                                            (1)    – 8     – 4    – 7
+       (2)     Limiting  value  of  static  friction  is  directly
+               proportional to normal reaction.                                     (2)    – 4     –    – 8
+       (3)     Coefficient      of      sliding      friction      has              (3)    – 7     – 4    – 8
+               dimensions of length.
+       (4)     Frictional force opposes the relative motion.                        (4)    – 7     – 8    – 4
+41.    A  moving  block  having  mass  m,  collides  with                   45.     A student measured the diameter of a small steel
+        another  stationary  block  having  mass  4m.  The                          ball    using    a    screw    gauge    of    least    count
+        lighter  block  comes  to  rest  after  collision.  When                    0·001  cm.  The  main  scale  reading  is  5  mm  and
+        the initial velocity of the lighter block is v, then                        zero   of   circular   scale   division   coincides   with
+        the value of coefficient of restitution (e) will be                         25  divisions  above  the  reference  level.  If  screw
+                                                                                    gauge has a zero error of – 0·004 cm, the correct
+       (1)     0·5                                                                  diameter of the ball is
+       (2)     0·25                                                                 (1)    0·521 cm
+       (3)     0·4                                                                  (2)    0·525 cm
+                                                                                    (3)    0·529 cm
+       (4)     0·8                                                                  (4)    0·053 cm
+ALHCA/ZZ/Page 7                                           SPACE FOR ROUGH WORK                                                                English
+
+===== PAGE BREAK =====
+
+46.    The    difference    between    spermiogenesis    and            50.    Match the items given in Column I with those in
+       spermiation is                                                          Column  II  and  select  the       correct     option  given
+       (1)    In  spermiogenesis  spermatids  are  formed,                     below :
+              while    in    spermiation    spermatozoa    are                        Column I                         Column II
+              formed.                                                          a.     Proliferative Phase       i.   Breakdown of
+                                                                                                                     endometrial
+       (2)    In spermiogenesis spermatozoa are formed,                                                              lining
+              while    in    spermiation    spermatids    are                  b.     Secretory Phase           ii.  Follicular Phase
+              formed.                                                          c.     Menstruation              iii. Luteal Phase
+       (3)    In spermiogenesis spermatozoa are formed,                               a        b         c
+              while    in    spermiation    spermatozoa    are
+              released from sertoli cells into the cavity of                   (1)    iii      ii        i
+              seminiferous tubules.                                            (2)    i        iii       ii
+       (4)    In spermiogenesis spermatozoa from sertoli                       (3)    iii      i         ii
+              cells    are    released    into    the    cavity    of          (4)    ii       iii       i
+              seminiferous  tubules,  while  in  spermiation            51.    All of the following are part of an operon except
+              spermatozoa are formed.
+                                                                               (1)    an operator
+47.    The  amnion  of  mammalian  embryo  is  derived                         (2)    structural genes
+       from                                                                    (3)    a promoter
+       (1)    ectoderm and mesoderm                                            (4)    an enhancer
+
+       (2)    endoderm and mesoderm                                     52.    A woman has an X-linked condition on one of her
+       (3)    ectoderm and endoderm                                            X    chromosomes.    This    chromosome    can    be
+       (4)    mesoderm and trophoblast                                         inherited by
+                                                                               (1)    Only daughters
+48.    The contraceptive ‘SAHELI’                                              (2)    Only sons
+       (1)    blocks   estrogen   receptors   in   the   uterus,               (3)    Both sons and daughters
+              preventing eggs from getting implanted.                          (4)    Only grandchildren
+
+       (2)    increases the concentration of estrogen and               53.    According  to  Hugo  de  Vries,  the  mechanism  of
+              prevents ovulation in females.                                   evolution is
+       (3)    is a post-coital contraceptive.                                  (1)    Multiple step mutations
+       (4)    is an IUD.                                                       (2)    Saltation
+                                                                               (3)    Minor mutations
+49.    Hormones  secreted  by  the  placenta  to  maintain                     (4)    Phenotypic variations
+
+       pregnancy are                                                    54.    AGGTATCGCAT  is  a  sequence  from  the  coding
+       (1)    hCG, hPL, progestogens, prolactin                                strand of a gene. What will be the corresponding
+                                                                               sequence of the transcribed mRNA ?
+       (2)    hCG, hPL, estrogens, relaxin, oxytocin                           (1)    AGGUAUCGCAU
+       (3)    hCG, progestogens, estrogens,                                    (2)    UGGTUTCGCAT
+              glucocorticoids                                                  (3)    UCCAUAGCGUA
+       (4)    hCG, hPL, progestogens, estrogens                                (4)    ACCUAUGCGAU
+ALHCA/ZZ/Page 8                                       SPACE FOR ROUGH WORK                                                            English
+
+===== PAGE BREAK =====
+
+55.    Among    the    following   sets    of    examples    for          61.    All   of   the   following   are   included   in   ‘Ex-situ
+       divergent evolution, select the incorrect option :                         conservation’ except
+       (1)    Forelimbs of man, bat and cheetah                                   (1)    Wildlife safari parks
+       (2)    Heart of bat, man and cheetah                                       (2)    Sacred groves
+       (3)    Eye of octopus, bat and man                                         (3)    Seed banks
+       (4)    Brain of bat, man and cheetah                                       (4)    Botanical gardens
+
+56.    Conversion    of    milk    to    curd    improves    its          62.    Which  part  of  poppy  plant  is  used  to  obtain  the
+       nutritional value by increasing the amount of                              drug ‘‘Smack’’ ?
+       (1)    Vitamin D                                                           (1)    Flowers
+       (2)    Vitamin A                                                           (2)    Latex
+       (3)    Vitamin E                                                           (3)    Leaves
+       (4)    Vitamin B12                                                         (4)    Roots
+
+57.    Which  of  the  following  is        not    an  autoimmune         63.    In  a growing population of a country,
+       disease ?                                                                  (1)    pre-reproductive individuals are more than
+       (1)    Psoriasis                                                                  the reproductive individuals.
+       (2)    Rheumatoid arthritis                                                (2)    reproductive  individuals  are  less  than  the
+       (3)    Vitiligo                                                                   post-reproductive individuals.
+       (4)    Alzheimer’s disease                                                 (3)    pre-reproductive  individuals  are  less  than
+58.    The similarity of bone structure in the forelimbs                                 the reproductive individuals.
+       of many vertebrates is an example of                                       (4)    reproductive         and         pre-reproductive
+       (1)    Homology                                                                   individuals are equal in number.
+       (2)    Analogy                                                     64.    Which     one     of     the     following     population
+       (3)    Adaptive radiation                                                  interactions is widely used in medical science for
+       (4)    Convergent evolution                                                the production of antibiotics ?
+59.    Which  of  the  following  characteristics  represent                      (1)    Commensalism
+       ‘Inheritance of blood groups’ in humans ?                                  (2)    Mutualism
+       a.     Dominance                                                           (3)    Amensalism
+       b.     Co-dominance                                                        (4)    Parasitism
+       c.     Multiple allele                                             65.    Match the items given in Column I with those in
+       d.     Incomplete dominance                                                Column  II  and  select  the        correct     option  given
+       e.     Polygenic inheritance                                               below :
+       (1)    b, c and e                                                                 Column I                         Column II
+       (2)    a, b and c                                                          a.     Eutrophication           i.    UV-B radiation
+       (3)    a, c and e                                                          b.     Sanitary landfill        ii.   Deforestation
+       (4)    b, d and e                                                          c.     Snow blindness           iii.  Nutrient
+60.    In   which   disease   does   mosquito   transmitted                                                             enrichment
+       pathogen     cause     chronic     inflammation     of                     d.     Jhum cultivation         iv.   Waste disposal
+       lymphatic vessels ?                                                               a        b         c         d
+       (1)    Elephantiasis                                                       (1)    ii       i         iii       iv
+       (2)    Ascariasis                                                          (2)    i        iii       iv        ii
+       (3)    Amoebiasis                                                          (3)    i        ii        iv        iii
+       (4)    Ringworm disease                                                    (4)    iii      iv        i         ii
+
+ALHCA/ZZ/Page 9                                         SPACE FOR ROUGH WORK                                                              English
+
+===== PAGE BREAK =====
+
+66.    Which    of    the    following    options    correctly            69.     Which  of  the  following  is  an  amino  acid  derived
+       represents  the  lung  conditions  in  asthma  and                         hormone ?
+       emphysema, respectively ?
+       (1)    Inflammation    of    bronchioles;    Decreased                     (1)    Epinephrine
+              respiratory surface                                                 (2)    Ecdysone
+       (2)    Increased number of bronchioles; Increased
+              respiratory surface                                                 (3)    Estriol
+       (3)    Decreased      respiratory      surface;                            (4)    Estradiol
+              Inflammation of bronchioles
+       (4)    Increased      respiratory      surface;
+              Inflammation of bronchioles                                 70.     Which  of  the  following  structures  or  regions  is
+67.    Match the items given in Column I with those in                            incorrectly paired with its function ?
+       Column  II  and  select  the         correct     option  given             (1)    Medulla oblongata  :           controls respiration
+       below :                                                                                                          and cardiovascular
+              Column I                         Column II                                                                reflexes.
+       a.     Tricuspid valve          i.    Between left atrium                  (2)    Limbic system             :    consists of fibre
+                                             and left ventricle                                                         tracts that
+       b.     Bicuspid valve           ii.   Between right                                                              interconnect
+                                             ventricle and                                                              different regions of
+                                             pulmonary artery                                                           brain; controls
+       c.     Semilunar valve          iii.  Between right                                                              movement.
+                                             atrium and right                     (3)    Corpus callosum           :    band of fibers
+                                             ventricle                                                                  connecting left and
+              a         b         c                                                                                     right cerebral
+       (1)    iii       i         ii                                                                                    hemispheres.
+
+       (2)    i         iii       ii                                              (4)    Hypothalamus              :    production of
+       (3)    ii        i         iii                                                                                   releasing hormones
+       (4)    i         ii        iii                                                                                   and regulation of
+                                                                                                                        temperature,
+68.    Match the items given in Column I with those in                                                                  hunger and thirst.
+       Column  II  and  select  the         correct     option  given
+       below :                                                            71.     The transparent lens in the human eye is held in
+              Column I                              Column II                     its place by
+       a.     Tidal volume                   i.    2500 – 3000 mL                 (1)    ligaments attached to the ciliary body
+       b.     Inspiratory Reserve            ii.   1100 – 1200 mL                 (2)    ligaments attached to the iris
+              volume                                                              (3)    smooth muscles attached to the ciliary body
+       c.     Expiratory Reserve             iii.  500 – 550 mL                   (4)    smooth muscles attached to the iris
+              volume
+       d.     Residual volume                iv.   1000 – 1100 mL         72.     Which   of   the   following  hormones   can   play   a
+              a         b         c         d                                     significant role in osteoporosis ?
+       (1)    iii       ii        i         iv                                    (1)    Aldosterone and Prolactin
+       (2)    iii       i         iv        ii                                    (2)    Progesterone and Aldosterone
+       (3)    iv        iii       ii        i                                     (3)    Parathyroid hormone and Prolactin
+       (4)    i         iv        ii        iii                                   (4)    Estrogen and Parathyroid hormone
+
+ALHCA/ZZ/Page 10                                         SPACE FOR ROUGH WORK                                                              English
+
+===== PAGE BREAK =====
+
+73.    Which  of  the  following  gastric  cells  indirectly            77.     Select the incorrect match :
+       help in erythropoiesis ?                                                 (1)    Lampbrush            –   Diplotene bivalents
+                                                                                       chromosomes
+       (1)    Chief cells                                                       (2)    Allosomes            –   Sex chromosomes
+       (2)    Mucous cells                                                      (3)    Polytene             –   Oocytes of amphibians
+       (3)    Parietal cells                                                           chromosomes
+                                                                                (4)    Submetacentric       –   L-shaped chromososmes
+       (4)    Goblet cells                                                             chromosomes
+
+74.    Match the items given in Column I with those in                  78.     Nissl bodies are mainly composed of
+       Column  II  and  select  the        correct    option  given             (1)    Proteins and lipids
+       below :                                                                  (2)    DNA and RNA
+              Column I                        Column II                         (3)    Free ribosomes and RER
+       a.     Fibrinogen           i.      Osmotic balance                      (4)    Nucleic acids and SER
+
+       b.     Globulin             ii.     Blood clotting               79.     Which of these statements is incorrect ?
+       c.     Albumin              iii.    Defence mechanism                    (1)    Enzymes   of   TCA   cycle   are   present   in
+                                                                                       mitochondrial matrix.
+              a        b         c                                              (2)    Glycolysis occurs in cytosol.
+       (1)    iii      ii        i                                              (3)    Oxidative  phosphorylation  takes  place  in
+       (2)    i        ii        iii                                                   outer mitochondrial membrane.
+                                                                                (4)    Glycolysis operates as long as it is supplied
+       (3)    ii       iii       i                                                     with NAD that can pick up hydrogen atoms.
+       (4)    i        iii       ii                                     80.     Which  of  the  following  events       does   not  occur  in
+75.    Which   of   the   following   is   an   occupational                    rough endoplasmic reticulum ?
+       respiratory disorder ?                                                   (1)    Protein folding
+       (1)    Anthracis                                                         (2)    Protein glycosylation
+                                                                                (3)    Phospholipid synthesis
+       (2)    Silicosis                                                         (4)    Cleavage of signal peptide
+       (3)    Emphysema                                                 81.     Many   ribosomes   may   associate   with   a   single
+       (4)    Botulism                                                          mRNA  to  form  multiple  copies  of  a  polypeptide
+                                                                                simultaneously.  Such  strings  of  ribosomes  are
+76.    Calcium    is    important    in    skeletal    muscle                   termed as
+       contraction because it                                                   (1)    Polysome
+       (1)    binds to troponin to remove the masking of                        (2)    Polyhedral bodies
+              active sites on actin for myosin.                                 (3)    Nucleosome
+       (2)    activates the myosin ATPase by binding to                         (4)    Plastidome
+              it.                                                       82.     Which  of  the  following  terms  describe  human
+       (3)    prevents  the  formation  of  bonds  between                      dentition ?
+              the   myosin   cross   bridges   and   the   actin                (1)    Thecodont, Diphyodont, Homodont
+              filament.                                                         (2)    Thecodont, Diphyodont, Heterodont
+       (4)    detaches  the  myosin  head  from  the  actin                     (3)    Pleurodont, Diphyodont, Heterodont
+              filament.                                                         (4)    Pleurodont, Monophyodont, Homodont
+
+ALHCA/ZZ/Page 11                                       SPACE FOR ROUGH WORK                                                            English
+
+===== PAGE BREAK =====
+
+83.    Identify    the    vertebrate    group    of    animals            89.     Match the items given in Column I with those in
+       characterized by crop and gizzard in its digestive                         Column  II  and  select  the        correct     option  given
+       system.                                                                    below :
+       (1)    Amphibia
+       (2)    Reptilia                                                                   Column I                          Column II
+       (3)    Osteichthyes                                                               (Function)                      (Part of Excretory
+       (4)    Aves                                                                                                       System)
+
+                                                                                  a.     Ultrafiltration            i.   Henle’s loop
+84.    Which    one    of    these    animals    is            not     a          b.     Concentration              ii.  Ureter
+       homeotherm ?                                                                      of urine
+       (1)    Macropus                                                            c.     Transport of               iii. Urinary bladder
+       (2)    Chelone                                                                    urine
+
+       (3)    Psittacula                                                          d.     Storage of urine           iv.  Malpighian
+       (4)    Camelus                                                                                                    corpuscle
+
+85.    Which of the following features is used to identify                                                          v.   Proximal
+       a male cockroach from a female cockroach ?                                                                        convoluted tubule
+
+       (1)    Presence  of  a  boat  shaped  sternum  on  the                            a        b         c          d
+              9th abdominal segment                                               (1)    iv       v         ii         iii
+
+       (2)    Presence of caudal styles                                           (2)    iv       i         ii         iii
+       (3)    Presence of anal cerci                                              (3)    v        iv        i          iii
+       (4)    Forewings with darker tegmina                                       (4)    v        iv        i          ii
+
+86.    Which  of  the  following  organisms  are  known  as
+       chief producers in the oceans ?                                    90.     Match the items given in Column I with those in
+       (1)    Dinoflagellates                                                     Column  II  and  select  the        correct     option  given
+       (2)    Diatoms                                                             below :
+       (3)    Euglenoids                                                                 Column I                    Column II
+       (4)    Cyanobacteria                                                       a.     Glycosuria           i.   Accumulation of uric
+87.    Ciliates differ from all other protozoans in                                                                acid in joints
+
+       (1)    using flagella for locomotion                                       b.     Gout                 ii.  Mass of crystallised
+       (2)    having  a  contractile  vacuole  for  removing                                                       salts within the kidney
+              excess water                                                        c.     Renal calculi        iii. Inflammation in
+       (3)    having two types of nuclei                                                                           glomeruli
+       (4)    using pseudopodia for capturing prey                                d.     Glomerular           iv.  Presence of glucose in
+                                                                                         nephritis                 urine
+88.    Which of the following animals does not undergo                                   a        b         c          d
+       metamorphosis ?
+       (1)    Earthworm                                                           (1)    iii      ii        iv         i
+       (2)    Tunicate                                                            (2)    i        ii        iii        iv
+       (3)    Starfish                                                            (3)    iv       i         ii         iii
+       (4)    Moth                                                                (4)    ii       iii       i          iv
+
+ALHCA/ZZ/Page 12                                        SPACE FOR ROUGH WORK                                                               English
+
+===== PAGE BREAK =====
+
+91.    What    is    the    role    of    NAD+         in    cellular  98.      Which among the following is not a prokaryote ?
+       respiration ?                                                            (1)    Saccharomyces
+       (1)    It functions as an enzyme.                                        (2)    Mycobacterium
+       (2)    It functions as an electron carrier.                              (3)    Oscillatoria
+       (3)    It is the final electron acceptor for anaerobic                   (4)    Nostoc
+              respiration.                                               99.    The   two   functional   groups   characteristic   of
+       (4)    It is a nucleotide source for ATP synthesis.                      sugars are
+92.    Which  one  of  the  following  plants  shows  a  very                   (1)    hydroxyl and methyl
+       close relationship with  a  species of moth, where                       (2)    carbonyl and methyl
+       none of the two can complete its life cycle without                      (3)    carbonyl and hydroxyl
+       the other ?                                                              (4)    carbonyl and phosphate
+       (1)    Hydrilla                                                   100.   Which  of  the  following  is      not  a  product  of  light
+       (2)    Yucca                                                             reaction of photosynthesis ?
+       (3)    Viola                                                             (1)    ATP
+       (4)    Banana                                                            (2)    NADH
+93.    Oxygen is not produced during photosynthesis by                          (3)    Oxygen
+       (1)    Green sulphur bacteria                                            (4)    NADPH
+       (2)    Nostoc                                                     101.   Stomatal movement is not affected by
+       (3)    Chara                                                             (1)    Temperature
+       (4)    Cycas                                                             (2)    Light
+94.    In which of the following forms is iron absorbed                         (3)    CO2 concentration
+       by plants ?                                                              (4)    O   concentration
+       (1)    Ferric                                                                     2
+       (2)    Ferrous                                                    102.   The Golgi complex participates in
+       (3)    Both ferric and ferrous                                           (1)    Fatty acid breakdown
+       (4)    Free element                                                      (2)    Formation of secretory vesicles
+95.    Double fertilization is                                                  (3)    Activation of amino acid
+       (1)    Fusion of two male gametes of a pollen tube                       (4)    Respiration in bacteria
+              with two different eggs                                    103.   Which of the following is true for nucleolus ?
+       (2)    Fusion  of  one  male  gamete  with  two  polar                   (1)    Larger nucleoli are present in dividing cells.
+              nuclei                                                            (2)    It is a membrane-bound structure.
+       (3)    Syngamy and triple fusion                                         (3)    It   is   a   site   for   active   ribosomal   RNA
+       (4)    Fusion of two male gametes with one egg                                  synthesis.
+96.    Which of the following elements is responsible for                       (4)    It takes part in spindle formation.
+       maintaining turgor in cells ?                                     104.   Stomata in grass leaf are
+       (1)    Magnesium                                                         (1)    Dumb-bell shaped
+       (2)    Sodium                                                            (2)    Kidney shaped
+       (3)    Calcium                                                           (3)    Barrel shaped
+       (4)    Potassium                                                         (4)    Rectangular
+97.    Pollen  grains  can  be  stored  for  several  years  in          105.   The stage during which separation of the paired
+       liquid nitrogen having a temperature of                                  homologous chromosomes begins is
+       (1)    – 120C                                                           (1)    Pachytene
+       (2)    – 80C                                                            (2)    Diplotene
+       (3)    – 160C                                                           (3)    Zygotene
+       (4)    – 196C                                                           (4)    Diakinesis
+ALHCA/ZZ/Page 13                                       SPACE FOR ROUGH WORK                                                             English
+
+===== PAGE BREAK =====
+
+106.   Which  of  the  following  is  commonly  used  as  a             112.   Select the correct match :
+       vector for introducing a DNA fragment in human                           (1)   Alec Jeffreys                  –  Streptococcus
+       lymphocytes ?                                                                                                    pneumoniae
+       (1)    Retrovirus                                                        (2)   Alfred Hershey and             –  TMV
+       (2)    Ti plasmid                                                              Martha Chase
+       (3)    pBR 322                                                           (3)   Francois Jacob and             –  Lac operon
+       (4)     phage                                                                 Jacques Monod
+107.   Use  of  bioresources  by  multinational  companies                      (4)   Matthew Meselson               –   Pisum sativum
+       and organisations without authorisation from the                               and F. Stahl
+       concerned country and its people is called                       113.   Which  of  the  following  has  proved  helpful  in
+       (1)    Bio-infringement                                                  preserving pollen as fossils ?
+       (2)    Biopiracy                                                         (1)   Pollenkitt
+       (3)    Bioexploitation                                                   (2)   Cellulosic intine
+       (4)    Biodegradation                                                    (3)   Sporopollenin
+                                                                                (4)   Oil content
+108.   In    India,    the    organisation    responsible    for        114.   The   experimental   proof   for   semiconservative
+       assessing  the  safety  of  introducing  genetically                     replication of DNA was first shown in a
+       modified organisms for public use is                                     (1)   Fungus
+       (1)    Indian Council of Medical Research (ICMR)                         (2)   Bacterium
+       (2)    Council    for    Scientific    and    Industrial                 (3)   Virus
+              Research (CSIR)                                                   (4)   Plant
+       (3)    Genetic  Engineering  Appraisal  Committee                115.   Which    of    the    following    pairs    is      wrongly
+              (GEAC)                                                            matched ?
+       (4)    Research        Committee        on        Genetic                (1)   Starch synthesis in pea          :  Multiple alleles
+              Manipulation (RCGM)                                               (2)   ABO blood grouping               :  Co-dominance
+109.   The  correct  order  of  steps  in  Polymerase  Chain                    (3)   T.H. Morgan                      :  Linkage
+       Reaction (PCR) is                                                        (4)   XO type sex                      :  Grasshopper
+       (1)    Extension, Denaturation, Annealing                                      determination
+       (2)    Annealing, Extension, Denaturation                        116.   Offsets are produced by
+       (3)    Denaturation, Annealing, Extension                                (1)   Meiotic divisions
+       (4)    Denaturation, Extension, Annealing                                (2)   Mitotic divisions
+                                                                                (3)   Parthenogenesis
+110.   Select the correct match :                                               (4)   Parthenocarpy
+       (1)    Ribozyme                       –    Nucleic acid          117.   Select the correct statement :
+       (2)    F2  Recessive parent          –    Dihybrid cross                (1)   Franklin Stahl coined the term ‘‘linkage’’.
+       (3)    G. Mendel                      –    Transformation                (2)   Punnett square was developed by a British
+       (4)    T.H. Morgan                    –    Transduction                        scientist.
+111.   A ‘new’ variety of rice was patented by a foreign                        (3)   Transduction was discovered by S. Altman.
+       company,   though   such   varieties   have   been                       (4)   Spliceosomes take part in translation.
+       present in India for a long time. This is related to             118.   Which  of  the  following  flowers  only  once  in  its
+       (1)    Co-667                                                            life-time ?
+       (2)    Sharbati Sonora                                                   (1)   Bamboo species
+       (3)    Basmati                                                           (2)   Jackfruit
+                                                                                (3)   Papaya
+       (4)    Lerma Rojo                                                        (4)   Mango
+
+ALHCA/ZZ/Page 14                                       SPACE FOR ROUGH WORK                                                            English
+
+===== PAGE BREAK =====
+
+119.   Niche is                                                          125.   Match the items given in Column I with those in
+       (1)    all  the  biological  factors  in  the  organism’s                 Column  II  and  select  the        correct    option  given
+              environment                                                        below :
+       (2)    the physical space where an organism lives                                 Column I              Column II
+       (3)    the  functional  role  played  by  the  organism                   a.     Herbarium       i.    It is a place having a
+              where it lives                                                                                  collection of preserved
+       (4)    the range of temperature that the organism                                                      plants and animals.
+              needs to live                                                      b.     Key             ii.   A list that enumerates
+
+120.   In stratosphere, which of the following elements                                                       methodically all the
+       acts  as  a  catalyst  in  degradation  of  ozone  and                                                 species found in an area
+       release of molecular oxygen ?                                                                          with brief description
+       (1)    Carbon                                                                                          aiding identification.
+       (2)    Cl                                                                 c.     Museum          iii.  Is a place where dried and
+       (3)    Oxygen                                                                                          pressed plant specimens
+       (4)    Fe                                                                                              mounted on sheets are
+121.   What   type   of   ecological   pyramid   would   be                                                   kept.
+       obtained with the following data ?                                        d.     Catalogue       iv.   A booklet containing a list
+              Secondary consumer : 120 g                                                                      of characters and their
+              Primary consumer : 60 g                                                                         alternates which are
+              Primary producer : 10 g                                                                         helpful in identification of
+       (1)    Inverted pyramid of biomass                                                                     various taxa.
+       (2)    Pyramid of energy                                                         a        b         c         d
+       (3)    Upright pyramid of biomass                                         (1)    i        iv        iii       ii
+                                                                                 (2)    iii      ii        i         iv
+       (4)    Upright pyramid of numbers                                         (3)    iii      iv        i         ii
+122.   Which of the following is a secondary pollutant ?                         (4)    ii       iv        iii       i
+       (1)    CO                                                         126.   Which one is wrongly matched ?
+       (2)    CO2                                                                (1)    Uniflagellate gametes         –    Polysiphonia
+       (3)    O3                                                                 (2)    Biflagellate zoospores        –    Brown algae
+       (4)    SO2                                                                (3)    Unicellular organism          –    Chlorella
+                                                                                 (4)    Gemma cups                    –    Marchantia
+123.   World Ozone Day is celebrated on
+                th                                                       127.   After karyogamy followed by meiosis, spores are
+       (1)    5    June                                                          produced exogenously in
+       (2)    21st April                                                         (1)    Neurospora
+                 nd                                                              (2)    Alternaria
+       (3)    22     April                                                       (3)    Saccharomyces
+       (4)    16th September                                                     (4)    Agaricus
+
+124.   Natality refers to                                                128.   Winged pollen grains are present in
+       (1)    Death rate                                                         (1)    Mustard
+       (2)    Birth rate                                                         (2)    Cycas
+       (3)    Number of individuals entering a habitat                           (3)    Pinus
+       (4)    Number of individuals leaving the habitat                          (4)    Mango
+
+ALHCA/ZZ/Page 15                                       SPACE FOR ROUGH WORK                                                             English
+
+===== PAGE BREAK =====
+
+129.   Pneumatophores occur in                                          136.   The    correct    order    of    N-compounds    in    its
+       (1)    Halophytes                                                        decreasing order of oxidation states is
+       (2)    Free-floating hydrophytes                                        (1)    HNO3, NO,  N2, NH4Cl
+       (3)    Submerged hydrophytes                                            (2)    HNO3, NO, NH4Cl, N2
+       (4)    Carnivorous plants                                               (3)    NH    Cl, N   , NO, HNO
+                                                                                           4       2              3
+130.   Plants having little or no secondary growth are                         (4)    HNO     , NH   Cl, NO, N
+       (1)    Grasses                                                                        3      4             2
+       (2)    Deciduous angiosperms                                     137.   The  correct  order  of  atomic  radii  in  group  13
+       (3)    Cycads                                                            elements is
+       (4)    Conifers                                                         (1)    B < Al < In < Ga < Tl
+131.   Casparian strips occur in                                               (2)    B < Al < Ga < In < Tl
+       (1)    Epidermis                                                        (3)    B < Ga < Al < In < Tl
+       (2)    Pericycle                                                        (4)    B < Ga < Al < Tl < In
+       (3)    Endodermis                                                138.   Considering  Ellingham  diagram,  which  of  the
+       (4)    Cortex                                                            following metals can be used to reduce alumina ?
+
+132.   Secondary  xylem  and  phloem  in  dicot  stem  are                     (1)    Fe
+       produced by                                                             (2)    Zn
+       (1)    Apical meristems                                                 (3)    Cu
+       (2)    Vascular cambium
+       (3)    Axillary meristems                                               (4)    Mg
+       (4)    Phellogen                                                 139.   Which one of the following elements is unable to
+133.   Select the wrong statement :                                             form          ion ?
+       (1)    Cell  wall  is  present  in  members  of  Fungi                  (1)    Ga
+              and Plantae.
+       (2)    Mushrooms belong to Basidiomycetes.                              (2)    Al
+       (3)    Mitochondria are the powerhouse of the cell                      (3)    In
+              in all kingdoms except Monera.                                   (4)    B
+       (4)    Pseudopodia   are   locomotory   and   feeding            140.   Which of the following statements is not true for
+              structures in Sporozoans.                                         halogens ?
+134.   Which of the following statements is correct ?                          (1)    All form monobasic oxyacids.
+       (1)    Ovules  are  not  enclosed  by  ovary  wall  in                  (2)    All are oxidizing agents.
+              gymnosperms.                                                     (3)    Chlorine   has    the   highest   electron-gain
+       (2)    Selaginella is heterosporous, while Salvinia                            enthalpy.
+              is homosporous.
+       (3)    Stems   are   usually   unbranched   in   both                   (4)    All   but   fluorine   show   positive   oxidation
+              Cycas and Cedrus.                                                       states.
+
+       (4)    Horsetails are gymnosperms.                               141.   In the structure of ClF3, the number of lone pairs
+135.   Sweet potato is a modified                                               of electrons on central atom ‘Cl’ is
+       (1)    Stem                                                             (1)    one
+       (2)    Adventitious root                                                (2)    two
+       (3)    Rhizome                                                          (3)    three
+       (4)    Tap root                                                         (4)    four
+
+ALHCA/ZZ/Page 16                                       SPACE FOR ROUGH WORK                                                           English
+
+===== PAGE BREAK =====
+
+142.   The difference between amylose and amylopectin                    147.   The compound A on treatment with Na gives B,
+       is                                                                       and with PCl       gives C.  B and C react together to
+       (1)    Amylopectin   have   1  4           -linkage   and                               5
+              1  6 -linkage                                                   give diethyl ether.  A, B and C are in the order
+
+       (2)    Amylose     have     1  4          -linkage     and             (1)    C2H5OH, C2H6, C2H5Cl
+              1  6 -linkage
+       (3)    Amylose    is    made    up    of    glucose    and               (2)    C2H5OH, C2H5Cl, C2H5ONa
+              galactose                                                         (3)    C  H   OH, C    H   ONa, C    H   Cl
+       (4)    Amylopectin   have   1           4   -linkage   and                      2   5        2  5          2   5
+              1  6 -linkage                                                   (4)    C2H5Cl, C2H6, C2H5OH
+
+143.   Regarding   cross-linked   or   network   polymers,
+       which of the following statements is incorrect ?                  148.   Hydrocarbon    (A)    reacts    with    bromine    by
+       (1)    They    contain    covalent    bonds    between                   substitution  to  form  an  alkyl  bromide  which  by
+              various linear polymer chains.                                    Wurtz     reaction     is     converted     to     gaseous
+       (2)    They are formed from bi- and tri-functional                       hydrocarbon  containing  less  than  four  carbon
+              monomers.                                                         atoms. (A) is
+       (3)    They contain strong covalent bonds in their
+              polymer chains.                                                   (1)    CH  CH
+       (4)    Examples are bakelite and melamine.                               (2)    CH2 = CH2
+
+144.   A  mixture  of  2·3  g  formic  acid  and  4·5  g  oxalic                (3)    CH
+       acid  is  treated  with  conc.  H2SO4.  The  evolved                                4
+       gaseous mixture is passed through KOH pellets.                           (4)    CH3 – CH3
+       Weight  (in  g)  of  the  remaining  product  at  STP
+       will be                                                           149.   The   compound   C7H8          undergoes   the   following
+       (1)    1·4                                                               reactions :
+       (2)    3·0
+       (3)    4·4
+       (4)    2·8                                                               The product ‘C’ is
+145.   Which  of  the  following  oxides  is  most  acidic  in                  (1)    m-bromotoluene
+       nature ?
+       (1)    MgO                                                               (2)    o-bromotoluene
+
+       (2)    BeO                                                               (3)    p-bromotoluene
+       (3)    CaO                                                               (4)    3-bromo-2,4,6-trichlorotoluene
+       (4)    BaO
+
+146.   Nitration of aniline in strong acidic medium also                 150.   Which   oxide   of   nitrogen   is        not    a   common
+       gives m-nitroaniline because                                             pollutant  introduced  into  the  atmosphere  both
+       (1)    In  spite  of  substituents  nitro  group  always                 due to natural and human activity ?
+              goes to only m-position.
+       (2)    In     electrophilic     substitution     reactions               (1)    N2O5
+              amino group is meta directive.                                    (2)    NO2
+       (3)    In acidic (strong) medium aniline is present
+              as anilinium ion.                                                 (3)    NO
+       (4)    In   absence   of   substituents   nitro   group                  (4)    N2O
+              always goes to m-position.
+ALHCA/ZZ/Page 17                                       SPACE FOR ROUGH WORK                                                             English
+
+===== PAGE BREAK =====
+
+151.   Which  of  the  following  molecules  represents  the            154.    In the reaction
+       order of hybridisation sp2, sp2, sp, sp from left to
+
+       right atoms ?
+
+       (1)    HC  C – C  CH
+
+       (2)    CH2 = CH – C  CH                                                 the electrophile involved is
+
+       (3)    CH3 – CH = CH – CH3                                               (1)    dichloromethyl cation (                )
+
+       (4)    CH2 = CH – CH = CH2
+                                                                                (2)    formyl cation (           )
+152.   Which of the following carbocations is expected to                       (3)    dichlorocarbene (:CCl2)
+       be most stable ?
+                                                                                (4)    dichloromethyl anion (               )
+
+
+                                                                        155.    Carboxylic acids have higher boiling points than
+                                                                                aldehydes,    ketones    and    even    alcohols    of
+                                                                                comparable molecular mass. It is due to their
+                                                                                (1)    formation of intramolecular H-bonding
+                                                                                (2)    formation of carboxylate ion
+                                                                                (3)    formation of  intermolecular H-bonding
+                                                                                (4)    more   extensive   association   of   carboxylic
+                                                                                       acid via van der Waals force of attraction
+
+                                                                        156.    Compound  A,  C8H10O,  is  found  to  react  with
+                                                                                NaOI  (produced  by  reacting  Y  with  NaOH)  and
+                                                                                yields  a  yellow  precipitate  with  characteristic
+                                                                                smell.
+                                                                                A and Y are respectively
+
+
+
+
+
+
+
+153.   Which of the following is correct with respect to
+       – I effect of the substituents ? (R = alkyl)
+       (1)    – NH2 < – OR < – F
+
+       (2)    – NR2 < – OR < – F
+
+       (3)    – NR2 > – OR > – F
+       (4)    – NH2 > – OR > – F
+
+
+ALHCA/ZZ/Page 18                                       SPACE FOR ROUGH WORK                                                            English
+
+===== PAGE BREAK =====
+
+157.   Identify  the  major  products  P,  Q  and  R  in  the             159.   For the redox reaction
+       following sequence of reactions :                                         Mn        + C2         +  H+           Mn2+ + CO2 + H2O
+                                                                                 the  correct  coefficients  of  the  reactants          for  the
+                                                                                  balanced equation are
+                                                                                        Mn                        H+
+
+                                                                                 (1)     16            5          2
+                                                                                 (2)     2             5          16
+                                                                                 (3)     5            16          2
+                                                                                 (4)     2            16          5
+
+                                                                          160.   Which one of the following conditions will favour
+                                                                                  maximum   formation   of   the   product   in   the
+                                                                                  reaction,
+                                                                                         A2 (g) + B2 (g)  X2 (g)   rH = – X kJ ?
+                                                                                 (1)     Low temperature and high pressure
+                                                                                 (2)     Low temperature and low pressure
+                                                                                 (3)     High temperature and low pressure
+                                                                                 (4)     High temperature and high pressure
+
+                                                                          161.   When   initial   concentration   of   the   reactant   is
+                                                                                  doubled,   the   half-life   period       of   a   zero   order
+                                                                                  reaction
+                                                                                 (1)     is halved
+                                                                                 (2)     is doubled
+                                                                                 (3)     remains unchanged
+                                                                                 (4)     is tripled
+
+                                                                          162.   The correction factor ‘a’ to the ideal gas equation
+                                                                                  corresponds to
+                                                                                 (1)     density of the gas molecules
+                                                                                 (2)     volume of the gas molecules
+                                                                                 (3)     forces    of    attraction    between    the    gas
+                                                                                         molecules
+                                                                                 (4)     electric   field   present   between   the   gas
+                                                                                         molecules
+158.   Which  of  the  following  compounds             can  form  a  163.       The bond dissociation energies of             X  , Y   and XY
+       zwitterion ?                                                                                                              2    2
+                                                                                  are in the ratio of 1 : 0·5 : 1. H for the formation
+       (1)    Aniline                                                             of XY    is – 200  kJ  mol–1.  The  bond  dissociation
+                                                                                  energy of X2 will be
+       (2)    Acetanilide                                                        (1)     200 kJ mol–1
+       (3)    Glycine                                                            (2)     100 kJ mol–1
+       (4)    Benzoic acid                                                       (3)     400 kJ mol–1
+                                                                                 (4)     800 kJ mol–1
+
+ALHCA/ZZ/Page 19                                        SPACE FOR ROUGH WORK                                                              English
+
+===== PAGE BREAK =====
+
+164.   Magnesium reacts with an element (X) to form an                   168.   The    correct    difference    between    first-           and
+       ionic  compound.  If  the  ground  state  electronic                      second-order reactions is that
+       configuration  of  (X)  is     1s2  2s2  2p3,  the  simplest             (1)    the  rate  of  a  first-order  reaction       does  not
+       formula for this compound is                                                    depend on reactant concentrations; the rate
+       (1)    Mg   X                                                                   of  a  second-order  reaction  does  depend  on
+                  2  3                                                                 reactant concentrations
+       (2)    MgX2                                                              (2)    the half-life of a first-order reaction does not
+       (3)    Mg3X2                                                                    depend    on    [A]0;    the    half-life    of    a
+       (4)    Mg   X                                                                   second-order reaction does depend on [A]0
+                  2
+                                                                                (3)    the   rate   of   a   first-order   reaction   does
+165.   Iron exhibits bcc structure at room temperature.                                depend on reactant concentrations; the rate
+       Above 900C, it transforms to fcc structure. The                                of  a  second-order  reaction  does  not  depend
+       ratio  of  density  of  iron  at  room  temperature  to                         on reactant concentrations
+       that at 900C (assuming molar mass and atomic                            (4)    a  first-order  reaction  can  be  catalyzed;  a
+       radii of iron remains constant with temperature)                                second-order reaction cannot be catalyzed
+       is
+                                                                         169.   In which case is the number of molecules of water
+       (1)                                                                       maximum ?
+                                                                                (1)    18 mL of water
+       (2)                                                                      (2)    0·18 g of water
+                                                                                (3)    10–3 mol of water
+
+       (3)                                                                      (4)    0·00224  L  of  water  vapours  at  1  atm  and
+                                                                                       273 K
+
+       (4)                                                               170.   Among  CaH2,  BeH2,  BaH2,  the  order  of  ionic
+                                                                                 character is
+166.   Consider the following species :                                         (1)    BeH2 < CaH2 < BaH2
+              CN+,  CN–,  NO  and  CN                                           (2)    CaH2 < BeH2 < BaH2
+
+       Which  one  of  these  will  have  the  highest  bond                    (3)    BaH2 < BeH2 < CaH2
+       order ?                                                                  (4)    BeH2 < BaH2 < CaH2
+       (1)    NO
+       (2)    CN–                                                        171.   Consider   the   change   in   oxidation    state   of
+       (3)    CN                                                                 Bromine corresponding to different emf values as
+       (4)    CN+                                                                shown in the diagram below :
+
+167.   Which one is a wrong statement ?
+       (1)    Total orbital angular momentum of electron
+              in ‘s’ orbital is equal to zero.
+       (2)    An  orbital  is  designated  by  three  quantum
+              numbers  while  an  electron  in  an  atom  is                    Then  the  species  undergoing  disproportionation
+              designated by four quantum numbers.                                is
+       (3)    The value of m for             is zero.                           (1)    Br
+
+       (4)    The electronic configuration of N atom is                         (2)    Br
+
+                                                                                (3)    HBrO
+
+                                                                                (4)    Br2
+ALHCA/ZZ/Page 20                                       SPACE FOR ROUGH WORK                                                             English
+
+===== PAGE BREAK =====
+
+172.   The     solubility     of     BaSO4         in     water     is  176.     Iron carbonyl, Fe(CO)5 is
+       2·42  10–3      gL–1    at   298 K.   The   value   of   its             (1)    tetranuclear
+
+       solubility product (Ksp) will be                                          (2)    mononuclear
+       (Given molar mass of BaSO4 = 233 g mol–1)                                 (3)    dinuclear
+
+       (1)    1·08  10–10 mol2 L–2                                              (4)    trinuclear
+
+                          –12      2   –2                                177.    The  type  of  isomerism  shown  by  the  complex
+       (2)    1·08  10        mol   L                                           [CoCl2(en)2] is
+       (3)    1·08  10–8 mol2 L–2                                               (1)    Geometrical isomerism
+       (4)    1·08  10–14 mol2 L–2                                              (2)    Coordination isomerism
+                                                                                 (3)    Linkage isomerism
+173.   Following   solutions   were   prepared   by   mixing                     (4)    Ionization isomerism
+       different volumes of NaOH and HCl of different
+       concentrations :                                                  178.    Which    one    of    the    following    ions    exhibits
+                                                                                 d-d transition and paramagnetism as well ?
+       a.     60 mL          HCl + 40 mL           NaOH                          (1)
+
+       b.     55 mL          HCl + 45 mL           NaOH                          (2)
+
+       c.     75 mL         HCl + 25 mL            NaOH                          (3)
+
+                                                                                 (4)
+       d.     100 mL          HCl + 100 mL             NaOH
+                                                                         179.    The  geometry  and  magnetic  behaviour  of  the
+       pH of which one of them will be equal to 1 ?                              complex [Ni(CO)4] are
+       (1)    b                                                                  (1)    square planar geometry and diamagnetic
+       (2)    a                                                                  (2)    tetrahedral geometry and diamagnetic
+       (3)    c                                                                  (3)    tetrahedral geometry and paramagnetic
+       (4)    d                                                                  (4)    square planar geometry and paramagnetic
+
+174.   On  which  of  the  following  properties  does  the              180.    Match the metal ions given in Column I with the
+       coagulating power of an ion depend ?                                      spin   magnetic   moments   of   the   ions   given   in
+       (1)    The  magnitude  of  the  charge  on  the  ion                      Column II and assign the correct code :
+              alone                                                                     Column I                      Column II
+       (2)    Size of the ion alone                                              a.     Co3+                  i.          B.M.
+       (3)    The sign of charge on the ion alone                                          3+
+       (4)    Both  magnitude  and  sign  of  the  charge  on                    b.     Cr                    ii.          B.M.
+              the ion                                                            c.     Fe3+                  iii.        B.M.
+
+175.   Given  van  der  Waals  constant  for  NH3,  H2,  O2                      d.     Ni2+                  iv.          B.M.
+       and  CO2     are  respectively  4·17,  0·244,  1·36  and                                               v.           B.M.
+       3·59,  which  one  of  the  following  gases  is  most
+       easily liquefied ?                                                               a        b         c         d
+       (1)    NH3                                                                (1)    iv       v         ii        i
+       (2)    H2                                                                 (2)    i        ii        iii       iv
+       (3)    CO2                                                                (3)    iii      v         i         ii
+       (4)    O2                                                                 (4)    iv       i         ii        iii
+
+ALHCA/ZZ/Page 21                                        SPACE FOR ROUGH WORK                                                             English
+
+===== PAGE BREAK =====
+
+                              SPACE FOR ROUGH WORK
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALHCA/ZZ/Page 22                     SPACE FOR ROUGH WORK                                   English
+
+===== PAGE BREAK =====
+
+                              SPACE FOR ROUGH WORK
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALHCA/ZZ/Page 23                      SPACE FOR ROUGH WORK                                   English
+
+===== PAGE BREAK =====
+
+   Read carefully the following instructions :
+
+   1.  Each candidate must show on demand his/her Admit Card to the Invigilator.
+
+   2.  No  candidate,  without  special  permission  of  the  Superintendent  or  Invigilator,              would    leave
+       his/her seat.
+
+   3.  The  candidates  should  not  leave  the  Examination  Hall  without  handing  over  their  Answer
+       Sheet  to  the  Invigilator  on  duty  and  sign  the  Attendance  Sheet  twice.               Cases  where  a
+       candidate has not signed the Attendance Sheet second time will be deemed not to
+       have handed over the Answer Sheet and dealt with as an unfair means case.
+
+   4.  Use of Electronic/Manual Calculator is prohibited.
+
+   5.  The candidates are governed by all Rules and Regulations of the examination with regard to
+       their  conduct  in  the  Examination  Hall.  All  cases  of  unfair means will  be  dealt  with  as  per
+       Rules and Regulations of this examination.
+
+   6.  No part of the Test Booklet and Answer Sheet shall be detached under any circumstances.
+
+   7.  The candidates will write the Correct Test Booklet Code as given in the Test Booklet/Answer
+       Sheet in the Attendance Sheet.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALHCA/ZZ/Page 24                                SPACE FOR ROUGH WORK                                                  English
