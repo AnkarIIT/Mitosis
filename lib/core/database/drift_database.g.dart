@@ -4438,6 +4438,29 @@ class $ChatsTable extends Chats with TableInfo<$ChatsTable, Chat> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _groundedChapterKeyMeta =
+      const VerificationMeta('groundedChapterKey');
+  @override
+  late final GeneratedColumn<String> groundedChapterKey =
+      GeneratedColumn<String>(
+        'grounded_chapter_key',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _groundedUserPdfIdMeta = const VerificationMeta(
+    'groundedUserPdfId',
+  );
+  @override
+  late final GeneratedColumn<String> groundedUserPdfId =
+      GeneratedColumn<String>(
+        'grounded_user_pdf_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -4446,6 +4469,8 @@ class $ChatsTable extends Chats with TableInfo<$ChatsTable, Chat> {
     isUser,
     timestamp,
     sessionId,
+    groundedChapterKey,
+    groundedUserPdfId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4498,6 +4523,24 @@ class $ChatsTable extends Chats with TableInfo<$ChatsTable, Chat> {
         sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
       );
     }
+    if (data.containsKey('grounded_chapter_key')) {
+      context.handle(
+        _groundedChapterKeyMeta,
+        groundedChapterKey.isAcceptableOrUnknown(
+          data['grounded_chapter_key']!,
+          _groundedChapterKeyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('grounded_user_pdf_id')) {
+      context.handle(
+        _groundedUserPdfIdMeta,
+        groundedUserPdfId.isAcceptableOrUnknown(
+          data['grounded_user_pdf_id']!,
+          _groundedUserPdfIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -4531,6 +4574,14 @@ class $ChatsTable extends Chats with TableInfo<$ChatsTable, Chat> {
         DriftSqlType.string,
         data['${effectivePrefix}session_id'],
       ),
+      groundedChapterKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}grounded_chapter_key'],
+      ),
+      groundedUserPdfId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}grounded_user_pdf_id'],
+      ),
     );
   }
 
@@ -4547,6 +4598,8 @@ class Chat extends DataClass implements Insertable<Chat> {
   final bool isUser;
   final DateTime timestamp;
   final String? sessionId;
+  final String? groundedChapterKey;
+  final String? groundedUserPdfId;
   const Chat({
     required this.id,
     required this.userId,
@@ -4554,6 +4607,8 @@ class Chat extends DataClass implements Insertable<Chat> {
     required this.isUser,
     required this.timestamp,
     this.sessionId,
+    this.groundedChapterKey,
+    this.groundedUserPdfId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4565,6 +4620,12 @@ class Chat extends DataClass implements Insertable<Chat> {
     map['timestamp'] = Variable<DateTime>(timestamp);
     if (!nullToAbsent || sessionId != null) {
       map['session_id'] = Variable<String>(sessionId);
+    }
+    if (!nullToAbsent || groundedChapterKey != null) {
+      map['grounded_chapter_key'] = Variable<String>(groundedChapterKey);
+    }
+    if (!nullToAbsent || groundedUserPdfId != null) {
+      map['grounded_user_pdf_id'] = Variable<String>(groundedUserPdfId);
     }
     return map;
   }
@@ -4579,6 +4640,12 @@ class Chat extends DataClass implements Insertable<Chat> {
       sessionId: sessionId == null && nullToAbsent
           ? const Value.absent()
           : Value(sessionId),
+      groundedChapterKey: groundedChapterKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(groundedChapterKey),
+      groundedUserPdfId: groundedUserPdfId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(groundedUserPdfId),
     );
   }
 
@@ -4594,6 +4661,12 @@ class Chat extends DataClass implements Insertable<Chat> {
       isUser: serializer.fromJson<bool>(json['isUser']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
       sessionId: serializer.fromJson<String?>(json['sessionId']),
+      groundedChapterKey: serializer.fromJson<String?>(
+        json['groundedChapterKey'],
+      ),
+      groundedUserPdfId: serializer.fromJson<String?>(
+        json['groundedUserPdfId'],
+      ),
     );
   }
   @override
@@ -4606,6 +4679,8 @@ class Chat extends DataClass implements Insertable<Chat> {
       'isUser': serializer.toJson<bool>(isUser),
       'timestamp': serializer.toJson<DateTime>(timestamp),
       'sessionId': serializer.toJson<String?>(sessionId),
+      'groundedChapterKey': serializer.toJson<String?>(groundedChapterKey),
+      'groundedUserPdfId': serializer.toJson<String?>(groundedUserPdfId),
     };
   }
 
@@ -4616,6 +4691,8 @@ class Chat extends DataClass implements Insertable<Chat> {
     bool? isUser,
     DateTime? timestamp,
     Value<String?> sessionId = const Value.absent(),
+    Value<String?> groundedChapterKey = const Value.absent(),
+    Value<String?> groundedUserPdfId = const Value.absent(),
   }) => Chat(
     id: id ?? this.id,
     userId: userId ?? this.userId,
@@ -4623,6 +4700,12 @@ class Chat extends DataClass implements Insertable<Chat> {
     isUser: isUser ?? this.isUser,
     timestamp: timestamp ?? this.timestamp,
     sessionId: sessionId.present ? sessionId.value : this.sessionId,
+    groundedChapterKey: groundedChapterKey.present
+        ? groundedChapterKey.value
+        : this.groundedChapterKey,
+    groundedUserPdfId: groundedUserPdfId.present
+        ? groundedUserPdfId.value
+        : this.groundedUserPdfId,
   );
   Chat copyWithCompanion(ChatsCompanion data) {
     return Chat(
@@ -4632,6 +4715,12 @@ class Chat extends DataClass implements Insertable<Chat> {
       isUser: data.isUser.present ? data.isUser.value : this.isUser,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
       sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      groundedChapterKey: data.groundedChapterKey.present
+          ? data.groundedChapterKey.value
+          : this.groundedChapterKey,
+      groundedUserPdfId: data.groundedUserPdfId.present
+          ? data.groundedUserPdfId.value
+          : this.groundedUserPdfId,
     );
   }
 
@@ -4643,14 +4732,24 @@ class Chat extends DataClass implements Insertable<Chat> {
           ..write('message: $message, ')
           ..write('isUser: $isUser, ')
           ..write('timestamp: $timestamp, ')
-          ..write('sessionId: $sessionId')
+          ..write('sessionId: $sessionId, ')
+          ..write('groundedChapterKey: $groundedChapterKey, ')
+          ..write('groundedUserPdfId: $groundedUserPdfId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, userId, message, isUser, timestamp, sessionId);
+  int get hashCode => Object.hash(
+    id,
+    userId,
+    message,
+    isUser,
+    timestamp,
+    sessionId,
+    groundedChapterKey,
+    groundedUserPdfId,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4660,7 +4759,9 @@ class Chat extends DataClass implements Insertable<Chat> {
           other.message == this.message &&
           other.isUser == this.isUser &&
           other.timestamp == this.timestamp &&
-          other.sessionId == this.sessionId);
+          other.sessionId == this.sessionId &&
+          other.groundedChapterKey == this.groundedChapterKey &&
+          other.groundedUserPdfId == this.groundedUserPdfId);
 }
 
 class ChatsCompanion extends UpdateCompanion<Chat> {
@@ -4670,6 +4771,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
   final Value<bool> isUser;
   final Value<DateTime> timestamp;
   final Value<String?> sessionId;
+  final Value<String?> groundedChapterKey;
+  final Value<String?> groundedUserPdfId;
   const ChatsCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
@@ -4677,6 +4780,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
     this.isUser = const Value.absent(),
     this.timestamp = const Value.absent(),
     this.sessionId = const Value.absent(),
+    this.groundedChapterKey = const Value.absent(),
+    this.groundedUserPdfId = const Value.absent(),
   });
   ChatsCompanion.insert({
     this.id = const Value.absent(),
@@ -4685,6 +4790,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
     required bool isUser,
     required DateTime timestamp,
     this.sessionId = const Value.absent(),
+    this.groundedChapterKey = const Value.absent(),
+    this.groundedUserPdfId = const Value.absent(),
   }) : message = Value(message),
        isUser = Value(isUser),
        timestamp = Value(timestamp);
@@ -4695,6 +4802,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
     Expression<bool>? isUser,
     Expression<DateTime>? timestamp,
     Expression<String>? sessionId,
+    Expression<String>? groundedChapterKey,
+    Expression<String>? groundedUserPdfId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4703,6 +4812,9 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
       if (isUser != null) 'is_user': isUser,
       if (timestamp != null) 'timestamp': timestamp,
       if (sessionId != null) 'session_id': sessionId,
+      if (groundedChapterKey != null)
+        'grounded_chapter_key': groundedChapterKey,
+      if (groundedUserPdfId != null) 'grounded_user_pdf_id': groundedUserPdfId,
     });
   }
 
@@ -4713,6 +4825,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
     Value<bool>? isUser,
     Value<DateTime>? timestamp,
     Value<String?>? sessionId,
+    Value<String?>? groundedChapterKey,
+    Value<String?>? groundedUserPdfId,
   }) {
     return ChatsCompanion(
       id: id ?? this.id,
@@ -4721,6 +4835,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
       isUser: isUser ?? this.isUser,
       timestamp: timestamp ?? this.timestamp,
       sessionId: sessionId ?? this.sessionId,
+      groundedChapterKey: groundedChapterKey ?? this.groundedChapterKey,
+      groundedUserPdfId: groundedUserPdfId ?? this.groundedUserPdfId,
     );
   }
 
@@ -4745,6 +4861,12 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
     if (sessionId.present) {
       map['session_id'] = Variable<String>(sessionId.value);
     }
+    if (groundedChapterKey.present) {
+      map['grounded_chapter_key'] = Variable<String>(groundedChapterKey.value);
+    }
+    if (groundedUserPdfId.present) {
+      map['grounded_user_pdf_id'] = Variable<String>(groundedUserPdfId.value);
+    }
     return map;
   }
 
@@ -4756,7 +4878,9 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
           ..write('message: $message, ')
           ..write('isUser: $isUser, ')
           ..write('timestamp: $timestamp, ')
-          ..write('sessionId: $sessionId')
+          ..write('sessionId: $sessionId, ')
+          ..write('groundedChapterKey: $groundedChapterKey, ')
+          ..write('groundedUserPdfId: $groundedUserPdfId')
           ..write(')'))
         .toString();
   }
@@ -16172,6 +16296,8 @@ typedef $$ChatsTableCreateCompanionBuilder =
       required bool isUser,
       required DateTime timestamp,
       Value<String?> sessionId,
+      Value<String?> groundedChapterKey,
+      Value<String?> groundedUserPdfId,
     });
 typedef $$ChatsTableUpdateCompanionBuilder =
     ChatsCompanion Function({
@@ -16181,6 +16307,8 @@ typedef $$ChatsTableUpdateCompanionBuilder =
       Value<bool> isUser,
       Value<DateTime> timestamp,
       Value<String?> sessionId,
+      Value<String?> groundedChapterKey,
+      Value<String?> groundedUserPdfId,
     });
 
 class $$ChatsTableFilterComposer extends Composer<_$AppDatabase, $ChatsTable> {
@@ -16218,6 +16346,16 @@ class $$ChatsTableFilterComposer extends Composer<_$AppDatabase, $ChatsTable> {
 
   ColumnFilters<String> get sessionId => $composableBuilder(
     column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get groundedChapterKey => $composableBuilder(
+    column: $table.groundedChapterKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get groundedUserPdfId => $composableBuilder(
+    column: $table.groundedUserPdfId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -16260,6 +16398,16 @@ class $$ChatsTableOrderingComposer
     column: $table.sessionId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get groundedChapterKey => $composableBuilder(
+    column: $table.groundedChapterKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get groundedUserPdfId => $composableBuilder(
+    column: $table.groundedUserPdfId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChatsTableAnnotationComposer
@@ -16288,6 +16436,16 @@ class $$ChatsTableAnnotationComposer
 
   GeneratedColumn<String> get sessionId =>
       $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
+  GeneratedColumn<String> get groundedChapterKey => $composableBuilder(
+    column: $table.groundedChapterKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get groundedUserPdfId => $composableBuilder(
+    column: $table.groundedUserPdfId,
+    builder: (column) => column,
+  );
 }
 
 class $$ChatsTableTableManager
@@ -16324,6 +16482,8 @@ class $$ChatsTableTableManager
                 Value<bool> isUser = const Value.absent(),
                 Value<DateTime> timestamp = const Value.absent(),
                 Value<String?> sessionId = const Value.absent(),
+                Value<String?> groundedChapterKey = const Value.absent(),
+                Value<String?> groundedUserPdfId = const Value.absent(),
               }) => ChatsCompanion(
                 id: id,
                 userId: userId,
@@ -16331,6 +16491,8 @@ class $$ChatsTableTableManager
                 isUser: isUser,
                 timestamp: timestamp,
                 sessionId: sessionId,
+                groundedChapterKey: groundedChapterKey,
+                groundedUserPdfId: groundedUserPdfId,
               ),
           createCompanionCallback:
               ({
@@ -16340,6 +16502,8 @@ class $$ChatsTableTableManager
                 required bool isUser,
                 required DateTime timestamp,
                 Value<String?> sessionId = const Value.absent(),
+                Value<String?> groundedChapterKey = const Value.absent(),
+                Value<String?> groundedUserPdfId = const Value.absent(),
               }) => ChatsCompanion.insert(
                 id: id,
                 userId: userId,
@@ -16347,6 +16511,8 @@ class $$ChatsTableTableManager
                 isUser: isUser,
                 timestamp: timestamp,
                 sessionId: sessionId,
+                groundedChapterKey: groundedChapterKey,
+                groundedUserPdfId: groundedUserPdfId,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
