@@ -1,0 +1,2326 @@
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+                                                                 AIPMT – 2015
+                                                 (Physics, Chemistry and Biology)
+                                                                     Code – E
+                 Time: 3 hrs                                                                                   Total Marks: 720
+
+                 General Instructions:
+                 1.   The Answer sheet is  inside  this  Text booklet. When you are  directed to open the  text
+                      booklet,  take  out  the  Answer  Sheet  and  fill  in  the  particulars  on  side-1  and  side-2
+                      carefully with blue/black ball point pen only.
+                 2.   The test is of 3 hours duration and consists of 180 questions. Each question carries 3
+                      marks.  For  each  correct  response  the  candidate  will  get  4  marks.  For  each  incorrect
+                      response, one mark will be deducted. The maximum marks are 720.
+                 3.   Use  Blue/Black  ball  point  pen  only  for  writing  particulars  on   this   page/marking
+                      responses.
+                 4.   Rough  work  is  to  be  done  on  the  space  provided  for  this  purpose  in  the  text  booklet
+                      only.
+                 5.   On  completion  of  the  test,  the  candidate  must  handover  the  answer  sheet  to  the
+                      invigilator in the room/Hall. The candidates are allowed to take away this text booklet
+                      with them.
+                 6.   Make sure that the CODE printed on side-2 of the answer sheet is the same as that on
+                      this booklet, In case of discrepancy, the candidate should immediately report the matter
+                      to the invigilator for the replacement of both the test Booklet and the Answer Sheet.
+                 7.   The  candidates  should  ensure  that  the  Answer  sheet  is  not  folded.  Do  not  make  any
+                      stray marks on the Answer sheet. Do not write your roll no. anywhere else except in the
+                      specified space in the Test booklet/Answer Sheet.
+                 8.   Use of white fluid for correction is not permissible on the Answer Sheet.
+
+
+                 1.   If  force  (E),  velocity  (V)  and  time  (T)  are  chosen  as  fundamental  quantities,  the
+                      dimensional formula of surface tension will be
+                      (1) [E V−2 T−1]
+                      (2) [E V−1 T−2]
+                      (3) [E V−2 T−2]
+                      (4) [E−2 V−1 T−3]
+
+                 2.   A Ship A is moving westwards with a speed of 10 km h−1 and a ship B 100 km south of A
+                      is  moving  northwards  with  a  speed  of  10  km  h−1.  The  time  after  which  the  distance
+                      between them becomes shortest is
+                      (1) 0 h
+                      (2) 5 h
+                      (3) 5   2 h
+                      (4) 10    2h
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  3.  A particle of unit mass undergoes one-dimensional motion such that its velocity varies
+                      according to
+                       υ(x)=βx-2n
+                      where β and n are constants and x is the position of the particle. The acceleration of the
+                      particle as a function of x is given by
+                      (1) -2nβ2 x-2n-1
+
+                      (2) -2nβ2 x-4n-1
+
+                      (3) -2β2 x-2n+1
+
+                      (4) -2nβ2e-4n+1
+
+
+                  4.  Three blocks A, B and C, of masses 4 kg, 2 kg and 1 kg, respectively, are in contact on a
+                      frictionless surface, as shown. If a force of 14 N is applied on the 4 kg block, then the
+                      contact force between A and B is
+
+
+
+
+
+
+                      (1) 2 N
+                      (2) 6 N
+                      (3) 8 N
+                      (4) 18 N
+
+                  5.  A block A  of mass m1 rests on a  horizontal table. A light string connected to it passes
+                      over a frictionless pulley at the edge of table and from its other end another block B of
+                      mass m2 is suspended. The coefficient of kinetic friction between the block and the table
+                      is k. When the block A is sliding on the table, the tension in the string is
+
+                            (m2 +μk m1 )g
+                      (1)
+                             (m1 +m2 )
+                      (2) (m2 -μk m1 )g
+                             (m1 +m2 )
+                      (3) m1 m2 (1+μk )g
+                              (m1 +m2 )
+                      (4) m1 m2 (1-μk )g
+                              (m1 +m2 )
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 6.   Two similar springs P and Q have spring constants KP and KQ. They are stretched, first
+                      by  the  same  amount  (case  a),  then  y  the  same  force  (case  b).  The  work  done  by  the
+                      springs WP and WQ are related as in case (a) and case (b), respectively:
+                      (1) WP = WQ; WP > WQ
+                      (2) WP = WQ; WP = WQ
+                      (3) WP > WQ; WQ > WP
+                      (4) WP < WQ; WQ < WP
+
+                 7.   A  block  of  mass  10  kg,  moving  in  x  direction  with  a  constant  speed  of  10  ms−1                 is
+                      subjected to a retarding force F = 0.1x J/m during its travel from x = 20 m to 30 m. Its
+                      final KE will be
+                      (1) 475 J
+                      (2) 450 J
+                      (3) 275 J
+                      (4) 250 J
+
+                 8.   A particle of mass m is driven by a machine that delivers a constant power k watts. If
+                      the particle starts from rest the force on the particle at time t is
+
+                      (1)    mk2 t-1/2
+
+                      (2)    mk t-1/2
+                      (3)    2mk t-1/2
+
+                      (4) 12      mk t-1/2
+
+
+                 9.   Two particles of masses m1, m2 move with initial velocities u1 and u2. On collision, one of
+                      the  particles  get  excited  to  higher  level,  after  absorbing  energyε          .  If  final  velocities  of
+                      particles be v1 and v2 then we must have
+                      (1) m12u1 +m22u2 -ε = m12 v 1 +m22 v2
+
+                      (2) 12m1 u12 +12m2u22 = 12m1 v12 +12m2 v22 
+
+                      (3) 12m1 u12 +12m2u22 -ε=12m1 v12 +12m2 v22
+
+                      (4) 12m12 u12 +12m2u22 -ε=12m1 v12 +12m2 v22
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  10.  The  rod  of  weight  W  is  supported  by  two  parallel  knife  edges  A  and  B  and  is  in
+                      equilibrium in a horizontal position. The knives are at a distance d from each other. The
+                      centre of mass of the rod is at distance x from A. The normal reaction on A is
+                      (1) Wxd
+
+                      (2) Wdx
+
+
+                      (3) W(d-x)
+                               x
+                      (4) W(d-x)
+                               d
+
+                  11. A mass m moves in a circle on a smooth horizontal plane with velocity v0 at a radius R0.
+                      The  mass  is  attached  to  a  string  which  passes  through  a  smooth  hole  in  the  plane  as
+                      shown
+
+
+
+
+
+
+
+
+
+                      The tension in the string is increased gradually and finally m moves in a circle of radius
+                       R20 . The final value of the kinetic energy is
+
+                      (1) mv20
+
+                      (2) 14 mv20
+
+                      (3) 2 mv20
+
+                      (4) 12mv20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 12. Three identical spherical shells, each of mass m and radius r placed as shown in figure.
+                      Consider an axis XX’ which is  touching to two shells and passing through diameter of
+                      third shell.
+                      Moment of inertia of the system consisting of these three spherical shells about XX’ axis
+                      is
+
+
+
+
+
+
+
+
+                      (1)  115 mr2
+
+                      (2) 3 mr2
+
+                      (3)  165 mr2
+
+                      (4) 4 mr2
+
+
+                 13. Kepler’s third law states that square of period of revolution (T) of a planet around the
+                      Sun is proportional to third power of average distance r between Sun and planet
+                      i.e. T2 = Kr3
+                      here K is constant
+                      If the masses of Sun and planet are M and m, respectively, then as per Newton’s law of
+                      gravitation, force of attraction between them is
+                      F=GMmr2 ,hereGisgravitational constant . The relation between G and K is described as
+
+                      (1) GK = 42
+                      (2) GMK = 42
+                      (3) K = G1
+
+                      (4) K = G
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                               AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                               Paper – 2015 (Code E)
+
+
+                  14. Two spherical bodies of mass M and 5 M and radii R and 2 R are released in free space
+                      with  initial  separation between  their  centres  equal  to  12  R.  If  they  attract  each  other
+                      due  to  gravitational  force  only,  then  the  distance  covered  by  the  smaller  body  before
+                      collision is
+                      (1) 2.5 R
+                      (2) 4.5 R
+                      (3) 7.5 R
+                      (4) 1.5 R
+
+                  15. On observing light from three different starts P, Q and R, it was found that intensity of
+                      violet colour is maximum in the spectrum of P, the intensity of green colour is maximum
+                      in the spectrum of R and the intensity of red colour is maximum in the spectrum of Q. If
+                      TP,  TQ and  TR    are  the  respective  absolute  temperatures  of  P,  Q  and  R,  then  it  can  be
+                      concluded from the above observation that
+                      (1) TP > TQ > TR
+                      (2) TP > TR > TQ
+                      (3) TP < TR < TQ
+                      (4) TP < TQ < TR
+
+                  16. The approximate depth of an ocean is 2700 m. the compressibility of water is 45.4 
+                      10−11 Pa−1 and  density  of  water  is  103 kg/m3.  What  fractional  compression  of  water
+                      will be obtained at the bottom of the ocean?
+                      (1) 0.8  10−2
+                      (2) 1.0  10−2
+                      (3) 1.2  10−2
+                      (4) 1.4  10−2
+
+                  17. The two ends of a metal rod maintained at temperatures 100 C and 110 C. The rate of
+                      heat flow in the rod is found to be 4.0 J/s. If the ends are maintained at temperatures
+                      200 C and 210 C, the rate of heat flow will be
+                      (1) 44.0 J/s
+                      (2) 16.8 J/s
+                      (3) 8.0 J/s
+                      (4) 4.0 J/s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  18. A wind with speed 40 m/s blows parallel to the roof of a house. The area of the roof is
+                      250 m2. Assuming that the pressure inside the house is atmospheric pressure, the force
+                      exerted by the wind on the roof and the direction of the force will be
+                      (Pair = 1.2 kg/m3)
+                      (1) 4.8  105 N, downwards
+                      (2) 4.8  105 N, upwards
+                      (3) 2.4  105 N, upwards
+                      (4) 2.4  105 N, downwards
+
+                  19. Figure below shows two paths that may be taken by a gas to go from a state A to a state
+                      C.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      In process AB, 400 J of heat is added to the system and in process BC, 100 J of heat is
+                      added to the system. The heat absorbed by the system in the process AC will be
+                      (1) 380 J
+                      (2) 500 J
+                      (3) 460 J
+                      (4) 300 J
+
+                  20. A Carnot engine having an efficiency of η=101 as heat engine is used as a refrigerator.
+
+                      If  the  work  done  on  the  system  is  10  J,  the  amount  of  energy  absorbed  from  the
+                      reservoir at lower temperature is
+                      (1) 100 J
+                      (2) 99 J
+                      (3) 90 J
+                      (4) 1 J
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                               AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                               Paper – 2015 (Code E)
+
+
+                  21. One mole of an ideal diatomic gas undergoes a transition from A to B along a path AB as
+                      shown in the figure,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      The change in internal energy of the gas during the transition is
+                      (1) 20 kJ
+                      (2) -20 kJ
+                      (3) 20 J
+                      (4) -12 kJ
+
+                  22. The ratio of the specific heats CP =γ in terms of degrees of freedom (n) is given by
+
+                                                              CV
+                       (1)   1+ 1
+                                 n
+                            
+                          
+                       (2)   1+ n3
+                            
+                          
+                       (3)   1+ n2
+                              
+                            
+                       (4)   1+ n2
+                            
+
+
+                  23. When two displacements represented by y1 = a sin (t) and y2 = b cos (t) are
+                      superimposed the motion is
+                      (1) Not a simple harmonic
+                      (2) Simple harmonic with amplitude ab
+
+                      (3) Simple harmonic with amplitude                a 2 +b2
+                      (4) Simple harmonic with amplitude (a+b)
+                                                                          2
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                               AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                               Paper – 2015 (Code E)
+
+
+                  24. A  particle  is  executing  SHM  along  a  straight  line.  Its  velocities  at  distances  x1               and  x2
+                       from the mean position are V1 and V2, respectively. Its time period is
+                                  x2 +x2
+                       (1) 2π       1   2
+                                  V12 +V22
+                                  x2 -x2
+                       (2) 2π       2  1
+                                  V12 -V22
+                                  V2 +V2
+                       (3) 2π      1    2
+                                  X12 +X22
+                                  V2 -V2
+                       (4) 2π      1   2
+                                  x12 -x22
+
+
+                  25.   The  fundamental  frequency  of  a  closed  organ  pipe  of  length  20  cm  is  equal  to  the
+                       second overtone of an organ pipe open at both the ends. The length of organ pipe open
+                       at both ends is
+                       (1) 80 cm
+                       (2) 100 cm
+                       (3) 120 cm
+                       (4) 140 cm
+
+                  26. A parallel plate air capacitor of capacitance C is connected to a cell of emf V and then
+                       disconnected from it. A dielectric slab of dielectric constant K which can just fill the air
+                       gap of the capacitor is now inserted in it. Which of the following is incorrect?
+                       (1) The potential difference between the plates decrease K times
+                       (2) The energy stored in the capacitor decreases K times
+                                                                     1      2  1   
+                       (3) The change in energy stored is              CV      -1 
+
+                                                                     2        K    
+                       (4) The charge on the capacitor is not conserved.
+
+                  27. The electric field in a certain region is acting radially outward and is given by E = Ar. A
+                       charge contained in a sphere of radius ‘a’ centred at the origin of the field, will be given
+                       by
+                       (1) 4πε 0 Aa2
+                       (2) A ε0a2
+                       (3) 4πε0Aa3
+                       (4) ε0Aa3
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  28. A potentiometer wire has length 4 m and resistance 8 . The resistance that must be
+                      connected in series with the wire and an accumulator of emf 2 V, so as to get a potential
+                      gradient 1 mV per cm on the wire is
+                      (1) 32 
+                      (2) 40 
+                      (3) 44 
+                      (4) 48 
+
+                  29. A,  B  and  C  are  voltmeters  of  resistance  R,  1.5R  and  3R,  respectively,  as  shown  in  the
+                      figure.  When      some  potential  difference  is  applied  between  X  and  Y,  the  voltmeter
+                      readings are VA, VB and VC, respectively, then
+
+
+
+
+
+                      (1) VA = VB = VC
+                      (2) VA  VB = VC
+                      (3) VA = VB  VC
+                      (4) VA  VB  VC
+
+                  30. Across a metallic conductor of non-uniform cross section a constant potential difference
+                      is applied. The quantity which remains constant along the conductor is
+                      (1) current density
+                      (2) current
+                      (3) drift velocity
+                      (4) electric field
+
+                  31. A wire carrying current I has the shape as shown in adjoining figure. Linear parts of the
+                      wire are very long and parallel to X-axis, while semicircular portion of radius R is lying
+                      in Y–Z plane. Magnetic field at point O is
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                      (1) B = 4μπ0 RI πi+2k
+
+                      (2) B = 4μπ0 RI πi-2kˆ
+
+                      (3) B =  4μπ0 RI πi+2k
+
+                      (4) B = 4μπ0 RI πi-2k
+
+
+                 32. An electron moving in a circular orbit of radius r makes n rotations per second. The
+                      magnetic field produced at the centre has magnitude:
+
+                           μ 0 ne
+                      (1)
+                           2πr
+                      (2) Zero
+                      (3) μ0n2e
+                             r
+                      (4) μ 0 ne
+                            2r
+
+                 33. A  conducting  square  frame  of  side        ‘a’  and  a  long  straight  wire  carrying  current  I  are
+                      located in the same plane as shown in the figure. The frame moves to the right with a
+                      constant velocity ‘V’. The emf induced in the frame will be proportional to
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      (1) x12
+                              1
+                      (2) (2x-a)2
+                              1
+                      (3) (2x+a)2
+                      (4)        1
+                          (2x-a)(2x+a)
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  34. A resistance ‘R’  draws  power ‘P’  when  connected to an AC source. If  an inductance  is
+                      now placed in series with the resistance, such that the impedance of the circuit becomes
+                      ‘Z’, the power drawn will be
+                      (1) P   R  2
+                              Z 
+
+                      (2) P    RZ
+                                 
+                      (3)  P   R
+                              Z 
+
+                      (4) P
+
+                  35. A radiation of energy ‘E’ falls normally on a perfectly reflecting surface. The momentum
+                      transferred to the surface is (C = velocity of light):
+                      (1) CE
+
+                      (2) 2EC
+
+                      (3) 2EC2
+
+                      (4) CE2
+
+
+                  36. Two identical thin plano–convex glass lenses (refractive index 1.5) each having radius
+                      of curvature of 20 cm are placed with their convex surfaces in contact at the centre. The
+                      intervening  space  is  filled  with  oil  of  refractive  index  1.7.  The  focal  length  of  the
+                      combination is
+                      (1) -20 cm
+                      (2) -25 cm
+                      (3) -50 cm
+                      (4) 50 cm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 37. For a parallel beam of monochromatic light of wavelength ‘’, diffraction is produced by
+                      a  single  lit  whose  width     ‘a’  is  of  the  order  of  the  wavelength  of  the  light.  If   ‘D’  is  the
+                      distance of the screen from the slit, the width of the central maxima will be
+                      (1) 2Daλ
+
+                      (2) Daλ
+
+                      (3) Daλ
+
+                      (4) 2Daλ
+
+
+                 38. In a double slit experiment, the two slits are 1 mm apart and the screen is placed 1 m
+                      away. A monochromatic light of wavelength 500 nm is used. What will be the width of
+                      each slit for obtaining ten maxima of double slit within the central maxima of single slit
+                      pattern?
+                      (1) 0.2 mm
+                      (2) 0.1 mm
+                      (3) 0.5 mm
+                      (4) 0.02 mm
+
+                 39. The refracting angle of a prism is A, and refractive index of the material of the prism is
+                      cot (A/2). The angle of minimum deviation is
+                      (1) 180 – 3A
+                      (2) 180 – 2A
+                      (3) 90 - A
+                      (4) 180 + 2A
+
+                 40. A certain metallic surface is illuminated with monochromatic light of wavelength . The
+                      stopping potential for photo–electric current for this light is 3V0. If the same surface is
+                      illuminated  with  light  of  wavelength  2,  the  stopping  potential  is  V0.              The  threshold
+                      wavelength for this surface for photo–electric effect is
+                      (1) 6
+                      (2) 4
+                      (3)  4λ
+
+                      (4)  6λ
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                               AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                               Paper – 2015 (Code E)
+
+
+                  41. Which  of  the  following  figures  represent  the  variation  of  particle  momentum  and  the
+                       associated de-Broglie wavelength?
+                       (1)
+
+
+
+
+
+
+                       (2)
+
+
+
+
+
+
+                       (3)
+
+
+
+
+
+
+                       (4)
+
+
+
+
+
+                  42. Consider  3rd       orbit  of  He+     (Helium),  using  non-relativistic  approach,  the  speed  of
+                       electron in this orbit will be [given K = 9  109 constant, Z = 2 and h(Planck’s constant)
+                       = 6.6  10−34 Js]
+                       (1) 2.92  106 m/s
+                       (2) 1.46  106 m/s
+                       (3) 0.73  106 m/s
+                       (4) 3.0  108 m/s
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                                AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                                Paper – 2015 (Code E)
+
+
+                   43. If radius of the 2713 Al nucleus is taken to be RAl then the radius of 12553Te nucleus
+
+                        is nearly:
+                              53 1/3 R
+                        (1)          Al
+                              13 
+                        (2) 5R
+                             3   Al
+                        (3) 3R
+                             5   Al
+                              13 1/3 R
+                        (4)          Al
+                              53 
+
+                   44. If in a p–n junction, a square input signal of 10 V is applied, as shown
+
+
+
+
+
+                        Then the output across RL will be
+                        (1)
+
+
+
+
+                        (2)
+
+
+
+
+
+
+
+
+
+                        (3)
+
+
+
+
+                        (4)
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 45. Which logic gate is represented by the following combination of logic gates?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      (1) OR
+                      (2) NAND
+                      (3) AND
+                      (4) NOR
+
+                 46. Which of the following species contains equal number of  and π -bonds?
+                      (1) HCO 3
+
+                      (2) XeO4
+                      (3) (CN)2
+                      (4) CH2(CN)2
+
+                 47. The species Ar, K+ and Ca2+ contain the same number of electrons. In which order do
+                      their radii increase?
+                      (1) Ar < K+ < Ca2+
+                      (2) Ca2+ < Ar <K+
+                      (3) Ca2+ < K+ < Ar
+                      (4) K+ < Ar < Ca2+
+
+                 48. The function of ‘’Sodium pump’’ is a biological process operating in each and every cell
+                      of all animals. Which of the following biologically important ions is also a constituent of
+                      this pump?
+                      (1) Ca2+
+                      (2) Mg2+
+                      (3) K+
+                      (4) Fe2+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  49. ‘’Metals are usually not found as nitrates in their ores’’. Out of the following two
+                      (a and b) reasons which is/are true for the above observation?
+                      (a) Metal nitrates are highly unstable
+                      (b) Metal nitrates are highly soluble in water
+                      (1) a and b are true
+                      (2) a and b are false
+                      (3) a is false but b is true
+                      (4) a is true but b is false
+
+                  50. Solubility of the alkaline earth’s metal sulphates in water decreases in the sequence :
+                      (1) Mg > Ca > Sr > Ba
+                      (2) Ca > Sr > Ba > Mg
+                      (3) Sr > Ca > Mg > Ba
+                      (4) Ba > Mg > Sr > Ca
+
+                  51. Because of lanthanoid contraction, which of the following pairs of elements have nearly
+                      same atomic radii? (Numbers in the parenthesis are atomic numbers).
+                      (1) Ti (22) and Zr (40)
+                      (2) Zr (40) and Nb (41)
+                      (3) Zr (40) and Hf (72)
+                      (4) Zr (40) and Ta (73)
+
+                  52. Which of the following processes does not involve oxidation of iron?
+                      (1) Rusting of iron sheets
+                      (2) Decolourisation of blue CuSO4 solution by iron
+                      (3) Formation of Fe(CO)5 from Fe
+                      (4) Liberation of H2 from steam by iron at high temperature
+
+                  53. Which of the following pairs of ions are isoelectronic and isostructural?
+                      (1) CO32- ,SO32-
+                      (2) ClO3- ,CO32-
+                      (3) SO32- ,NO3-
+                      (4) ClO3- ,SO32-
+
+
+                  54. Which of the following options represents the correct bond order?
+                      (1) O2- >O2 >O2+
+                      (2) O2- <O2 <O2+
+                      (3) O2- >O2 <O2+
+                      (4) O2- <O2 >O2+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 55. Nitrogen   dioxide   and   sulphur   dioxide   have   some   properties   in   common.   Which
+                      property is shown by one of these compounds, but not by the other?
+                      (1) forms ‘acid – rain’
+                      (2) is a reducing agent
+                      (3) is soluble in water
+                      (4) is used as a food-preservative
+
+                 56. Maximum bond angle at nitrogen is present in which of the following
+                      (1) NO2
+                      (2) NO2-
+                      (3) NO2+
+                      (4) NO3-
+
+
+                 57. Magnetic moment 2.84 B.M. is given by:
+                      (At. nos. Ni = 28, Ti = 22, Cr = 24, Co = 27)
+                      (1) Ni2+
+                      (2) Ti3+
+                      (3) Cr2+
+                      (4) Co2+
+
+                 58. Cobalt (III) Chloride  forms several octahedral complexes with ammonia. Which of the
+                      following will not give test for chloride ions with silver nitrate at 25°C?
+                      (1) CoCl3.3NH3
+                      (2) CoCl3.4NH3
+                      (3) CoCl3.5NH3
+                      (4) CoCl3.6NH3
+
+                 59. Which of these statements about [Co(CN)6]3− is true?
+                      (1) [Co(CN)6]3− has no unpaired electrons and will be in a low-spin configuration
+                      (2) [Co(CN)6]3− has four unpaired electrons and will be in low-spin configuration
+                      (3) [Co(CN)6]3− has four unpaired electrons and will be in a high-spin configuration
+                      (4) [Co(CN)6]3− has no unpaired electrons and will e in a high-spin configuration
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 60. The activation energy of a  reaction can be determined from the  slope of which of the
+                      following graphs?
+                      (1) In K vs. T
+                      (2) InKT vs.T
+
+                      (3) InKvs. T1
+
+                      (4) InKT vs. T1
+
+
+                 61. Which one is not equal to zero for an ideal solution?
+                      (1) ΔHmix
+                      (2) ΔSmix
+                      (3) ΔVmix
+                      (4) ΔP=Pobserved -PRaoult
+
+                 62. A mixture of gases contains H2 and O2 gases in the ratio of 1:4 (w/w). What is the molar
+                      ratio of the two gases in the mixture?
+                      (1) 1:4
+                      (2) 4:1
+                      (3) 16:1
+                      (4) 2:1
+
+                 63. A given metal crystallizes out with a  cubic structure having edge  length of 361 pm. If
+                      there are four metal atoms in one unit cell, what is the radius of one atom?
+                      (1) 40 pm
+                      (2) 127 pm
+                      (3) 80 pm
+                      (4) 108 pm
+
+                 64. When initial concentration of a reactant is doubled in a reaction, its half – life period is
+                      not affected. The order of the reaction is :
+                      (1) Zero
+                      (2) First
+                      (3) Second
+                      (4) More than zero but less than first
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  65. If the value of an equilibrium constant for a particular reaction is 1.6 × 1012, then at
+                      equilibrium the system will contain
+                      (1) All reactants
+                      (2) Mostly reactants
+                      (3) Mostly products
+                      (4) Similar amounts of reactants and products
+
+                  66. A device that converts energy of combustion of fuels like hydrogen and methane,
+                      directly into electrical energy is known as :
+                      (1) Fuel cell
+                      (2) Electrolytic cell
+                      (3) Dynamo
+                      (4) Ni–Cd cell
+
+                  67. The boiling point of 0.2 mol kg−1 solution of X in water is greater than equimolal
+                      solution of Y in water. Which one of the following statements is true in this case?
+                      (1) X is undergoing dissociation in water
+                      (2) Molecular mass of X is greater than the molecular mass of Y
+                      (3) Molecular mass of X is less than the molecular mass of Y
+                      (4) Y is undergoing dissociation in water, while X undergoes no change
+
+                  68. Which one of the following electrolytes has the same value of van’t Hoff’s factor (i) as
+                      that of Al2(SO4)3 (if all are 100% ionized)?
+                      (1) K2SO4
+                      (2) K3[Fe(CN)6]
+                      (3) Al(NO3)3
+                      (4) K4[Fe(CN)6]
+
+                  69. The number of d-electrons in Fe2+ (Z = 26) is not equal to the number of electrons in
+                      which one of the following?
+                      (1) s-electrons in Mg (Z = 12)
+                      (2) p-electrons in Cl (Z = 17)
+                      (3) d-electrons in Fe (Z = 26)
+                      (4) p-electrons in Ne (Z = 10)
+
+                  70. The correct bond order in the following species is:
+                      (1) O2+2 <O2+ <O2-
+
+                      (2) O2+2 <O2- <O2+
+                      (3) O+ <O-  O2+
+                             2    2     2
+                      (4) O2- <O2+ <O2+2
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 71. The angular momentum of electron in ‘d’ orbital is equal to:
+                      (1)    6 h
+                      (2)    2h
+                      (3) 2   3h
+                      (4) 0 h
+
+                 72. The Ksp of Ag2CrO4, AgCl, AgBr and AgI are, respectively, 1.1 × 10−12, 1.8 × 10−10, 5.0 ×
+                      10−13,  8.3  ×  10−17.  Which  one  of  the  following  salts  will  precipitate  last  if  AgNO3
+                      solution is added to the solution containing equal moles of NaCl, NaBr, NaI and Na2CrO4
+                      (1) AgI
+                      (2) AgCl
+                      (3) AgBr
+                      (4) AgCrO4
+
+                 73. Which property of colloidal solution is independent of charge on the colloidal particles?
+                      (1) Coagulation
+                      (2) Electrophoresis
+                      (3) Electro-osmosis
+                      (4) Tyndall effect
+
+                 74. Which  of  the  following  statements  is  correct  for  a  reversible  process  in  a  state  of
+                      equilibrium?
+                      (1) ΔG=-2.30RTlogK
+                      (2) ΔG=2.30RTlogK
+                      (3) ΔGo =-2.30RTlogK
+                      (4) ΔGo =2.30RTlogK
+
+                 75. Bithional is generally added to the soaps as an additive to function as a/an:
+                      (1) Softener
+                      (2) Dryer
+                      (3) Buffering agent
+                      (4) Antiseptic
+
+                 76. The electrolytic reduction of nitrobenzene in strongly acidic medium produces:
+                      (1) P-Aminophenol
+                      (2) Azoxybenzene
+                      (3) Azobenzene
+                      (4) Aniline
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  77. In Duma’s method for estimation of nitrogen 0.25 g of an organic compound gave 40 mL
+                      if nitrogen collected at 300 K temperature and 725 mm pressure. If the aqueous tension
+                      at 300 K is 25 mm, the percentage of nitrogen in the compound is:
+                      (1) 17.36
+                      (2) 18.20
+                      (3) 16.76
+                      (4) 15.76
+
+                  78. In  which  of  the  following  compounds,  the  C–Cl  bond  ionization  shall  give  most  stable
+                      carbonium ion?
+ (1)
+
+
+
+
+
+ (2)
+
+
+
+
+(3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      (4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                               AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 79. The reaction
+
+
+
+
+                      (1) Williamson Synthesis
+                      (2) Williamson continuous etherification process
+                      (3) Etard reaction
+                      (4) Gattterman–Koch reaction
+
+                 80. The reaction of C6H5CH = CHCH3 with HBr produces
+                      (1)  C6H5CHCH2CH3
+                                 |
+                                 Br
+                      (2) C6H5CH2CHCH3
+                                      |
+                                      Br
+                      (3) C6H5CH2CH2CH2Br
+(4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                                AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                                Paper – 2015 (Code E)
+
+
+                  81. A single compound of the structure
+
+
+
+
+                       is obtainable from ozonolysis of which of the following cyclic compounds
+                       (1)
+
+
+
+
+                       (2)
+
+
+
+
+
+                       (3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+                       (4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+
+                              Paper – 2015 (Code E)
+
+
+
+
+
+                  82. Treatment of cyclopentanone
+                      the following species?
+                      (1) Cyclopentanonyl anion
+                      (2) Cyclopentanonyl cation
+                      (3) Cyclopentanonyl radical
+                      (4) Cyclopentanonyl biradical
+
+                  83. Consider the following compounds
+
+
+
+
+
+
+                      Hyperconjugation occurs in:
+                      (1) I only
+                      (2) II only
+                      (3) III only
+                      (4) I and III
+
+                  84. Which  of  the  following  is  the  most  correct  electron  displacement  of  a  nucleophilic
+                      reaction to take place
+ (1)
+
+
+ (2)
+
+
+
+ (3)
+
+
+ (4)
+
+
+
+                  85. The enolic form of ethyl acetoacetate as below has:
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+
+
+
+
+
+
+
+
+                      (1)18 sigma bonds and 2 pi-bonds
+                      (2)16 sigma bonds and 1 pi-bonds
+                      (3)9  sigma  bonds  and  2  pi-bonds
+                      (4)9 sigma bonds and 1 pi-bonds
+
+                  86. Given
+
+
+
+
+
+
+
+
+
+
+
+                      Which of the given compounds can exhibit tautomerism?
+                      (1) I and II
+                      (2) I and III
+                      (3) II and III
+                      (4) I, II and III
+
+                  87. Given
+
+
+
+
+
+                      The enthalpy of hydrogenation of these compounds will be in the order as:
+                      (1) I > II > III
+                      (2) III > II > I
+                      (3) II > III > I
+                      (4) II > I > III
+
+                  88. Biodegradable polymer which can be produced from glycine and aminocaproic acid is
+                      (1) Nylon 2–nylon 6
+                      (2) PHBV
+                      (3) Buna-N
+                      (4) Nylon 6, 6
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 89. The total number of π- bond electrons in the following structure is:
+
+
+
+
+
+
+
+                      (1) 4
+                      (2) 8
+                      (3) 12
+                      (4) 16
+
+                 90. An organic compound ‘X’ having molecular formula C5H10O yields phenyl hydrazone
+                      and gives negative response to the lodoform test and Tollens’ test. It produces n-
+                      pentane on reduction. ‘X’ could be:
+                      (1) pentanal
+                      (2) 2-pentanone
+                      (3) 3-pentanone
+                      (4) n-amyl alcohol
+
+                 91. Which one of the following matches is correct?
+
+                        (1)   Phytophthora       Aseptate mycelium                        Basidiomycetes
+
+
+                        (2)   Alternaria         Sexual reproduction absent               Deuteromycetes
+
+
+                        (3)   Mucor              Reproduction by conjugation              Ascomycetes
+
+
+
+                        (4)   Agaricus           Parasitic fungus                         Basidiomycetes
+
+
+                 92. Read the following five statements (A to E) and select the option with all correct
+                      statements:
+                      (A) Mosses and Lichens are the first organisms to colonise a bare rock
+                      (B) Selaginella is a homosporous pteridophyte.
+                      (C) Coralloid roots in Cycas have VAM
+                      (D) Main plant body in bryophytes is gametophytic, whereas in pteridophytes                                   is
+                          sporophytic
+                      (E) In gymnosperms, male and female gametophytes are present within sporangia
+                          located on sporophyte.
+                      (1) (A),(C) and (D)
+                      (2) (B),(C) and (D)
+                      (3) (A),(D) and (E)
+                      (4) (B),(C) and (E)
+
+
+
+
+                 93. In which of the following gametophyte is not independent free living
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                     (1) Funaria
+                     (2) Marchantia
+                     (3) Pteris
+                     (4) Pinus
+
+                 94. Which one of the following statements is wrong?
+                     (1) Algin and carrageen are products of algae
+                     (2) Agar–agar is obtained from Gelidium and Gracilaria
+                     (3) Chlorella and Spirulina are used as space food
+                     (4) Mannitol is stored food in Rhodophyceae
+
+                 95. The guts of cow and buffalo possess
+                     (1) Fucus spp.
+                     (2) Chlorella spp.
+                     (3) Methanogens
+                     (4) Cyanobacteria
+
+                 96. Male gametes are flagellated in
+                     (1) Polysiphonia
+                     (2) anabaena
+                     (3) Ectocarpus
+                     (4) Spirogyra
+
+                 97. Vascular bundles in monocotyledons are considered closed because
+                     (1) A bundle sheath surrounds each bundle
+                     (2) Cambium is absent
+                     (3) There are no vessels with perforations
+                     (4) Xylem is surrounded all around by phloem
+
+
+                 98.                             is the floral formula of
+                     (1) Allium
+                     (2) Sesbania
+                     (3) Petunia
+                     (4) Brassica
+
+                 99. A major characteristic of the monocot root is the presence of
+                     (1) Open vascular bundles
+                     (2) Scattered vascular bundles
+                     (3) Vasculature without cambium
+                     (4) Cambium sandwiched between phloem and xylem along the radius
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                 100. Keel is the characteristic feature of flower of
+                        (1) Tulip
+                        (2) Indigofera
+                        (3) Aloe
+                        (4) Tomato
+
+                 101. Perigynous flowers are found in
+                        (1) Guava
+                        (2) Cucumber
+                        (3) China rose
+                        (4) Rose
+
+                 102. Leaves become modified into spins in
+                        (1) Opuntia
+                        (2) Pea
+                        (3) Onion
+                        (4) Silk Cotton
+
+                 103. The structures that are formed by stacking of organised flattened membranous sacs in
+                        the chloroplasts are
+                        (1) Cristae
+                        (2) Grana
+                        (3) Stroma lamellae
+                        (4) Stroma
+
+                 104. The chromosomes in which centromere is situated close to one end are
+                        (1) Metacentric
+                        (2) Acrocentric
+                        (3) Telocentric
+                        (4) Sub-metacentric
+
+                 105. Select the correct matching in the following pairs
+                        (1) Smooth ER – Oxidation of phospholipids
+                        (2) Smooth ER – Synthesis of lipids
+                        (3) Rough ER – Synthesis of glycogen
+                        (4) Rough ER – Oxidation of fatty acids
+
+                 106. True nucleus is absent in
+                        (1) Anabaena
+                        (2) Mucor
+                        (3) Vaucheria
+                        (4) Volvox
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                 107. Which one of the following is not an inclusion body found in prokaryotes?
+                        (1) Phosphate granule
+                        (2) Cyanophycean granule
+                        (3) Glycogen granule
+                        (4) Polysome
+
+                 108. Transpiration and root pressure cause water to rise in plants by
+                        (1) Pulling it upward
+                        (2) Pulling and pushing it, respectively
+                        (3) Pushing it upward
+                        (4) Pushing and pulling it, respectively
+
+                 109. Minerals known to be required in large amounts for plant growth include
+                        (1) Phosphorus, potassium, sulphur, calcium
+                        (2) Calcium, magnesium, manganese, copper
+                        (3) Potassium, phosphorus, selenium, boron
+                        (4) Magnesium, sulphur, iron, zinc
+
+                 110. What causes a green plant exposed to the light on only one side to bend toward the
+                        source of light as it grows?
+                        (1) Green plants need light to perform photosynthesis
+                        (2) Green plants seek because they are phototropic
+                        (3) Light stimulates plant cells on the lighted side to grow faster
+                        (4) Auxin accumulates on the shaded side, stimulating greater cell elongation there.
+
+                 111. In a ring girdled plant
+                        (1) The shoot dies first
+                        (2) The root dies first
+                        (3) The shoot and root die together
+                        (4) Neither root nor shoot will die
+
+                 112. Typical growth curve in plants is
+                        (1) Sigmoid
+                        (2) Linear
+                        (3) Stair–steps shaped
+                        (4) Parabolic
+
+                 113. Which one gives the most valid and recent explanation for stomatal movements?
+                        (1) Transpiration
+                        (2) Potassium influx and efflux
+                        (3) Starch hydrolysis
+                        (4) Guard cell photosynthesis
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 114. The hilum is a scar on the
+                        (1) Seed, where funicle was attached
+                        (2) Fruit, where it was attached to pedicel
+                        (3) Fruit, where style was present
+                        (4) Seed, where micropyle was present
+
+                 115. Which  one  of  the  following  may  require  pollinators,  but  is  genetically  similar  to
+                        autogamy?
+                        (1) Geitonogamy
+                        (2) Xenogamy
+                        (3) Apogamy
+                        (4) Cleistogamy
+
+                 116. Which one of the following statement is not true?
+                        (1) Pollen grains are rich in nutrients, and they used in the form of tablets and syrups
+                        (2) Pollen  grains  of  some  plants  cause  severe  allergies  and  bronchial  afflictions  in
+                             some people
+                        (3) The flowers pollinated by flies and bats secrete four odour to attract them
+                        (4) Honey is made by bees by digesting pollen collected from flowers
+
+                 117. Transmission tissue is characteristics feature of
+                        (1) Hollow style
+                        (2) Solid style
+                        (3) Dry stigma
+                        (4) Wet stigma
+
+                 118. In ginger vegetative propagation occurs through
+                        (1) Rhizome
+                        (2) Offsets
+                        (3) Bulbils
+                        (4) Runners
+
+                 119. Which of the following are the important floral rewards to the animal pollinators?
+                        (1) Colour and large size of flower
+                        (2) Nectar and pollen grains
+                        (3) Floral fragrance and calcium crystals
+                        (4) Protein pellicle and stigmatic exudates
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                 120. How many pairs of contrasting characters in pea plants were studies by Mendel in his
+                        experiments?
+                        (1) Five
+                        (2) Six
+                        (3) Eight
+                        (4) Seven
+
+                 121. Which  is  the  most  common  mechanism  of  genetic  variation  in  the  population  of  a
+                        sexually reproducing organism?
+                        (1) Transduction
+                        (2) Chromosomal aberrations
+                        (3) Genetic drift
+                        (4) Recombination
+
+                 122. A technique of micropropagation is
+                        (1) Somatic hybridisation
+                        (2) Somatic embryogenesis
+                        (3) Protoplast fusion
+                        (4) Embryo rescue
+
+                 123. The movement of a gene from one linkage group to another is called
+                        (1) Inversion
+                        (2) Duplication
+                        (3) Translocation
+                        (4) Crossing over
+
+                 124. Multiple alleles are present
+                        (1) On different chromosomes
+                        (2) At different loci on the same chromosome
+                        (3) At the same locus of the chromosome
+                        (4) On non-sister chromatids
+
+                 125. Which   body   of       the   Government   of   India   regulates   GM   research   and   safety   of
+                        introducing GM organisms for public services?
+                        (1) Bio-safety committee
+                        (2) Indian council of agricultural research
+                        (3) Genetic Engineering Approval committee
+                        (4) Research committee on Genetic Manipulation
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 126. In BT cotton, the BT toxin present in plant tissue as pro-toxin is converted into active
+                        toxin due to
+                        (1) Alkaline pH of the insect gut
+                        (2) Acidic pH of the insect gut
+                        (3) Action of gut microorganisms
+                        (4) Presence of conversion factors in insect gut
+
+                 127. The crops engineered for glyphosate are resistant/tolerant to
+                        (1) Fungi
+                        (2) Bacteria
+                        (3) Insects
+                        (4) Herbicides
+
+                 128. DNA is not present in
+                        (1) Chloroplast
+                        (2) Ribosomes
+                        (3) Nucleus
+                        (4) Mitochondria
+
+                 129. Which of the following enhances or induces fusion of protoplasts?
+                        (1) Sodium chloride and potassium chloride
+                        (2) Polyethylene glycol and sodium nitrate
+                        (3) IAA and kinetin
+                        (4) IAA and gibberellins
+
+                 130. The UN conference of Parties on climate change in the year 2011 was held in
+                        (1) Poland
+                        (2) South Africa
+                        (3) Peru
+                        (4) Qatar
+
+                 131. Vertical   distribution   of   different   species   occupying   different   levels   in   a   biotic
+                        community is known as
+                        (1) Divergence
+                        (2) Stratification
+                        (3) Zonation
+                        (4) Pyramid
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 132. In which of the following both pairs have correct combination?
+                        (1) In situ conservation : National Park
+                             Ex situ conservation : Botanical Garden
+                        (2) In  situ conservation  :  Cryopreservation
+                             Ex situ conservation : Wildlife sanctuary
+                        (3) In situ conservation : Seed Bank Ex
+                             situ conservation : National Park
+                        (4) In situ conservation : Tissue culture
+                             Ex situ conservation : Sacred groves
+
+                 133. Secondary succession takes place on/in
+                        (1)  Bare rock
+                        (2) Degraded forest
+                        (3) Newly created pond
+                        (4) Newly cooled lava
+
+                 134. The mass of living material at a trophic level at a particular time is called
+                        (1) Gross primary productivity
+                        (2) Standing state
+                        (3) Net primary productivity
+                        (4) Standing crop
+
+                 135. In  an  ecosystem  the  rate  of  production  of  organic  matter  during  photosynthesis  is
+                        termed
+                        (1) Net primary productivity
+                        (2) Gross primary productivity
+                        (3) Secondary productivity
+                        (4) Net productivity
+
+                 136. Which  of  the  following  characteristics  is  mainly  responsible  for  diversification  of
+                        insects on land?
+                        (1) Segmentation
+                        (2) Bilateral symmetry
+                        (3) Exoskeleton
+                        (4) Eyes
+
+                 137. Which of the following endoparasites of humans does show viviparity
+                        (1) Ancylostoma duodenale
+                        (2) Enterobius vermicularis
+                        (3) Trichinella spiralis
+                        (4) Ascaris lumbricoides
+
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                 138. Which of the following represents the correct combination without any exception?
+
+                                               Characteristics                               Class
+
+
+                                   (1)   Mammary gland; hair on              Mammalia
+                                         body; pinnae; two pairs of
+                                         limbs
+
+
+                                   (2)   Mouth ventral : grills              Chondrichthyes
+                                         without operculum; skin
+                                         with placoid scales;
+                                         persistent notochord
+
+                                   (3)   Sucking and circular                Cyclostomata
+                                         mouth; Jaws absent
+                                         integument without
+                                         scales; paired appendages
+
+
+                                   (4)   Body covered with                   Aves
+                                         feathers; skin moist and
+                                         glandular; forelimbs form
+                                         wings; lungs with air sacs
+
+
+
+
+                 139. Which of the following animals is not viviparous?
+                        (1) Flying fox (bat)
+                        (2) Elephant
+                        (3) Platypus
+                        (4) Whale
+
+                 140. Erythropoiesis starts in
+                        (1) Kidney
+                        (2) Liver
+                        (3) Spleen
+                        (4) Red bone marrow
+
+                 141. The terga, sterna and pleura of cockroach body are joined by
+                        (1)  Cementing glue
+                        (2) Muscular tissue
+                        (3) Arthrodial membrane
+                        (4) Cartilage
+
+                 142. Nuclear envelope is a derivative of
+                        (1) Smooth endoplasmic reticulum
+                        (2) Membrane of Golgi complex
+                        (3) Microtubules
+                        (4) Rough endoplasmic reticulum
+
+
+
+===== PAGE BREAK =====
+
+                               AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                               Paper – 2015 (Code E)
+
+
+                  143. Cytochromes are found in
+                         (1) Matrix of mitochondria
+                         (2) Outer wall of mitochondria
+                         (3) Cristae of mitochondria
+                         (4) Lysosomes
+
+                  144. Which one of the following statements is incorrect?
+                         (1) A  competitive       inhibitor  reacts  reversibly  with  the  enzyme  to  form  an  enzyme–
+                              inhibitor complex
+                         (2) In competitive inhibition, the inhibitor molecule is not chemically changed by the
+                              enzyme
+                         (3) The  competitive  inhibitor  does  not  affect  the  rate  breakdown  of  the  enzyme–
+                              substrate complex
+                         (4) The presence of the competitive inhibitor decreases the Km of the enzyme for the
+                              substrate
+
+                  145. Select the correct option:
+
+                                                               I                                           II
+
+
+
+                                   (a)      Synapsis aligns homologous               (i)     Anaphase-II
+                                            chromosomes
+
+
+
+                                   (b)      Synthesis of RNA and                     (ii)    Zygotene
+                                            protein
+
+
+
+                                   (c)      Action of enzyme                         (iii)   G2-Phase
+                                            recombinase
+
+
+
+                                   (d)      Centromeres do not                       (iv)    Anaphase-I
+                                            separate but chromatids
+                                            move toward opposite poles
+
+
+                                                                                     (v)     Pachytene
+
+
+
+                                     (a)      (b)       (c)      (d)
+                           (1)       (ii)     (i)       (iii)    (iv)
+                           (2)       (ii)     (iii)     (v)      (iv)
+                           (3)       (i)      (ii)      (v)      (iv)
+                         (4)         (ii)   (iii)   (iv)   (v)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                 146. A  somatic  cell  that  has  just  completed  the  S       phase  of  its  cell  cycle,  as  compared  to
+                        gamete of the same species, has
+                        (1) Twice the number of chromosomes and twice the amount of DNA
+                        (2) Same number of chromosomes but twice the amount of DNA
+                        (3) Twice the number of chromosomes and four times the amount of DNA
+                        (4) Four times the number of chromosomes and twice the amount of DNA
+
+                 147. Which of the following statements is not correct?
+                        (1) Brunner’s glands are present in the submucosa of stomach and secrete pepsinogen
+                        (2) Goblet cells are present in the mucosa of intestine and secrete mucus
+                        (3) Oxyntic cells are present in the mucosa of stomach and secrete HCl
+                        (4) Acini are present in the pancreas and secrete carboxypeptidase
+
+                 148. Gastric juice of infants contains
+                        (1) Maltase, pepsinogen, rennin
+                        (2) Nuclease, pepsinogen, lipase
+                        (3) Pepsinogen, lipase, rennin
+                        (4) Amylase, rennin, pepsinogen
+
+                 149. When you hold your breath, which of the following gas changes in blood would first
+                        lead to the urge to breathe?
+                        (1) Falling O2 concentration
+                        (2) Rising CO2 concentration
+                        (3) Falling CO2 concentration
+                        (4) Rising CO2 and falling O2 concentration
+
+                 150. Blood pressure in the mammalian aorta is maximum during
+                        (1) Systole of the left atrium
+                        (2) Diastole of the right ventricle
+                        (3) Systole of the left ventricle
+                        (4) Diastole of the right atrium
+
+                 151. Which one of the following is correct?
+                        (1) Plasma = Blood - Lymphocytes
+                        (2) Serum = Blood + Fibrinogen
+                        (3) Lymph = Plasma + RBC + WBC
+                        (4) Blood = Plasma + RBC + WBC + Platelets
+
+                 152. Removal of proximal convoluted tubule from the nephron will result in
+                        (1) More diluted urine
+                        (2) More concentrated urine
+                        (3) No change in quality and quantity of urine
+                        (4) No urine formation
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                 153. Sliding filament theory can best explained as
+                        (1) When  myofilaments  slide  pass  each  other  actin  filaments  shorten,  while  Myosin
+                            filament do not shorten
+                        (2) Actin and Myosin filaments shorten and slide pass each other
+                        (3) Actin and Myosin filaments shorten and slide pass each other
+                        (4) When myofilaments slide pass each other, Myosin filaments shorten, while Actin
+                            filaments do not shorten
+
+                 154. Glenoid cavity articulates
+                        (1) Clavicle with acromion
+                        (2) Scapula with acromion
+                        (3) Clavicle with scapula
+                        (4) Humerus with scapula
+
+                 155. Which of the following regions of the brain is incorrectly paired with its function?
+                        (1) Medulla oblongata – Homoeostatic control
+                        (2) Cerebellum – Language comprehension
+                        (3) Corpus callosum – Communication between the left and right cerebral cortices
+                        (4) Cerebrum – Calculation and contemplation
+
+                 156. A gymnast is able to balance his body upside down even in the total darkness because
+                        of
+                        (1) Cochlea
+                        (2) Vestibular apparatus
+                        (3) Tectorial membrane
+                        (4) Organ of Corti
+
+                 157. A chemical signal that has both endocrine and neural roles is
+                        (1)  Melatonin
+                        (2) Calcitonin
+                        (3) Epinephrine
+                        (4) Cortisol
+
+                 158. Which  of  the  following  does  not  favour  the  formation  of  large  quantities  of  dilute
+                        urine?
+                        (1) Alcohol
+                        (2) Caffeine
+                        (3) Renin
+                        (4) Atrial-natriuretic factor
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                 159. Capacitation refers to changes in the
+                       (1) Sperm before fertilisation
+                       (2) Ovum before fertilisation
+                       (3) Ovum after fertilisation
+                       (4) Sperm after fertilisation
+
+                 160. Which of these is not an important component of initiation of parturition in humans?
+                       (1) Increase in oestrogen and progesterone ratio
+                       (2) Synthesis of prostaglandins
+                       (3) Release of oxytocin
+                       (4) Release of prolactin
+
+                 161. Which of the following viruses is not transferred through semen of an infected male?
+                       (1) Hepatitis B virus
+                       (2) Human immunodeficiency virus
+                       (3) Chikungunya virus
+                       (4) Ebola virus
+
+                 162. Which of the following cells during gametogenesis is normally diploid?
+                       (1)  Primary polar body
+                       (2) Spermatid
+                       (3) Spermatogonia
+                       (4) Secondary polar body
+
+                 163. Hysterectomy is surgical removal of
+                       (1) Uterus
+                       (2) Prostate gland
+                       (3) Vas deferens
+                       (4) Mammary glands
+
+                 164. Which of the following is not sexually transmitted disease?
+                       (1) Syphilis
+                       (2) Acquired immune deficiency syndrome (AIDS)
+                       (3) Trichomoniasis
+                       (4) Encephalitis
+
+                 165. An abnormal human baby with ‘XXX’ sex chromosomes was born due to
+                       (1) Formation of abnormal sperms in the father
+                       (2) Formation of abnormal ova in the mother
+                       (3) Fusion of two ova and one sperm
+                       (4) Fusion of two sperms and one ovum
+
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                 166. Alleles are
+                        (1) Different phenotype
+                        (2) True breeding homozygotes
+                        (3) Different molecular forms of a gene
+                        (4) Heterozygotes
+
+                 167. A man with blood group ‘A’ marries a woman with blood group ‘B’. What are all the
+                        possible blood groups of their offspring?
+                        (1) A and B only
+                        (2) A, B and AB only
+                        (3) A, B, AB and O
+                        (4) O only
+
+                 168. Gene regulation governing lactose operon of E. coli that involves the lac I gene product
+                        is
+                        (1) Positive and inducible because it can be induced by lactose
+                        (2) Negative and inducible because repressor protein prevents transcription
+                        (3) Negative and repressible because repressor protein prevents transcription
+                        (4) Feedback    inhibition    because    excess    of        β   -  galactosidase    can    switch    off
+                            transcription
+
+                 169. In  sea  urchin  DNA,  which  is  double  stranded,  17%  of  the  bases  were  shown  to  be
+                        cytosine. The percentages of the other three bases expected to be present in the DNA
+                        are
+                        (1) G 34%, A 24.5%, T 24.5%
+                        (2) G 17%, A 16.5%, T 32.5%
+                        (3) G 17%, A 33%, T 33%
+                        (4) G 8.5%, A 50%, T 24.5%
+
+                 170. Which of the following had the smallest brain capacity?
+                        (1) Homo erectus
+                        (2) Homo sapiens
+                        (3) Homo neanderthalensis
+                        (4) Homo habilis
+
+                 171. A population will not exist in Hardy–Weinberg equilibrium is
+                        (1) Individuals mate selectively
+                        (2) There are no mutations
+                        (3) There is no migration
+                        (4) The population is large
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                              AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                              Paper – 2015 (Code E)
+
+
+                  172. Match each disease with its correct type of vaccine:
+                        (a) Tuberculosis                       (i) harmless virus
+                        (b) Whooping cough                     (ii) Inactivated toxin
+                        (c) Diphtheria                         (iii) Killed bacteria
+                        (d) Polio                              (iv) harmless bacteria
+                               (a)           (b)               (c)               (d)
+                           (1) (ii)          (i)               (iii)             (iv)
+                           (2) (iii)         (ii)              (iv)              (i)
+                           (3) (iv)          (iii)             (ii)              (i)
+                           (4) (i)           (ii)              (iv)              (iii)
+
+                  173. HIV that causes AIDS, first starts destroying
+                        (1) B-lymphocytes
+                        (2) Leucocytes
+                        (3) Helper T-lymphocytes
+                        (4) Thrombocytes
+
+                  174. To active form of Entamoeba histolytica feeds upon
+                        (1) Erythrocytes mucosa and submucosa of colon
+                        (2) Mucosa an submucosa of colon only
+                        (3) Food n intestine
+                        (4) Blood only
+
+                  175. High value of BOD (biochemical oxygen demand) indicates that
+                        (1) Water is pure
+                        (2) Water is highly polluted
+                        (3) Water is less polluted
+                        (4) Consumption of organic matter in the water is higher by the microbes
+
+                  176. Most animals are tree dwellers in a
+                        (1) Coniferous forest
+                        (2) Thorn woodland
+                        (3) Temperate deciduous forest
+                        (4) Tropical rainforest
+
+
+
+
+
+
+
+
+
+
+
+
+===== PAGE BREAK =====
+
+                             AIPMT | PHYSICS, CHEMISTRY AND BIOLOGY
+                             Paper – 2015 (Code E)
+
+
+                 177. The following graph depicts changes in two populations (A and B) of herbivores in a
+                        grassy field. A possible reason for these changes is that
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        (1) Both plant populations in this habitat decreased
+                        (2) Population B competed more successfully for food than population A
+                        (3) Population A produced more offspring than population B
+                        (4) Population A consumed the members of population B
+
+                 178. Cryopreservation of gametes of threatened species in viable and fertile condition can
+                        be referred to as
+                        (1) In situ conservation of biodiversity
+                        (2) Advanced ex situ conservation of biodiversity
+                        (3) In situ conservation by sacred groves
+                        (4) In situ cryo-conservation of biodiversity
+
+                 179. Rachel Carson’s famous book ‘Silent spring’ is related to
+                        (1) Pesticide pollution
+                        (2) Noise pollution
+                        (3) Population explosion
+                        (4) Ecosystem management
+
+                 180. Which of the following is not one of the prime health risks associated with greater UV
+                        radiation through the atmosphere due to depletion of stratospheric ozone?
+                        (1) Increased skin cancer
+                        (2) Reduced immune system
+                        (3) Damage to eyes
+                        (4) Increased liver cancer
+
+
+
+
+
+
+
+
+
+
