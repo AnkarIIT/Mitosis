@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../database/drift_database.dart' as db;
 import '../services/ml_service.dart';
 import '../services/gemini_chat_service.dart';
+import '../services/ncert_text_index_service.dart';
+import '../services/user_pdf_index_service.dart';
 import '../services/connectivity_service.dart';
 import 'service_providers.dart';
 
@@ -19,6 +21,17 @@ final geminiServiceProvider = Provider<GeminiChatService>((ref) {
   service.init();
   return service;
 });
+
+/// Lazy loader for the extracted NCERT chapter text (`assets/ncert_text/`).
+/// Feeds the grounded AI tutor in the chat.
+final ncertTextIndexProvider = Provider<NcertTextIndexService>(
+  (ref) => NcertTextIndexService(),
+);
+
+/// Service for managing user-uploaded PDF indices (grounding source).
+final userPdfIndexProvider = Provider<UserPdfIndexService>(
+  (ref) => UserPdfIndexService(),
+);
 
 final connectivityServiceProvider = Provider<ConnectivityService>((ref) {
   final service = ConnectivityService.instance;
