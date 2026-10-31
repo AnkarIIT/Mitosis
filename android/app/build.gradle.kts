@@ -98,7 +98,11 @@ android {
             // No fallback branch: configuration above has already failed the
             // build if the credentials are absent, so an unqualified reference
             // here can only ever resolve to the real release config.
-            signingConfig = signingConfigs.getByName("release")
+            // Only attach it when present so Gradle can still configure a
+            // debug-only build on machines without the distribution keystore.
+            if (hasKeystoreProperties) {
+                signingConfig = signingConfigs.getByName("release")
+            }
 
             // Obfuscation. Without it, the release APK ships Dart code and asset
             // paths in a form that is trivial to read and reverse. ProGuard
