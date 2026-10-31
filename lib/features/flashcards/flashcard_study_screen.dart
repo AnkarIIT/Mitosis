@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:confetti/confetti.dart';
 
 import '../../core/models/flashcard_model.dart';
 import '../../core/providers/providers.dart';
@@ -10,7 +8,6 @@ import '../../core/providers/current_user_provider.dart';
 import '../../core/services/flashcard_scheduler_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/theme/tokens.dart';
 import 'package:go_router/go_router.dart';
 
 /// Dedicated study screen: flip card → rate → next.
@@ -35,7 +32,6 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   int _currentIndex = 0;
   int _reviewed = 0;
   List<Flashcard> _queue = [];
-  late ConfettiController _confettiController;
 
   /// Captured while mounted: `ref` throws if touched after dispose, so the
   /// leave-refresh goes through the container instead.
@@ -46,26 +42,25 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
     super.initState();
     _flipController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 250),
     );
     _flipAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _flipController, curve: Curves.easeInOut),
-    );
-    _confettiController = ConfettiController(
-      duration: const Duration(seconds: 2),
     );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _flipController.duration = MediaQuery.of(context).disableAnimations
+        ? Duration.zero
+        : const Duration(milliseconds: 250);
     _container ??= ProviderScope.containerOf(context);
   }
 
   @override
   void dispose() {
     _flipController.dispose();
-    _confettiController.dispose();
     // Invalidate providers when leaving so the list refreshes on next visit.
     _container?.invalidate(flashcardsFromDbProvider);
     _container?.invalidate(dueFlashcardsProvider);
@@ -224,64 +219,32 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
             child: Row(
               children: [
                 _buildRatingButton(
-                      label: 'Again',
-                      icon: Icons.close_rounded,
-                      color: AppColors.error,
-                      onTap: () => _rate(FlashcardRating.again),
-                    )
-                    .animate()
-                    .fadeIn(delay: 0.ms, duration: AppDuration.fast)
-                    .scale(
-                      begin: const Offset(0.8, 0.8),
-                      end: const Offset(1, 1),
-                      curve: Curves.easeOutCubic,
-                      duration: AppDuration.normal,
-                    ),
+                  label: 'Again',
+                  icon: Icons.close_rounded,
+                  color: AppColors.error,
+                  onTap: () => _rate(FlashcardRating.again),
+                ),
                 const SizedBox(width: 8),
                 _buildRatingButton(
-                      label: 'Hard',
-                      icon: Icons.sentiment_dissatisfied_rounded,
-                      color: AppColors.warning,
-                      onTap: () => _rate(FlashcardRating.hard),
-                    )
-                    .animate()
-                    .fadeIn(delay: 60.ms, duration: AppDuration.fast)
-                    .scale(
-                      begin: const Offset(0.8, 0.8),
-                      end: const Offset(1, 1),
-                      curve: Curves.easeOutCubic,
-                      duration: AppDuration.normal,
-                    ),
+                  label: 'Hard',
+                  icon: Icons.sentiment_dissatisfied_rounded,
+                  color: AppColors.warning,
+                  onTap: () => _rate(FlashcardRating.hard),
+                ),
                 const SizedBox(width: 8),
                 _buildRatingButton(
-                      label: 'Good',
-                      icon: Icons.sentiment_satisfied_rounded,
-                      color: AdaptiveColors.primary(context),
-                      onTap: () => _rate(FlashcardRating.good),
-                    )
-                    .animate()
-                    .fadeIn(delay: 120.ms, duration: AppDuration.fast)
-                    .scale(
-                      begin: const Offset(0.8, 0.8),
-                      end: const Offset(1, 1),
-                      curve: Curves.easeOutCubic,
-                      duration: AppDuration.normal,
-                    ),
+                  label: 'Good',
+                  icon: Icons.sentiment_satisfied_rounded,
+                  color: AdaptiveColors.primary(context),
+                  onTap: () => _rate(FlashcardRating.good),
+                ),
                 const SizedBox(width: 8),
                 _buildRatingButton(
-                      label: 'Easy',
-                      icon: Icons.sentiment_very_satisfied_rounded,
-                      color: AppColors.success,
-                      onTap: () => _rate(FlashcardRating.easy),
-                    )
-                    .animate()
-                    .fadeIn(delay: 180.ms, duration: AppDuration.fast)
-                    .scale(
-                      begin: const Offset(0.8, 0.8),
-                      end: const Offset(1, 1),
-                      curve: Curves.easeOutCubic,
-                      duration: AppDuration.normal,
-                    ),
+                  label: 'Easy',
+                  icon: Icons.sentiment_very_satisfied_rounded,
+                  color: AppColors.success,
+                  onTap: () => _rate(FlashcardRating.easy),
+                ),
               ],
             ),
           ),
@@ -303,23 +266,12 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   }
 
   Widget _buildFront(Flashcard card) {
-    // Fixed deep-teal gradient (not theme-adaptive): in dark mode
-    // AdaptiveColors.primary resolves to a light mint where fixed white
-    // text loses contrast. A constant dark surface keeps white readable
-    // in both light and dark mode.
-    const frontGradient = LinearGradient(
-      colors: [Color(0xFF0B3538), Color(0xFF0E5B54)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    );
     return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      elevation: 0,
+      color: AdaptiveColors.primary(context),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: frontGradient,
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
         padding: const EdgeInsets.all(28),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -332,7 +284,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                 letterSpacing: 2,
                 fontSize: 11,
               ),
-            ).animate().fadeIn(delay: 100.ms, duration: AppDuration.normal),
+            ),
             const SizedBox(height: 20),
             Text(
               card.front,
@@ -343,7 +295,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                 fontWeight: FontWeight.bold,
                 height: 1.3,
               ),
-            ).animate().fadeIn(delay: 150.ms, duration: AppDuration.normal),
+            ),
             const Spacer(),
             if (card.difficulty.isNotEmpty)
               Container(
@@ -359,7 +311,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                   card.difficulty,
                   style: const TextStyle(color: Colors.white70, fontSize: 11),
                 ),
-              ).animate().fadeIn(delay: 200.ms, duration: AppDuration.normal),
+              ),
           ],
         ),
       ),
@@ -393,7 +345,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                 letterSpacing: 2,
                 fontSize: 11,
               ),
-            ).animate().fadeIn(delay: 100.ms, duration: AppDuration.normal),
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: SingleChildScrollView(
@@ -406,7 +358,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     height: 1.4,
                     color: AdaptiveColors.textPrimary(context),
                   ),
-                ).animate().fadeIn(delay: 150.ms, duration: AppDuration.normal),
+                ),
               ),
             ),
             if (card.ncertReference.isNotEmpty) ...[
@@ -447,7 +399,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                     ],
                   ),
                 ),
-              ).animate().fadeIn(delay: 200.ms, duration: AppDuration.normal),
+              ),
             ],
           ],
         ),
@@ -534,74 +486,36 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   }
 
   Widget _buildSessionComplete() {
-    // Trigger confetti on session complete
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _confettiController.play();
-    });
-
-    return Stack(
-      children: [
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.celebration_rounded,
-                size: 72,
-                color: AdaptiveColors.primary(context),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                    'Session Complete!',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  )
-                  .animate()
-                  .fadeIn(duration: AppDuration.slow)
-                  .scale(
-                    begin: const Offset(0.8, 0.8),
-                    end: const Offset(1, 1),
-                    curve: Curves.easeOutCubic,
-                    duration: AppDuration.slow,
-                  ),
-              const SizedBox(height: 8),
-              Text(
-                'You reviewed $_reviewed card${_reviewed == 1 ? '' : 's'}',
-                style: TextStyle(
-                  color: AdaptiveColors.textSecondary(context),
-                  fontSize: 14,
-                ),
-              ).animate().fadeIn(delay: 100.ms, duration: AppDuration.normal),
-              const SizedBox(height: 28),
-              FilledButton.icon(
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back_rounded),
-                    label: const Text('BACK TO FLASHCARDS'),
-                  )
-                  .animate()
-                  .fadeIn(delay: 200.ms, duration: AppDuration.normal)
-                  .slideY(begin: 0.2, end: 0),
-            ],
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.check_circle_outline_rounded,
+            size: 64,
+            color: AdaptiveColors.primary(context),
           ),
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            shouldLoop: false,
-            colors: const [
-              AppColors.primary,
-              AppColors.success,
-              AppColors.warning,
-              SubjectColors.biology,
-              SubjectColors.chemistry,
-            ],
-            emissionFrequency: 0.05,
-            numberOfParticles: 20,
-            gravity: 0.1,
+          const SizedBox(height: 20),
+          Text(
+            'Session complete',
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Text(
+            'You reviewed $_reviewed card${_reviewed == 1 ? '' : 's'}',
+            style: TextStyle(
+              color: AdaptiveColors.textSecondary(context),
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 28),
+          FilledButton.icon(
+            onPressed: () => context.pop(),
+            icon: const Icon(Icons.arrow_back_rounded),
+            label: const Text('Back to flashcards'),
+          ),
+        ],
+      ),
     );
   }
 
