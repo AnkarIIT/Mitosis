@@ -35,119 +35,147 @@ class ProgressDashboard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Headline first: estimated score + predicted rank, then the
-            // daily goal ring, then what to do next.
-            _buildRankPredictor(
-              context,
-              stats['accuracy'] as double,
-              mockStats,
-            ),
+            // Show a mock-backed estimate or a first-mock action, then daily
+            // progress and the next useful study step.
+            _buildRankPredictor(context, mockStats),
             const SizedBox(height: 24),
             _buildDailyGoal(context, dailyGoal),
             const SizedBox(height: 24),
 
-            // Overall Stats Card (fixed deep-teal: readable in both modes)
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: AppRadius.xlAll,
-                side: BorderSide(color: AdaptiveColors.outlineVariant(context)),
-              ),
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF0B3538), Color(0xFF0E5B54)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: AppRadius.xlAll,
-                ),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Text(
-                      'Overall Performance',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+            if ((stats['totalAttempted'] as num).toInt() == 0)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Your progress starts with practice',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 120,
-                          height: 120,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
-                                width: 120,
-                                height: 120,
-                                child: CircularProgressIndicator(
-                                  value: (stats['accuracy'] as double) / 100,
-                                  strokeWidth: 12,
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.2,
-                                  ),
-                                  valueColor: const AlwaysStoppedAnimation(
-                                    Colors.white,
+                      const SizedBox(height: 6),
+                      Text(
+                        'Answer a few questions to see topic strengths, accuracy, and study history here.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AdaptiveColors.textSecondary(context),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      FilledButton(
+                        onPressed: () => context.go('/study'),
+                        child: const Text('Choose a subject'),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppRadius.lgAll,
+                  side: BorderSide(
+                    color: AdaptiveColors.outlineVariant(context),
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AdaptiveColors.primary(context),
+                    borderRadius: AppRadius.lgAll,
+                  ),
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Practice performance',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Accuracy across ${(stats['totalAttempted'] as num).toInt()} questions',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.82),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 120,
+                            height: 120,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 120,
+                                  height: 120,
+                                  child: CircularProgressIndicator(
+                                    value: (stats['accuracy'] as double) / 100,
+                                    strokeWidth: 12,
+                                    backgroundColor: Colors.white.withValues(
+                                      alpha: 0.2,
+                                    ),
+                                    valueColor: const AlwaysStoppedAnimation(
+                                      Colors.white,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    '${(stats['accuracy'] as double).toStringAsFixed(0)}%',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium
-                                        ?.copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                  Text(
-                                    'Accuracy',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelSmall
-                                        ?.copyWith(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.8,
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '${(stats['accuracy'] as double).toStringAsFixed(0)}%',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                    ),
+                                    Text(
+                                      'Accuracy',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 24),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              _StatItem(
-                                label: 'Quizzes',
-                                value: '${stats['quizCount']}',
-                                icon: Icons.quiz,
-                              ),
-                              const SizedBox(height: 16),
-                              _StatItem(
-                                label: 'Topics',
-                                value: '${stats['topicsCompleted']}',
-                                icon: Icons.check_circle,
-                              ),
-                            ],
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                _StatItem(
+                                  label: 'Quizzes',
+                                  value: '${stats['quizCount']}',
+                                  icon: Icons.quiz,
+                                ),
+                                const SizedBox(height: 16),
+                                _StatItem(
+                                  label: 'Topics',
+                                  value: '${stats['topicsCompleted']}',
+                                  icon: Icons.check_circle,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 24),
 
             if (recommendations.isNotEmpty) ...[
@@ -310,7 +338,7 @@ class ProgressDashboard extends ConsumerWidget {
             // Weak Topics Section
             if (weakTopics.isNotEmpty) ...[
               Text(
-                'Focus Areas (Weak Topics)',
+                'Topics to revisit',
                 style: Theme.of(
                   context,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -365,7 +393,7 @@ class ProgressDashboard extends ConsumerWidget {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      'Needs Practice',
+                                      'Revisit soon',
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelSmall
@@ -414,56 +442,72 @@ class ProgressDashboard extends ConsumerWidget {
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              subject.name,
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: accuracy >= 70
-                                    ? AdaptiveColors.primary(
-                                        context,
-                                      ).withValues(alpha: 0.2)
-                                    : AdaptiveColors.warning(
-                                        context,
-                                      ).withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                            Expanded(
                               child: Text(
-                                '${accuracy.toStringAsFixed(1)}%',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                subject.name,
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            if (totalQuestions == 0)
+                              Text(
+                                'Not started',
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      color: AdaptiveColors.textSecondary(
+                                        context,
+                                      ),
+                                    ),
+                              )
+                            else
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
                                   color: accuracy >= 70
-                                      ? AdaptiveColors.primary(context)
-                                      : AdaptiveColors.warning(context),
+                                      ? AdaptiveColors.primary(
+                                          context,
+                                        ).withValues(alpha: 0.12)
+                                      : AdaptiveColors.warning(
+                                          context,
+                                        ).withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  '${accuracy.toStringAsFixed(1)}%',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: accuracy >= 70
+                                        ? AdaptiveColors.primary(context)
+                                        : AdaptiveColors.warning(context),
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: LinearProgressIndicator(
-                            value: totalQuestions == 0 ? 0 : accuracy / 100,
-                            minHeight: 6,
-                            backgroundColor: AdaptiveColors.outlineVariant(
-                              context,
-                            ),
-                            valueColor: AlwaysStoppedAnimation(
-                              accuracy >= 70
-                                  ? AdaptiveColors.primary(context)
-                                  : AdaptiveColors.warning(context),
+                        const SizedBox(height: 8),
+                        if (totalQuestions > 0) ...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: LinearProgressIndicator(
+                              value: accuracy / 100,
+                              minHeight: 6,
+                              backgroundColor: AdaptiveColors.outlineVariant(
+                                context,
+                              ),
+                              valueColor: AlwaysStoppedAnimation(
+                                accuracy >= 70
+                                    ? AdaptiveColors.primary(context)
+                                    : AdaptiveColors.warning(context),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
+                          const SizedBox(height: 8),
+                        ],
                         Text(
                           totalQuestions == 0
                               ? 'No quizzes attempted yet'
@@ -591,13 +635,40 @@ class ProgressDashboard extends ConsumerWidget {
 
   Widget _buildRankPredictor(
     BuildContext context,
-    double accuracy,
     Map<String, dynamic> mockStats,
   ) {
     final bool hasMock = mockStats['hasMockTests'] as bool;
-    final int estimatedScore = hasMock
-        ? mockStats['highestScore'] as int
-        : (accuracy / 100 * 720).toInt();
+    if (!hasMock) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Start with a full mock',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Topic practice is useful, but it cannot predict an exam score. Take a mock to get a score-based estimate.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AdaptiveColors.textSecondary(context),
+                ),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () => context.push('/test-series'),
+                icon: const Icon(Icons.quiz_outlined),
+                label: const Text('Browse mock tests'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final int estimatedScore = mockStats['highestScore'] as int;
 
     final predictedRank = RankPredictor.predictRank(estimatedScore);
     final percentile = RankPredictor.getPercentile(estimatedScore);
@@ -624,7 +695,7 @@ class ProgressDashboard extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'NEET Rank Predictor',
+                  'NEET rank estimate',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -646,7 +717,7 @@ class ProgressDashboard extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Based on Mocks',
+                    'Based on mocks',
                     style: TextStyle(
                       fontSize: 10,
                       color: AdaptiveColors.success(context),
@@ -666,7 +737,7 @@ class ProgressDashboard extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      hasMock ? 'Highest Mock Score' : 'Estimated Score',
+                      'Best mock score',
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                     Text(
@@ -711,7 +782,7 @@ class ProgressDashboard extends ConsumerWidget {
             children: [
               Flexible(
                 child: Text(
-                  'Current Percentile: $percentile',
+                  'Indicative percentile: $percentile',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
@@ -720,31 +791,15 @@ class ProgressDashboard extends ConsumerWidget {
                   ),
                 ),
               ),
-              if (!hasMock)
-                Flexible(
-                  child: Text(
-                    'Rough estimate from topic accuracy',
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: AdaptiveColors.textSecondary(context),
-                    ),
-                  ),
-                ),
             ],
           ),
-          if (!hasMock) ...[
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => context.push('/test-series'),
-                icon: const Icon(Icons.quiz_outlined, size: 18),
-                label: const Text('Take a mock test for a real prediction'),
-              ),
+          const SizedBox(height: 8),
+          Text(
+            'Rank estimates are indicative; actual results vary.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AdaptiveColors.textSecondary(context),
             ),
-          ],
+          ),
         ],
       ),
     );
