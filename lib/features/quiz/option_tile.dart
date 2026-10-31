@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/models/question_model.dart';
 import '../../core/utils/answer_normalizer.dart';
 import '../../core/theme/app_theme.dart';
@@ -11,6 +10,9 @@ class OptionTile extends ConsumerWidget {
   final int index;
   final String option;
   final bool isAnswered;
+  /// When true, correctness feedback is shown (practice/review mode).
+  /// When false, correctness is hidden (test/exam mode until submission).
+  final bool showResults;
   final String? selectedAnswer;
   final VoidCallback onTap;
 
@@ -20,6 +22,7 @@ class OptionTile extends ConsumerWidget {
     required this.index,
     required this.option,
     required this.isAnswered,
+    this.showResults = true,
     this.selectedAnswer,
     required this.onTap,
   });
@@ -29,107 +32,149 @@ class OptionTile extends ConsumerWidget {
     final isSelected = selectedAnswer == option;
     final isCorrect = AnswerNormalizer.isCorrect(option, question);
 
-    Color borderColor = AdaptiveColors.divider(context);
+    final scheme = Theme.of(context).colorScheme;
+    Color borderColor = AdaptiveColors.outline(context);
     Color bgColor = AdaptiveColors.surface(context);
     Color textColor = AdaptiveColors.textPrimary(context);
 
+    // Only show correctness feedback when showResults is true.
+    // In test/exam mode, correctness is hidden until quiz completion.
+    final revealCorrectness = showResults && isAnswered;
+
     if (isSelected && !isAnswered) {
-      borderColor = AdaptiveColors.primary(context);
-      bgColor = AdaptiveColors.primary(context).withValues(alpha: 0.05);
-    } else if (isAnswered) {
+      borderColor = scheme.primary;
+      bgColor = scheme.primaryContainer;
+    } else if (revealCorrectness) {
       if (isCorrect) {
         borderColor = AdaptiveColors.success(context);
-        bgColor = AdaptiveColors.success(context).withValues(alpha: 0.05);
-        textColor = AdaptiveColors.success(context);
+        bgColor = AdaptiveColors.success(context).withValues(alpha: 0.10);
       } else if (isSelected) {
         borderColor = AdaptiveColors.error(context);
-        bgColor = AdaptiveColors.error(context).withValues(alpha: 0.05);
-        textColor = AdaptiveColors.error(context);
+        bgColor = AdaptiveColors.error(context).withValues(alpha: 0.10);
       }
     }
 
+    // Result label only appears in review (showResults) mode
+    final resultLabel = revealCorrectness && isCorrect
+        ? 'Correct answer'
+        : revealCorrectness && isSelected
+        ? 'Your answer · Incorrect'
+        : null;
+
+    // In review mode, correct answer is always highlighted even if not selected
+    if (showResults && isAnswered && isCorrect && !isSelected) {
+      borderColor = AdaptiveColors.success(context);
+      bgColor = AdaptiveColors.success(context).withValues(alpha: 0.06);
+    }
+
     return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
-            ),
-            child: InkWell(
-              onTap: isAnswered ? null : onTap,
-              borderRadius: BorderRadius.circular(AppRadius.md),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: AnimatedContainer(
+        duration: MediaQuery.of(context).disableAnimations
+            ? Duration.zero
+            : AppDuration.fast,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: borderColor, width: isSelected ? 1.5 : 1),
+        ),
+        child: Semantics(
+          button: !isAnswered,
+          selected: isSelected,
+          label:
+              'Option ${String.fromCharCode(65 + index)}. $option${resultLabel == null ? '' : '. $resultLabel'}',
+          child: InkWell(
+            onTap: isAnswered ? null : onTap,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 64),
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 child: Row(
                   children: [
                     Container(
-                      width: 32,
-                      height: 32,
+                      width: 28,
+                      height: 28,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isSelected ? borderColor : Colors.transparent,
-                        border: Border.all(color: borderColor),
+                        color: isSelected ? scheme.primary : Colors.transparent,
+                        border: Border.all(
+                          color: isSelected ? scheme.primary : borderColor,
+                          width: 1.5,
+                        ),
                       ),
                       child: Center(
                         child: Text(
                           String.fromCharCode(65 + index),
                           style: TextStyle(
-                            color: isSelected ? Colors.white : textColor,
-                            fontWeight: FontWeight.bold,
+                            color: isSelected ? scheme.onPrimary : textColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: Text(
-                        option,
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 16,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.normal,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            option,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: textColor,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : null,
+                                ),
+                          ),
+                          if (resultLabel != null) ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isCorrect
+                                      ? Icons.check_circle_outline
+                                      : Icons.cancel_outlined,
+                                  size: 16,
+                                  color: isCorrect
+                                      ? AdaptiveColors.success(context)
+                                      : AdaptiveColors.error(context),
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    resultLabel,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          color: isCorrect
+                                              ? AdaptiveColors.success(context)
+                                              : AdaptiveColors.error(context),
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    if (isAnswered && isCorrect)
-                      Icon(
-                        Icons.check_circle,
-                        color: AdaptiveColors.success(context),
-                      )
-                    else if (isAnswered && isSelected)
-                      Icon(Icons.cancel, color: AdaptiveColors.error(context)),
+                    if (isSelected && !isAnswered)
+                      Icon(Icons.check_rounded, color: scheme.primary),
                   ],
                 ),
               ),
             ),
           ),
-        )
-        .animate(
-          key: ValueKey(
-            '${question.id}_${isAnswered ? 'answered' : 'unanswered'}',
-          ),
-        )
-        .fadeIn(duration: AppDuration.normal)
-        .slideX(
-          begin: 0.08,
-          end: 0,
-          duration: AppDuration.normal,
-          curve: Curves.easeOutCubic,
-        )
-        .then(
-          delay: isAnswered && isCorrect ? AppDuration.fast : Duration.zero,
-          duration: AppDuration.fast,
-        )
-        .scale(
-          begin: isAnswered && isCorrect
-              ? const Offset(1.05, 1.05)
-              : const Offset(1, 1),
-          end: const Offset(1, 1),
-          curve: Curves.easeOutCubic,
-        );
+        ),
+      ),
+    );
   }
 }
