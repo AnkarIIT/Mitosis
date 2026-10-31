@@ -34,7 +34,7 @@
 
 | Decision | Rationale |
 |----------|-----------|
-| **Offline-First** | Core study features (quiz, DPP, exam) work 100% offline; Supabase sync is optional enhancement |
+| **Local-first study** | Questions, attempts, DPPs, and exam checkpoints use local Drift storage; cloud auth/sync is optional and must not block these flows |
 | **Riverpod for State** | Compile-safe DI, fine-grained reactivity, easy testing with `ProviderContainer` overrides |
 | **Drift (SQLite)** | Type-safe queries, migrations, reactive streams, works on all platforms |
 | **go_router + StatefulShellRoute** | Deep linking, tab state preservation, declarative routing |
@@ -65,7 +65,7 @@ lib/
 │   ├── error_book/       # Wrong question review
 │   ├── exam_engine/      # Full-length CBT (NEET mock)
 │   ├── flashcards/       # AI-gen + manual, SM-2 scheduler
-│   ├── home/             # 5-tab shell (Home, Flashcards, Review, Progress, Profile)
+│   ├── home/             # Three-destination shell: Today, Study, You
 │   ├── mark_booster/     # Targeted weak-topic drills
 │   ├── pdf/              # NCERT PDF viewer
 │   ├── quiz/             # Topic-wise MCQ practice
@@ -76,6 +76,51 @@ lib/
 │   └── topic_browser/    # Subject → Chapter → Topic hierarchy
 └── main.dart             # App bootstrap, background init
 ```
+
+### Current implementation and architecture risks
+
+This section records the current code shape, not an aspirational target.
+
+- `HomeShellScreen` uses a three-destination `StatefulShellRoute`; Study
+  contains Learn, Practice, and Review sections. Detailed screens remain
+  reachable through `go_router` routes.
+- Riverpod providers are split by domain in `lib/core/providers/`, but many
+  feature screens still read providers and services directly. The app is a
+  modular Flutter monolith, not a cleanly enforced domain-layer architecture.
+- Drift is the local source of truth for question attempts and study records.
+  SharedPreferences stores lightweight preferences; secrets use secure
+  storage. Supabase startup and content sync are optional/background paths.
+- `main.dart` seeds sample questions and starter flashcards after first frame.
+  Keep this work off the launch-critical path and surface a recoverable status
+  if import fails.
+- **App delivery is currently oversized.** `pubspec.yaml` bundles all NCERT
+  chapter PDFs; the source PDFs total about 383 MB and the debug APK built for
+  emulator review was about 579 MB. This makes first install and storage cost
+  a major product risk. The durable fix is a content-pack/download boundary:
+  install the compact app first, let a student choose which books to download,
+  retain downloaded PDFs for offline use, and show download/storage state in
+  the library. Do not remove bundled PDFs until the downloader has a verified
+  source, integrity checks, retry/resume behavior, and a migration path for
+  already-downloaded content.
+- The topic quiz (`EnhancedQuizScreen`) is an immediate-feedback practice flow;
+  the separate CBT engine is the timed test flow. Keep those modes explicit in
+  labels, controls, and results so users do not mistake practice feedback for
+  an exam simulation.
+
+### Dependency direction
+
+```text
+Feature screens
+  -> feature/core Riverpod providers
+  -> domain services and repositories
+  -> Drift / local files / optional remote gateways
+```
+
+Widgets should not construct databases, make raw network calls, or resolve
+PDF storage paths themselves. A feature provider/service owns that work and
+returns a typed loading, ready, empty, or recoverable-error state. Keep
+cross-feature route arguments small and typed where practical; avoid passing
+whole maps as long-lived domain contracts.
 
 ---
 
