@@ -68,14 +68,24 @@ class TopicBrowserScreen extends ConsumerWidget {
                     elevation: 0,
                     color: AdaptiveColors.surface(context),
                     child: ExpansionTile(
-                      title: Text(
-                        chapter.name,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.2,
-                              color: AdaptiveColors.textPrimary(context),
+                      title: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              chapter.name,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.2,
+                                    color: AdaptiveColors.textPrimary(context),
+                                  ),
                             ),
+                          ),
+                          if (chapter.isRemovedFromSyllabus) ...[
+                            const SizedBox(width: 8),
+                            const _RemovedFromSyllabusBadge(),
+                          ],
+                        ],
                       ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
@@ -321,6 +331,33 @@ class TopicBrowserScreen extends ConsumerWidget {
                 );
               },
             ),
+    );
+  }
+}
+
+/// Marks a chapter that the rationalised NCERT syllabus dropped.
+///
+/// The chapter stays in the app because older PYQs still reference it, but no
+/// current textbook chapter exists, so `NcertBookCatalog.entryFor` returns null
+/// and the "read the chapter" action stays hidden.
+class _RemovedFromSyllabusBadge extends StatelessWidget {
+  const _RemovedFromSyllabusBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.warningLight,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        'Not in current NCERT',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: AppColors.warning,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
